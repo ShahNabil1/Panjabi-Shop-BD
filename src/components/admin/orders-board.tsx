@@ -39,7 +39,7 @@ export function OrdersBoard({
   statuses: readonly OrderStatus[];
   emptyTitle?: string;
 }) {
-  const [status, setStatus] = useState<string>("");
+  const [status, setStatus] = useState<string>(statuses[0]);
   const [search, setSearch] = useState("");
 
   const { data, isLoading } = useQuery({
