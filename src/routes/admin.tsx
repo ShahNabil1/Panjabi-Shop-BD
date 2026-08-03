@@ -15,6 +15,7 @@ import {
   Rocket,
   Settings,
   ShoppingCart,
+  ListOrdered,
   X,
 } from "lucide-react";
 
@@ -57,6 +58,7 @@ const sections: Array<{ title: string; items: NavItem[] }> = [
     items: [
       { to: "/admin/orders/create", label: "Create Order", icon: PlusCircle },
       { to: "/admin/orders", label: "Web Orders", icon: ShoppingCart, exact: true },
+      { to: "/admin/orders/list", label: "Order List", icon: ListOrdered },
     ],
   },
   {
