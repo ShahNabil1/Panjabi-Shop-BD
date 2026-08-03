@@ -94,6 +94,7 @@ function AdminOrderDetail() {
     delivery_partner: string | null;
     delivery_charge: number | string;
     discount: number | string;
+    total?: number | string | null;
     advance_amount?: number | string | null;
     advance_method?: string | null;
     fulfillment_status: string;
@@ -102,6 +103,13 @@ function AdminOrderDetail() {
     order_items: OrderItemRow[];
     order_activity?: Array<{ id: string; kind: string; message: string | null; created_at: string }>;
   };
+
+  const confirmSms = renderSmsTemplate(
+    smsTemplates.find((t) => t.id === "order_confirm")?.body ?? "",
+    orderSmsVars(order),
+  );
+
+
 
   const isWeb = (webOrderStatuses as readonly string[]).includes(order.status);
   const isDanger = pending === "hold" || pending === "cancelled";
