@@ -59,8 +59,24 @@ export const orderStatusSchema = z.object({
 
 export const orderListSchema = z.object({
   status: z.enum(orderStatuses).optional(),
+  bucket: z.enum(orderBuckets).optional(),
   search: z.string().trim().max(120).optional(),
 });
+
+/** Edit of an incomplete / web order captured before confirmation. */
+export const adminEditOrderSchema = z.object({
+  id: uuid,
+  customerName: z.string().trim().min(2).max(80),
+  customerPhone: z
+    .string()
+    .trim()
+    .regex(/^01[3-9]\d{8}$/, "Invalid Bangladeshi mobile number"),
+  addressLine: z.string().trim().min(4).max(300),
+  note: z.string().trim().max(500).optional().default(""),
+  discount: z.number().min(0).default(0),
+  deliveryCharge: z.number().min(0).default(0),
+});
+
 
 export const orderSources = [
   "Facebook",
