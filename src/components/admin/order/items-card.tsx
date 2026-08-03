@@ -278,26 +278,84 @@ export function ItemsCard({
         ))}
       </ul>
 
+      <div className="grid gap-3 rounded-xl border border-border/70 bg-background/60 p-3 sm:grid-cols-2">
+        <div className="space-y-1.5">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+            Discount (৳)
+          </p>
+          <Input
+            type="number"
+            min={0}
+            className="h-9 rounded-lg"
+            value={discount}
+            onChange={(e) => setDiscount(Math.max(0, Number(e.target.value)))}
+          />
+        </div>
+        <div className="space-y-1.5">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+            Advance (৳)
+          </p>
+          <div className="flex gap-2">
+            <Input
+              type="number"
+              min={0}
+              className="h-9 rounded-lg"
+              value={advance}
+              onChange={(e) => setAdvance(Math.max(0, Number(e.target.value)))}
+            />
+            {advance > 0 ? (
+              <select
+                className="h-9 rounded-lg border border-border/80 bg-background px-2 text-sm"
+                value={advanceMethod}
+                onChange={(e) => setAdvanceMethod(e.target.value)}
+              >
+                {advanceMethods.map((m) => (
+                  <option key={m} value={m}>
+                    {m}
+                  </option>
+                ))}
+              </select>
+            ) : null}
+          </div>
+          {advance > 0 ? (
+            <p className="text-[11px] text-muted-foreground">
+              Paid via {advanceMethod} · rest is cash on delivery
+            </p>
+          ) : null}
+        </div>
+      </div>
+
       <dl className="space-y-1.5 border-t border-dashed border-border pt-3 text-sm">
         <div className="flex justify-end gap-3">
           <dt className="text-muted-foreground">Subtotal:</dt>
-          <dd className="w-24 text-right font-semibold tabular-nums">{money(subtotal)}</dd>
+          <dd className="w-28 text-right font-semibold tabular-nums">{money(subtotal)}</dd>
         </div>
         <div className="flex justify-end gap-3">
           <dt className="text-muted-foreground">Shipping:</dt>
-          <dd className="w-24 text-right font-semibold tabular-nums">{money(deliveryCharge)}</dd>
+          <dd className="w-28 text-right font-semibold tabular-nums">{money(deliveryCharge)}</dd>
         </div>
         {discount > 0 ? (
-          <div className="flex justify-end gap-3">
-            <dt className="text-muted-foreground">Discount:</dt>
-            <dd className="w-24 text-right font-semibold tabular-nums">-{money(discount)}</dd>
+          <div className="flex justify-end gap-3 text-emerald-600">
+            <dt>Discount:</dt>
+            <dd className="w-28 text-right font-semibold tabular-nums">-{money(discount)}</dd>
           </div>
         ) : null}
-        <div className="flex justify-end gap-3 text-base">
-          <dt className="font-semibold">Total:</dt>
-          <dd className="w-24 text-right font-bold tabular-nums text-primary">{money(total)}</dd>
+        <div className="flex justify-end gap-3">
+          <dt className="text-muted-foreground">Total:</dt>
+          <dd className="w-28 text-right font-semibold tabular-nums">{money(total)}</dd>
+        </div>
+        {paidAdvance > 0 ? (
+          <div className="flex justify-end gap-3 text-emerald-600">
+            <dt>Advance ({advanceMethod}):</dt>
+            <dd className="w-28 text-right font-semibold tabular-nums">-{money(paidAdvance)}</dd>
+          </div>
+        ) : null}
+        <div className="flex justify-end gap-3 border-t border-border/70 pt-2 text-base">
+          <dt className="font-semibold">{paidAdvance > 0 ? "Due (COD):" : "Total:"}</dt>
+          <dd className="w-28 text-right font-bold tabular-nums text-primary">{money(due)}</dd>
         </div>
       </dl>
+
     </Panel>
   );
 }
