@@ -114,6 +114,16 @@ function AdminOrdersPage() {
                     <span className="rounded-md bg-muted px-1.5 py-0.5 font-mono text-xs text-muted-foreground">
                       {o.order_number}
                     </span>
+                    {ratios?.[o.customer_phone] !== undefined ? (
+                      <span
+                        className={cn(
+                          "rounded-full px-2 py-0.5 text-xs font-bold ring-1 tabular-nums",
+                          ratioTone(ratios[o.customer_phone] as number),
+                        )}
+                      >
+                        {ratios[o.customer_phone]}%
+                      </span>
+                    ) : null}
                   </div>
                   <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
                     <span className="inline-flex items-center gap-1.5">
