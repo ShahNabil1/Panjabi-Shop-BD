@@ -173,6 +173,17 @@ export function OrdersBoard({
           </ul>
         )}
       </Panel>
+
+      {total > 0 ? (
+        <Pagination
+          page={current}
+          pageSize={pageSize}
+          total={total}
+          onPageChange={setPage}
+          onPageSizeChange={setPageSize}
+        />
+      ) : null}
     </div>
+
   );
 }
