@@ -69,7 +69,7 @@ function AdminOverviewPage() {
 
 
       <Panel>
-        <h2 className="ig-text text-sm font-bold">Recent orders</h2>
+        <h2 className="text-sm font-bold text-foreground">Recent orders</h2>
         <div className="mt-3 space-y-2">
           {isLoading ? (
             <p className="text-sm text-muted-foreground">Loading…</p>

@@ -16,7 +16,7 @@ export function AdminHeading({
   action?: ReactNode;
 }) {
   return (
-    <div className="admin-rise flex flex-wrap items-start justify-between gap-3 rounded-2xl border border-border/70 bg-card/80 p-5 shadow-[0_18px_45px_-38px_rgba(238,42,123,0.9)] backdrop-blur">
+    <div className="admin-rise flex flex-wrap items-start justify-between gap-3 rounded-2xl border border-border bg-card p-5">
       <div className="relative pl-4">
         <span className="ig-gradient absolute left-0 top-1 h-[calc(100%-0.5rem)] w-1 rounded-full" />
         <h1 className="text-xl font-bold tracking-tight sm:text-2xl">{title}</h1>
@@ -42,7 +42,7 @@ export function Panel({
     <div
       style={style}
       className={cn(
-        "admin-rise rounded-2xl border border-border/70 bg-card p-4 shadow-[0_16px_40px_-34px_rgba(98,40,215,0.8)] transition-all duration-300 hover:border-primary/30 hover:shadow-[0_22px_50px_-30px_rgba(238,42,123,0.55)] sm:p-5",
+        "admin-rise rounded-2xl border border-border bg-card p-4 transition-colors duration-200 hover:border-primary/25 sm:p-5",
         className,
       )}
     >
@@ -184,7 +184,7 @@ export function ToggleField({
 export function EmptyState({ title, hint }: { title: string; hint?: string }) {
   return (
     <div className="admin-rise rounded-2xl border border-dashed border-primary/25 bg-background/50 px-6 py-14 text-center">
-      <p className="ig-text text-sm font-bold">{title}</p>
+      <p className="text-sm font-bold text-foreground">{title}</p>
       {hint ? <p className="mt-1 text-sm text-muted-foreground">{hint}</p> : null}
     </div>
   );
