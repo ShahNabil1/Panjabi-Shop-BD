@@ -132,8 +132,47 @@ export const adminUpdateOrderStatus = createServerFn({ method: "POST" })
         ? `Status changed to ${data.status} — ${data.reason}`
         : `Status changed to ${data.status}`,
     });
+
+    // Auto confirmation SMS once an order moves into the confirmed pipeline.
+    if (data.status === "pending" || data.status === "confirmed") {
+      const { data: order } = await db
+        .from("orders")
+        .select("order_number, customer_name, customer_phone, total, auto_sms_status")
+        .eq("id", data.id)
+        .maybeSingle();
+      const o = order as unknown as Record<string, unknown> | null;
+      if (o && o["auto_sms_status"] !== "sent") {
+        const { deliverSms, renderSmsTemplate } = await import("./sms.server");
+        const { smsTemplates } = await import("./admin-schema");
+        const tpl = smsTemplates.find((t) => t.id === "order_confirm")?.body ?? "";
+        const message = renderSmsTemplate(tpl, {
+          name: String(o["customer_name"] ?? ""),
+          order_no: String(o["order_number"] ?? ""),
+          amount: String(Number(o["total"] ?? 0)),
+          phone: String(o["customer_phone"] ?? ""),
+          receipt_url: "",
+        });
+        const result = await deliverSms(db, {
+          orderId: data.id,
+          phone: String(o["customer_phone"] ?? ""),
+          message,
+          isManual: false,
+          sentByName: "System",
+        });
+        await db
+          .from("orders")
+          .update({ auto_sms_status: result.ok ? "sent" : "failed" })
+          .eq("id", data.id);
+        await db.from("order_activity").insert({
+          order_id: data.id,
+          kind: "sms",
+          message: `Auto confirmation SMS ${result.ok ? "sent" : "failed"} — ${result.message}`,
+        });
+      }
+    }
     return { ok: true };
   });
+
 
 /** Edit the customer details of a web/incomplete order before confirming it. */
 export const adminEditOrder = createServerFn({ method: "POST" })
