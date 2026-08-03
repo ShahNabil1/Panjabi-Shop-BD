@@ -9,6 +9,7 @@ import { ProductGrid, ProductThumb } from "@/components/site/product-card";
 import { NotFoundView } from "@/components/site/not-found-view";
 import { FaqList } from "@/components/site/faq-list";
 import { Breadcrumbs, Prose, Section } from "@/components/site/ui";
+import { AddToCartBar } from "@/components/site/add-to-cart";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/p/$product")({
