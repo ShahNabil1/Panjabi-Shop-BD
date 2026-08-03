@@ -67,8 +67,7 @@ function SettingsAdmin() {
         <div>
           <h2 className="ig-text text-sm font-bold">Hero banner slider</h2>
           <p className="mt-1 text-xs text-muted-foreground">
-            At least 1, up to {MAX_HERO_SLIDES} banners. Images are stored in the{" "}
-            <code className="rounded bg-muted px-1">hero/</code> folder on R2. Adding a link makes
+            At least 1, up to {MAX_HERO_SLIDES} banners. Adding a link makes
             the banner clickable (e.g. <code className="rounded bg-muted px-1">/c/gift-combo</code>).
           </p>
         </div>
