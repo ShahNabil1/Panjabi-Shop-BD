@@ -131,22 +131,29 @@ function AdminLayout() {
 
   const sidebar = (
     <div className="flex h-full flex-col">
-      <div className="flex items-center gap-2 px-3 py-4">
-
-        <img
-          src="/favicon.png"
-          alt="Upoharkabbo"
-          className="size-9 shrink-0 rounded-full bg-white object-contain ring-1 ring-border"
-        />
-        <span
-          className={cn(
-            "min-w-0 overflow-hidden whitespace-nowrap transition-all duration-300",
-            collapsed ? "w-0 opacity-0" : "w-auto opacity-100",
-          )}
+      <div className="flex items-center px-3 py-4">
+        <Link
+          to="/"
+          title="Upoharkabbo"
+          className={cn("shrink-0 transition-all duration-300", collapsed ? "block" : "hidden")}
         >
-          <span className="block text-sm font-bold leading-tight">Upoharkabbo</span>
-          <span className="block text-[11px] text-muted-foreground">Admin Panel</span>
-        </span>
+          <img
+            src="/favicon.png"
+            alt="Upoharkabbo"
+            className="size-9 rounded-full bg-white object-contain ring-1 ring-border"
+          />
+        </Link>
+        <Link
+          to="/"
+          title="Upoharkabbo"
+          className={cn("shrink-0 transition-all duration-300", collapsed ? "hidden" : "block")}
+        >
+          <img
+            src={logoMark}
+            alt="Upoharkabbo"
+            className="h-11 w-auto object-contain"
+          />
+        </Link>
       </div>
 
       <nav className="flex-1 space-y-5 overflow-y-auto px-2 pb-4">
