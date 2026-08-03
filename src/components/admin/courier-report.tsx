@@ -11,6 +11,83 @@ import { cn } from "@/lib/utils";
 
 const VISIBLE_COURIERS = ["steadfast", "pathao", "redx", "carrybee"];
 
+type Theme = { from: string; to: string; ring: string; accent: string };
+
+const COURIER_THEME: Record<string, Theme> = {
+  all: { from: "#3b2a4d", to: "#6d4c7d", ring: "#e9d5f0", accent: "#f5e9fa" },
+  steadfast: { from: "#0b7a3b", to: "#14a85a", ring: "#c7ecd6", accent: "#e8f8ef" },
+  pathao: { from: "#b31217", to: "#e23744", ring: "#f6cdd0", accent: "#fdeced" },
+  redx: { from: "#1b1b1f", to: "#3d3d46", ring: "#d9d9de", accent: "#f1f1f4" },
+  carrybee: { from: "#b8860b", to: "#f2b705", ring: "#f6e3ae", accent: "#fdf6e0" },
+};
+
+function CourierTile({
+  name,
+  logo,
+  theme,
+  total,
+  delivered,
+  cancelled,
+  ratio,
+}: {
+  name: string;
+  logo?: string | null;
+  theme: Theme;
+  total: number;
+  delivered: number;
+  cancelled: number;
+  ratio: number;
+}) {
+  const pct = Math.max(0, Math.min(100, Number(ratio) || 0));
+  return (
+    <div
+      className="overflow-hidden rounded-2xl border shadow-sm"
+      style={{ borderColor: theme.ring, background: theme.accent }}
+    >
+      <div
+        className="flex items-center justify-center gap-1.5 px-2 py-2"
+        style={{ background: `linear-gradient(135deg, ${theme.from}, ${theme.to})` }}
+      >
+        {logo ? <img src={logo} alt="" className="size-4 rounded bg-white/90 object-contain" /> : null}
+        <p className="text-[13px] font-extrabold uppercase tracking-wide text-white">{name}</p>
+      </div>
+
+      <div className="flex flex-col items-center px-2 py-3">
+        <div
+          className="grid size-16 place-items-center rounded-full"
+          style={{
+            background: `conic-gradient(${theme.to} ${pct * 3.6}deg, ${theme.ring} 0deg)`,
+          }}
+        >
+          <div className="grid size-[52px] place-items-center rounded-full bg-white">
+            <span
+              className="text-[15px] font-extrabold tabular-nums"
+              style={{ color: theme.from }}
+            >
+              {pct}%
+            </span>
+          </div>
+        </div>
+
+        <div className="mt-3 grid w-full grid-cols-3 gap-1 text-center">
+          <div>
+            <p className="text-sm font-extrabold tabular-nums text-slate-900">{total}</p>
+            <p className="text-[10px] font-bold uppercase tracking-wide text-slate-500">Total</p>
+          </div>
+          <div>
+            <p className="text-sm font-extrabold tabular-nums text-emerald-700">{delivered}</p>
+            <p className="text-[10px] font-bold uppercase tracking-wide text-slate-500">Done</p>
+          </div>
+          <div>
+            <p className="text-sm font-extrabold tabular-nums text-rose-700">{cancelled}</p>
+            <p className="text-[10px] font-bold uppercase tracking-wide text-slate-500">Cancel</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function CourierReport({ phone }: { phone: string }) {
   const qc = useQueryClient();
 
