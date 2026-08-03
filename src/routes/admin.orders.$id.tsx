@@ -327,31 +327,7 @@ function AdminOrderDetail() {
 
       <CommunicationLog logs={data.sms as never[]} autoStatus={order.auto_sms_status} />
 
-      <Panel>
-        <h2 className="flex items-center gap-2 text-sm font-bold">
-          <History className="size-4 text-primary" />
-          Activity log
-        </h2>
-        {(order.order_activity ?? []).length === 0 ? (
-          <p className="mt-2 text-sm text-muted-foreground">No activity recorded yet.</p>
-        ) : (
-          <ul className="mt-3 space-y-2 text-sm">
-            {[...(order.order_activity ?? [])]
-              .sort((a, b) => (a.created_at < b.created_at ? 1 : -1))
-              .map((a) => (
-                <li
-                  key={a.id}
-                  className="flex flex-wrap justify-between gap-2 border-b border-border pb-2 last:border-0"
-                >
-                  <span>{a.message ?? a.kind}</span>
-                  <span className="text-xs text-muted-foreground">
-                    {new Date(a.created_at).toLocaleString("en-GB", { timeZone: "Asia/Dhaka" })}
-                  </span>
-                </li>
-              ))}
-          </ul>
-        )}
-      </Panel>
+      <ActivityLog entries={order.order_activity ?? []} />
     </div>
   );
 }
