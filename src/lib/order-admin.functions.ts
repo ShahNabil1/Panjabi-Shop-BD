@@ -30,22 +30,27 @@ export const adminOrderWorkspace = createServerFn({ method: "POST" })
 
     const o = order as unknown as Record<string, unknown>;
 
-    // Record who opened the order, throttled to one entry per viewer per 15 min.
+    // Record who opened the order: throttled to one entry per viewer per 30 min,
+    // but always record when someone else viewed after this viewer's last view.
     const who = await actorName(db, context.userId);
-    const since = new Date(Date.now() - 15 * 60 * 1000).toISOString();
     const { data: recentViews } = await db
       .from("order_activity")
-      .select("id, meta")
+      .select("id, meta, created_at")
       .eq("order_id", data.id)
       .eq("kind", "view")
-      .gte("created_at", since)
-      .limit(20);
-    const alreadyViewed = (recentViews ?? []).some(
-      (r) => ((r as { meta?: { actor?: string } }).meta?.actor ?? "") === who,
-    );
-    if (!alreadyViewed) {
+      .order("created_at", { ascending: false })
+      .limit(1);
+    const last = (recentViews ?? [])[0] as
+      | { meta?: { actor?: string }; created_at: string }
+      | undefined;
+    const lastActor = last?.meta?.actor ?? "";
+    const lastAt = last ? new Date(last.created_at).getTime() : 0;
+    const shouldLog =
+      !last || lastActor !== who || Date.now() - lastAt >= 30 * 60 * 1000;
+    if (shouldLog) {
       await logActivity(db, data.id, "view", `${who} viewed this order`, { actor: who });
     }
+
 
     const [notes, sms, blocked, activity] = await Promise.all([
       db
