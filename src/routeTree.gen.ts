@@ -21,6 +21,7 @@ import { Route as SearchRouteImport } from './routes/search'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as OffersIndexRouteImport } from './routes/offers.index'
 import { Route as OffersPromotionRouteImport } from './routes/offers.$promotion'
+import { Route as OrderOrderNumberRouteImport } from './routes/order.$orderNumber'
 import { Route as PProductRouteImport } from './routes/p.$product'
 import { Route as CCategoryIndexRouteImport } from './routes/c.$category.index'
 import { Route as CCategorySubcategoryRouteImport } from './routes/c.$category.$subcategory'
@@ -85,6 +86,11 @@ const OffersPromotionRoute = OffersPromotionRouteImport.update({
   path: '/offers/$promotion',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OrderOrderNumberRoute = OrderOrderNumberRouteImport.update({
+  id: '/order/$orderNumber',
+  path: '/order/$orderNumber',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PProductRoute = PProductRouteImport.update({
   id: '/p/$product',
   path: '/p/$product',
@@ -113,6 +119,7 @@ export interface FileRoutesByFullPath {
   '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/offers/$promotion': typeof OffersPromotionRoute
+  '/order/$orderNumber': typeof OrderOrderNumberRoute
   '/p/$product': typeof PProductRoute
   '/offers/': typeof OffersIndexRoute
   '/c/$category/$subcategory': typeof CCategorySubcategoryRoute
@@ -130,6 +137,7 @@ export interface FileRoutesByTo {
   '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/offers/$promotion': typeof OffersPromotionRoute
+  '/order/$orderNumber': typeof OrderOrderNumberRoute
   '/p/$product': typeof PProductRoute
   '/offers': typeof OffersIndexRoute
   '/c/$category/$subcategory': typeof CCategorySubcategoryRoute
@@ -148,6 +156,7 @@ export interface FileRoutesById {
   '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/offers/$promotion': typeof OffersPromotionRoute
+  '/order/$orderNumber': typeof OrderOrderNumberRoute
   '/p/$product': typeof PProductRoute
   '/offers/': typeof OffersIndexRoute
   '/c/$category/$subcategory': typeof CCategorySubcategoryRoute
@@ -167,6 +176,7 @@ export interface FileRouteTypes {
     | '/search'
     | '/sitemap.xml'
     | '/offers/$promotion'
+    | '/order/$orderNumber'
     | '/p/$product'
     | '/offers/'
     | '/c/$category/$subcategory'
@@ -184,6 +194,7 @@ export interface FileRouteTypes {
     | '/search'
     | '/sitemap.xml'
     | '/offers/$promotion'
+    | '/order/$orderNumber'
     | '/p/$product'
     | '/offers'
     | '/c/$category/$subcategory'
@@ -201,6 +212,7 @@ export interface FileRouteTypes {
     | '/search'
     | '/sitemap.xml'
     | '/offers/$promotion'
+    | '/order/$orderNumber'
     | '/p/$product'
     | '/offers/'
     | '/c/$category/$subcategory'
@@ -219,6 +231,7 @@ export interface RootRouteChildren {
   SearchRoute: typeof SearchRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   OffersPromotionRoute: typeof OffersPromotionRoute
+  OrderOrderNumberRoute: typeof OrderOrderNumberRoute
   PProductRoute: typeof PProductRoute
   OffersIndexRoute: typeof OffersIndexRoute
   CCategorySubcategoryRoute: typeof CCategorySubcategoryRoute
@@ -311,6 +324,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OffersPromotionRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/order/$orderNumber': {
+      id: '/order/$orderNumber'
+      path: '/order/$orderNumber'
+      fullPath: '/order/$orderNumber'
+      preLoaderRoute: typeof OrderOrderNumberRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/p/$product': {
       id: '/p/$product'
       path: '/p/$product'
@@ -347,6 +367,7 @@ const rootRouteChildren: RootRouteChildren = {
   SearchRoute: SearchRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   OffersPromotionRoute: OffersPromotionRoute,
+  OrderOrderNumberRoute: OrderOrderNumberRoute,
   PProductRoute: PProductRoute,
   OffersIndexRoute: OffersIndexRoute,
   CCategorySubcategoryRoute: CCategorySubcategoryRoute,
