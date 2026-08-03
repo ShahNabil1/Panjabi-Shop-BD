@@ -59,7 +59,7 @@ function AdminOrdersPage() {
 
   return (
     <div className="space-y-5">
-      <AdminHeading title="Orders" description="View all orders and update their status." />
+      <AdminHeading title="Web Orders" description="Orders placed through the website." />
 
       <CourierStatusBar />
 
