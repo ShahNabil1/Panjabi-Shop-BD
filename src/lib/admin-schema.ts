@@ -321,3 +321,106 @@ export const customerLookupSchema = z.object({
     .trim()
     .regex(/^01[3-9]\d{8}$/),
 });
+
+
+/* ------------------------------------------------------------------ */
+/* Order detail workspace (customer edit, items, notes, SMS, blocking) */
+/* ------------------------------------------------------------------ */
+
+const bdPhone = z
+  .string()
+  .trim()
+  .regex(/^01[3-9]\d{8}$/, "Invalid Bangladeshi mobile number");
+
+export const orderCustomerSchema = z.object({
+  id: uuid,
+  customerName: z.string().trim().min(2).max(80),
+  customerPhone: bdPhone,
+  altPhone: z
+    .string()
+    .trim()
+    .max(20)
+    .optional()
+    .default("")
+    .transform((v) => (v ? v : null)),
+  division: z.string().trim().max(60).optional().default(""),
+  district: z.string().trim().max(60).optional().default(""),
+  upazila: z.string().trim().max(80).optional().default(""),
+  addressLine: z.string().trim().min(4).max(300),
+});
+
+export const orderDeliveryNoteSchema = z.object({
+  id: uuid,
+  deliveryNote: z.string().trim().max(500).optional().default(""),
+});
+
+export const orderItemsSchema = z.object({
+  id: uuid,
+  items: z
+    .array(
+      z.object({
+        productId: uuid.nullable().default(null),
+        productName: z.string().trim().min(1).max(200),
+        variantLabel: z.string().trim().max(120).nullable().default(null),
+        sku: z.string().trim().max(80).nullable().default(null),
+        unitPrice: z.number().min(0),
+        quantity: z.number().int().min(1).max(99),
+      }),
+    )
+    .min(1)
+    .max(30),
+  deliveryCharge: z.number().min(0).default(0),
+  discount: z.number().min(0).default(0),
+});
+
+export const orderNoteSchema = z.object({
+  orderId: uuid,
+  body: z.string().trim().min(1).max(2000),
+});
+
+export const blockKinds = ["ip", "fingerprint", "phone"] as const;
+export type BlockKind = (typeof blockKinds)[number];
+
+export const blockSchema = z.object({
+  orderId: uuid,
+  action: z.enum(["block", "unblock"]),
+  targets: z
+    .array(z.object({ kind: z.enum(blockKinds), value: z.string().trim().min(1).max(200) }))
+    .min(1)
+    .max(5),
+  reason: z.string().trim().max(300).optional().default(""),
+});
+
+export const smsSendSchema = z.object({
+  orderId: uuid,
+  phone: z.string().trim().min(6).max(20),
+  message: z.string().trim().min(1).max(1000),
+});
+
+export const smsRetrySchema = z.object({ id: uuid });
+
+/** Reusable SMS templates. Functional sending is wired once BulkSMSBD credentials arrive. */
+export const smsTemplates = [
+  {
+    id: "order_confirm",
+    label: "Order confirmation",
+    body: "প্রিয় {{name}}, আপনার অর্ডার {{order_no}} কনফার্ম হয়েছে। মোট: {{amount}} টাকা। ধন্যবাদ — উপহারকাব্য",
+  },
+  {
+    id: "no_response",
+    label: "No response follow-up",
+    body: "প্রিয় {{name}}, আপনার অর্ডার {{order_no}} নিশ্চিত করতে আমরা কল করেছি কিন্তু পাইনি। কল ব্যাক করুন — উপহারকাব্য",
+  },
+  {
+    id: "shipped",
+    label: "Order shipped",
+    body: "প্রিয় {{name}}, আপনার অর্ডার {{order_no}} কুরিয়ারে পাঠানো হয়েছে। ইনভয়েস: {{receipt_url}}",
+  },
+  {
+    id: "delivery_today",
+    label: "Delivery today",
+    body: "প্রিয় {{name}}, আজ আপনার পার্সেল {{order_no}} ডেলিভারি হবে। অনুগ্রহ করে ফোন খোলা রাখুন।",
+  },
+] as const;
+
+export const smsVariables = ["name", "order_no", "amount", "receipt_url", "phone"] as const;
