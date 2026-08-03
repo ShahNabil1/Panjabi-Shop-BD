@@ -108,7 +108,7 @@ function AdminLayout() {
 
   if (loading || !session || isAdmin.isLoading) {
     return (
-      <div className="admin-scope flex min-h-[70vh] flex-col items-center justify-center bg-background">
+      <div className="admin-scope fixed inset-0 z-50 flex h-screen w-screen flex-col items-center justify-center bg-background">
         <BrandLoader size="lg" message="Loading dashboard…" />
       </div>
     );

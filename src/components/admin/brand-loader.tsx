@@ -35,7 +35,7 @@ export function BrandLoader({ message, size = "md", className, fullScreen }: Bra
 
   if (fullScreen) {
     return (
-      <div className="admin-scope flex min-h-[70vh] flex-col items-center justify-center">
+      <div className="admin-scope fixed inset-0 z-50 flex h-screen w-screen flex-col items-center justify-center bg-background">
         {wrapper}
       </div>
     );
