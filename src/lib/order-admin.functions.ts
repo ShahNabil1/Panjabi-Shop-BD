@@ -215,10 +215,12 @@ export const adminSaveOrderItems = createServerFn({ method: "POST" })
       .eq("id", data.id);
     if (upd.error) throw new Error(upd.error.message);
 
-    const label = (i: { product_name?: string; productName?: string; variant_label?: string | null; variantLabel?: string | null; quantity: number }) =>
-      `${i.product_name ?? i.productName}${(i.variant_label ?? i.variantLabel) ? ` (${i.variant_label ?? i.variantLabel})` : ""} ×${i.quantity}`;
-    const oldList = ((beforeItems ?? []) as Array<Record<string, never>>).map((i) => label(i as never));
-    const newList = data.items.map((i) => label(i as never));
+    const label = (name: string, variant: string | null, qty: number) =>
+      `${name}${variant ? ` (${variant})` : ""} ×${qty}`;
+    const oldList = (beforeItems ?? []).map((i) =>
+      label(i.product_name, i.variant_label, i.quantity),
+    );
+    const newList = data.items.map((i) => label(i.productName, i.variantLabel ?? null, i.quantity));
     const changes: string[] = [];
     if (oldList.join(", ") !== newList.join(", ")) {
       changes.push(`Products: ${oldList.join(", ") || "—"} → ${newList.join(", ") || "—"}`);
