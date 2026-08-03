@@ -38,3 +38,43 @@ export function unwrap<T>(res: { data: T | null; error: { message: string } | nu
   if (res.error) throw new Error(res.error.message);
   return (res.data ?? []) as T;
 }
+
+/** Human-readable name of the staff member performing an action. */
+export async function actorName(db: Db, userId: string): Promise<string> {
+  const { data } = await db.from("profiles").select("full_name").eq("id", userId).maybeSingle();
+  const name = (data as { full_name?: string | null } | null)?.full_name;
+  return name && name.trim().length > 0 ? name : "Staff";
+}
+
+/** Appends an entry to the order activity timeline. */
+export async function logActivity(
+  db: Db,
+  orderId: string,
+  kind: string,
+  message: string,
+  opts?: { actor?: string; meta?: Record<string, unknown> },
+): Promise<void> {
+  await db.from("order_activity").insert({
+    order_id: orderId,
+    kind,
+    message,
+    meta: { actor: opts?.actor ?? "System", ...(opts?.meta ?? {}) },
+  });
+}
+
+/** Builds "Field: old → new" strings for every changed value. */
+export function diffFields(
+  before: Record<string, unknown>,
+  after: Record<string, unknown>,
+  labels: Record<string, string>,
+): string[] {
+  const out: string[] = [];
+  for (const key of Object.keys(labels)) {
+    const a = before[key] ?? "";
+    const b = after[key] ?? "";
+    if (String(a) !== String(b)) {
+      out.push(`${labels[key]}: ${String(a) || "—"} → ${String(b) || "—"}`);
+    }
+  }
+  return out;
+}
