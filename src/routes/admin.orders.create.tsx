@@ -351,7 +351,7 @@ function CreateOrderPage() {
             </div>
 
             {products.isLoading ? (
-              <BrandLoader size="sm" message="Searching…" className="py-6" />
+              <BrandLoader size="sm" className="py-6" />
             ) : (
               <ul className="mt-3 max-h-64 space-y-1.5 overflow-y-auto">
                 {(products.data ?? []).map((p) => {
