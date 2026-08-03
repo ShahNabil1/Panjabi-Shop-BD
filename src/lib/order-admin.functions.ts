@@ -223,17 +223,34 @@ export const adminSendSms = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => smsSendSchema.parse(input))
   .handler(async ({ data, context }) => {
     const db = await requireAdmin(context.supabase, context.userId);
-    const { deliverSms } = await import("./sms.server");
+    const { deliverSms, renderSmsTemplate } = await import("./sms.server");
+    const { SITE_URL } = await import("./site");
     const { data: profile } = await db
       .from("profiles")
       .select("full_name")
       .eq("id", context.userId)
       .maybeSingle();
 
+    // Resolve {{variables}} against the real order so the log and the SMS match.
+    const { data: order } = await db
+      .from("orders")
+      .select("order_number, customer_name, customer_phone, total")
+      .eq("id", data.orderId)
+      .maybeSingle();
+    const o = (order ?? {}) as unknown as Record<string, unknown>;
+    const orderNo = String(o["order_number"] ?? "");
+    const message = renderSmsTemplate(data.message, {
+      name: String(o["customer_name"] ?? ""),
+      order_no: orderNo,
+      amount: String(Number(o["total"] ?? 0)),
+      phone: String(o["customer_phone"] ?? data.phone),
+      receipt_url: orderNo ? `${SITE_URL}/invoice/${orderNo}` : "",
+    });
+
     const result = await deliverSms(db, {
       orderId: data.orderId,
       phone: data.phone,
-      message: data.message,
+      message,
       isManual: true,
       sentBy: context.userId,
       sentByName: (profile?.full_name as string | null) ?? "Staff",
