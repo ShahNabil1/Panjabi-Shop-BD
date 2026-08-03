@@ -182,10 +182,16 @@ export function ItemsCard({
             <Plus className="size-3.5" />
             Add Product
           </Button>
-          <Button size="sm" disabled={save.isPending} onClick={() => save.mutate()}>
-            <Save className="size-3.5" />
-            Save
+          <Button
+            size="sm"
+            variant={isDirty ? "default" : "secondary"}
+            disabled={save.isPending || !isDirty}
+            onClick={() => save.mutate()}
+          >
+            {isDirty ? <Save className="size-3.5" /> : <Check className="size-3.5" />}
+            {save.isPending ? "Saving…" : isDirty ? "Save" : "Saved"}
           </Button>
+
         </div>
       </div>
 
