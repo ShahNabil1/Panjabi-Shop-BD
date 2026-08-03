@@ -5,7 +5,7 @@ import { Search, Clock, Globe, Eye } from "lucide-react";
 
 import { adminListOrders } from "@/lib/admin.functions";
 import { orderStatuses } from "@/lib/admin-schema";
-import { AdminHeading, EmptyState, Panel, StatusPill, statusLabels } from "@/components/admin/kit";
+import { EmptyState, Panel, StatusPill, statusLabels } from "@/components/admin/kit";
 import { BrandLoader } from "@/components/admin/brand-loader";
 import { Input } from "@/components/ui/input";
 import { courierCachedRatios } from "@/lib/courier.functions";
@@ -59,11 +59,9 @@ function AdminOrdersPage() {
 
   return (
     <div className="space-y-5">
-      <AdminHeading title="Web Orders" description="Orders placed through the website." />
-
-      <CourierStatusBar />
-
-
+      <div className="flex justify-end">
+        <CourierStatusBar />
+      </div>
 
       <div className="admin-rise flex flex-wrap items-center gap-3 rounded-2xl border border-border/70 bg-card p-3">
         <div className="relative max-w-xs flex-1 min-w-[200px]">

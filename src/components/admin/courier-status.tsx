@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { PlugZap, Gauge } from "lucide-react";
+import { PlugZap } from "lucide-react";
 
 import { courierConnectionStatus, courierPlan } from "@/lib/courier.functions";
 import { cn } from "@/lib/utils";
@@ -23,13 +23,13 @@ export function CourierStatusBar() {
   const p = plan.data;
 
   return (
-    <div className="admin-rise flex flex-wrap items-center gap-x-5 gap-y-2 rounded-2xl border border-border bg-card px-4 py-3">
+    <div className="admin-rise inline-flex items-center gap-3 rounded-xl border border-border bg-card px-3 py-2 shadow-sm">
       <div className="flex items-center gap-2">
-        <PlugZap className="size-4 text-muted-foreground" />
-        <span className="text-sm font-semibold">BD Courier</span>
+        <PlugZap className="size-4 text-primary" />
+        <span className="text-sm font-bold text-foreground">Fraud Checker</span>
         <span
           className={cn(
-            "inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-semibold ring-1",
+            "inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[11px] font-semibold ring-1",
             conn.isLoading
               ? "bg-muted text-muted-foreground ring-border"
               : ok
@@ -47,26 +47,19 @@ export function CourierStatusBar() {
         </span>
       </div>
 
-      <div className="h-5 w-px bg-border max-sm:hidden" />
+      <div className="hidden h-4 w-px bg-border sm:block" />
 
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-muted-foreground">
-        <span className="inline-flex items-center gap-1.5">
-          <Gauge className="size-3.5" />
-          Plan:{" "}
-          <span className="font-semibold text-foreground">
-            {plan.isLoading ? "…" : (p?.planName ?? "—")}
-          </span>
-        </span>
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-muted-foreground">
         {p && p.ok ? (
           <>
             <span>
-              Free left:{" "}
+              Free:{" "}
               <span className="font-semibold text-foreground tabular-nums">
                 {p.remainingFreeCalls}/{p.callLimit}
               </span>
             </span>
             <span>
-              Paid left:{" "}
+              Paid:{" "}
               <span className="font-semibold text-foreground tabular-nums">
                 {p.remainingPaidCalls}/{p.paidLimit}
               </span>
@@ -75,18 +68,12 @@ export function CourierStatusBar() {
               Used:{" "}
               <span className="font-semibold text-foreground tabular-nums">{p.apiCalls}</span>
             </span>
-            {p.expiresAt ? (
-              <span>
-                Expires:{" "}
-                <span className="font-semibold text-foreground">
-                  {new Date(p.expiresAt).toLocaleDateString("en-GB")} ({p.daysRemaining}d)
-                </span>
-              </span>
-            ) : null}
           </>
         ) : p && !p.ok ? (
           <span className="text-rose-700">{p.message}</span>
-        ) : null}
+        ) : (
+          <span>—</span>
+        )}
       </div>
     </div>
   );
