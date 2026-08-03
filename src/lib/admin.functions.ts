@@ -138,11 +138,22 @@ export const adminUpdateOrderStatus = createServerFn({ method: "POST" })
       data.id,
       "status",
       `${who} changed status ${before} → ${data.status}${data.reason ? ` — ${data.reason}` : ""}`,
-      { actor: who, meta: { from: before, to: data.status, reason: data.reason ?? null } },
+      {
+        actor: who,
+        meta: {
+          from: before,
+          to: data.status,
+          reason: data.reason ?? null,
+          skipSms: data.skipSms ?? false,
+        },
+      },
     );
+    if (data.skipSms) {
+      await logActivity(db, data.id, "sms", `${who} confirmed without sending SMS`, { actor: who });
+    }
 
     // Auto confirmation SMS once an order moves into the confirmed pipeline.
-    if (data.status === "pending" || data.status === "confirmed") {
+    if (!data.skipSms && (data.status === "pending" || data.status === "confirmed")) {
       const { data: order } = await db
         .from("orders")
         .select("order_number, customer_name, customer_phone, total, auto_sms_status")

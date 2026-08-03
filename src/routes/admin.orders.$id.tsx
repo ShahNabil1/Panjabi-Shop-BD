@@ -68,14 +68,20 @@ function AdminOrderDetail() {
   const [pending, setPending] = useState<PendingStatus | "">("");
   const [reason, setReason] = useState("");
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [silent, setSilent] = useState(false);
 
   const update = useMutation({
-    mutationFn: (input: { status: OrderStatus; reason?: string }) =>
+    mutationFn: (input: { status: OrderStatus; reason?: string; skipSms?: boolean }) =>
       adminUpdateOrderStatus({
-        data: { id, status: input.status, ...(input.reason ? { reason: input.reason } : {}) },
+        data: {
+          id,
+          status: input.status,
+          ...(input.reason ? { reason: input.reason } : {}),
+          ...(input.skipSms ? { skipSms: true } : {}),
+        },
       }),
     onSuccess: async () => {
-      toast.success("Status updated");
+      toast.success(silent ? "Order confirmed (no SMS sent)" : "Status updated");
       setConfirmOpen(false);
       setPending("");
       setReason("");
@@ -304,13 +310,34 @@ function AdminOrderDetail() {
                   </p>
                 </div>
 
-                <DialogFooter>
-                  <Button variant="ghost" onClick={() => setConfirmOpen(false)}>
+                <DialogFooter className="gap-2 sm:gap-2">
+                  <Button
+                    variant="destructive"
+                    onClick={() => setConfirmOpen(false)}
+                    disabled={update.isPending}
+                  >
+                    <X className="size-4" />
                     Cancel
                   </Button>
                   <Button
-                    loading={update.isPending}
-                    onClick={() => update.mutate({ status: "pending" })}
+                    variant="outline"
+                    loading={update.isPending && silent}
+                    disabled={update.isPending}
+                    onClick={() => {
+                      setSilent(true);
+                      update.mutate({ status: "pending", skipSms: true });
+                    }}
+                  >
+                    <CheckCircle2 className="size-4" />
+                    Confirm only
+                  </Button>
+                  <Button
+                    loading={update.isPending && !silent}
+                    disabled={update.isPending}
+                    onClick={() => {
+                      setSilent(false);
+                      update.mutate({ status: "pending" });
+                    }}
                     className="bg-[hsl(143,85%,32%)] text-white hover:bg-[hsl(143,85%,27%)] focus-visible:ring-[hsl(143,85%,32%)]"
                   >
                     <CheckCircle2 className="size-4" />
