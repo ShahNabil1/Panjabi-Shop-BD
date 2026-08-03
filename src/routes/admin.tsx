@@ -56,7 +56,7 @@ const sections: Array<{ title: string; items: NavItem[] }> = [
     title: "Orders",
     items: [
       { to: "/admin/orders/create", label: "Create Order", icon: PlusCircle },
-      { to: "/admin/orders", label: "Order List", icon: ShoppingCart, exact: true },
+      { to: "/admin/orders", label: "Web Orders", icon: ShoppingCart, exact: true },
     ],
   },
   {
