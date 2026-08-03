@@ -1,7 +1,7 @@
 import { Link, createFileRoute, useParams } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { CheckCircle2, FileText, History, MessageSquare, X } from "lucide-react";
+import { CheckCircle2, FileText, MessageSquare, X } from "lucide-react";
 import { useState } from "react";
 
 import { adminUpdateOrderStatus } from "@/lib/admin.functions";
@@ -12,6 +12,7 @@ import { renderSmsTemplate, orderSmsVars } from "@/lib/sms-template";
 import { Panel, StatusPill, statusLabels } from "@/components/admin/kit";
 import { BrandLoader } from "@/components/admin/brand-loader";
 import { CourierReport } from "@/components/admin/courier-report";
+import { ActivityLog } from "@/components/admin/order/activity-log";
 import { CustomerCard } from "@/components/admin/order/customer-card";
 import { DeliveryNoteCard, ItemsCard } from "@/components/admin/order/items-card";
 import { CommunicationLog, SmsCard } from "@/components/admin/order/sms-card";
@@ -21,6 +22,13 @@ import {
   SecurityCard,
 } from "@/components/admin/order/security-card";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 
 const updatableStatuses = ["no_response", "good_no_response", "hold", "cancelled"] as const;
@@ -103,7 +111,13 @@ function AdminOrderDetail() {
     auto_sms_status: string;
     source: string;
     order_items: OrderItemRow[];
-    order_activity?: Array<{ id: string; kind: string; message: string | null; created_at: string }>;
+    order_activity?: Array<{
+      id: string;
+      kind: string;
+      message: string | null;
+      meta?: unknown;
+      created_at: string;
+    }>;
   };
 
   const confirmSms = renderSmsTemplate(
@@ -138,24 +152,28 @@ function AdminOrderDetail() {
 
           <div className="flex flex-wrap items-center gap-2">
             <StatusPill status={order.status} />
-            <select
-              className="h-9 rounded-xl border border-border bg-background px-3 text-sm font-semibold outline-none transition-colors focus:border-primary/60"
-              value={pending}
-              onChange={(e) => {
-                setPending(e.target.value as PendingStatus | "");
+            <Select
+              {...(pending ? { value: pending } : {})}
+              onValueChange={(v) => {
+                setPending(v as PendingStatus);
                 setReason("");
               }}
             >
-              <option value="">Update status…</option>
-              {updatableStatuses.map((s) => (
-                <option key={s} value={s} disabled={s === order.status}>
-                  {statusLabels[s]}
-                </option>
-              ))}
-            </select>
+              <SelectTrigger className="h-9 w-[190px] rounded-xl border-border bg-background text-sm font-semibold">
+                <SelectValue placeholder="Update Status" />
+              </SelectTrigger>
+              <SelectContent>
+                {updatableStatuses.map((s) => (
+                  <SelectItem key={s} value={s} disabled={s === order.status}>
+                    {statusLabels[s]}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             {pending ? (
               <button
                 aria-label="Clear"
+                className="transition-transform active:scale-90"
                 onClick={() => {
                   setPending("");
                   setReason("");
@@ -217,7 +235,8 @@ function AdminOrderDetail() {
                 <Button
                   size="sm"
                   variant={pending === "hold" ? "default" : "destructive"}
-                  disabled={update.isPending || reason.trim().length === 0}
+                  loading={update.isPending}
+                  disabled={reason.trim().length === 0}
                   onClick={() => update.mutate({ status: pending, reason: reason.trim() })}
                 >
                   {pending === "hold" ? "Confirm Hold" : "Confirm Cancel"}
@@ -229,7 +248,7 @@ function AdminOrderDetail() {
           <div className="flex justify-end">
             <Button
               size="sm"
-              disabled={update.isPending}
+              loading={update.isPending}
               onClick={() => update.mutate({ status: pending })}
             >
               Confirm change to {statusLabels[pending]}
@@ -258,7 +277,7 @@ function AdminOrderDetail() {
             </div>
             <Button
               size="lg"
-              disabled={update.isPending}
+              loading={update.isPending}
               onClick={() => update.mutate({ status: "pending" })}
               className="w-full"
             >
@@ -315,31 +334,7 @@ function AdminOrderDetail() {
 
       <CommunicationLog logs={data.sms as never[]} autoStatus={order.auto_sms_status} />
 
-      <Panel>
-        <h2 className="flex items-center gap-2 text-sm font-bold">
-          <History className="size-4 text-primary" />
-          Activity log
-        </h2>
-        {(order.order_activity ?? []).length === 0 ? (
-          <p className="mt-2 text-sm text-muted-foreground">No activity recorded yet.</p>
-        ) : (
-          <ul className="mt-3 space-y-2 text-sm">
-            {[...(order.order_activity ?? [])]
-              .sort((a, b) => (a.created_at < b.created_at ? 1 : -1))
-              .map((a) => (
-                <li
-                  key={a.id}
-                  className="flex flex-wrap justify-between gap-2 border-b border-border pb-2 last:border-0"
-                >
-                  <span>{a.message ?? a.kind}</span>
-                  <span className="text-xs text-muted-foreground">
-                    {new Date(a.created_at).toLocaleString("en-GB", { timeZone: "Asia/Dhaka" })}
-                  </span>
-                </li>
-              ))}
-          </ul>
-        )}
-      </Panel>
+      <ActivityLog entries={order.order_activity ?? []} />
     </div>
   );
 }

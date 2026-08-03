@@ -321,7 +321,7 @@ function LandingPagesAdmin() {
           />
 
           <div className="sticky bottom-0 z-10 -mx-4 flex gap-2 border-t border-border/70 bg-card/95 px-4 py-3 backdrop-blur sm:-mx-5 sm:px-5">
-            <Button disabled={save.isPending} onClick={() => save.mutate(draft)}>
+            <Button loading={save.isPending} onClick={() => save.mutate(draft)}>
               Save
             </Button>
             {draft.id ? (

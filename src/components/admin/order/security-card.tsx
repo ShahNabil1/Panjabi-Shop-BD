@@ -212,7 +212,8 @@ export function InternalNotesCard({ orderId, notes }: { orderId: string; notes: 
         />
         <Button
           size="sm"
-          disabled={add.isPending || body.trim().length === 0}
+          loading={add.isPending}
+          disabled={body.trim().length === 0}
           onClick={() => add.mutate()}
         >
           Add

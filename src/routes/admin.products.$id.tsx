@@ -667,7 +667,7 @@ function ProductEditor() {
             {isNew ? "Creating a new product" : "Editing existing product"}
           </p>
           <Button
-            disabled={save.isPending}
+            loading={save.isPending}
             className="ig-gradient rounded-xl px-6 transition-transform duration-300 hover:scale-[1.02]"
             onClick={() =>
               save.mutate({

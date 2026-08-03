@@ -180,7 +180,8 @@ export function SmsCard({ orderId, phone }: { orderId: string; phone: string }) 
               </Button>
               <Button
                 size="sm"
-                disabled={send.isPending || message.trim().length === 0}
+                loading={send.isPending}
+                disabled={message.trim().length === 0}
                 onClick={() => send.mutate()}
               >
                 <Send className="size-3.5" />
@@ -275,10 +276,10 @@ export function CommunicationLog({
                     type="button"
                     disabled={retry.isPending}
                     onClick={() => retry.mutate(log.id)}
-                    className="ml-auto inline-flex items-center gap-1.5 rounded-lg border border-border bg-background px-2.5 py-1 font-semibold text-foreground transition-colors hover:border-primary/40 hover:bg-accent"
+                    className="ml-auto inline-flex items-center gap-1.5 rounded-lg border border-border bg-background px-2.5 py-1 font-semibold text-foreground transition-[colors,transform] active:scale-95 hover:border-primary/40 hover:bg-accent disabled:opacity-60"
                   >
-                    <RotateCw className="size-3.5" />
-                    Retry
+                    <RotateCw className={retry.isPending ? "size-3.5 animate-spin" : "size-3.5"} />
+                    {retry.isPending ? "Retrying…" : "Retry"}
                   </button>
                 ) : null}
               </div>

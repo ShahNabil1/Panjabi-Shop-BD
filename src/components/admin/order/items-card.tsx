@@ -73,7 +73,7 @@ export function DeliveryNoteCard({
           />
           <div className="flex items-center justify-between">
             <span className="text-xs text-muted-foreground">{note.length}/500 characters</span>
-            <Button size="sm" disabled={save.isPending} onClick={() => save.mutate()}>
+            <Button size="sm" loading={save.isPending} onClick={() => save.mutate()}>
               <Save className="size-3.5" />
               Save note
             </Button>
@@ -185,7 +185,8 @@ export function ItemsCard({
           <Button
             size="sm"
             variant={isDirty ? "default" : "secondary"}
-            disabled={save.isPending || !isDirty}
+            loading={save.isPending}
+            disabled={!isDirty}
             onClick={() => save.mutate()}
           >
             {isDirty ? <Save className="size-3.5" /> : <Check className="size-3.5" />}
