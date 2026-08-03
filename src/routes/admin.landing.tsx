@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
+import { ArrowDown, ArrowUp, Plus, Trash2 } from "lucide-react";
 
 import {
   adminDeleteLandingPage,
@@ -13,6 +14,7 @@ import type { LandingPageInput } from "@/lib/admin-schema";
 import {
   AdminHeading,
   AreaField,
+  EmptyState,
   Field,
   Panel,
   TextField,
@@ -58,6 +60,14 @@ function emptyLanding(): LandingPageInput {
   };
 }
 
+function moveItem<T>(list: T[], from: number, to: number): T[] {
+  if (to < 0 || to >= list.length) return list;
+  const next = list.slice();
+  const [item] = next.splice(from, 1);
+  next.splice(to, 0, item);
+  return next;
+}
+
 function LandingPagesAdmin() {
   const qc = useQueryClient();
   const [draft, setDraft] = useState<LandingPageInput>(emptyLanding());
@@ -74,7 +84,7 @@ function LandingPagesAdmin() {
   const save = useMutation({
     mutationFn: (input: LandingPageInput) => adminSaveLandingPage({ data: input }),
     onSuccess: async () => {
-      toast.success("ল্যান্ডিং পেইজ সেভ হয়েছে");
+      toast.success("Landing page saved");
       setDraft(emptyLanding());
       await qc.invalidateQueries({ queryKey: ["admin", "landing"] });
     },
@@ -83,7 +93,7 @@ function LandingPagesAdmin() {
   const remove = useMutation({
     mutationFn: (id: string) => adminDeleteLandingPage({ data: { id } }),
     onSuccess: async () => {
-      toast.success("মুছে ফেলা হয়েছে");
+      toast.success("Deleted");
       await qc.invalidateQueries({ queryKey: ["admin", "landing"] });
     },
     onError: (e: Error) => toast.error(e.message),
@@ -92,14 +102,14 @@ function LandingPagesAdmin() {
   return (
     <div className="space-y-6 pb-16">
       <AdminHeading
-        title="ল্যান্ডিং পেইজ"
-        description="প্রতিটি প্রোডাক্টের জন্য আলাদা সিঙ্গেল পেইজ — /lp/your-slug"
+        title="Landing Pages"
+        description="A dedicated single page per product — /lp/your-slug"
       />
 
       <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_360px]">
         <Panel className="space-y-4">
-          <h2 className="text-sm font-bold">{draft.id ? "পেইজ এডিট" : "নতুন ল্যান্ডিং পেইজ"}</h2>
-          <Field label="প্রোডাক্ট">
+          <h2 className="text-sm font-bold">{draft.id ? "Edit Page" : "New Landing Page"}</h2>
+          <Field label="Product">
             <Select
               value={draft.product_id || "none"}
               onValueChange={(v) => {
@@ -112,10 +122,10 @@ function LandingPagesAdmin() {
               }}
             >
               <SelectTrigger>
-                <SelectValue placeholder="বাছাই করুন" />
+                <SelectValue placeholder="Select a product" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="none">বাছাই করুন</SelectItem>
+                <SelectItem value="none">Select a product</SelectItem>
                 {(products.data ?? []).map((p) => (
                   <SelectItem key={p.id} value={p.id}>
                     {p.name_bn}
@@ -127,45 +137,37 @@ function LandingPagesAdmin() {
 
           <div className="grid gap-3 sm:grid-cols-2">
             <TextField
-              label="স্লাগ"
+              label="Slug"
               value={draft.slug}
               onChange={(v) => setDraft({ ...draft, slug: slugify(v) })}
               hint="URL: /lp/your-slug"
             />
             <ImageField
-              label="OG image (সোশ্যাল প্রিভিউ)"
+              label="OG Image (social preview)"
               folder="landing"
               value={draft.og_image_url}
               onChange={(v) => setDraft({ ...draft, og_image_url: v })}
             />
             <TextField
-              label="হেডলাইন (বাংলা)"
+              label="Headline"
               value={draft.headline_bn ?? ""}
-              onChange={(v) => setDraft({ ...draft, headline_bn: v || null })}
+              onChange={(v) => setDraft({ ...draft, headline_bn: v || null, headline_en: v || null })}
             />
             <TextField
-              label="Headline (English)"
-              value={draft.headline_en ?? ""}
-              onChange={(v) => setDraft({ ...draft, headline_en: v || null })}
-            />
-            <TextField
-              label="সাব-হেডলাইন (বাংলা)"
+              label="Sub-headline"
               value={draft.subheadline_bn ?? ""}
-              onChange={(v) => setDraft({ ...draft, subheadline_bn: v || null })}
+              onChange={(v) =>
+                setDraft({ ...draft, subheadline_bn: v || null, subheadline_en: v || null })
+              }
             />
             <TextField
-              label="Sub-headline (English)"
-              value={draft.subheadline_en ?? ""}
-              onChange={(v) => setDraft({ ...draft, subheadline_en: v || null })}
-            />
-            <TextField
-              label="Meta title"
+              label="Meta Title"
               value={draft.meta_title ?? ""}
               onChange={(v) => setDraft({ ...draft, meta_title: v || null })}
             />
           </div>
           <AreaField
-            label="Meta description"
+            label="Meta Description"
             rows={3}
             value={draft.meta_description ?? ""}
             onChange={(v) => setDraft({ ...draft, meta_description: v || null })}
@@ -174,120 +176,153 @@ function LandingPagesAdmin() {
           <div>
             <div className="flex items-center justify-between">
               <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                বুলেট পয়েন্ট
+                Bullet Points
               </p>
               <Button
                 size="sm"
                 variant="outline"
+                className="gap-1"
                 onClick={() =>
                   setDraft({ ...draft, bullets: [...draft.bullets, { bn: "", en: "" }] })
                 }
               >
-                যোগ করুন
+                <Plus className="h-3.5 w-3.5" />
+                Add
               </Button>
             </div>
             <div className="mt-2 space-y-2">
-              {draft.bullets.map((b, i) => (
-                <div key={i} className="flex gap-2">
-                  <Input
-                    placeholder="বাংলা"
-                    value={b.bn}
-                    onChange={(e) =>
-                      setDraft({
-                        ...draft,
-                        bullets: draft.bullets.map((x, j) =>
-                          j === i ? { ...x, bn: e.target.value } : x,
-                        ),
-                      })
-                    }
-                  />
-                  <Input
-                    placeholder="English"
-                    value={b.en}
-                    onChange={(e) =>
-                      setDraft({
-                        ...draft,
-                        bullets: draft.bullets.map((x, j) =>
-                          j === i ? { ...x, en: e.target.value } : x,
-                        ),
-                      })
-                    }
-                  />
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() =>
-                      setDraft({ ...draft, bullets: draft.bullets.filter((_, j) => j !== i) })
-                    }
+              {draft.bullets.length === 0 ? (
+                <EmptyState title="No bullets yet" hint="Add a highlight point above." />
+              ) : (
+                draft.bullets.map((b, i) => (
+                  <div
+                    key={i}
+                    className="admin-rise flex items-center gap-2 rounded-xl border border-border/70 bg-background/50 p-2 transition-all duration-200 hover:border-primary/30"
                   >
-                    ✕
-                  </Button>
-                </div>
-              ))}
+                    <span className="flex h-7 w-7 shrink-0 select-none items-center justify-center rounded-full bg-muted text-xs font-semibold text-muted-foreground">
+                      {i + 1}
+                    </span>
+                    <Input
+                      placeholder="Bullet point text"
+                      value={b.bn}
+                      onChange={(e) =>
+                        setDraft({
+                          ...draft,
+                          bullets: draft.bullets.map((x, j) =>
+                            j === i ? { bn: e.target.value, en: e.target.value } : x,
+                          ),
+                        })
+                      }
+                      className="rounded-lg border-border/80 bg-background/70"
+                    />
+                    <div className="flex shrink-0 items-center gap-1">
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="h-7 w-7"
+                        disabled={i === 0}
+                        onClick={() =>
+                          setDraft({ ...draft, bullets: moveItem(draft.bullets, i, i - 1) })
+                        }
+                      >
+                        <ArrowUp className="h-3.5 w-3.5" />
+                      </Button>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="h-7 w-7"
+                        disabled={i === draft.bullets.length - 1}
+                        onClick={() =>
+                          setDraft({ ...draft, bullets: moveItem(draft.bullets, i, i + 1) })
+                        }
+                      >
+                        <ArrowDown className="h-3.5 w-3.5" />
+                      </Button>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="h-7 w-7 text-destructive"
+                        onClick={() =>
+                          setDraft({ ...draft, bullets: draft.bullets.filter((_, j) => j !== i) })
+                        }
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </Button>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </div>
 
           <ToggleField
-            label="অ্যাক্টিভ"
+            label="Active"
             checked={draft.is_active}
             onChange={(v) => setDraft({ ...draft, is_active: v })}
           />
 
-          <div className="flex gap-2">
+          <div className="sticky bottom-0 z-10 -mx-4 flex gap-2 border-t border-border/70 bg-card/95 px-4 py-3 backdrop-blur sm:-mx-5 sm:px-5">
             <Button disabled={save.isPending} onClick={() => save.mutate(draft)}>
-              সেভ করুন
+              Save
             </Button>
             {draft.id ? (
               <Button variant="outline" onClick={() => setDraft(emptyLanding())}>
-                বাতিল
+                Cancel
               </Button>
             ) : null}
           </div>
         </Panel>
 
         <Panel className="p-0">
-          <h2 className="border-b border-border p-4 text-sm font-bold">পেইজ তালিকা</h2>
-          <ul className="divide-y divide-border">
-            {(pages.data ?? []).map((p) => (
-              <li key={p.id} className="flex items-center gap-2 px-4 py-3 text-sm">
-                <div className="min-w-0 flex-1">
-                  <p className="truncate font-semibold">{p.headline_bn ?? p.slug}</p>
-                  <a
-                    href={`/lp/${p.slug}`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="truncate text-xs text-muted-foreground underline-offset-2 hover:underline"
+          <h2 className="border-b border-border p-4 text-sm font-bold">Page List</h2>
+          {(pages.data ?? []).length === 0 ? (
+            <EmptyState title="No landing pages yet" hint="Create one on the left." />
+          ) : (
+            <ul className="divide-y divide-border">
+              {(pages.data ?? []).map((p) => (
+                <li
+                  key={p.id}
+                  className="flex items-center gap-2 px-4 py-3 text-sm transition-colors duration-200 hover:bg-muted/40"
+                >
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate font-semibold">{p.headline_bn ?? p.slug}</p>
+                    <a
+                      href={`/lp/${p.slug}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="truncate text-xs text-muted-foreground underline-offset-2 hover:text-primary hover:underline"
+                    >
+                      /lp/{p.slug}
+                    </a>
+                  </div>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => {
+                      const content = (p.content ?? {}) as {
+                        bullets?: Array<{ bn: string; en: string }>;
+                      };
+                      setDraft({
+                        ...(p as unknown as LandingPageInput),
+                        bullets: Array.isArray(content.bullets) ? content.bullets : [],
+                      });
+                    }}
                   >
-                    /lp/{p.slug}
-                  </a>
-                </div>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => {
-                    const content = (p.content ?? {}) as {
-                      bullets?: Array<{ bn: string; en: string }>;
-                    };
-                    setDraft({
-                      ...(p as unknown as LandingPageInput),
-                      bullets: Array.isArray(content.bullets) ? content.bullets : [],
-                    });
-                  }}
-                >
-                  এডিট
-                </Button>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={() => {
-                    if (confirm("মুছে ফেলবেন?")) remove.mutate(p.id);
-                  }}
-                >
-                  মুছুন
-                </Button>
-              </li>
-            ))}
-          </ul>
+                    Edit
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => {
+                      if (confirm("Delete this page?")) remove.mutate(p.id);
+                    }}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </li>
+              ))}
+            </ul>
+          )}
         </Panel>
       </div>
     </div>
