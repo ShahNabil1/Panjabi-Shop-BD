@@ -314,8 +314,9 @@ export const adminSaveLandingPage = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => landingPageSchema.parse(mirrorLang(input)))
   .handler(async ({ data, context }) => {
     const db = await requireAdmin(context.supabase, context.userId);
-    const { id, bullets, ...rest } = data;
-    const payload = { ...rest, content: { bullets } };
+    const { id, bullets, seo, ...rest } = data;
+    const payload = { ...rest, content: { bullets, seo } };
+
     const res = id
       ? await db.from("landing_pages").update(payload).eq("id", id).select("id").single()
       : await db.from("landing_pages").insert(payload).select("id").single();
