@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
+import { FolderTree, Layers, Pencil, Trash2, X } from "lucide-react";
 
 import {
   adminDeleteCategory,
@@ -13,7 +14,7 @@ import {
 import type { CategoryInput, SubcategoryInput } from "@/lib/admin-schema";
 import {
   AdminHeading,
-  AreaField,
+  EmptyState,
   Field,
   NumberField,
   Panel,
@@ -58,6 +59,24 @@ function emptyCategory(): CategoryInput {
   };
 }
 
+function toCategoryDraft(c: any): CategoryInput {
+  return {
+    ...c,
+    name_bn: c.name_bn || c.name_en || "",
+    name_en: c.name_bn || c.name_en || "",
+    description_bn: c.description_bn ?? c.description_en ?? null,
+    description_en: c.description_bn ?? c.description_en ?? null,
+  };
+}
+
+function toSubcategoryDraft(s: any): SubcategoryInput {
+  return {
+    ...s,
+    name_bn: s.name_bn || s.name_en || "",
+    name_en: s.name_bn || s.name_en || "",
+  };
+}
+
 function TaxonomyPage() {
   const qc = useQueryClient();
   const { data, isLoading } = useQuery({
@@ -72,7 +91,7 @@ function TaxonomyPage() {
   const saveCat = useMutation({
     mutationFn: (input: CategoryInput) => adminSaveCategory({ data: input }),
     onSuccess: async () => {
-      toast.success("ক্যাটাগরি সেভ হয়েছে");
+      toast.success("Category saved");
       setCat(emptyCategory());
       await refresh();
     },
@@ -81,7 +100,7 @@ function TaxonomyPage() {
   const delCat = useMutation({
     mutationFn: (id: string) => adminDeleteCategory({ data: { id } }),
     onSuccess: async () => {
-      toast.success("মুছে ফেলা হয়েছে");
+      toast.success("Deleted");
       await refresh();
     },
     onError: (e: Error) => toast.error(e.message),
@@ -89,7 +108,7 @@ function TaxonomyPage() {
   const saveSub = useMutation({
     mutationFn: (input: SubcategoryInput) => adminSaveSubcategory({ data: input }),
     onSuccess: async () => {
-      toast.success("সাব-ক্যাটাগরি সেভ হয়েছে");
+      toast.success("Subcategory saved");
       setSub({ ...emptyCategory(), category_id: sub.category_id });
       await refresh();
     },
@@ -98,7 +117,7 @@ function TaxonomyPage() {
   const delSub = useMutation({
     mutationFn: (id: string) => adminDeleteSubcategory({ data: { id } }),
     onSuccess: async () => {
-      toast.success("মুছে ফেলা হয়েছে");
+      toast.success("Deleted");
       await refresh();
     },
     onError: (e: Error) => toast.error(e.message),
@@ -106,97 +125,126 @@ function TaxonomyPage() {
 
   return (
     <div className="space-y-6 pb-16">
-      <AdminHeading title="ক্যাটাগরি ও সাব-ক্যাটাগরি" description="স্টোরের নেভিগেশন কাঠামো।" />
+      <AdminHeading
+        title="Categories & Subcategories"
+        description="Manage the store's navigation structure."
+      />
 
       <div className="grid gap-5 lg:grid-cols-2">
         <Panel className="space-y-4">
-          <h2 className="text-sm font-bold">{cat.id ? "ক্যাটাগরি এডিট" : "নতুন ক্যাটাগরি"}</h2>
+          <h2 className="flex items-center gap-2 text-sm font-bold">
+            <FolderTree className="size-4 text-primary" />
+            {cat.id ? "Edit category" : "New category"}
+          </h2>
           <div className="grid gap-3 sm:grid-cols-2">
             <TextField
-              label="নাম (বাংলা)"
+              label="Name"
               value={cat.name_bn}
-              onChange={(v) => setCat({ ...cat, name_bn: v })}
-            />
-            <TextField
-              label="নাম (English)"
-              value={cat.name_en}
               onChange={(v) =>
-                setCat({ ...cat, name_en: v, slug: cat.slug || slugify(v) })
+                setCat({
+                  ...cat,
+                  name_bn: v,
+                  name_en: v,
+                  slug: cat.slug || slugify(v),
+                })
               }
             />
             <TextField
-              label="স্লাগ"
+              label="Slug"
               value={cat.slug}
               onChange={(v) => setCat({ ...cat, slug: slugify(v) })}
             />
             <NumberField
-              label="সর্ট অর্ডার"
+              label="Sort order"
               value={cat.sort_order}
               onChange={(v) => setCat({ ...cat, sort_order: v })}
-            />
-            <ImageField
-              label="ক্যাটাগরির ছবি"
-              folder="categories"
-              value={cat.image_url}
-              onChange={(v) => setCat({ ...cat, image_url: v })}
             />
             <TextField
               label="Meta title"
               value={cat.meta_title ?? ""}
               onChange={(v) => setCat({ ...cat, meta_title: v || null })}
             />
+            <ImageField
+              label="Category image"
+              folder="categories"
+              value={cat.image_url}
+              onChange={(v) => setCat({ ...cat, image_url: v })}
+            />
           </div>
-          <AreaField
-            label="বিবরণ (বাংলা)"
-            rows={3}
-            value={cat.description_bn ?? ""}
-            onChange={(v) => setCat({ ...cat, description_bn: v || null })}
-          />
+          <Field label="Description">
+            <textarea
+              className="min-h-[84px] w-full rounded-xl border border-border/80 bg-background/70 p-3 text-sm transition-all duration-200 focus-visible:border-primary/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/25"
+              rows={3}
+              value={cat.description_bn ?? ""}
+              onChange={(e) =>
+                setCat({
+                  ...cat,
+                  description_bn: e.target.value || null,
+                  description_en: e.target.value || null,
+                })
+              }
+            />
+          </Field>
           <ToggleField
-            label="অ্যাক্টিভ"
+            label="Active"
             checked={cat.is_active}
             onChange={(v) => setCat({ ...cat, is_active: v })}
           />
-          <div className="flex gap-2">
-            <Button disabled={saveCat.isPending} onClick={() => saveCat.mutate(cat)}>
-              সেভ করুন
+          <div className="flex gap-2 pt-1">
+            <Button
+              disabled={saveCat.isPending}
+              onClick={() => saveCat.mutate(cat)}
+              className="ig-gradient transition-transform duration-300 hover:scale-[1.02]"
+            >
+              Save
             </Button>
             {cat.id ? (
               <Button variant="outline" onClick={() => setCat(emptyCategory())}>
-                বাতিল
+                <X className="mr-1 size-4" />
+                Cancel
               </Button>
             ) : null}
           </div>
         </Panel>
 
         <Panel className="p-0">
-          <h2 className="border-b border-border p-4 text-sm font-bold">ক্যাটাগরি তালিকা</h2>
+          <h2 className="border-b border-border p-4 text-sm font-bold">Categories</h2>
           {isLoading ? (
-            <p className="p-4 text-sm text-muted-foreground">লোড হচ্ছে…</p>
+            <p className="admin-shimmer p-4 text-sm text-muted-foreground">Loading…</p>
+          ) : (data?.categories ?? []).length === 0 ? (
+            <div className="p-4">
+              <EmptyState title="No categories yet" hint="Create your first category on the left." />
+            </div>
           ) : (
             <ul className="divide-y divide-border">
-              {(data?.categories ?? []).map((c) => (
-                <li key={c.id} className="flex items-center gap-2 px-4 py-3 text-sm">
+              {(data?.categories ?? []).map((c, i) => (
+                <li
+                  key={c.id}
+                  className="admin-rise group flex items-center gap-2 px-4 py-3 text-sm transition-colors duration-300 hover:bg-primary/5"
+                  style={{ animationDelay: `${i * 30}ms` }}
+                >
                   <div className="min-w-0 flex-1">
-                    <p className="truncate font-semibold">{c.name_bn}</p>
+                    <p className="truncate font-semibold">{c.name_bn || c.name_en}</p>
                     <p className="truncate text-xs text-muted-foreground">/c/{c.slug}</p>
                   </div>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => setCat(c as unknown as CategoryInput)}
-                  >
-                    এডিট
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => {
-                      if (confirm("মুছে ফেলবেন?")) delCat.mutate(c.id);
-                    }}
-                  >
-                    মুছুন
-                  </Button>
+                  <div className="flex items-center gap-1 opacity-70 transition-opacity duration-200 group-hover:opacity-100">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setCat(toCategoryDraft(c))}
+                    >
+                      <Pencil className="size-3.5" />
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => {
+                        if (confirm("Delete this category?")) delCat.mutate(c.id);
+                      }}
+                    >
+                      <Trash2 className="size-3.5" />
+                    </Button>
+                  </div>
                 </li>
               ))}
             </ul>
@@ -206,22 +254,23 @@ function TaxonomyPage() {
 
       <div className="grid gap-5 lg:grid-cols-2">
         <Panel className="space-y-4">
-          <h2 className="text-sm font-bold">
-            {sub.id ? "সাব-ক্যাটাগরি এডিট" : "নতুন সাব-ক্যাটাগরি"}
+          <h2 className="flex items-center gap-2 text-sm font-bold">
+            <Layers className="size-4 text-primary" />
+            {sub.id ? "Edit subcategory" : "New subcategory"}
           </h2>
-          <Field label="প্যারেন্ট ক্যাটাগরি">
+          <Field label="Parent category">
             <Select
               value={sub.category_id || "none"}
               onValueChange={(v) => setSub({ ...sub, category_id: v === "none" ? "" : v })}
             >
               <SelectTrigger>
-                <SelectValue placeholder="বাছাই করুন" />
+                <SelectValue placeholder="Select" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="none">বাছাই করুন</SelectItem>
+                <SelectItem value="none">Select</SelectItem>
                 {(data?.categories ?? []).map((c) => (
                   <SelectItem key={c.id} value={c.id}>
-                    {c.name_bn}
+                    {c.name_bn || c.name_en}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -229,79 +278,98 @@ function TaxonomyPage() {
           </Field>
           <div className="grid gap-3 sm:grid-cols-2">
             <TextField
-              label="নাম (বাংলা)"
+              label="Name"
               value={sub.name_bn}
-              onChange={(v) => setSub({ ...sub, name_bn: v })}
+              onChange={(v) =>
+                setSub({
+                  ...sub,
+                  name_bn: v,
+                  name_en: v,
+                  slug: sub.slug || slugify(v),
+                })
+              }
             />
             <TextField
-              label="নাম (English)"
-              value={sub.name_en}
-              onChange={(v) => setSub({ ...sub, name_en: v, slug: sub.slug || slugify(v) })}
-            />
-            <TextField
-              label="স্লাগ"
+              label="Slug"
               value={sub.slug}
               onChange={(v) => setSub({ ...sub, slug: slugify(v) })}
             />
             <NumberField
-              label="সর্ট অর্ডার"
+              label="Sort order"
               value={sub.sort_order}
               onChange={(v) => setSub({ ...sub, sort_order: v })}
             />
           </div>
           <ToggleField
-            label="অ্যাক্টিভ"
+            label="Active"
             checked={sub.is_active}
             onChange={(v) => setSub({ ...sub, is_active: v })}
           />
-          <div className="flex gap-2">
-            <Button disabled={saveSub.isPending} onClick={() => saveSub.mutate(sub)}>
-              সেভ করুন
+          <div className="flex gap-2 pt-1">
+            <Button
+              disabled={saveSub.isPending}
+              onClick={() => saveSub.mutate(sub)}
+              className="ig-gradient transition-transform duration-300 hover:scale-[1.02]"
+            >
+              Save
             </Button>
             {sub.id ? (
               <Button
                 variant="outline"
                 onClick={() => setSub({ ...emptyCategory(), category_id: sub.category_id })}
               >
-                বাতিল
+                <X className="mr-1 size-4" />
+                Cancel
               </Button>
             ) : null}
           </div>
         </Panel>
 
         <Panel className="p-0">
-          <h2 className="border-b border-border p-4 text-sm font-bold">সাব-ক্যাটাগরি তালিকা</h2>
-          <ul className="divide-y divide-border">
-            {(data?.subcategories ?? []).map((s) => {
-              const parent = (data?.categories ?? []).find((c) => c.id === s.category_id);
-              return (
-                <li key={s.id} className="flex items-center gap-2 px-4 py-3 text-sm">
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate font-semibold">{s.name_bn}</p>
-                    <p className="truncate text-xs text-muted-foreground">
-                      /c/{parent?.slug ?? "?"}/{s.slug}
-                    </p>
-                  </div>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => setSub(s as unknown as SubcategoryInput)}
+          <h2 className="border-b border-border p-4 text-sm font-bold">Subcategories</h2>
+          {(data?.subcategories ?? []).length === 0 ? (
+            <div className="p-4">
+              <EmptyState title="No subcategories yet" />
+            </div>
+          ) : (
+            <ul className="divide-y divide-border">
+              {(data?.subcategories ?? []).map((s, i) => {
+                const parent = (data?.categories ?? []).find((c) => c.id === s.category_id);
+                return (
+                  <li
+                    key={s.id}
+                    className="admin-rise group flex items-center gap-2 px-4 py-3 text-sm transition-colors duration-300 hover:bg-primary/5"
+                    style={{ animationDelay: `${i * 30}ms` }}
                   >
-                    এডিট
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => {
-                      if (confirm("মুছে ফেলবেন?")) delSub.mutate(s.id);
-                    }}
-                  >
-                    মুছুন
-                  </Button>
-                </li>
-              );
-            })}
-          </ul>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate font-semibold">{s.name_bn || s.name_en}</p>
+                      <p className="truncate text-xs text-muted-foreground">
+                        /c/{parent?.slug ?? "?"}/{s.slug}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-1 opacity-70 transition-opacity duration-200 group-hover:opacity-100">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => setSub(toSubcategoryDraft(s))}
+                      >
+                        <Pencil className="size-3.5" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => {
+                          if (confirm("Delete this subcategory?")) delSub.mutate(s.id);
+                        }}
+                      >
+                        <Trash2 className="size-3.5" />
+                      </Button>
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
         </Panel>
       </div>
     </div>
