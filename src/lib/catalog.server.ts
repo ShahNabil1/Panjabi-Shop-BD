@@ -444,6 +444,15 @@ export async function fetchLandingPage(slug: string) {
   const blocks = Array.isArray(content["blocks"])
     ? (content["blocks"] as Array<Record<string, string>>)
     : [];
+  const rawSeo = (content["seo"] ?? {}) as Record<string, unknown>;
+  const str = (v: unknown) => (typeof v === "string" && v.trim() ? v.trim() : null);
+  const seo = {
+    ogTitle: str(rawSeo["ogTitle"]),
+    ogDescription: str(rawSeo["ogDescription"]),
+    canonicalUrl: str(rawSeo["canonicalUrl"]),
+    productJsonLd: rawSeo["productJsonLd"] !== false,
+    noindex: rawSeo["noindex"] === true,
+  };
 
   return {
     landing: {
@@ -455,8 +464,10 @@ export async function fetchLandingPage(slug: string) {
       metaTitle: landing.meta_title,
       metaDescription: landing.meta_description,
       ogImageUrl: landing.og_image_url,
+      seo,
       blocks,
     },
+
     product: {
       id: product.id,
       slug: product.slug,
