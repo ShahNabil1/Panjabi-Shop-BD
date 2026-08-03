@@ -77,7 +77,7 @@ export const Route = createFileRoute("/p/$product")({
                 .toISOString()
                 .slice(0, 10),
               itemCondition: "https://schema.org/NewCondition",
-              seller: { "@type": "Organization", name: "তাঁতঘর" },
+              seller: { "@type": "Organization", name: "উপহারকাব্য" },
               shippingDetails: {
                 "@type": "OfferShippingDetails",
                 shippingDestination: {

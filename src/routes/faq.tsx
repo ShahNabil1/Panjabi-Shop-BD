@@ -11,13 +11,13 @@ export const Route = createFileRoute("/faq")({
   loader: async (): Promise<FaqData> => getFaqPage(),
   head: ({ loaderData }) => ({
     meta: [
-      { title: "সাধারণ প্রশ্নোত্তর | FAQ — তাঁতঘর" },
+      { title: "সাধারণ প্রশ্নোত্তর | FAQ — উপহারকাব্য" },
       {
         name: "description",
         content:
           "ডেলিভারি, পেমেন্ট, রিটার্ন ও পণ্যের মান নিয়ে সবচেয়ে বেশি জিজ্ঞাসিত প্রশ্নের উত্তর।",
       },
-      { property: "og:title", content: "সাধারণ প্রশ্নোত্তর | FAQ — তাঁতঘর" },
+      { property: "og:title", content: "সাধারণ প্রশ্নোত্তর | FAQ — উপহারকাব্য" },
       { property: "og:description", content: "ডেলিভারি, পেমেন্ট ও রিটার্ন সংক্রান্ত প্রশ্নের উত্তর।" },
       { property: "og:url", content: "/faq" },
     ],

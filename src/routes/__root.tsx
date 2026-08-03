@@ -36,7 +36,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     return {
       lang,
       categories: layout.categories,
-      brand: str(general["brand_name"], "তাঁতঘর"),
+      brand: str(general["brand_name"], "উপহারকাব্য"),
       tagline: str(general["tagline"], "সারা দেশে ক্যাশ অন ডেলিভারি · ৪৮ ঘণ্টায় ডেলিভারি"),
       contact: {
         phone: str(contactSetting["phone"], ""),
@@ -46,7 +46,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     };
   },
   head: ({ loaderData }) => {
-    const brand = loaderData?.brand ?? "তাঁতঘর";
+    const brand = loaderData?.brand ?? "উপহারকাব্য";
     return {
       meta: [
         { charSet: "utf-8" },

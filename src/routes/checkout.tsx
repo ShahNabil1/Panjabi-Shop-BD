@@ -12,13 +12,13 @@ export const Route = createFileRoute("/checkout")({
   component: CheckoutPage,
   head: () => ({
     meta: [
-      { title: "চেকআউট | তাঁতঘর" },
+      { title: "চেকআউট | উপহারকাব্য" },
       {
         name: "description",
         content: "ক্যাশ অন ডেলিভারিতে অর্ডার সম্পন্ন করুন — কোনো অগ্রিম পেমেন্ট লাগবে না।",
       },
       { name: "robots", content: "noindex" },
-      { property: "og:title", content: "চেকআউট | তাঁতঘর" },
+      { property: "og:title", content: "চেকআউট | উপহারকাব্য" },
       { property: "og:description", content: "ক্যাশ অন ডেলিভারিতে অর্ডার সম্পন্ন করুন।" },
       { property: "og:url", content: "https://upoharkabbo.lovable.app/checkout" },
     ],
