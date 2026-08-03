@@ -9,7 +9,6 @@ import {
   HelpCircle,
   LayoutDashboard,
   LogOut,
-  Menu,
   Package,
   Rocket,
   Settings,
@@ -277,23 +276,7 @@ function AdminLayout() {
           collapsed ? "lg:pl-[76px]" : "lg:pl-64",
         )}
       >
-        <header className="sticky top-0 z-30 border-b border-border/70 bg-background/80 backdrop-blur-xl">
-          <div className="flex items-center gap-3 px-4 py-3">
-            <button
-              onClick={() => setMobileOpen(true)}
-              aria-label="Open menu"
-              className="grid size-9 place-items-center rounded-xl border border-border transition-colors hover:bg-accent lg:hidden"
-            >
-              <Menu className="size-4" />
-            </button>
-            <p className="ig-text text-sm font-bold">Store Admin</p>
-            <span className="ml-auto hidden text-xs text-muted-foreground sm:block">
-              {session.user.email}
-            </span>
-          </div>
-        </header>
-
-        <main key={pathname} className="admin-rise mx-auto max-w-6xl space-y-6 px-4 py-6">
+        <main key={pathname} className="admin-rise mx-auto max-w-6xl space-y-6 px-4 py-6 pt-4 lg:pt-6">
           <Outlet />
         </main>
       </div>
