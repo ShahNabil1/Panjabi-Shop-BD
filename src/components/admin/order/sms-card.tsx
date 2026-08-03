@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Copy, MessageSquare, RotateCw, Send, X } from "lucide-react";
 
 import { smsTemplates, smsVariables } from "@/lib/admin-schema";
-import { adminRetrySms, adminSendSms } from "@/lib/order-admin.functions";
+import { adminRetrySms, adminSendSms, adminSmsBalance } from "@/lib/order-admin.functions";
 import { Panel } from "@/components/admin/kit";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -16,11 +16,21 @@ export type SmsLogRow = {
   message: string;
   status: string;
   provider_code: string | null;
+  provider_response?: string | null;
   segments: number;
   is_manual: boolean;
   sent_by_name: string | null;
   created_at: string;
 };
+
+/** Bangla text is sent as UCS-2: 70 chars for one part, 67 per part after that. */
+function segmentInfo(message: string) {
+  const unicode = /[^\u0000-\u007F]/.test(message);
+  const single = unicode ? 70 : 160;
+  const multi = unicode ? 67 : 153;
+  const parts = message.length === 0 ? 0 : message.length <= single ? 1 : Math.ceil(message.length / multi);
+  return { unicode, parts, limit: single };
+}
 
 const dt = (value: string) =>
   new Date(value).toLocaleString("en-US", {
@@ -40,11 +50,19 @@ export function SmsCard({ orderId, phone }: { orderId: string; phone: string }) 
   const [template, setTemplate] = useState("");
   const [message, setMessage] = useState("");
 
+  const { data: balance } = useQuery({
+    queryKey: ["admin", "sms", "balance"],
+    queryFn: () => adminSmsBalance(),
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+  });
+  const seg = segmentInfo(message);
+
   const send = useMutation({
     mutationFn: () => adminSendSms({ data: { orderId, phone, message } }),
     onSuccess: async (res) => {
-      if (res.ok) toast.success("SMS sent");
-      else toast.error("BulkSMSBD gateway is not configured yet — logged as failed");
+      if (res.ok) toast.success(`SMS sent — ${res.message}`);
+      else toast.error(`SMS failed${res.code ? ` (#${res.code})` : ""} — ${res.message}`);
       setOpen(false);
       setMessage("");
       setTemplate("");
@@ -63,7 +81,10 @@ export function SmsCard({ orderId, phone }: { orderId: string; phone: string }) 
             </span>
             <div>
               <p className="text-sm font-bold text-white">Send SMS to customer</p>
-              <p className="text-xs text-white/70">Ready → {phone}</p>
+              <p className="text-xs text-white/70">
+                Ready → {phone}
+                {balance?.ok ? ` · Balance ${balance.balance}` : balance ? ` · ${balance.message}` : ""}
+              </p>
             </div>
           </div>
           <Button
@@ -146,7 +167,10 @@ export function SmsCard({ orderId, phone }: { orderId: string; phone: string }) 
                 <span>
                   Sends to: <b className="font-mono text-foreground">{phone}</b>
                 </span>
-                <span>{message.length}/1000</span>
+                <span>
+                  {message.length}/1000 · {seg.parts} SMS ({seg.unicode ? "Bangla/Unicode" : "English"},{" "}
+                  {seg.limit} chars first part)
+                </span>
               </div>
             </div>
 
@@ -182,8 +206,8 @@ export function CommunicationLog({
   const retry = useMutation({
     mutationFn: (id: string) => adminRetrySms({ data: { id } }),
     onSuccess: async (res) => {
-      if (res.ok) toast.success("SMS resent");
-      else toast.error("BulkSMSBD gateway is not configured yet");
+      if (res.ok) toast.success(`SMS resent — ${res.message}`);
+      else toast.error(`Retry failed${res.code ? ` (#${res.code})` : ""} — ${res.message}`);
       await qc.invalidateQueries({ queryKey: ["admin"] });
     },
     onError: (e: Error) => toast.error(e.message),
@@ -240,6 +264,9 @@ export function CommunicationLog({
                 <span className="ml-auto text-xs text-muted-foreground">{dt(log.created_at)}</span>
               </div>
               <p className="whitespace-pre-wrap text-sm">{log.message}</p>
+              {log.provider_response ? (
+                <p className="text-xs text-muted-foreground">{log.provider_response}</p>
+              ) : null}
               <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
                 <span>{log.sent_by_name ?? "Staff"}</span>
                 <span className="font-mono">{log.phone}</span>
