@@ -3,7 +3,8 @@ import type {} from "@tanstack/react-start";
 
 import { fetchSitemapData } from "@/lib/catalog.server";
 
-const BASE_URL = "https://upoharkabbo.lovable.app";
+
+import { SITE_URL as BASE_URL } from "@/lib/site";
 
 type Entry = { path: string; changefreq?: string; priority?: string };
 

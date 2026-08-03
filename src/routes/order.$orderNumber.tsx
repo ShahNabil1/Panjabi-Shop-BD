@@ -106,7 +106,17 @@ function OrderReceipt() {
           </div>
         ) : null}
 
-        <div className="mt-6 text-center">
+        <div className="mt-6 flex flex-wrap justify-center gap-3">
+          {data ? (
+            <Link
+              to="/invoice/$orderNumber"
+              params={{ orderNumber }}
+              search={{ phone }}
+              className="inline-block rounded-sm bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
+            >
+              {tr(lang, "downloadInvoice")}
+            </Link>
+          ) : null}
           <Link
             to="/"
             className="inline-block rounded-sm border border-border px-5 py-2.5 text-sm font-semibold transition-colors hover:border-primary hover:text-primary"

@@ -27,6 +27,7 @@ import { Route as AdminLandingRouteImport } from './routes/admin.landing'
 import { Route as AdminPromotionsRouteImport } from './routes/admin.promotions'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AdminTaxonomyRouteImport } from './routes/admin.taxonomy'
+import { Route as InvoiceOrderNumberRouteImport } from './routes/invoice.$orderNumber'
 import { Route as LpSlugRouteImport } from './routes/lp.$slug'
 import { Route as OffersIndexRouteImport } from './routes/offers.index'
 import { Route as OffersPromotionRouteImport } from './routes/offers.$promotion'
@@ -129,6 +130,11 @@ const AdminTaxonomyRoute = AdminTaxonomyRouteImport.update({
   path: '/taxonomy',
   getParentRoute: () => AdminRoute,
 } as any)
+const InvoiceOrderNumberRoute = InvoiceOrderNumberRouteImport.update({
+  id: '/invoice/$orderNumber',
+  path: '/invoice/$orderNumber',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LpSlugRoute = LpSlugRouteImport.update({
   id: '/lp/$slug',
   path: '/lp/$slug',
@@ -203,6 +209,7 @@ export interface FileRoutesByFullPath {
   '/admin/promotions': typeof AdminPromotionsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/taxonomy': typeof AdminTaxonomyRoute
+  '/invoice/$orderNumber': typeof InvoiceOrderNumberRoute
   '/lp/$slug': typeof LpSlugRoute
   '/offers/$promotion': typeof OffersPromotionRoute
   '/order/$orderNumber': typeof OrderOrderNumberRoute
@@ -233,6 +240,7 @@ export interface FileRoutesByTo {
   '/admin/promotions': typeof AdminPromotionsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/taxonomy': typeof AdminTaxonomyRoute
+  '/invoice/$orderNumber': typeof InvoiceOrderNumberRoute
   '/lp/$slug': typeof LpSlugRoute
   '/offers/$promotion': typeof OffersPromotionRoute
   '/order/$orderNumber': typeof OrderOrderNumberRoute
@@ -265,6 +273,7 @@ export interface FileRoutesById {
   '/admin/promotions': typeof AdminPromotionsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/taxonomy': typeof AdminTaxonomyRoute
+  '/invoice/$orderNumber': typeof InvoiceOrderNumberRoute
   '/lp/$slug': typeof LpSlugRoute
   '/offers/$promotion': typeof OffersPromotionRoute
   '/order/$orderNumber': typeof OrderOrderNumberRoute
@@ -298,6 +307,7 @@ export interface FileRouteTypes {
     | '/admin/promotions'
     | '/admin/settings'
     | '/admin/taxonomy'
+    | '/invoice/$orderNumber'
     | '/lp/$slug'
     | '/offers/$promotion'
     | '/order/$orderNumber'
@@ -328,6 +338,7 @@ export interface FileRouteTypes {
     | '/admin/promotions'
     | '/admin/settings'
     | '/admin/taxonomy'
+    | '/invoice/$orderNumber'
     | '/lp/$slug'
     | '/offers/$promotion'
     | '/order/$orderNumber'
@@ -359,6 +370,7 @@ export interface FileRouteTypes {
     | '/admin/promotions'
     | '/admin/settings'
     | '/admin/taxonomy'
+    | '/invoice/$orderNumber'
     | '/lp/$slug'
     | '/offers/$promotion'
     | '/order/$orderNumber'
@@ -386,6 +398,7 @@ export interface RootRouteChildren {
   FaqRoute: typeof FaqRoute
   SearchRoute: typeof SearchRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  InvoiceOrderNumberRoute: typeof InvoiceOrderNumberRoute
   LpSlugRoute: typeof LpSlugRoute
   OffersPromotionRoute: typeof OffersPromotionRoute
   OrderOrderNumberRoute: typeof OrderOrderNumberRoute
@@ -523,6 +536,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminTaxonomyRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/invoice/$orderNumber': {
+      id: '/invoice/$orderNumber'
+      path: '/invoice/$orderNumber'
+      fullPath: '/invoice/$orderNumber'
+      preLoaderRoute: typeof InvoiceOrderNumberRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/lp/$slug': {
       id: '/lp/$slug'
       path: '/lp/$slug'
@@ -644,6 +664,7 @@ const rootRouteChildren: RootRouteChildren = {
   FaqRoute: FaqRoute,
   SearchRoute: SearchRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  InvoiceOrderNumberRoute: InvoiceOrderNumberRoute,
   LpSlugRoute: LpSlugRoute,
   OffersPromotionRoute: OffersPromotionRoute,
   OrderOrderNumberRoute: OrderOrderNumberRoute,
@@ -655,13 +676,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

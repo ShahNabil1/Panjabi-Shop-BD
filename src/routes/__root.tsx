@@ -21,6 +21,7 @@ import { NotFoundView } from "../components/site/not-found-view";
 import { CartProvider } from "../lib/cart-context";
 import { AuthProvider } from "../lib/auth-context";
 import { Toaster } from "../components/ui/sonner";
+import { SITE_URL } from "../lib/site";
 
 function str(value: unknown, fallback: string) {
   return typeof value === "string" && value.trim() ? value : fallback;
@@ -60,6 +61,60 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         { rel: "stylesheet", href: appCss },
         { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
       ],
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@graph": [
+              {
+                "@type": "Organization",
+                "@id": `${SITE_URL}/#organization`,
+                name: brand,
+                url: SITE_URL,
+                ...(loaderData?.contact.phone
+                  ? {
+                      contactPoint: [
+                        {
+                          "@type": "ContactPoint",
+                          telephone: loaderData.contact.phone,
+                          contactType: "customer service",
+                          areaServed: "BD",
+                          availableLanguage: ["bn", "en"],
+                        },
+                      ],
+                    }
+                  : {}),
+                ...(loaderData?.contact.address
+                  ? {
+                      address: {
+                        "@type": "PostalAddress",
+                        streetAddress: loaderData.contact.address,
+                        addressCountry: "BD",
+                      },
+                    }
+                  : {}),
+              },
+              {
+                "@type": "WebSite",
+                "@id": `${SITE_URL}/#website`,
+                name: brand,
+                url: SITE_URL,
+                inLanguage: ["bn", "en"],
+                publisher: { "@id": `${SITE_URL}/#organization` },
+                potentialAction: {
+                  "@type": "SearchAction",
+                  target: {
+                    "@type": "EntryPoint",
+                    urlTemplate: `${SITE_URL}/search?q={search_term_string}`,
+                  },
+                  "query-input": "required name=search_term_string",
+                },
+              },
+            ],
+          }),
+        },
+      ],
     };
   },
   shellComponent: RootShell,
@@ -84,7 +139,10 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function Chrome({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const bare = pathname.startsWith("/admin") || pathname.startsWith("/auth");
+  const bare =
+    pathname.startsWith("/admin") ||
+    pathname.startsWith("/auth") ||
+    pathname.startsWith("/invoice");
 
   if (bare) {
     return <div className="min-h-screen">{children}</div>;

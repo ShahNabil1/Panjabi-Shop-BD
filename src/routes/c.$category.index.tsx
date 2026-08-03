@@ -7,6 +7,7 @@ import { pick, tr } from "@/lib/i18n";
 import { ProductGrid } from "@/components/site/product-card";
 import { NotFoundView } from "@/components/site/not-found-view";
 import { Breadcrumbs, Prose, Section } from "@/components/site/ui";
+import { absoluteUrl } from "@/lib/site";
 
 export const Route = createFileRoute("/c/$category/")({
   loader: async ({ params }): Promise<CategoryPageData> => {
@@ -44,7 +45,28 @@ export const Route = createFileRoute("/c/$category/")({
             "@type": "CollectionPage",
             name: title,
             description,
-            url,
+            url: absoluteUrl(url),
+            mainEntity: {
+              "@type": "ItemList",
+              numberOfItems: loaderData.products.length,
+              itemListElement: loaderData.products.map((product, index) => ({
+                "@type": "ListItem",
+                position: index + 1,
+                url: absoluteUrl(`/p/${product.slug}`),
+                name: product.nameBn,
+              })),
+            },
+          }),
+        },
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              { "@type": "ListItem", position: 1, name: "হোম", item: absoluteUrl("/") },
+              { "@type": "ListItem", position: 2, name: c.name_bn, item: absoluteUrl(url) },
+            ],
           }),
         },
       ],

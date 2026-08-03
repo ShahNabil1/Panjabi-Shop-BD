@@ -7,6 +7,7 @@ import { useLang } from "@/lib/language-context";
 import { discountPercent, formatPrice, pick, tr, formatNumber, toBnDigits } from "@/lib/i18n";
 import { ProductGrid, ProductThumb } from "@/components/site/product-card";
 import { NotFoundView } from "@/components/site/not-found-view";
+import { absoluteUrl } from "@/lib/site";
 import { FaqList } from "@/components/site/faq-list";
 import { Breadcrumbs, Prose, Section } from "@/components/site/ui";
 import { AddToCartBar } from "@/components/site/add-to-cart";
@@ -71,8 +72,46 @@ export const Route = createFileRoute("/p/$product")({
                 p.stock > 0
                   ? "https://schema.org/InStock"
                   : "https://schema.org/OutOfStock",
-              url,
+              url: absoluteUrl(url),
+              priceValidUntil: new Date(Date.now() + 1000 * 60 * 60 * 24 * 90)
+                .toISOString()
+                .slice(0, 10),
+              itemCondition: "https://schema.org/NewCondition",
+              seller: { "@type": "Organization", name: "তাঁতঘর" },
+              shippingDetails: {
+                "@type": "OfferShippingDetails",
+                shippingDestination: {
+                  "@type": "DefinedRegion",
+                  addressCountry: "BD",
+                },
+              },
             },
+          }),
+        },
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              { "@type": "ListItem", position: 1, name: "হোম", item: absoluteUrl("/") },
+              ...(loaderData.category
+                ? [
+                    {
+                      "@type": "ListItem",
+                      position: 2,
+                      name: loaderData.category.name_bn,
+                      item: absoluteUrl(`/c/${loaderData.category.slug}`),
+                    },
+                  ]
+                : []),
+              {
+                "@type": "ListItem",
+                position: loaderData.category ? 3 : 2,
+                name: p.nameBn,
+                item: absoluteUrl(url),
+              },
+            ],
           }),
         },
         ...(Array.isArray(p.faq) && p.faq.length > 0

@@ -79,9 +79,21 @@ function AdminOrderDetail() {
         title={order.order_number}
         description={new Date(order.created_at).toLocaleString("bn-BD")}
         action={
-          <Button asChild variant="outline" size="sm">
-            <Link to="/admin/orders">ফিরে যান</Link>
-          </Button>
+          <div className="flex gap-2">
+            <Button asChild size="sm">
+              <Link
+                to="/invoice/$orderNumber"
+                params={{ orderNumber: order.order_number }}
+                search={{ phone: order.customer_phone }}
+                target="_blank"
+              >
+                ইনভয়েস
+              </Link>
+            </Button>
+            <Button asChild variant="outline" size="sm">
+              <Link to="/admin/orders">ফিরে যান</Link>
+            </Button>
+          </div>
         }
       />
 
