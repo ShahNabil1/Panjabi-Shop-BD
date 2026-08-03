@@ -82,8 +82,11 @@ function AdminOrderDetail() {
   return (
     <div className="space-y-5">
       <AdminHeading
+        backTo="/admin/orders"
+        backLabel="Orders"
         title={order.order_number}
         description={new Date(order.created_at).toLocaleString("en-GB")}
+
         action={
           <div className="flex gap-2">
             <Button asChild size="sm">
