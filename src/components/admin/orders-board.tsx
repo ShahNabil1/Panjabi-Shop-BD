@@ -1,7 +1,7 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { Search, Clock, Globe, Eye } from "lucide-react";
+import { Search, Clock, Globe, Eye, ShieldAlert, UserRound } from "lucide-react";
 
 import { adminListOrders } from "@/lib/admin.functions";
 import type { OrderBucket, OrderStatus } from "@/lib/admin-schema";
@@ -12,6 +12,17 @@ import { courierCachedRatios } from "@/lib/courier.functions";
 import { CourierStatusBar, ratioTone } from "@/components/admin/courier-status";
 import { cn } from "@/lib/utils";
 import { Pagination } from "@/components/admin/pagination";
+import { useOrderPresence } from "@/lib/use-order-presence";
+import { useAuth } from "@/lib/auth-context";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 
 function adminPrice(value: number | string | null | undefined) {
@@ -78,6 +89,11 @@ export function OrdersBoard({
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
   const current = Math.min(Math.max(1, page), totalPages);
   const rows = all.slice((current - 1) * pageSize, current * pageSize);
+
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const presence = useOrderPresence(rows.map((o) => o.id));
+  const [takeover, setTakeover] = useState<{ id: string; name: string } | null>(null);
 
   const phones = [...new Set(rows.map((o) => o.customer_phone))];
   const { data: ratios } = useQuery({
@@ -217,6 +233,43 @@ export function OrdersBoard({
           onPageSizeChange={setPageSize}
         />
       ) : null}
+
+      <Dialog open={!!takeover} onOpenChange={(open) => !open && setTakeover(null)}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-base">
+              <ShieldAlert className="size-4 text-rose-600" />
+              Take over this order?
+            </DialogTitle>
+            <DialogDescription>
+              <span className="font-semibold text-foreground">{takeover?.name}</span> is currently
+              handling this order. If you confirm, they will be removed from the order workspace
+              immediately and this takeover will be recorded in the activity log.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 sm:gap-2">
+            <Button variant="outline" onClick={() => setTakeover(null)}>
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => {
+                const id = takeover?.id;
+                setTakeover(null);
+                if (id)
+                  void navigate({
+                    to: "/admin/orders/$id",
+                    params: { id },
+                    search: { takeover: 1 },
+                  });
+              }}
+            >
+              <ShieldAlert className="size-4" />
+              Confirm takeover
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
 
   );
