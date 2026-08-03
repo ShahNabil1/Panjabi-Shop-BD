@@ -88,17 +88,26 @@ export function ItemsCard({
   orderId,
   initialItems,
   deliveryCharge,
-  discount,
+  discount: initialDiscount,
+  advanceAmount: initialAdvance,
+  advanceMethod: initialAdvanceMethod,
 }: {
   orderId: string;
   initialItems: EditableItem[];
   deliveryCharge: number;
   discount: number;
+  advanceAmount?: number;
+  advanceMethod?: string | null;
 }) {
   const qc = useQueryClient();
   const [items, setItems] = useState<EditableItem[]>(initialItems);
   const [adding, setAdding] = useState(false);
   const [query, setQuery] = useState("");
+  const [discount, setDiscount] = useState(initialDiscount);
+  const [advance, setAdvance] = useState(initialAdvance ?? 0);
+  const [advanceMethod, setAdvanceMethod] = useState<string>(
+    initialAdvanceMethod ?? advanceMethods[0],
+  );
 
   const { data: results } = useQuery({
     queryKey: ["admin", "product-search", query],
@@ -108,6 +117,8 @@ export function ItemsCard({
 
   const subtotal = items.reduce((s, i) => s + i.unitPrice * i.quantity, 0);
   const total = Math.max(0, subtotal + deliveryCharge - discount);
+  const paidAdvance = Math.min(advance, total);
+  const due = Math.max(0, total - paidAdvance);
 
   const save = useMutation({
     mutationFn: () =>
@@ -117,6 +128,11 @@ export function ItemsCard({
           items: items.map(({ image: _image, ...rest }) => rest),
           deliveryCharge,
           discount,
+          advanceAmount: paidAdvance,
+          advanceMethod:
+            paidAdvance > 0
+              ? (advanceMethod as (typeof advanceMethods)[number])
+              : null,
         },
       }),
     onSuccess: async () => {
@@ -128,6 +144,7 @@ export function ItemsCard({
 
   const patch = (index: number, next: Partial<EditableItem>) =>
     setItems(items.map((it, i) => (i === index ? { ...it, ...next } : it)));
+
 
   return (
     <Panel className="space-y-4">
