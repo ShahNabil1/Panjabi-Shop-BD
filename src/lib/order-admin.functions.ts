@@ -217,44 +217,37 @@ export const adminSetBlocked = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-/**
- * Records an outbound SMS. Delivery through BulkSMSBD is wired once the
- * API key and sender ID are provided; until then every attempt is logged
- * as failed so the communication log and retry flow stay accurate.
- */
+/** Sends an SMS through BulkSMSBD and records it in the communication log. */
 export const adminSendSms = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => smsSendSchema.parse(input))
   .handler(async ({ data, context }) => {
     const db = await requireAdmin(context.supabase, context.userId);
+    const { deliverSms } = await import("./sms.server");
     const { data: profile } = await db
       .from("profiles")
       .select("full_name")
       .eq("id", context.userId)
       .maybeSingle();
 
-    const { error } = await db.from("sms_logs").insert({
-      order_id: data.orderId,
+    const result = await deliverSms(db, {
+      orderId: data.orderId,
       phone: data.phone,
       message: data.message,
-      status: "failed",
-      provider_code: null,
-      provider_response: "BulkSMSBD gateway not configured yet",
-      segments: Math.max(1, Math.ceil(data.message.length / 160)),
-      is_manual: true,
-      sent_by: context.userId,
-      sent_by_name: (profile?.full_name as string | null) ?? "Staff",
+      isManual: true,
+      sentBy: context.userId,
+      sentByName: (profile?.full_name as string | null) ?? "Staff",
     });
-    if (error) throw new Error(error.message);
-    return { ok: false, reason: "gateway_not_configured" as const };
+    return { ok: result.ok, code: result.code, message: result.message };
   });
 
-/** Retry a failed SMS. Re-attempts through the gateway once it is configured. */
+/** Retry a failed SMS by re-sending the same message through the gateway. */
 export const adminRetrySms = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => smsRetrySchema.parse(input))
   .handler(async ({ data, context }) => {
     const db = await requireAdmin(context.supabase, context.userId);
+    const { deliverSms } = await import("./sms.server");
     const { data: row, error } = await db
       .from("sms_logs")
       .select("*")
@@ -264,17 +257,23 @@ export const adminRetrySms = createServerFn({ method: "POST" })
     if (!row) throw new Error("SMS not found");
 
     const r = row as unknown as Record<string, unknown>;
-    const { error: insErr } = await db.from("sms_logs").insert({
-      order_id: r["order_id"] as string | null,
+    const result = await deliverSms(db, {
+      orderId: (r["order_id"] as string | null) ?? null,
       phone: r["phone"] as string,
       message: r["message"] as string,
-      status: "failed",
-      provider_response: "Retry — BulkSMSBD gateway not configured yet",
-      segments: (r["segments"] as number) ?? 1,
-      is_manual: true,
-      sent_by: context.userId,
-      sent_by_name: (r["sent_by_name"] as string | null) ?? "Staff",
+      isManual: true,
+      sentBy: context.userId,
+      sentByName: (r["sent_by_name"] as string | null) ?? "Staff",
     });
-    if (insErr) throw new Error(insErr.message);
-    return { ok: false, reason: "gateway_not_configured" as const };
+    return { ok: result.ok, code: result.code, message: result.message };
   });
+
+/** Remaining BulkSMSBD credit balance, shown in the SMS card. */
+export const adminSmsBalance = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await requireAdmin(context.supabase, context.userId);
+    const { getSmsBalance } = await import("./sms.server");
+    return getSmsBalance();
+  });
+
