@@ -507,10 +507,11 @@ function ProductEditor() {
           onChange={(v) => set("meta_title", v || null)}
           hint="৬০ অক্ষরের মধ্যে রাখুন"
         />
-        <TextField
-          label="OG image URL"
-          value={draft.og_image_url ?? ""}
-          onChange={(v) => set("og_image_url", v || null)}
+        <ImageField
+          label="OG image (সোশ্যাল প্রিভিউ)"
+          folder="products"
+          value={draft.og_image_url}
+          onChange={(v) => set("og_image_url", v)}
         />
         <AreaField
           label="Meta description"
