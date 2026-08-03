@@ -34,6 +34,52 @@ export const orderListSchema = z.object({
   search: z.string().trim().max(120).optional(),
 });
 
+export const orderSources = [
+  "Facebook",
+  "Instagram",
+  "WhatsApp",
+  "Website",
+  "Direct",
+  "Upsell",
+  "Cross Sell",
+  "Phone Call",
+  "Other",
+] as const;
+
+export const advanceMethods = ["bKash", "Nagad", "Bank"] as const;
+
+export const deliveryPartners = ["Steadfast", "Pathao", "RedX", "CarryBee", "Other"] as const;
+
+export const adminOrderItemSchema = z.object({
+  productId: uuid,
+  variantId: uuid.nullable().default(null),
+  quantity: z.number().int().min(1).max(99),
+  unitPrice: z.number().min(0),
+});
+
+export const adminCreateOrderSchema = z.object({
+  customerName: z.string().trim().min(2).max(80),
+  customerPhone: z
+    .string()
+    .trim()
+    .regex(/^01[3-9]\d{8}$/, "Invalid Bangladeshi mobile number"),
+  addressLine: z.string().trim().min(4).max(300),
+  division: z.string().trim().min(2).max(60),
+  district: z.string().trim().min(2).max(60),
+  upazila: z.string().trim().min(2).max(80),
+  note: z.string().trim().max(500).optional().default(""),
+  discount: z.number().min(0).default(0),
+  deliveryCharge: z.number().min(0).default(0),
+  advanceAmount: z.number().min(0).default(0),
+  advanceMethod: z.enum(advanceMethods).nullable().default(null),
+  source: z.enum(orderSources).default("Direct"),
+  deliveryPartner: z.enum(deliveryPartners).nullable().default(null),
+  items: z.array(adminOrderItemSchema).min(1).max(30),
+});
+
+export type AdminCreateOrderInput = z.infer<typeof adminCreateOrderSchema>;
+
+
 export const categorySchema = z.object({
   id: uuid.optional(),
   slug: z.string().trim().min(1).max(80),
@@ -221,3 +267,12 @@ export function mirrorLang<T>(input: T): T {
   };
   return walk(input) as T;
 }
+
+export const productSearchSchema = z.object({ query: z.string().trim().max(80).default("") });
+
+export const customerLookupSchema = z.object({
+  phone: z
+    .string()
+    .trim()
+    .regex(/^01[3-9]\d{8}$/),
+});

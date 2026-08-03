@@ -10,6 +10,8 @@ import {
   LayoutDashboard,
   LogOut,
   Package,
+  PlusCircle,
+
   Rocket,
   Settings,
   ShoppingCart,
@@ -51,12 +53,17 @@ const sections: Array<{ title: string; items: NavItem[] }> = [
     ],
   },
   {
-    title: "Sales",
+    title: "Orders",
     items: [
-      { to: "/admin/orders", label: "Orders", icon: ShoppingCart },
-      { to: "/admin/promotions", label: "Promotions", icon: BadgePercent },
+      { to: "/admin/orders/create", label: "Create Order", icon: PlusCircle },
+      { to: "/admin/orders", label: "Order List", icon: ShoppingCart, exact: true },
     ],
   },
+  {
+    title: "Sales",
+    items: [{ to: "/admin/promotions", label: "Promotions", icon: BadgePercent }],
+  },
+
   {
     title: "Content",
     items: [
