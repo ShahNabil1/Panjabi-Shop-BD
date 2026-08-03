@@ -166,6 +166,7 @@ function CreateOrderPage() {
           sku: variant?.sku ?? product.sku,
           unitPrice,
           quantity: 1,
+          imageUrl,
         },
       ];
     });
@@ -430,6 +431,18 @@ function CreateOrderPage() {
             <ul className="mt-4 divide-y divide-border border-t border-border">
               {lines.map((l) => (
                 <li key={l.key} className="flex flex-wrap items-center gap-3 py-2.5">
+                  {l.imageUrl ? (
+                    <img
+                      src={l.imageUrl}
+                      alt={l.name}
+                      loading="lazy"
+                      className="size-10 shrink-0 rounded-lg border border-border/70 object-cover"
+                    />
+                  ) : (
+                    <div className="grid size-10 shrink-0 place-items-center rounded-lg border border-dashed border-border text-[10px] text-muted-foreground">
+                      No img
+                    </div>
+                  )}
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-semibold">
                       {l.name}
