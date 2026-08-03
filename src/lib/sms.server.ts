@@ -150,10 +150,8 @@ export async function getSmsBalance(): Promise<{ ok: boolean; balance: number | 
   }
 }
 
-/** Fills {{variables}} in an SMS template. */
-export function renderSmsTemplate(template: string, vars: Record<string, string>): string {
-  return template.replace(/\{\{\s*(\w+)\s*\}\}/g, (_m, key: string) => vars[key] ?? "");
-}
+export { renderSmsTemplate, orderSmsVars } from "./sms-template";
+
 
 /** Sends an SMS and records the attempt in `sms_logs`. Returns the gateway result. */
 export async function deliverSms(
