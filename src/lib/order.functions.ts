@@ -55,6 +55,20 @@ export const placeOrder = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<PlacedOrder> => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
+    const { getRequestIP, getRequestHeader } = await import("@tanstack/react-start/server");
+    let clientIp: string | null = null;
+    try {
+      const forwarded = getRequestHeader("x-forwarded-for") ?? "";
+      clientIp =
+        (getRequestHeader("cf-connecting-ip") ||
+          forwarded.split(",")[0]?.trim() ||
+          getRequestIP({ xForwardedFor: true }) ||
+          null) ?? null;
+    } catch {
+      clientIp = null;
+    }
+
+
     const productIds = [...new Set(data.items.map((i) => i.productId))];
     const variantIds = [
       ...new Set(data.items.map((i) => i.variantId).filter((v): v is string => Boolean(v))),
