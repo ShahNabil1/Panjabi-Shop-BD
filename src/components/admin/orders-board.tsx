@@ -11,6 +11,8 @@ import { Input } from "@/components/ui/input";
 import { courierCachedRatios } from "@/lib/courier.functions";
 import { CourierStatusBar, ratioTone } from "@/components/admin/courier-status";
 import { cn } from "@/lib/utils";
+import { Pagination } from "@/components/admin/pagination";
+
 
 function adminPrice(value: number | string | null | undefined) {
   const n = Number(value ?? 0);
