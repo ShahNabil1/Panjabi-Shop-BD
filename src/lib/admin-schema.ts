@@ -4,12 +4,40 @@ export const orderStatuses = [
   "pending",
   "confirmed",
   "processing",
+  "incomplete",
+  "no_response",
+  "good_no_response",
+  "hold",
   "shipped",
   "delivered",
   "cancelled",
   "returned",
 ] as const;
 export type OrderStatus = (typeof orderStatuses)[number];
+
+/** Statuses shown on the Web Orders screen (incoming website / landing traffic). */
+export const webOrderStatuses = [
+  "processing",
+  "incomplete",
+  "no_response",
+  "good_no_response",
+  "hold",
+  "cancelled",
+] as const;
+
+/** Statuses shown on the Order List screen (confirmed fulfilment pipeline). */
+export const listOrderStatuses = [
+  "pending",
+  "confirmed",
+  "shipped",
+  "delivered",
+  "cancelled",
+  "returned",
+] as const;
+
+export const orderBuckets = ["web", "list"] as const;
+export type OrderBucket = (typeof orderBuckets)[number];
+
 
 export const promotionTypes = ["offer", "featured", "flash", "new_arrival"] as const;
 
