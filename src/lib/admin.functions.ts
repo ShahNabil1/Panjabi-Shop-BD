@@ -5,6 +5,7 @@ import { requireAdmin, unwrap } from "./admin.server";
 import {
   categorySchema,
   faqSchema,
+  mirrorLang,
   idSchema,
   landingPageSchema,
   orderListSchema,
@@ -132,7 +133,7 @@ export const adminTaxonomy = createServerFn({ method: "GET" })
 
 export const adminSaveCategory = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => categorySchema.parse(input))
+  .inputValidator((input: unknown) => categorySchema.parse(mirrorLang(input)))
   .handler(async ({ data, context }) => {
     const db = await requireAdmin(context.supabase, context.userId);
     const { id, ...rest } = data;
@@ -155,7 +156,7 @@ export const adminDeleteCategory = createServerFn({ method: "POST" })
 
 export const adminSaveSubcategory = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => subcategorySchema.parse(input))
+  .inputValidator((input: unknown) => subcategorySchema.parse(mirrorLang(input)))
   .handler(async ({ data, context }) => {
     const db = await requireAdmin(context.supabase, context.userId);
     const { id, ...rest } = data;
@@ -207,7 +208,7 @@ export const adminGetProduct = createServerFn({ method: "POST" })
 
 export const adminSaveProduct = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => productSchema.parse(input))
+  .inputValidator((input: unknown) => productSchema.parse(mirrorLang(input)))
   .handler(async ({ data, context }) => {
     const db = await requireAdmin(context.supabase, context.userId);
     const { id, images, variants, ...rest } = data;
@@ -266,7 +267,7 @@ export const adminListPromotions = createServerFn({ method: "GET" })
 
 export const adminSavePromotion = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => promotionSchema.parse(input))
+  .inputValidator((input: unknown) => promotionSchema.parse(mirrorLang(input)))
   .handler(async ({ data, context }) => {
     const db = await requireAdmin(context.supabase, context.userId);
     const { id, product_ids, ...rest } = data;
@@ -310,7 +311,7 @@ export const adminListLandingPages = createServerFn({ method: "GET" })
 
 export const adminSaveLandingPage = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => landingPageSchema.parse(input))
+  .inputValidator((input: unknown) => landingPageSchema.parse(mirrorLang(input)))
   .handler(async ({ data, context }) => {
     const db = await requireAdmin(context.supabase, context.userId);
     const { id, bullets, ...rest } = data;
@@ -341,7 +342,7 @@ export const adminListFaqs = createServerFn({ method: "GET" })
 
 export const adminSaveFaq = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => faqSchema.parse(input))
+  .inputValidator((input: unknown) => faqSchema.parse(mirrorLang(input)))
   .handler(async ({ data, context }) => {
     const db = await requireAdmin(context.supabase, context.userId);
     const { id, ...rest } = data;
