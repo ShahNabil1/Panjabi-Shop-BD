@@ -46,9 +46,22 @@ function AdminOrdersPage() {
       }),
   });
 
+  const phones = [...new Set((data ?? []).map((o) => o.customer_phone))];
+  const { data: ratios } = useQuery({
+    queryKey: ["admin", "courier", "ratios", phones.join(",")],
+    queryFn: () => courierCachedRatios({ data: { phones } }),
+    enabled: phones.length > 0,
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+  });
+
   return (
     <div className="space-y-5">
       <AdminHeading title="Orders" description="View all orders and update their status." />
+
+      <CourierStatusBar />
+
+
 
       <div className="admin-rise flex flex-wrap items-center gap-3 rounded-2xl border border-border/70 bg-card p-3">
         <div className="relative max-w-xs flex-1 min-w-[200px]">
