@@ -99,7 +99,7 @@ export function OrdersBoard({
 
       <Panel className="p-0">
         {isLoading ? (
-          <BrandLoader size="md" message="Loading orders…" className="py-8" />
+          <BrandLoader size="md" className="py-8" />
         ) : (data?.length ?? 0) === 0 ? (
           <div className="p-4">
             <EmptyState title={emptyTitle} />

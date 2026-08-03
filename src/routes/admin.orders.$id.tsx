@@ -90,7 +90,7 @@ function AdminOrderDetail() {
     onError: (e: Error) => toast.error(e.message),
   });
 
-  if (isLoading) return <BrandLoader size="md" message="Loading order…" className="py-8" />;
+  if (isLoading) return <BrandLoader size="md" className="py-8" />;
   if (!data) {
     return (
       <Panel className="space-y-3 text-center">

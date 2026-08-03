@@ -352,6 +352,15 @@
   }
 }
 
+@keyframes loader-bar-shimmer {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 200% 50%;
+  }
+}
+
 .admin-rise {
   animation: admin-rise 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
@@ -359,6 +368,11 @@
 .admin-shimmer {
   background-size: 200% 200%;
   animation: admin-shimmer 6s linear infinite alternate;
+}
+
+.loader-progress {
+  background-size: 200% 200%;
+  animation: loader-bar-shimmer 1.6s linear infinite;
 }
 
 /* Always-visible toast close button */

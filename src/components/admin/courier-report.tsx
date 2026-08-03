@@ -132,7 +132,7 @@ export function CourierReport({ phone }: { phone: string }) {
       </div>
 
       {isLoading || refresh.isPending ? (
-        <BrandLoader size="sm" message="Loading courier data…" className="py-6" />
+        <BrandLoader size="sm" className="py-6" />
       ) : error ? (
         <p className="mt-3 text-sm text-rose-700">{(error as Error).message}</p>
       ) : !data ? (
