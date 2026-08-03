@@ -904,6 +904,48 @@ export type Database = {
           },
         ]
       }
+      sms_templates: {
+        Row: {
+          body: string
+          category: string
+          created_at: string
+          enabled: boolean
+          id: string
+          is_system: boolean
+          key: string | null
+          name: string
+          sort_order: number
+          updated_at: string
+          variables: Json
+        }
+        Insert: {
+          body: string
+          category?: string
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          is_system?: boolean
+          key?: string | null
+          name: string
+          sort_order?: number
+          updated_at?: string
+          variables?: Json
+        }
+        Update: {
+          body?: string
+          category?: string
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          is_system?: boolean
+          key?: string | null
+          name?: string
+          sort_order?: number
+          updated_at?: string
+          variables?: Json
+        }
+        Relationships: []
+      }
       subcategories: {
         Row: {
           category_id: string
