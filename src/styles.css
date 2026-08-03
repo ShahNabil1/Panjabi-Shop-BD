@@ -250,47 +250,65 @@
 .admin-scope {
   --radius: 0.85rem;
 
-  --background: oklch(0.985 0.008 330);
-  --foreground: oklch(0.24 0.04 320);
-  --surface: oklch(0.975 0.014 335);
-  --surface-foreground: oklch(0.24 0.04 320);
+  --background: oklch(0.995 0.003 330);
+  --foreground: oklch(0.18 0.005 320);
+  --surface: oklch(0.988 0.006 335);
+  --surface-foreground: oklch(0.18 0.005 320);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.24 0.04 320);
+  --card-foreground: oklch(0.18 0.005 320);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.24 0.04 320);
+  --popover-foreground: oklch(0.18 0.005 320);
 
-  --primary: oklch(0.56 0.223 348);
-  --primary-foreground: oklch(0.99 0.005 330);
-  --secondary: oklch(0.955 0.024 340);
-  --secondary-foreground: oklch(0.35 0.09 340);
-  --muted: oklch(0.962 0.016 335);
-  --muted-foreground: oklch(0.52 0.045 330);
-  --accent: oklch(0.94 0.045 340);
-  --accent-foreground: oklch(0.36 0.13 340);
-  --destructive: oklch(0.58 0.21 20);
-  --destructive-foreground: oklch(0.99 0.005 330);
-  --success: oklch(0.6 0.13 155);
-  --success-foreground: oklch(0.99 0.005 330);
+  --primary: oklch(0.63 0.17 348);
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.975 0.012 340);
+  --secondary-foreground: oklch(0.24 0.02 340);
+  --muted: oklch(0.978 0.008 335);
+  --muted-foreground: oklch(0.42 0.02 330);
+  --accent: oklch(0.968 0.022 340);
+  --accent-foreground: oklch(0.26 0.05 340);
+  --destructive: oklch(0.63 0.17 20);
+  --destructive-foreground: oklch(1 0 0);
+  --success: oklch(0.66 0.1 155);
+  --success-foreground: oklch(1 0 0);
 
-  --border: oklch(0.915 0.022 335);
-  --input: oklch(0.915 0.022 335);
-  --ring: oklch(0.56 0.223 348);
+  --border: oklch(0.945 0.01 335);
+  --input: oklch(0.945 0.01 335);
+  --ring: oklch(0.63 0.17 348);
 
   --ig-gradient: linear-gradient(
     135deg,
-    #f9ce34 0%,
-    #ee2a7b 45%,
-    #b134c8 72%,
-    #6228d7 100%
+    #fbd97a 0%,
+    #f473a6 45%,
+    #c377dd 72%,
+    #8a6ae8 100%
   );
   --ig-gradient-soft: linear-gradient(
     135deg,
-    rgba(249, 206, 52, 0.14) 0%,
-    rgba(238, 42, 123, 0.16) 45%,
-    rgba(98, 40, 215, 0.16) 100%
+    rgba(249, 206, 52, 0.08) 0%,
+    rgba(238, 42, 123, 0.09) 45%,
+    rgba(98, 40, 215, 0.09) 100%
   );
   font-family: "Times New Roman", Times, serif;
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  color: var(--foreground);
 }
+
+.admin-scope .text-xs {
+  font-size: 0.85rem;
+}
+.admin-scope .text-sm {
+  font-size: 0.975rem;
+}
+.admin-scope .text-base {
+  font-size: 1.075rem;
+}
+
+.admin-scope .text-muted-foreground {
+  color: oklch(0.42 0.02 330);
+}
+
 
 @utility ig-gradient {
   background-image: var(--ig-gradient);
