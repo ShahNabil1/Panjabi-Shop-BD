@@ -39,7 +39,7 @@ function Value({ label, children }: { label: string; children: React.ReactNode }
 export function CustomerCard({ order }: { order: OrderCustomer }) {
   const qc = useQueryClient();
   const [editing, setEditing] = useState(false);
-  const [form, setForm] = useState({
+  const baseline = {
     customerName: order.customer_name,
     customerPhone: order.customer_phone,
     altPhone: order.alt_phone ?? "",
@@ -47,7 +47,9 @@ export function CustomerCard({ order }: { order: OrderCustomer }) {
     district: order.district ?? "",
     upazila: order.upazila ?? "",
     addressLine: order.address_line,
-  });
+  };
+  const [form, setForm] = useState(baseline);
+  const isDirty = JSON.stringify(form) !== JSON.stringify(baseline);
 
   const division = BD_DIVISIONS.find((d) => d.bn === form.division || d.en === form.division);
   const district = division?.districts.find(
@@ -73,13 +75,25 @@ export function CustomerCard({ order }: { order: OrderCustomer }) {
         </h2>
         {editing ? (
           <div className="flex items-center gap-2">
-            <Button size="sm" variant="outline" onClick={() => setEditing(false)}>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => {
+                setForm(baseline);
+                setEditing(false);
+              }}
+            >
               <X className="size-3.5" />
               Cancel
             </Button>
-            <Button size="sm" loading={save.isPending} onClick={() => save.mutate()}>
+            <Button
+              size="sm"
+              loading={save.isPending}
+              disabled={!isDirty || save.isPending}
+              onClick={() => save.mutate()}
+            >
               <Save className="size-3.5" />
-              Save
+              {isDirty ? "Save" : "Saved"}
             </Button>
           </div>
         ) : (
