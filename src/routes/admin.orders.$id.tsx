@@ -228,16 +228,36 @@ function AdminOrderDetail() {
         ) : null}
 
         {isWeb ? (
-          <Button
-            size="lg"
-            disabled={update.isPending}
-            onClick={() => update.mutate({ status: "pending" })}
-            className="w-full"
-          >
-            <CheckCircle2 className="size-5" />
-            Confirm Order
-          </Button>
+          <div className="space-y-3">
+            <div className="rounded-xl border border-border bg-muted/40 p-3">
+              <div className="flex items-center gap-2">
+                <MessageSquare className="size-4 text-primary" />
+                <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground">
+                  SMS preview — sent on confirm
+                </p>
+              </div>
+              <p className="mt-2 whitespace-pre-wrap rounded-lg border border-border/70 bg-background p-3 text-sm leading-relaxed">
+                {confirmSms}
+              </p>
+              <p className="mt-2 text-[11px] text-muted-foreground">
+                To {order.customer_phone} · {confirmSms.length} chars ·{" "}
+                {order.auto_sms_status === "sent"
+                  ? "Already sent for this order"
+                  : "Variables rendered with live order data"}
+              </p>
+            </div>
+            <Button
+              size="lg"
+              disabled={update.isPending}
+              onClick={() => update.mutate({ status: "pending" })}
+              className="w-full"
+            >
+              <CheckCircle2 className="size-5" />
+              Confirm Order
+            </Button>
+          </div>
         ) : null}
+
       </Panel>
 
       {/* Fraud checker directly under the order title */}
