@@ -10,6 +10,7 @@ import {
   LayoutDashboard,
   LogOut,
   Menu,
+  MessageSquareText,
 
   Package,
   PlusCircle,
@@ -73,7 +74,13 @@ const sections: Array<{ title: string; items: NavItem[] }> = [
     items: [
       { to: "/admin/landing", label: "Landing Pages", icon: Rocket },
       { to: "/admin/faqs", label: "FAQs", icon: HelpCircle },
-      { to: "/admin/settings", label: "Settings", icon: Settings },
+    ],
+  },
+  {
+    title: "Settings",
+    items: [
+      { to: "/admin/settings", label: "Site Settings", icon: Settings, exact: true },
+      { to: "/admin/settings/sms-templates", label: "SMS Templates", icon: MessageSquareText },
     ],
   },
 ];
