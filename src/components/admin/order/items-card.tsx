@@ -1,0 +1,285 @@
+import { useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { Package, Plus, Save, Search, Trash2, Truck } from "lucide-react";
+
+import { adminSearchProducts } from "@/lib/admin.functions";
+import { adminSaveDeliveryNote, adminSaveOrderItems } from "@/lib/order-admin.functions";
+import { Panel } from "@/components/admin/kit";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
+
+export type EditableItem = {
+  productId: string | null;
+  productName: string;
+  variantLabel: string | null;
+  sku: string | null;
+  unitPrice: number;
+  quantity: number;
+  image?: string | null;
+};
+
+const money = (n: number) => `৳ ${Number(n || 0).toLocaleString("en-US")}`;
+
+/** Delivery note forwarded to the selected courier partner at booking time. */
+export function DeliveryNoteCard({
+  orderId,
+  initial,
+  partner,
+}: {
+  orderId: string;
+  initial: string;
+  partner: string | null;
+}) {
+  const qc = useQueryClient();
+  const [enabled, setEnabled] = useState(Boolean(initial));
+  const [note, setNote] = useState(initial);
+
+  const save = useMutation({
+    mutationFn: () =>
+      adminSaveDeliveryNote({ data: { id: orderId, deliveryNote: enabled ? note : "" } }),
+    onSuccess: async () => {
+      toast.success("Delivery note saved");
+      await qc.invalidateQueries({ queryKey: ["admin"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  return (
+    <Panel className="space-y-3">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <label className="flex cursor-pointer items-center gap-2.5 text-sm font-bold">
+          <Checkbox checked={enabled} onCheckedChange={(v) => setEnabled(Boolean(v))} />
+          <Truck className="size-4 text-primary" />
+          Add delivery note
+        </label>
+        <span className="text-xs text-muted-foreground">
+          for {partner ?? "courier"} · optional
+        </span>
+      </div>
+
+      {enabled ? (
+        <div className="space-y-2">
+          <Textarea
+            rows={3}
+            maxLength={500}
+            className="rounded-xl"
+            placeholder="Optional — e.g. Deliver by 3 PM, call before arrival, leave with security…"
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+          />
+          <div className="flex items-center justify-between">
+            <span className="text-xs text-muted-foreground">{note.length}/500 characters</span>
+            <Button size="sm" disabled={save.isPending} onClick={() => save.mutate()}>
+              <Save className="size-3.5" />
+              Save note
+            </Button>
+          </div>
+        </div>
+      ) : null}
+    </Panel>
+  );
+}
+
+/** Order line items with search-based add, inline quantity/price edit and delete. */
+export function ItemsCard({
+  orderId,
+  initialItems,
+  deliveryCharge,
+  discount,
+}: {
+  orderId: string;
+  initialItems: EditableItem[];
+  deliveryCharge: number;
+  discount: number;
+}) {
+  const qc = useQueryClient();
+  const [items, setItems] = useState<EditableItem[]>(initialItems);
+  const [adding, setAdding] = useState(false);
+  const [query, setQuery] = useState("");
+
+  const { data: results } = useQuery({
+    queryKey: ["admin", "product-search", query],
+    queryFn: () => adminSearchProducts({ data: { query } }),
+    enabled: adding,
+  });
+
+  const subtotal = items.reduce((s, i) => s + i.unitPrice * i.quantity, 0);
+  const total = Math.max(0, subtotal + deliveryCharge - discount);
+
+  const save = useMutation({
+    mutationFn: () =>
+      adminSaveOrderItems({
+        data: {
+          id: orderId,
+          items: items.map(({ image: _image, ...rest }) => rest),
+          deliveryCharge,
+          discount,
+        },
+      }),
+    onSuccess: async () => {
+      toast.success("Items updated");
+      await qc.invalidateQueries({ queryKey: ["admin"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const patch = (index: number, next: Partial<EditableItem>) =>
+    setItems(items.map((it, i) => (i === index ? { ...it, ...next } : it)));
+
+  return (
+    <Panel className="space-y-4">
+      <div className="flex items-center justify-between gap-3">
+        <h2 className="flex items-center gap-2 text-sm font-bold">
+          <Package className="size-4 text-primary" />
+          Items
+        </h2>
+        <div className="flex items-center gap-2">
+          <Button size="sm" variant="outline" onClick={() => setAdding((v) => !v)}>
+            <Plus className="size-3.5" />
+            Add Product
+          </Button>
+          <Button size="sm" disabled={save.isPending} onClick={() => save.mutate()}>
+            <Save className="size-3.5" />
+            Save
+          </Button>
+        </div>
+      </div>
+
+      {adding ? (
+        <div className="space-y-2 rounded-xl border border-border/70 bg-background/60 p-3">
+          <div className="relative">
+            <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              autoFocus
+              className="rounded-xl pl-9"
+              placeholder="Search product title…"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+            />
+          </div>
+          <ul className="max-h-64 space-y-1 overflow-auto">
+            {(results ?? []).map((p) => {
+              const row = p as unknown as {
+                id: string;
+                name_bn: string;
+                sku: string | null;
+                price: number | string;
+                product_images?: Array<{ url: string }>;
+              };
+              return (
+                <li key={row.id}>
+                  <button
+                    type="button"
+                    className="flex w-full items-center gap-3 rounded-lg px-2 py-2 text-left transition-colors hover:bg-muted/60"
+                    onClick={() => {
+                      setItems([
+                        ...items,
+                        {
+                          productId: row.id,
+                          productName: row.name_bn,
+                          variantLabel: null,
+                          sku: row.sku,
+                          unitPrice: Number(row.price),
+                          quantity: 1,
+                          image: row.product_images?.[0]?.url ?? null,
+                        },
+                      ]);
+                      setAdding(false);
+                      setQuery("");
+                    }}
+                  >
+                    {row.product_images?.[0]?.url ? (
+                      <img
+                        src={row.product_images[0].url}
+                        alt=""
+                        className="size-9 shrink-0 rounded-md object-cover"
+                      />
+                    ) : (
+                      <span className="size-9 shrink-0 rounded-md bg-muted" />
+                    )}
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate text-sm font-semibold">{row.name_bn}</span>
+                      <span className="block font-mono text-xs text-muted-foreground">
+                        {row.sku ?? "no-sku"} · {money(Number(row.price))}
+                      </span>
+                    </span>
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      ) : null}
+
+      <ul className="space-y-2">
+        {items.map((item, index) => (
+          <li
+            key={`${item.productId ?? "custom"}-${index}`}
+            className="flex flex-wrap items-center gap-3 rounded-xl border border-border/70 bg-background/60 p-2.5"
+          >
+            {item.image ? (
+              <img src={item.image} alt="" className="size-11 rounded-md object-cover" />
+            ) : (
+              <span className="size-11 rounded-md bg-muted" />
+            )}
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-semibold">{item.productName}</p>
+              <p className="font-mono text-xs text-muted-foreground">
+                {item.sku ?? "no-sku"} · {item.variantLabel ?? "physical"}
+              </p>
+            </div>
+            <Input
+              type="number"
+              min={1}
+              className="h-9 w-20 rounded-lg text-center"
+              value={item.quantity}
+              onChange={(e) => patch(index, { quantity: Math.max(1, Number(e.target.value)) })}
+            />
+            <Input
+              type="number"
+              min={0}
+              className="h-9 w-28 rounded-lg text-center"
+              value={item.unitPrice}
+              onChange={(e) => patch(index, { unitPrice: Math.max(0, Number(e.target.value)) })}
+            />
+            <span className="w-24 text-right text-sm font-bold tabular-nums">
+              {money(item.unitPrice * item.quantity)}
+            </span>
+            <button
+              type="button"
+              aria-label="Remove item"
+              className="text-muted-foreground transition-colors hover:text-destructive"
+              onClick={() => setItems(items.filter((_, i) => i !== index))}
+            >
+              <Trash2 className="size-4" />
+            </button>
+          </li>
+        ))}
+      </ul>
+
+      <dl className="space-y-1.5 border-t border-dashed border-border pt-3 text-sm">
+        <div className="flex justify-end gap-3">
+          <dt className="text-muted-foreground">Subtotal:</dt>
+          <dd className="w-24 text-right font-semibold tabular-nums">{money(subtotal)}</dd>
+        </div>
+        <div className="flex justify-end gap-3">
+          <dt className="text-muted-foreground">Shipping:</dt>
+          <dd className="w-24 text-right font-semibold tabular-nums">{money(deliveryCharge)}</dd>
+        </div>
+        {discount > 0 ? (
+          <div className="flex justify-end gap-3">
+            <dt className="text-muted-foreground">Discount:</dt>
+            <dd className="w-24 text-right font-semibold tabular-nums">-{money(discount)}</dd>
+          </div>
+        ) : null}
+        <div className="flex justify-end gap-3 text-base">
+          <dt className="font-semibold">Total:</dt>
+          <dd className="w-24 text-right font-bold tabular-nums text-primary">{money(total)}</dd>
+        </div>
+      </dl>
+    </Panel>
+  );
+}
