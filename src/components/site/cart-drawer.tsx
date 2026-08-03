@@ -63,7 +63,7 @@ export function CartDrawer() {
         aria-label={tr(lang, "close")}
         onClick={closeCart}
         className={cn(
-          "absolute inset-0 bg-foreground/50 backdrop-blur-[2px] transition-opacity duration-300 ease-out",
+          "absolute inset-0 bg-foreground/50 backdrop-blur-[2px] transition-opacity duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]",
           open ? "opacity-100" : "opacity-0",
         )}
       />
@@ -73,7 +73,7 @@ export function CartDrawer() {
         aria-modal={open}
         aria-label={tr(lang, "cart")}
         className={cn(
-          "absolute inset-y-0 right-0 flex w-full max-w-md flex-col bg-background shadow-2xl transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] will-change-transform",
+          "absolute inset-y-0 right-0 flex w-full max-w-md flex-col bg-background shadow-2xl transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] will-change-transform",
           open ? "translate-x-0" : "translate-x-full",
         )}
       >
