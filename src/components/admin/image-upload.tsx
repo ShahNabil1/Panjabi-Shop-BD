@@ -6,7 +6,7 @@ import { compressImage, formatBytes } from "@/lib/image-compress";
 import { createUploadTicket } from "@/lib/media.functions";
 import { cn } from "@/lib/utils";
 
-type Folder = "products" | "categories" | "promotions" | "landing" | "site";
+type Folder = "products" | "categories" | "promotions" | "landing" | "site" | "hero";
 
 async function uploadOne(file: File, folder: Folder): Promise<string> {
   const compressed = await compressImage(file);

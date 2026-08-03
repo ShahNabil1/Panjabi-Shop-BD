@@ -7,7 +7,7 @@ import { requireAdmin } from "@/lib/admin.server";
 const MAX_UPLOAD_BYTES = 8 * 1024 * 1024;
 
 const uploadInput = z.object({
-  folder: z.enum(["products", "categories", "promotions", "landing", "site"]),
+  folder: z.enum(["products", "categories", "promotions", "landing", "site", "hero"]),
   fileName: z.string().min(1).max(120),
   contentType: z.enum(["image/webp", "image/jpeg", "image/png", "image/svg+xml", "image/gif"]),
   size: z.number().int().positive().max(MAX_UPLOAD_BYTES),
