@@ -190,7 +190,9 @@ export function SmsCard({ orderId, phone }: { orderId: string; phone: string }) 
           </div>
         </div>
       ) : null}
+      </Panel>
     </>
+
   );
 }
 
