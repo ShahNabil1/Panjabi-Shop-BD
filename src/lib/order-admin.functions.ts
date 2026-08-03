@@ -128,6 +128,7 @@ export const adminSaveOrderItems = createServerFn({ method: "POST" })
     );
     if (ins.error) throw new Error(ins.error.message);
 
+    const advance = Math.min(data.advanceAmount, total);
     const upd = await db
       .from("orders")
       .update({
@@ -135,6 +136,9 @@ export const adminSaveOrderItems = createServerFn({ method: "POST" })
         delivery_charge: data.deliveryCharge,
         discount: data.discount,
         total,
+        advance_amount: advance,
+        advance_method: advance > 0 ? data.advanceMethod : null,
+        payment_method: advance > 0 ? "partial_advance" : "cod",
       })
       .eq("id", data.id);
     if (upd.error) throw new Error(upd.error.message);
