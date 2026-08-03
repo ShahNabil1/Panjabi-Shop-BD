@@ -8,7 +8,7 @@ import { orderStatuses } from "@/lib/admin-schema";
 import { AdminHeading, Panel, StatusPill, statusLabels } from "@/components/admin/kit";
 import { Button } from "@/components/ui/button";
 
-export const Route = createFileRoute("/admin/orders/$id")({
+export const Route = createFileRoute("/admin/orders/")({
   component: AdminOrderDetail,
 });
 
