@@ -359,6 +359,41 @@ export type Database = {
           },
         ]
       }
+      order_presence: {
+        Row: {
+          actor_name: string
+          created_at: string
+          last_seen_at: string
+          order_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          actor_name: string
+          created_at?: string
+          last_seen_at?: string
+          order_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          actor_name?: string
+          created_at?: string
+          last_seen_at?: string
+          order_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_presence_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: true
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       orders: {
         Row: {
           address_line: string
