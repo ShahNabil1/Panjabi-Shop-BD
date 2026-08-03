@@ -146,7 +146,7 @@ function AdminOrderDetail() {
           <div className="flex flex-wrap items-center gap-2">
             <StatusPill status={order.status} />
             <Select
-              value={pending || undefined}
+              {...(pending ? { value: pending } : {})}
               onValueChange={(v) => {
                 setPending(v as PendingStatus);
                 setReason("");
