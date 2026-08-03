@@ -171,14 +171,37 @@ export function OrdersBoard({
                   </div>
                 </div>
 
-                <Link
-                  to="/admin/orders/$id"
-                  params={{ id: o.id }}
-                  className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-border bg-background px-3 py-1.5 text-xs font-semibold text-foreground transition-colors hover:border-primary/40 hover:bg-accent"
-                >
-                  <Eye className="size-3.5" />
-                  View
-                </Link>
+                {(() => {
+                  const held = presence[o.id];
+                  const byOther = held && held.user_id !== user?.id;
+                  if (!byOther) {
+                    return (
+                      <Link
+                        to="/admin/orders/$id"
+                        params={{ id: o.id }}
+                        className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-border bg-background px-3 py-1.5 text-xs font-semibold text-foreground transition-colors hover:border-primary/40 hover:bg-accent active:scale-95"
+                      >
+                        <Eye className="size-3.5" />
+                        View
+                      </Link>
+                    );
+                  }
+                  return (
+                    <div className="flex shrink-0 items-center gap-2">
+                      <span className="inline-flex items-center gap-1.5 rounded-full bg-rose-50 px-2.5 py-1 text-xs font-bold text-rose-700 ring-1 ring-rose-200">
+                        <UserRound className="size-3.5" />
+                        {held.actor_name} is handling
+                      </span>
+                      <button
+                        onClick={() => setTakeover({ id: o.id, name: held.actor_name })}
+                        className="inline-flex items-center gap-1.5 rounded-lg bg-rose-600 px-4 py-2 text-xs font-bold text-white shadow-sm transition-all hover:bg-rose-700 active:scale-95"
+                      >
+                        <ShieldAlert className="size-4" />
+                        Takeover
+                      </button>
+                    </div>
+                  );
+                })()}
               </li>
             ))}
           </ul>
