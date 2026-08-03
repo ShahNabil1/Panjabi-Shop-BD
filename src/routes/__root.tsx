@@ -30,9 +30,16 @@ function str(value: unknown, fallback: string) {
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   loader: async () => {
-    const [lang, layout] = await Promise.all([getLang(), getLayoutData()]);
+    const [lang, layout] = await Promise.all([
+      getLang().catch(() => "bn" as const),
+      getLayoutData().catch(() => ({
+        categories: [] as Awaited<ReturnType<typeof getLayoutData>>["categories"],
+        settings: {} as Awaited<ReturnType<typeof getLayoutData>>["settings"],
+      })),
+    ]);
     const general = layout.settings["general"] ?? {};
     const contactSetting = layout.settings["contact"] ?? {};
+
 
     return {
       lang,
