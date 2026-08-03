@@ -73,7 +73,7 @@ function AdminOverviewPage() {
         <h2 className="text-sm font-bold text-foreground">Recent orders</h2>
         <div className="mt-3 space-y-2">
           {isLoading ? (
-            <p className="text-sm text-muted-foreground">Loading…</p>
+            <BrandLoader size="sm" message="Loading orders…" className="py-6" />
           ) : (data?.recent.length ?? 0) === 0 ? (
             <EmptyState title="No orders yet" />
           ) : (
