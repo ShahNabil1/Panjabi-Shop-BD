@@ -138,24 +138,28 @@ function AdminOrderDetail() {
 
           <div className="flex flex-wrap items-center gap-2">
             <StatusPill status={order.status} />
-            <select
-              className="h-9 rounded-xl border border-border bg-background px-3 text-sm font-semibold outline-none transition-colors focus:border-primary/60"
-              value={pending}
-              onChange={(e) => {
-                setPending(e.target.value as PendingStatus | "");
+            <Select
+              value={pending || undefined}
+              onValueChange={(v) => {
+                setPending(v as PendingStatus);
                 setReason("");
               }}
             >
-              <option value="">Update status…</option>
-              {updatableStatuses.map((s) => (
-                <option key={s} value={s} disabled={s === order.status}>
-                  {statusLabels[s]}
-                </option>
-              ))}
-            </select>
+              <SelectTrigger className="h-9 w-[190px] rounded-xl border-border bg-background text-sm font-semibold">
+                <SelectValue placeholder="Update Status" />
+              </SelectTrigger>
+              <SelectContent>
+                {updatableStatuses.map((s) => (
+                  <SelectItem key={s} value={s} disabled={s === order.status}>
+                    {statusLabels[s]}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             {pending ? (
               <button
                 aria-label="Clear"
+                className="transition-transform active:scale-90"
                 onClick={() => {
                   setPending("");
                   setReason("");
