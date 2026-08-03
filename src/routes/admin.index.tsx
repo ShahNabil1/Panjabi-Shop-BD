@@ -11,6 +11,7 @@ import {
 
 import { adminOverview } from "@/lib/admin.functions";
 import { AdminHeading, EmptyState, Panel, StatusPill } from "@/components/admin/kit";
+import { BrandLoader } from "@/components/admin/brand-loader";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/admin/")({
