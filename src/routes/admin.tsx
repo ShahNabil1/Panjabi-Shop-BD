@@ -172,16 +172,16 @@ function AdminLayout() {
         </Link>
       </div>
 
-      <nav className="relative flex-1 space-y-5 overflow-y-auto px-3 py-4">
+      <nav className="relative flex-1 space-y-6 overflow-y-auto px-4 py-5">
         {sections.map((section) => (
           <div key={section.title}>
             {!collapsed && (
-              <p className="px-2 pb-1.5 text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">
+              <p className="px-2 pb-2 text-[11px] font-bold uppercase tracking-[0.16em] text-slate-400">
                 {section.title}
               </p>
             )}
 
-            <ul className="space-y-1">
+            <ul className="space-y-1.5">
               {section.items.map((item) => {
                 const active = isActive(item);
                 return (
@@ -190,7 +190,7 @@ function AdminLayout() {
                       to={item.to as "/admin"}
                       title={item.label}
                       className={cn(
-                        "group relative flex items-center gap-3 overflow-hidden rounded-lg px-3 py-2.5 text-sm font-semibold tracking-tight transition-all duration-200",
+                        "group relative flex items-center gap-3.5 overflow-hidden rounded-xl px-3 py-3 text-[0.95rem] font-semibold tracking-tight transition-all duration-200",
                         collapsed && "justify-center px-0",
                         active
                           ? "bg-white/10 text-white shadow-lg shadow-black/30 ring-1 ring-inset ring-white/15 backdrop-blur-xl"
@@ -198,11 +198,11 @@ function AdminLayout() {
                       )}
                     >
                       {active && !collapsed && (
-                        <span className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-full bg-gradient-to-b from-indigo-400 to-fuchsia-400" />
+                        <span className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-full bg-gradient-to-b from-violet-400 to-fuchsia-400" />
                       )}
                       <item.icon
                         className={cn(
-                          "size-[17px] shrink-0 transition-colors",
+                          "size-[19px] shrink-0 transition-colors",
                           active ? "text-white" : "text-slate-400 group-hover:text-white",
                         )}
                       />
@@ -223,16 +223,16 @@ function AdminLayout() {
         ))}
       </nav>
 
-      <div className="relative space-y-1 border-t border-white/10 px-3 py-3">
+      <div className="relative space-y-1.5 border-t border-white/10 px-4 py-4">
         <Link
           to="/"
           title="Go to Main Website"
           className={cn(
-            "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold text-slate-300 transition-colors hover:bg-white/5 hover:text-white",
+            "flex items-center gap-3.5 rounded-xl px-3 py-3 text-[0.95rem] font-semibold text-slate-300 transition-colors hover:bg-white/5 hover:text-white",
             collapsed && "justify-center px-0",
           )}
         >
-          <ExternalLink className="size-[18px] shrink-0 text-slate-400" />
+          <ExternalLink className="size-[19px] shrink-0 text-slate-400" />
           <span className={cn("truncate transition-all duration-200", collapsed && "hidden")}>
             Go to Main Website
           </span>
@@ -241,11 +241,11 @@ function AdminLayout() {
           onClick={() => void signOut()}
           title="Sign out"
           className={cn(
-            "flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold text-red-300 transition-colors hover:bg-red-500/10 hover:text-red-200",
+            "flex w-full items-center gap-3.5 rounded-xl px-3 py-3 text-[0.95rem] font-semibold text-red-300 transition-colors hover:bg-red-500/10 hover:text-red-200",
             collapsed && "justify-center px-0",
           )}
         >
-          <LogOut className="size-[18px] shrink-0" />
+          <LogOut className="size-[19px] shrink-0" />
           <span className={cn("truncate transition-all duration-200", collapsed && "hidden")}>
             Sign out
           </span>
