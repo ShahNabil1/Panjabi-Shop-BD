@@ -389,14 +389,24 @@ export const adminRetrySms = createServerFn({ method: "POST" })
     if (!row) throw new Error("SMS not found");
 
     const r = row as unknown as Record<string, unknown>;
+    const who = await actorName(db, context.userId);
     const result = await deliverSms(db, {
       orderId: (r["order_id"] as string | null) ?? null,
       phone: r["phone"] as string,
       message: r["message"] as string,
       isManual: true,
       sentBy: context.userId,
-      sentByName: (r["sent_by_name"] as string | null) ?? "Staff",
+      sentByName: (r["sent_by_name"] as string | null) ?? who,
     });
+    if (r["order_id"]) {
+      await logActivity(
+        db,
+        r["order_id"] as string,
+        "sms",
+        `${who} retried an SMS to ${String(r["phone"])} — ${result.ok ? "delivered" : "failed"}`,
+        { actor: who },
+      );
+    }
     return { ok: result.ok, code: result.code, message: result.message };
   });
 
