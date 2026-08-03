@@ -17,6 +17,9 @@ import {
   promotionSchema,
   settingSchema,
   subcategorySchema,
+  adminEditOrderSchema,
+  webOrderStatuses,
+  listOrderStatuses,
 } from "./admin-schema";
 
 
@@ -90,6 +93,8 @@ export const adminListOrders = createServerFn({ method: "POST" })
       .order("created_at", { ascending: false })
       .limit(200);
     if (data.status) q = q.eq("status", data.status);
+    else if (data.bucket)
+      q = q.in("status", [...(data.bucket === "web" ? webOrderStatuses : listOrderStatuses)]);
     if (data.search) {
       const s = data.search.replace(/[%,]/g, "");
       q = q.or(
@@ -106,7 +111,7 @@ export const adminGetOrder = createServerFn({ method: "POST" })
     const db = await requireAdmin(context.supabase, context.userId);
     const { data: order, error } = await db
       .from("orders")
-      .select("*, order_items(*)")
+      .select("*, order_items(*), order_activity(id, kind, message, meta, created_at)")
       .eq("id", data.id)
       .maybeSingle();
     if (error) throw new Error(error.message);
@@ -120,6 +125,48 @@ export const adminUpdateOrderStatus = createServerFn({ method: "POST" })
     const db = await requireAdmin(context.supabase, context.userId);
     const { error } = await db.from("orders").update({ status: data.status }).eq("id", data.id);
     if (error) throw new Error(error.message);
+    await db.from("order_activity").insert({
+      order_id: data.id,
+      kind: "status",
+      message: `Status changed to ${data.status}`,
+    });
+    return { ok: true };
+  });
+
+/** Edit the customer details of a web/incomplete order before confirming it. */
+export const adminEditOrder = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => adminEditOrderSchema.parse(input))
+  .handler(async ({ data, context }) => {
+    const db = await requireAdmin(context.supabase, context.userId);
+    const { data: current, error: readError } = await db
+      .from("orders")
+      .select("subtotal")
+      .eq("id", data.id)
+      .maybeSingle();
+    if (readError) throw new Error(readError.message);
+    if (!current) throw new Error("Order not found");
+
+    const subtotal = Number(current.subtotal ?? 0);
+    const total = Math.max(0, subtotal + data.deliveryCharge - data.discount);
+    const { error } = await db
+      .from("orders")
+      .update({
+        customer_name: data.customerName,
+        customer_phone: data.customerPhone,
+        address_line: data.addressLine,
+        note: data.note || null,
+        discount: data.discount,
+        delivery_charge: data.deliveryCharge,
+        total,
+      })
+      .eq("id", data.id);
+    if (error) throw new Error(error.message);
+    await db.from("order_activity").insert({
+      order_id: data.id,
+      kind: "edit",
+      message: "Order details updated by admin",
+    });
     return { ok: true };
   });
 
