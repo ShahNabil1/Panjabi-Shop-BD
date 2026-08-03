@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
@@ -29,9 +29,18 @@ export function AdminHeading({
   );
 }
 
-export function Panel({ className, children }: { className?: string; children: ReactNode }) {
+export function Panel({
+  className,
+  children,
+  style,
+}: {
+  className?: string;
+  children: ReactNode;
+  style?: CSSProperties;
+}) {
   return (
     <div
+      style={style}
       className={cn(
         "admin-rise rounded-2xl border border-border/70 bg-card p-4 shadow-[0_16px_40px_-34px_rgba(98,40,215,0.8)] transition-all duration-300 hover:border-primary/30 hover:shadow-[0_22px_50px_-30px_rgba(238,42,123,0.55)] sm:p-5",
         className,
