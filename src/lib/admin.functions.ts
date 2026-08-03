@@ -1,8 +1,10 @@
 import { createServerFn } from "@tanstack/react-start";
+import { z } from "zod";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { requireAdmin, unwrap } from "./admin.server";
 import {
+  adminCreateOrderSchema,
   categorySchema,
   faqSchema,
   mirrorLang,
@@ -15,6 +17,12 @@ import {
   settingSchema,
   subcategorySchema,
 } from "./admin-schema";
+
+const productSearchSchema = z.object({ query: z.string().trim().max(80).default("") });
+const customerLookupSchema = z.object({
+  phone: z.string().trim().regex(/^01[3-9]\d{8}$/),
+});
+
 
 /** True when the signed-in user holds the admin role. Safe for any logged-in user. */
 export const checkIsAdmin = createServerFn({ method: "GET" })
