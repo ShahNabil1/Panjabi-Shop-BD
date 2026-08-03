@@ -1,7 +1,7 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { Search } from "lucide-react";
+import { Search, Clock, Globe, Eye } from "lucide-react";
 
 import { adminListOrders } from "@/lib/admin.functions";
 import { orderStatuses } from "@/lib/admin-schema";
