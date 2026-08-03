@@ -160,11 +160,19 @@ export const adminUpdateOrderStatus = createServerFn({ method: "POST" })
         .eq("id", data.id)
         .maybeSingle();
       const o = order as unknown as Record<string, unknown> | null;
-      if (o && o["auto_sms_status"] !== "sent") {
+      // Template body + auto-send toggle live in Settings → SMS Templates.
+      const { data: tplRow } = await db
+        .from("sms_templates")
+        .select("body, enabled")
+        .eq("key", "order_confirm")
+        .maybeSingle();
+      const tplData = tplRow as { body?: string; enabled?: boolean } | null;
+      const autoEnabled = tplData?.enabled !== false;
+
+      if (o && autoEnabled && o["auto_sms_status"] !== "sent") {
         const { deliverSms, renderSmsTemplate } = await import("./sms.server");
-        const { smsTemplates } = await import("./admin-schema");
         const { SITE_URL } = await import("./site");
-        const tpl = smsTemplates.find((t) => t.id === "order_confirm")?.body ?? "";
+        const tpl = tplData?.body ?? "";
         const orderNo = String(o["order_number"] ?? "");
         const message = renderSmsTemplate(tpl, {
           name: String(o["customer_name"] ?? ""),
