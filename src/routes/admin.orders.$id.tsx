@@ -6,6 +6,7 @@ import { FileText, ArrowLeft } from "lucide-react";
 import { adminGetOrder, adminUpdateOrderStatus } from "@/lib/admin.functions";
 import { orderStatuses } from "@/lib/admin-schema";
 import { AdminHeading, Panel, StatusPill, statusLabels } from "@/components/admin/kit";
+import { BrandLoader } from "@/components/admin/brand-loader";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/admin/orders/$id")({
