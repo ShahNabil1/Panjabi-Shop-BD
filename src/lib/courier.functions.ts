@@ -120,7 +120,7 @@ export const courierCheck = createServerFn({ method: "POST" })
         total_parcel: fresh.summary.total_parcel,
         success_parcel: fresh.summary.success_parcel,
         cancelled_parcel: fresh.summary.cancelled_parcel,
-        data: fresh as unknown as Record<string, unknown>,
+        data: JSON.parse(JSON.stringify(fresh)),
         checked_at: fresh.checkedAt,
       },
       { onConflict: "phone" },
