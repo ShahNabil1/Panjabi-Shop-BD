@@ -6,7 +6,9 @@ import { useState } from "react";
 
 import { adminUpdateOrderStatus } from "@/lib/admin.functions";
 import { adminOrderWorkspace } from "@/lib/order-admin.functions";
-import { webOrderStatuses, type OrderStatus } from "@/lib/admin-schema";
+import { webOrderStatuses, smsTemplates, type OrderStatus } from "@/lib/admin-schema";
+import { renderSmsTemplate, orderSmsVars } from "@/lib/sms-template";
+
 import { Panel, StatusPill, statusLabels } from "@/components/admin/kit";
 import { BrandLoader } from "@/components/admin/brand-loader";
 import { CourierReport } from "@/components/admin/courier-report";
