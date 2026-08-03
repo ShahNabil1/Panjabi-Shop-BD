@@ -110,6 +110,15 @@ function AdminOrderDetail() {
   };
 
   const isWeb = (webOrderStatuses as readonly string[]).includes(order.status);
+  const form = edited ?? {
+    customerName: order.customer_name,
+    customerPhone: order.customer_phone,
+    addressLine: order.address_line,
+    note: order.note ?? "",
+    discount: Number(order.discount ?? 0),
+    deliveryCharge: Number(order.delivery_charge ?? 0),
+  };
+  const setForm = setEdited;
 
   return (
     <div className="space-y-5">
