@@ -12,6 +12,8 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SplatRouteImport } from './routes/$'
 import { Route as AboutRouteImport } from './routes/about'
+import { Route as AdminRouteImport } from './routes/admin'
+import { Route as AuthRouteImport } from './routes/auth'
 import { Route as CartRouteImport } from './routes/cart'
 import { Route as CatalogDotxmlRouteImport } from './routes/catalog[.]xml'
 import { Route as CheckoutRouteImport } from './routes/checkout'
@@ -19,11 +21,21 @@ import { Route as ContactRouteImport } from './routes/contact'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AdminFaqsRouteImport } from './routes/admin.faqs'
+import { Route as AdminLandingRouteImport } from './routes/admin.landing'
+import { Route as AdminPromotionsRouteImport } from './routes/admin.promotions'
+import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
+import { Route as AdminTaxonomyRouteImport } from './routes/admin.taxonomy'
 import { Route as LpSlugRouteImport } from './routes/lp.$slug'
 import { Route as OffersIndexRouteImport } from './routes/offers.index'
 import { Route as OffersPromotionRouteImport } from './routes/offers.$promotion'
 import { Route as OrderOrderNumberRouteImport } from './routes/order.$orderNumber'
 import { Route as PProductRouteImport } from './routes/p.$product'
+import { Route as AdminOrdersIndexRouteImport } from './routes/admin.orders.index'
+import { Route as AdminOrdersIdRouteImport } from './routes/admin.orders.$id'
+import { Route as AdminProductsIndexRouteImport } from './routes/admin.products.index'
+import { Route as AdminProductsIdRouteImport } from './routes/admin.products.$id'
 import { Route as CCategoryIndexRouteImport } from './routes/c.$category.index'
 import { Route as CCategorySubcategoryRouteImport } from './routes/c.$category.$subcategory'
 
@@ -40,6 +52,16 @@ const SplatRoute = SplatRouteImport.update({
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
   path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CartRoute = CartRouteImport.update({
@@ -77,6 +99,36 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminFaqsRoute = AdminFaqsRouteImport.update({
+  id: '/faqs',
+  path: '/faqs',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminLandingRoute = AdminLandingRouteImport.update({
+  id: '/landing',
+  path: '/landing',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminPromotionsRoute = AdminPromotionsRouteImport.update({
+  id: '/promotions',
+  path: '/promotions',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminSettingsRoute = AdminSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminTaxonomyRoute = AdminTaxonomyRouteImport.update({
+  id: '/taxonomy',
+  path: '/taxonomy',
+  getParentRoute: () => AdminRoute,
+} as any)
 const LpSlugRoute = LpSlugRouteImport.update({
   id: '/lp/$slug',
   path: '/lp/$slug',
@@ -102,6 +154,26 @@ const PProductRoute = PProductRouteImport.update({
   path: '/p/$product',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminOrdersIndexRoute = AdminOrdersIndexRouteImport.update({
+  id: '/orders/',
+  path: '/orders/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminOrdersIdRoute = AdminOrdersIdRouteImport.update({
+  id: '/orders/$id',
+  path: '/orders/$id',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminProductsIndexRoute = AdminProductsIndexRouteImport.update({
+  id: '/products/',
+  path: '/products/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminProductsIdRoute = AdminProductsIdRouteImport.update({
+  id: '/products/$id',
+  path: '/products/$id',
+  getParentRoute: () => AdminRoute,
+} as any)
 const CCategoryIndexRoute = CCategoryIndexRouteImport.update({
   id: '/c/$category/',
   path: '/c/$category/',
@@ -117,6 +189,8 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
   '/about': typeof AboutRoute
+  '/admin': typeof AdminRouteWithChildren
+  '/auth': typeof AuthRoute
   '/cart': typeof CartRoute
   '/catalog.xml': typeof CatalogDotxmlRoute
   '/checkout': typeof CheckoutRoute
@@ -124,18 +198,29 @@ export interface FileRoutesByFullPath {
   '/faq': typeof FaqRoute
   '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/admin/faqs': typeof AdminFaqsRoute
+  '/admin/landing': typeof AdminLandingRoute
+  '/admin/promotions': typeof AdminPromotionsRoute
+  '/admin/settings': typeof AdminSettingsRoute
+  '/admin/taxonomy': typeof AdminTaxonomyRoute
   '/lp/$slug': typeof LpSlugRoute
   '/offers/$promotion': typeof OffersPromotionRoute
   '/order/$orderNumber': typeof OrderOrderNumberRoute
   '/p/$product': typeof PProductRoute
+  '/admin/': typeof AdminIndexRoute
   '/offers/': typeof OffersIndexRoute
+  '/admin/orders/$id': typeof AdminOrdersIdRoute
+  '/admin/products/$id': typeof AdminProductsIdRoute
   '/c/$category/$subcategory': typeof CCategorySubcategoryRoute
+  '/admin/orders/': typeof AdminOrdersIndexRoute
+  '/admin/products/': typeof AdminProductsIndexRoute
   '/c/$category/': typeof CCategoryIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
   '/about': typeof AboutRoute
+  '/auth': typeof AuthRoute
   '/cart': typeof CartRoute
   '/catalog.xml': typeof CatalogDotxmlRoute
   '/checkout': typeof CheckoutRoute
@@ -143,12 +228,22 @@ export interface FileRoutesByTo {
   '/faq': typeof FaqRoute
   '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/admin/faqs': typeof AdminFaqsRoute
+  '/admin/landing': typeof AdminLandingRoute
+  '/admin/promotions': typeof AdminPromotionsRoute
+  '/admin/settings': typeof AdminSettingsRoute
+  '/admin/taxonomy': typeof AdminTaxonomyRoute
   '/lp/$slug': typeof LpSlugRoute
   '/offers/$promotion': typeof OffersPromotionRoute
   '/order/$orderNumber': typeof OrderOrderNumberRoute
   '/p/$product': typeof PProductRoute
+  '/admin': typeof AdminIndexRoute
   '/offers': typeof OffersIndexRoute
+  '/admin/orders/$id': typeof AdminOrdersIdRoute
+  '/admin/products/$id': typeof AdminProductsIdRoute
   '/c/$category/$subcategory': typeof CCategorySubcategoryRoute
+  '/admin/orders': typeof AdminOrdersIndexRoute
+  '/admin/products': typeof AdminProductsIndexRoute
   '/c/$category': typeof CCategoryIndexRoute
 }
 export interface FileRoutesById {
@@ -156,6 +251,8 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
   '/about': typeof AboutRoute
+  '/admin': typeof AdminRouteWithChildren
+  '/auth': typeof AuthRoute
   '/cart': typeof CartRoute
   '/catalog.xml': typeof CatalogDotxmlRoute
   '/checkout': typeof CheckoutRoute
@@ -163,12 +260,22 @@ export interface FileRoutesById {
   '/faq': typeof FaqRoute
   '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/admin/faqs': typeof AdminFaqsRoute
+  '/admin/landing': typeof AdminLandingRoute
+  '/admin/promotions': typeof AdminPromotionsRoute
+  '/admin/settings': typeof AdminSettingsRoute
+  '/admin/taxonomy': typeof AdminTaxonomyRoute
   '/lp/$slug': typeof LpSlugRoute
   '/offers/$promotion': typeof OffersPromotionRoute
   '/order/$orderNumber': typeof OrderOrderNumberRoute
   '/p/$product': typeof PProductRoute
+  '/admin/': typeof AdminIndexRoute
   '/offers/': typeof OffersIndexRoute
+  '/admin/orders/$id': typeof AdminOrdersIdRoute
+  '/admin/products/$id': typeof AdminProductsIdRoute
   '/c/$category/$subcategory': typeof CCategorySubcategoryRoute
+  '/admin/orders/': typeof AdminOrdersIndexRoute
+  '/admin/products/': typeof AdminProductsIndexRoute
   '/c/$category/': typeof CCategoryIndexRoute
 }
 export interface FileRouteTypes {
@@ -177,6 +284,8 @@ export interface FileRouteTypes {
     | '/'
     | '/$'
     | '/about'
+    | '/admin'
+    | '/auth'
     | '/cart'
     | '/catalog.xml'
     | '/checkout'
@@ -184,18 +293,29 @@ export interface FileRouteTypes {
     | '/faq'
     | '/search'
     | '/sitemap.xml'
+    | '/admin/faqs'
+    | '/admin/landing'
+    | '/admin/promotions'
+    | '/admin/settings'
+    | '/admin/taxonomy'
     | '/lp/$slug'
     | '/offers/$promotion'
     | '/order/$orderNumber'
     | '/p/$product'
+    | '/admin/'
     | '/offers/'
+    | '/admin/orders/$id'
+    | '/admin/products/$id'
     | '/c/$category/$subcategory'
+    | '/admin/orders/'
+    | '/admin/products/'
     | '/c/$category/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/$'
     | '/about'
+    | '/auth'
     | '/cart'
     | '/catalog.xml'
     | '/checkout'
@@ -203,18 +323,30 @@ export interface FileRouteTypes {
     | '/faq'
     | '/search'
     | '/sitemap.xml'
+    | '/admin/faqs'
+    | '/admin/landing'
+    | '/admin/promotions'
+    | '/admin/settings'
+    | '/admin/taxonomy'
     | '/lp/$slug'
     | '/offers/$promotion'
     | '/order/$orderNumber'
     | '/p/$product'
+    | '/admin'
     | '/offers'
+    | '/admin/orders/$id'
+    | '/admin/products/$id'
     | '/c/$category/$subcategory'
+    | '/admin/orders'
+    | '/admin/products'
     | '/c/$category'
   id:
     | '__root__'
     | '/'
     | '/$'
     | '/about'
+    | '/admin'
+    | '/auth'
     | '/cart'
     | '/catalog.xml'
     | '/checkout'
@@ -222,12 +354,22 @@ export interface FileRouteTypes {
     | '/faq'
     | '/search'
     | '/sitemap.xml'
+    | '/admin/faqs'
+    | '/admin/landing'
+    | '/admin/promotions'
+    | '/admin/settings'
+    | '/admin/taxonomy'
     | '/lp/$slug'
     | '/offers/$promotion'
     | '/order/$orderNumber'
     | '/p/$product'
+    | '/admin/'
     | '/offers/'
+    | '/admin/orders/$id'
+    | '/admin/products/$id'
     | '/c/$category/$subcategory'
+    | '/admin/orders/'
+    | '/admin/products/'
     | '/c/$category/'
   fileRoutesById: FileRoutesById
 }
@@ -235,6 +377,8 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   SplatRoute: typeof SplatRoute
   AboutRoute: typeof AboutRoute
+  AdminRoute: typeof AdminRouteWithChildren
+  AuthRoute: typeof AuthRoute
   CartRoute: typeof CartRoute
   CatalogDotxmlRoute: typeof CatalogDotxmlRoute
   CheckoutRoute: typeof CheckoutRoute
@@ -272,6 +416,20 @@ declare module '@tanstack/react-router' {
       path: '/about'
       fullPath: '/about'
       preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/cart': {
@@ -323,6 +481,48 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/faqs': {
+      id: '/admin/faqs'
+      path: '/faqs'
+      fullPath: '/admin/faqs'
+      preLoaderRoute: typeof AdminFaqsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/landing': {
+      id: '/admin/landing'
+      path: '/landing'
+      fullPath: '/admin/landing'
+      preLoaderRoute: typeof AdminLandingRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/promotions': {
+      id: '/admin/promotions'
+      path: '/promotions'
+      fullPath: '/admin/promotions'
+      preLoaderRoute: typeof AdminPromotionsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/settings': {
+      id: '/admin/settings'
+      path: '/settings'
+      fullPath: '/admin/settings'
+      preLoaderRoute: typeof AdminSettingsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/taxonomy': {
+      id: '/admin/taxonomy'
+      path: '/taxonomy'
+      fullPath: '/admin/taxonomy'
+      preLoaderRoute: typeof AdminTaxonomyRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/lp/$slug': {
       id: '/lp/$slug'
       path: '/lp/$slug'
@@ -358,6 +558,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PProductRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/orders/': {
+      id: '/admin/orders/'
+      path: '/orders'
+      fullPath: '/admin/orders/'
+      preLoaderRoute: typeof AdminOrdersIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/orders/$id': {
+      id: '/admin/orders/$id'
+      path: '/orders/$id'
+      fullPath: '/admin/orders/$id'
+      preLoaderRoute: typeof AdminOrdersIdRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/products/': {
+      id: '/admin/products/'
+      path: '/products'
+      fullPath: '/admin/products/'
+      preLoaderRoute: typeof AdminProductsIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/products/$id': {
+      id: '/admin/products/$id'
+      path: '/products/$id'
+      fullPath: '/admin/products/$id'
+      preLoaderRoute: typeof AdminProductsIdRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/c/$category/': {
       id: '/c/$category/'
       path: '/c/$category'
@@ -375,10 +603,40 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AdminRouteChildren {
+  AdminFaqsRoute: typeof AdminFaqsRoute
+  AdminLandingRoute: typeof AdminLandingRoute
+  AdminPromotionsRoute: typeof AdminPromotionsRoute
+  AdminSettingsRoute: typeof AdminSettingsRoute
+  AdminTaxonomyRoute: typeof AdminTaxonomyRoute
+  AdminIndexRoute: typeof AdminIndexRoute
+  AdminOrdersIdRoute: typeof AdminOrdersIdRoute
+  AdminProductsIdRoute: typeof AdminProductsIdRoute
+  AdminOrdersIndexRoute: typeof AdminOrdersIndexRoute
+  AdminProductsIndexRoute: typeof AdminProductsIndexRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminFaqsRoute: AdminFaqsRoute,
+  AdminLandingRoute: AdminLandingRoute,
+  AdminPromotionsRoute: AdminPromotionsRoute,
+  AdminSettingsRoute: AdminSettingsRoute,
+  AdminTaxonomyRoute: AdminTaxonomyRoute,
+  AdminIndexRoute: AdminIndexRoute,
+  AdminOrdersIdRoute: AdminOrdersIdRoute,
+  AdminProductsIdRoute: AdminProductsIdRoute,
+  AdminOrdersIndexRoute: AdminOrdersIndexRoute,
+  AdminProductsIndexRoute: AdminProductsIndexRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   SplatRoute: SplatRoute,
   AboutRoute: AboutRoute,
+  AdminRoute: AdminRouteWithChildren,
+  AuthRoute: AuthRoute,
   CartRoute: CartRoute,
   CatalogDotxmlRoute: CatalogDotxmlRoute,
   CheckoutRoute: CheckoutRoute,
