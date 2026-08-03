@@ -278,16 +278,14 @@
 
   --ig-gradient: linear-gradient(
     135deg,
-    #fbd97a 0%,
-    #f473a6 45%,
-    #c377dd 72%,
-    #8a6ae8 100%
+    #f77fb0 0%,
+    #d976cf 50%,
+    #9b7ff0 100%
   );
   --ig-gradient-soft: linear-gradient(
     135deg,
-    rgba(249, 206, 52, 0.08) 0%,
-    rgba(238, 42, 123, 0.09) 45%,
-    rgba(98, 40, 215, 0.09) 100%
+    rgba(244, 115, 166, 0.07) 0%,
+    rgba(155, 127, 240, 0.07) 100%
   );
   font-family: "Times New Roman", Times, serif;
   font-size: 1.0625rem;

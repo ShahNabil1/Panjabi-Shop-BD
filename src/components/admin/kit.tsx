@@ -191,7 +191,7 @@ export function EmptyState({ title, hint }: { title: string; hint?: string }) {
 }
 
 const statusStyles: Record<string, string> = {
-  pending: "bg-amber-100 text-amber-900 ring-amber-200",
+  pending: "bg-slate-100 text-slate-800 ring-slate-200",
   confirmed: "bg-sky-100 text-sky-900 ring-sky-200",
   processing: "bg-indigo-100 text-indigo-900 ring-indigo-200",
   shipped: "bg-violet-100 text-violet-900 ring-violet-200",
