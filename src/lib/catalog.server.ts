@@ -406,3 +406,77 @@ export async function fetchCatalogFeed() {
 }
 
 export type { CategoryRow, SubcategoryRow, SettingsMap, SettingValue };
+
+export async function fetchLandingPage(slug: string) {
+  const db = createPublicServerClient();
+  const { data: landing } = await db
+    .from("landing_pages")
+    .select(
+      "id, slug, product_id, headline_bn, headline_en, subheadline_bn, subheadline_en, content, meta_title, meta_description, og_image_url",
+    )
+    .eq("slug", slug)
+    .eq("is_active", true)
+    .maybeSingle();
+
+  if (!landing) return null;
+
+  const { data: product } = await db
+    .from("products")
+    .select(
+      `id, slug, name_bn, name_en, short_description_bn, short_description_en,
+       description_bn, description_en, specs, faq, price, compare_at_price, stock, sku, brand,
+       rating, review_count,
+       product_images(id, url, alt_bn, alt_en, sort_order),
+       product_variants(id, group_name_bn, group_name_en, value_bn, value_en, price_delta, stock, sort_order, is_active)`,
+    )
+    .eq("id", landing.product_id)
+    .eq("is_active", true)
+    .maybeSingle();
+
+  if (!product) return null;
+
+  const images = [...(product.product_images ?? [])].sort((a, b) => a.sort_order - b.sort_order);
+  const variants = [...(product.product_variants ?? [])]
+    .filter((v) => v.is_active)
+    .sort((a, b) => a.sort_order - b.sort_order);
+
+  const content = (landing.content ?? {}) as Record<string, unknown>;
+  const blocks = Array.isArray(content["blocks"])
+    ? (content["blocks"] as Array<Record<string, string>>)
+    : [];
+
+  return {
+    landing: {
+      slug: landing.slug,
+      headlineBn: landing.headline_bn,
+      headlineEn: landing.headline_en,
+      subheadlineBn: landing.subheadline_bn,
+      subheadlineEn: landing.subheadline_en,
+      metaTitle: landing.meta_title,
+      metaDescription: landing.meta_description,
+      ogImageUrl: landing.og_image_url,
+      blocks,
+    },
+    product: {
+      id: product.id,
+      slug: product.slug,
+      nameBn: product.name_bn,
+      nameEn: product.name_en,
+      shortBn: product.short_description_bn,
+      shortEn: product.short_description_en,
+      descriptionBn: product.description_bn,
+      descriptionEn: product.description_en,
+      specs: (product.specs ?? []) as Array<Record<string, string>>,
+      faq: (product.faq ?? []) as Array<Record<string, string>>,
+      price: Number(product.price),
+      compareAtPrice: product.compare_at_price == null ? null : Number(product.compare_at_price),
+      stock: product.stock,
+      sku: product.sku,
+      brand: product.brand,
+      rating: Number(product.rating),
+      reviewCount: product.review_count,
+    },
+    images,
+    variants,
+  };
+}

@@ -46,3 +46,10 @@ export const searchProducts = createServerFn({ method: "GET" })
 export const getLayoutData = createServerFn({ method: "GET" }).handler(async () =>
   fetchLayoutData(),
 );
+
+export const getLandingPage = createServerFn({ method: "GET" })
+  .inputValidator((data: { slug: string }) => ({ slug: String(data.slug) }))
+  .handler(async ({ data }) => {
+    const { fetchLandingPage } = await import("./catalog.server");
+    return fetchLandingPage(data.slug);
+  });
