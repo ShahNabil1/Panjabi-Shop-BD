@@ -50,12 +50,6 @@ export function SmsCard({ orderId, phone }: { orderId: string; phone: string }) 
   const [template, setTemplate] = useState("");
   const [message, setMessage] = useState("");
 
-  const { data: balance } = useQuery({
-    queryKey: ["admin", "sms", "balance"],
-    queryFn: () => adminSmsBalance(),
-    staleTime: 5 * 60 * 1000,
-    refetchOnWindowFocus: false,
-  });
   const seg = segmentInfo(message);
 
   const send = useMutation({
