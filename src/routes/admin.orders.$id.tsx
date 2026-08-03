@@ -1,12 +1,14 @@
 import { Link, createFileRoute, useParams } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { CheckCircle2, FileText, History, X } from "lucide-react";
+import { CheckCircle2, FileText, History, MessageSquare, X } from "lucide-react";
 import { useState } from "react";
 
 import { adminUpdateOrderStatus } from "@/lib/admin.functions";
 import { adminOrderWorkspace } from "@/lib/order-admin.functions";
-import { webOrderStatuses, type OrderStatus } from "@/lib/admin-schema";
+import { webOrderStatuses, smsTemplates, type OrderStatus } from "@/lib/admin-schema";
+import { renderSmsTemplate, orderSmsVars } from "@/lib/sms-template";
+
 import { Panel, StatusPill, statusLabels } from "@/components/admin/kit";
 import { BrandLoader } from "@/components/admin/brand-loader";
 import { CourierReport } from "@/components/admin/courier-report";
@@ -94,6 +96,7 @@ function AdminOrderDetail() {
     delivery_partner: string | null;
     delivery_charge: number | string;
     discount: number | string;
+    total?: number | string | null;
     advance_amount?: number | string | null;
     advance_method?: string | null;
     fulfillment_status: string;
@@ -102,6 +105,13 @@ function AdminOrderDetail() {
     order_items: OrderItemRow[];
     order_activity?: Array<{ id: string; kind: string; message: string | null; created_at: string }>;
   };
+
+  const confirmSms = renderSmsTemplate(
+    smsTemplates.find((t) => t.id === "order_confirm")?.body ?? "",
+    orderSmsVars(order),
+  );
+
+
 
   const isWeb = (webOrderStatuses as readonly string[]).includes(order.status);
   const isDanger = pending === "hold" || pending === "cancelled";
@@ -228,16 +238,36 @@ function AdminOrderDetail() {
         ) : null}
 
         {isWeb ? (
-          <Button
-            size="lg"
-            disabled={update.isPending}
-            onClick={() => update.mutate({ status: "pending" })}
-            className="w-full"
-          >
-            <CheckCircle2 className="size-5" />
-            Confirm Order
-          </Button>
+          <div className="space-y-3">
+            <div className="rounded-xl border border-border bg-muted/40 p-3">
+              <div className="flex items-center gap-2">
+                <MessageSquare className="size-4 text-primary" />
+                <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground">
+                  SMS preview — sent on confirm
+                </p>
+              </div>
+              <p className="mt-2 whitespace-pre-wrap rounded-lg border border-border/70 bg-background p-3 text-sm leading-relaxed">
+                {confirmSms}
+              </p>
+              <p className="mt-2 text-[11px] text-muted-foreground">
+                To {order.customer_phone} · {confirmSms.length} chars ·{" "}
+                {order.auto_sms_status === "sent"
+                  ? "Already sent for this order"
+                  : "Variables rendered with live order data"}
+              </p>
+            </div>
+            <Button
+              size="lg"
+              disabled={update.isPending}
+              onClick={() => update.mutate({ status: "pending" })}
+              className="w-full"
+            >
+              <CheckCircle2 className="size-5" />
+              Confirm Order
+            </Button>
+          </div>
         ) : null}
+
       </Panel>
 
       {/* Fraud checker directly under the order title */}
