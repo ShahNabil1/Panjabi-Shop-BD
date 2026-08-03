@@ -270,7 +270,13 @@ function LandingPage() {
         <p className="mt-1 text-sm text-muted-foreground">{tr(lang, "codNote")}</p>
         <div className="mt-5 max-w-2xl">
           {stock > 0 ? (
-            <CheckoutForm items={items} rates={rates} source="landing" compact />
+            <CheckoutForm
+              items={items}
+              rates={rates}
+              source="landing"
+              compact
+              onSetQuantity={(_key, next) => setQty(next)}
+            />
           ) : (
             <p className="rounded-sm border border-border bg-secondary px-4 py-3 text-center text-sm font-semibold text-muted-foreground">
               {tr(lang, "outOfStock")}

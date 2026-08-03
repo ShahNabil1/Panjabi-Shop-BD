@@ -29,7 +29,7 @@ export const Route = createFileRoute("/checkout")({
 function CheckoutPage() {
   const { rates } = Route.useLoaderData();
   const { lang } = useLang();
-  const { items, ready } = useCart();
+  const { items, ready, setQuantity, remove } = useCart();
 
   return (
     <Section title={tr(lang, "checkout")}>
@@ -48,7 +48,14 @@ function CheckoutPage() {
       ) : (
         <div className="mx-auto max-w-2xl">
           <h2 className="mb-4 text-base font-bold">{tr(lang, "deliveryInfo")}</h2>
-          <CheckoutForm items={items} rates={rates} source="website" />
+          <CheckoutForm
+            items={items}
+            rates={rates}
+            source="website"
+            onSetQuantity={setQuantity}
+            onRemove={remove}
+            allowAddMore
+          />
         </div>
       )}
     </Section>
