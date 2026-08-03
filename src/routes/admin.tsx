@@ -9,7 +9,6 @@ import {
   HelpCircle,
   LayoutDashboard,
   LogOut,
-  Menu,
   Package,
   Rocket,
   Settings,
