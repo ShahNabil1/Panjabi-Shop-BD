@@ -354,14 +354,22 @@ export const adminSendSms = createServerFn({ method: "POST" })
       receipt_url: orderNo ? `${SITE_URL}/invoice/${orderNo}` : "",
     });
 
+    const who = (profile?.full_name as string | null) ?? "Staff";
     const result = await deliverSms(db, {
       orderId: data.orderId,
       phone: data.phone,
       message,
       isManual: true,
       sentBy: context.userId,
-      sentByName: (profile?.full_name as string | null) ?? "Staff",
+      sentByName: who,
     });
+    await logActivity(
+      db,
+      data.orderId,
+      "sms",
+      `${who} sent an SMS to ${data.phone} — ${result.ok ? "delivered" : "failed"} (${result.message})`,
+      { actor: who, meta: { message } },
+    );
     return { ok: result.ok, code: result.code, message: result.message };
   });
 
