@@ -138,8 +138,14 @@ function AdminLayout() {
     item.exact ? pathname === item.to : pathname.startsWith(item.to);
 
   const sidebar = (
-    <div className="flex h-full flex-col">
-      <div className="flex min-h-[5.5rem] items-center justify-center px-3 py-5">
+    <div className="relative flex h-full flex-col">
+      {/* Ambient glow */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="absolute -left-16 -top-32 h-64 w-64 rounded-full bg-indigo-500/20 blur-3xl" />
+        <div className="absolute -right-16 top-1/3 h-48 w-48 rounded-full bg-fuchsia-500/10 blur-3xl" />
+      </div>
+
+      <div className="relative flex min-h-[5.5rem] items-center justify-center border-b border-white/10 px-3 py-5">
         <Link
           to="/"
           title="Upoharkabbo"
@@ -148,7 +154,7 @@ function AdminLayout() {
           <img
             src="/favicon.png"
             alt="Upoharkabbo"
-            className="size-14 rounded-full bg-white object-contain p-1 ring-1 ring-border"
+            className="size-11 rounded-xl bg-white object-contain p-1 ring-1 ring-white/15"
           />
         </Link>
         <Link
@@ -159,16 +165,16 @@ function AdminLayout() {
           <img
             src={logoMark}
             alt="Upoharkabbo"
-            className="h-16 w-auto object-contain"
+            className="h-14 w-auto object-contain brightness-0 invert"
           />
         </Link>
       </div>
 
-      <nav className="flex-1 space-y-5 overflow-y-auto px-2 pb-4">
+      <nav className="relative flex-1 space-y-5 overflow-y-auto px-3 py-4">
         {sections.map((section) => (
           <div key={section.title}>
             {!collapsed && (
-              <p className="px-2 pb-1.5 text-[10px] font-bold uppercase tracking-[0.16em] text-muted-foreground">
+              <p className="px-2 pb-1.5 text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">
                 {section.title}
               </p>
             )}
@@ -182,21 +188,25 @@ function AdminLayout() {
                       to={item.to as "/admin"}
                       title={item.label}
                       className={cn(
-                        "group relative flex items-center gap-3 overflow-hidden rounded-xl px-2.5 py-2.5 text-sm font-medium transition-all duration-300",
+                        "group relative flex items-center gap-3 overflow-hidden rounded-lg px-3 py-2.5 text-sm font-semibold tracking-tight transition-all duration-200",
+                        collapsed && "justify-center px-0",
                         active
-                          ? "ig-gradient text-white shadow-[0_12px_26px_-16px_rgba(238,42,123,0.95)]"
-                          : "text-foreground/75 hover:bg-accent hover:text-accent-foreground",
+                          ? "bg-white/10 text-white shadow-lg shadow-black/30 ring-1 ring-inset ring-white/15 backdrop-blur-xl"
+                          : "text-slate-300 hover:bg-white/5 hover:text-white",
                       )}
                     >
+                      {active && !collapsed && (
+                        <span className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-full bg-gradient-to-b from-indigo-400 to-fuchsia-400" />
+                      )}
                       <item.icon
                         className={cn(
-                          "size-[18px] shrink-0 transition-transform duration-300 group-hover:scale-110",
-                          active && "drop-shadow",
+                          "size-[17px] shrink-0 transition-colors",
+                          active ? "text-white" : "text-slate-400 group-hover:text-white",
                         )}
                       />
                       <span
                         className={cn(
-                          "min-w-0 truncate transition-all duration-300",
+                          "min-w-0 truncate whitespace-nowrap transition-all duration-200",
                           collapsed ? "w-0 opacity-0" : "w-auto opacity-100",
                         )}
                       >
@@ -211,24 +221,30 @@ function AdminLayout() {
         ))}
       </nav>
 
-      <div className="space-y-1 border-t border-border/70 px-2 py-3">
+      <div className="relative space-y-1 border-t border-white/10 px-3 py-3">
         <Link
           to="/"
-          title="View site"
-          className="flex items-center gap-3 rounded-xl px-2.5 py-2.5 text-sm font-medium text-foreground/75 transition-colors hover:bg-accent hover:text-accent-foreground"
+          title="Go to Main Website"
+          className={cn(
+            "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold text-slate-300 transition-colors hover:bg-white/5 hover:text-white",
+            collapsed && "justify-center px-0",
+          )}
         >
-          <ExternalLink className="size-[18px] shrink-0" />
-          <span className={cn("truncate transition-all duration-300", collapsed && "hidden")}>
-            View site
+          <ExternalLink className="size-[18px] shrink-0 text-slate-400" />
+          <span className={cn("truncate transition-all duration-200", collapsed && "hidden")}>
+            Go to Main Website
           </span>
         </Link>
         <button
           onClick={() => void signOut()}
           title="Sign out"
-          className="flex w-full items-center gap-3 rounded-xl px-2.5 py-2.5 text-sm font-medium text-destructive transition-colors hover:bg-destructive/10"
+          className={cn(
+            "flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold text-red-300 transition-colors hover:bg-red-500/10 hover:text-red-200",
+            collapsed && "justify-center px-0",
+          )}
         >
           <LogOut className="size-[18px] shrink-0" />
-          <span className={cn("truncate transition-all duration-300", collapsed && "hidden")}>
+          <span className={cn("truncate transition-all duration-200", collapsed && "hidden")}>
             Sign out
           </span>
         </button>
@@ -241,31 +257,46 @@ function AdminLayout() {
       {/* Desktop sidebar */}
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-40 hidden border-r border-border/70 bg-card/85 backdrop-blur-xl transition-[width] duration-500 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] lg:block",
-          collapsed ? "w-[76px]" : "w-64",
+          "fixed inset-y-0 left-0 z-40 hidden bg-slate-950 shadow-2xl shadow-black/40 transition-[width] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] lg:block",
+          collapsed ? "w-[72px]" : "w-64",
         )}
       >
         {sidebar}
         <button
           onClick={() => setCollapsed((v) => !v)}
           aria-label="Toggle sidebar"
-          className="absolute -right-3 top-20 grid size-6 place-items-center rounded-full border border-border bg-card text-muted-foreground shadow transition-all duration-300 hover:scale-110 hover:text-primary"
+          className="absolute -right-3 top-20 z-10 grid size-6 place-items-center rounded-full border border-border bg-card text-muted-foreground shadow transition-all duration-300 hover:scale-110 hover:text-primary"
         >
           <ChevronLeft className={cn("size-4 transition-transform duration-500", collapsed && "rotate-180")} />
         </button>
       </aside>
 
+      {/* Mobile top bar */}
+      <header className="sticky top-0 z-20 flex items-center justify-between border-b border-border bg-card/80 px-4 py-3 backdrop-blur lg:hidden">
+        <div className="flex items-center gap-2">
+          <img src="/favicon.png" alt="" className="size-8 rounded-lg object-contain" />
+          <span className="text-base font-bold tracking-tight">Upoharkabbo</span>
+        </div>
+        <button
+          onClick={() => setMobileOpen(true)}
+          aria-label="Open menu"
+          className="grid size-9 place-items-center rounded-lg text-foreground transition-transform duration-150 hover:bg-accent active:scale-95"
+        >
+          <Menu className="size-5" />
+        </button>
+      </header>
+
       {/* Mobile drawer */}
       <div
         onClick={() => setMobileOpen(false)}
         className={cn(
-          "fixed inset-0 z-40 bg-foreground/30 backdrop-blur-sm transition-opacity duration-500 lg:hidden",
+          "fixed inset-0 z-40 bg-slate-950/50 backdrop-blur-sm transition-opacity duration-300 lg:hidden",
           mobileOpen ? "opacity-100" : "pointer-events-none opacity-0",
         )}
       />
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-50 w-64 border-r border-border/70 bg-card transition-transform duration-500 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] lg:hidden",
+          "fixed inset-y-0 left-0 z-50 w-72 bg-slate-950 text-slate-100 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] lg:hidden",
           mobileOpen ? "translate-x-0" : "-translate-x-full",
         )}
       >
@@ -273,7 +304,7 @@ function AdminLayout() {
         <button
           onClick={() => setMobileOpen(false)}
           aria-label="Close menu"
-          className="absolute right-2 top-4 grid size-8 place-items-center rounded-full hover:bg-accent"
+          className="absolute right-2 top-4 z-10 grid size-8 place-items-center rounded-full text-slate-400 hover:bg-white/10 hover:text-white"
         >
           <X className="size-4" />
         </button>
@@ -281,14 +312,15 @@ function AdminLayout() {
 
       <div
         className={cn(
-          "transition-[padding] duration-500 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)]",
-          collapsed ? "lg:pl-[76px]" : "lg:pl-64",
+          "transition-[padding] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
+          collapsed ? "lg:pl-[72px]" : "lg:pl-64",
         )}
       >
-        <main key={pathname} className="admin-rise mx-auto max-w-6xl space-y-6 px-4 py-6 pt-4 lg:pt-6">
+        <main key={pathname} className="admin-rise mx-auto w-full max-w-6xl space-y-6 px-4 py-6 lg:px-10 lg:py-10">
           <Outlet />
         </main>
       </div>
     </div>
   );
 }
+
