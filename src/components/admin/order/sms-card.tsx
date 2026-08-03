@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Copy, MessageSquare, RotateCw, Send, X } from "lucide-react";
+import { Copy, MessageSquare, RotateCw, Send } from "lucide-react";
 
 import { smsTemplates, smsVariables } from "@/lib/admin-schema";
 import { adminRetrySms, adminSendSms, adminSmsBalance } from "@/lib/order-admin.functions";
