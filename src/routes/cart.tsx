@@ -11,10 +11,10 @@ export const Route = createFileRoute("/cart")({
   component: CartPage,
   head: () => ({
     meta: [
-      { title: "কার্ট | তাঁতঘর" },
+      { title: "কার্ট | উপহারকাব্য" },
       { name: "description", content: "আপনার নির্বাচিত পণ্যগুলো দেখুন এবং ক্যাশ অন ডেলিভারিতে অর্ডার করুন।" },
       { name: "robots", content: "noindex" },
-      { property: "og:title", content: "কার্ট | তাঁতঘর" },
+      { property: "og:title", content: "কার্ট | উপহারকাব্য" },
       { property: "og:description", content: "আপনার নির্বাচিত পণ্যগুলো দেখুন।" },
       { property: "og:url", content: "https://upoharkabbo.lovable.app/cart" },
     ],

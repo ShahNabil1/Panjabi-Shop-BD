@@ -7,6 +7,8 @@ import type { Lang } from "@/lib/i18n";
 import { formatNumber, pick, tr } from "@/lib/i18n";
 import { useCart } from "@/lib/cart-context";
 import { cn } from "@/lib/utils";
+import logoMark from "@/assets/upoharkabbo-logo.png";
+
 
 export type SiteData = {
   lang: Lang;
@@ -214,11 +216,16 @@ export function SiteHeader() {
         </button>
 
         <Link to="/" className="flex min-w-0 shrink-0 items-center gap-2">
-          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-sm bg-primary text-lg font-bold text-primary-foreground">
-            {brand.charAt(0)}
-          </span>
+          <img
+            src={logoMark}
+            alt={brand}
+            width={40}
+            height={40}
+            className="h-9 w-9 shrink-0 object-contain"
+          />
           <span className="truncate text-lg font-bold tracking-tight">{brand}</span>
         </Link>
+
 
         <div className="ml-auto hidden max-w-md flex-1 lg:block">
           <SearchBox />

@@ -8,12 +8,12 @@ import { Breadcrumbs, Section } from "@/components/site/ui";
 export const Route = createFileRoute("/contact")({
   head: () => ({
     meta: [
-      { title: "যোগাযোগ | Contact — তাঁতঘর" },
+      { title: "যোগাযোগ | Contact — উপহারকাব্য" },
       {
         name: "description",
         content: "অর্ডার, ডেলিভারি বা পণ্য সংক্রান্ত যেকোনো প্রশ্নে ফোন, ইমেইল বা হোয়াটসঅ্যাপে যোগাযোগ করুন।",
       },
-      { property: "og:title", content: "যোগাযোগ | Contact — তাঁতঘর" },
+      { property: "og:title", content: "যোগাযোগ | Contact — উপহারকাব্য" },
       { property: "og:description", content: "ফোন, ইমেইল বা সরাসরি দোকানে যোগাযোগ করুন।" },
       { property: "og:url", content: "/contact" },
     ],

@@ -15,11 +15,11 @@ export const Route = createFileRoute("/search")({
   loader: async ({ deps }): Promise<SearchData> => searchProducts({ data: { q: deps.q } }),
   head: ({ loaderData }) => {
     const term = loaderData?.query ?? "";
-    const title = term ? `“${term}” — খোঁজার ফলাফল | তাঁতঘর` : "পণ্য খুঁজুন | তাঁতঘর";
+    const title = term ? `“${term}” — খোঁজার ফলাফল | উপহারকাব্য` : "পণ্য খুঁজুন | উপহারকাব্য";
     return {
       meta: [
         { title },
-        { name: "description", content: "তাঁতঘরের পণ্য ক্যাটালগে নাম, ব্র্যান্ড বা এসকেইউ দিয়ে খুঁজুন।" },
+        { name: "description", content: "উপহারকাব্যের গিফট কম্বো ক্যাটালগে নাম, ব্র্যান্ড বা এসকেইউ দিয়ে খুঁজুন।" },
         { name: "robots", content: "noindex, follow" },
         { property: "og:title", content: title },
         { property: "og:url", content: "/search" },

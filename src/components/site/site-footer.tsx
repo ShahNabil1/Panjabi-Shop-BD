@@ -3,6 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { useLang } from "@/lib/language-context";
 import { pick, tr } from "@/lib/i18n";
 import { useSiteData } from "./site-header";
+import logoMark from "@/assets/upoharkabbo-logo.png";
 
 export function SiteFooter() {
   const { lang } = useLang();
@@ -14,11 +15,17 @@ export function SiteFooter() {
       <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 sm:grid-cols-2 lg:grid-cols-4">
         <div className="min-w-0">
           <div className="flex items-center gap-2">
-            <span className="grid h-8 w-8 shrink-0 place-items-center rounded-sm bg-primary text-base font-bold text-primary-foreground">
-              {brand.charAt(0)}
-            </span>
+            <img
+              src={logoMark}
+              alt={brand}
+              loading="lazy"
+              width={36}
+              height={36}
+              className="h-8 w-8 shrink-0 object-contain"
+            />
             <span className="truncate text-base font-bold">{brand}</span>
           </div>
+
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{tagline}</p>
         </div>
 

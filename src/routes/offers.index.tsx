@@ -11,12 +11,12 @@ export const Route = createFileRoute("/offers/")({
   loader: async (): Promise<PromotionListData> => getPromotions(),
   head: () => ({
     meta: [
-      { title: "অফার ও ক্যাম্পেইন | Offers — তাঁতঘর" },
+      { title: "অফার ও ক্যাম্পেইন | Offers — উপহারকাব্য" },
       {
         name: "description",
         content: "চলমান সব অফার, ফ্ল্যাশ সেল আর নতুন কালেকশন এক জায়গায়। ক্যাশ অন ডেলিভারি সারা দেশে।",
       },
-      { property: "og:title", content: "অফার ও ক্যাম্পেইন | Offers — তাঁতঘর" },
+      { property: "og:title", content: "অফার ও ক্যাম্পেইন | Offers — উপহারকাব্য" },
       { property: "og:description", content: "চলমান সব অফার আর নতুন কালেকশন এক জায়গায়।" },
       { property: "og:url", content: "/offers" },
     ],

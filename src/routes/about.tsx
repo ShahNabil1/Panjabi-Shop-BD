@@ -8,33 +8,34 @@ import { Breadcrumbs, Prose, Section } from "@/components/site/ui";
 export const Route = createFileRoute("/about")({
   head: () => ({
     meta: [
-      { title: "আমাদের কথা | About — তাঁতঘর" },
+      { title: "আমাদের কথা | About — উপহারকাব্য" },
       {
         name: "description",
         content:
-          "তাঁতঘর সরাসরি তাঁতি পরিবারের কাছ থেকে পণ্য সংগ্রহ করে। আমাদের গল্প, কাজের ধরন ও প্রতিশ্রুতি।",
+          "উপহারকাব্য প্রতিটি উপলক্ষের জন্য যত্নে সাজানো গিফট কম্বো তৈরি করে। আমাদের গল্প, কাজের ধরন ও প্রতিশ্রুতি।",
       },
-      { property: "og:title", content: "আমাদের কথা | About — তাঁতঘর" },
-      { property: "og:description", content: "সরাসরি তাঁতির কাছ থেকে, ন্যায্য দামে।" },
-      { property: "og:url", content: "/about" },
+      { property: "og:title", content: "আমাদের কথা | About — উপহারকাব্য" },
+      { property: "og:description", content: "উপহার সাজানোর কাজটা আমরা কবিতার মতো করে করি।" },
+      { property: "og:url", content: "https://upoharkabbo.lovable.app/about" },
     ],
-    links: [{ rel: "canonical", href: "/about" }],
+    links: [{ rel: "canonical", href: "https://upoharkabbo.lovable.app/about" }],
   }),
   component: AboutPage,
 });
 
 const BODY = {
-  bn: `তাঁতঘর শুরু হয়েছিল একটা সহজ প্রশ্ন থেকে — তাঁতির হাতে বোনা একটা শাড়ি ঢাকার দোকানে পৌঁছাতে দাম তিনগুণ হয়ে যায় কেন?
+  bn: `উপহারকাব্য শুরু হয়েছিল একটা সহজ ভাবনা থেকে — উপহার শুধু একটা জিনিস নয়, এটা একটা কথা বলার উপায়।
 
-আমরা সিরাজগঞ্জ, টাঙ্গাইল ও নরসিংদীর তাঁতি পরিবারের সঙ্গে সরাসরি কাজ করি। কোনো মধ্যস্বত্বভোগী নেই, তাই তাঁতি ন্যায্য দাম পান আর আপনি কম দামে আসল পণ্য পান।
+আমরা প্রতিটি গিফট কম্বো নিজেরা সাজাই। কোন উপলক্ষ, কার জন্য, বাজেট কত — এসব মাথায় রেখে পণ্য বাছাই করা হয়, তারপর হাতে মোড়ানো হয় সুন্দর বক্সে, সঙ্গে থাকে আপনার লেখা কার্ড।
 
-প্রতিটি পণ্য পাঠানোর আগে হাতে ধরে যাচাই করা হয় — সুতার মান, রঙের স্থায়িত্ব আর বুননের নিখুঁততা। পছন্দ না হলে ডেলিভারির ৭ দিনের ভেতর ফেরত দেওয়া যাবে।`,
-  en: `Tantghor started with one question — why does a handwoven saree cost three times more by the time it reaches a Dhaka shop?
+পাঠানোর আগে প্রতিটি বক্স হাতে ধরে যাচাই করা হয় — পণ্যের মান, প্যাকেজিং আর মোড়কের নিখুঁততা। পছন্দ না হলে ডেলিভারির ৭ দিনের ভেতর ফেরত দেওয়া যাবে।`,
+  en: `Upoharkabbo began with a simple thought — a gift is not just an object, it is a way of saying something.
 
-We work directly with weaving families in Sirajganj, Tangail and Narsingdi. No middlemen, so the weaver earns fairly and you pay less for the real thing.
+We build every combo ourselves. The occasion, the person and the budget decide what goes in the box; then it is wrapped by hand and paired with a card in your own words.
 
-Every parcel is checked by hand before it ships — yarn quality, colour fastness and weave consistency. If it is not right, return it within 7 days of delivery.`,
+Each box is checked by hand before it ships — product quality, packaging and finish. If it is not right, return it within 7 days of delivery.`,
 };
+
 
 export function AboutPage() {
   const { lang } = useLang();
@@ -50,7 +51,7 @@ export function AboutPage() {
 
       <div className="mt-8 grid gap-3 sm:grid-cols-3">
         {[
-          { bn: "সরাসরি তাঁতির কাছ থেকে", en: "Straight from the weaver" },
+          { bn: "যত্নে সাজানো গিফট কম্বো", en: "Curated gift combos" },
           { bn: "হাতে যাচাই করা মান", en: "Hand-checked quality" },
           { bn: "৭ দিনের রিটার্ন", en: "7-day returns" },
         ].map((item) => (

@@ -36,8 +36,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     return {
       lang,
       categories: layout.categories,
-      brand: str(general["brand_name"], "তাঁতঘর"),
-      tagline: str(general["tagline"], "সারা দেশে ক্যাশ অন ডেলিভারি · ৪৮ ঘণ্টায় ডেলিভারি"),
+      brand: str(general["brand_name"], "উপহারকাব্য"),
+      tagline: str(general["tagline"], "গিফট কম্বো ও উপহার সামগ্রী · সারা দেশে ক্যাশ অন ডেলিভারি"),
       contact: {
         phone: str(contactSetting["phone"], ""),
         email: str(contactSetting["email"], ""),
@@ -46,7 +46,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     };
   },
   head: ({ loaderData }) => {
-    const brand = loaderData?.brand ?? "তাঁতঘর";
+    const brand = loaderData?.brand ?? "উপহারকাব্য";
     return {
       meta: [
         { charSet: "utf-8" },
@@ -55,12 +55,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         { property: "og:site_name", content: brand },
         { property: "og:type", content: "website" },
         { name: "twitter:card", content: "summary_large_image" },
-        { name: "theme-color", content: "#fbf8f3" },
+        { name: "theme-color", content: "#fdf9f2" },
       ],
       links: [
         { rel: "stylesheet", href: appCss },
-        { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+        { rel: "icon", href: "/favicon.png", type: "image/png" },
+        { rel: "apple-touch-icon", href: "/favicon.png" },
       ],
+
       scripts: [
         {
           type: "application/ld+json",
