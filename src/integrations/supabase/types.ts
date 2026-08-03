@@ -259,6 +259,8 @@ export type Database = {
       orders: {
         Row: {
           address_line: string
+          advance_amount: number
+          advance_method: string | null
           city: string
           created_at: string
           customer_email: string | null
@@ -267,6 +269,7 @@ export type Database = {
           customer_phone: string
           delivery_area: string | null
           delivery_charge: number
+          delivery_partner: string | null
           discount: number
           id: string
           invoice_r2_key: string | null
@@ -282,6 +285,8 @@ export type Database = {
         }
         Insert: {
           address_line: string
+          advance_amount?: number
+          advance_method?: string | null
           city: string
           created_at?: string
           customer_email?: string | null
@@ -290,6 +295,7 @@ export type Database = {
           customer_phone: string
           delivery_area?: string | null
           delivery_charge?: number
+          delivery_partner?: string | null
           discount?: number
           id?: string
           invoice_r2_key?: string | null
@@ -305,6 +311,8 @@ export type Database = {
         }
         Update: {
           address_line?: string
+          advance_amount?: number
+          advance_method?: string | null
           city?: string
           created_at?: string
           customer_email?: string | null
@@ -313,6 +321,7 @@ export type Database = {
           customer_phone?: string
           delivery_area?: string | null
           delivery_charge?: number
+          delivery_partner?: string | null
           discount?: number
           id?: string
           invoice_r2_key?: string | null
