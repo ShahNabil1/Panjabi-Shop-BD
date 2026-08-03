@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Fingerprint, Globe, NotebookPen, Phone, Shield, ShieldCheck, ShieldX, Trash2 } from "lucide-react";
+import { Fingerprint, Globe, NotebookPen, Phone, Shield, ShieldCheck, ShieldX } from "lucide-react";
 
 import type { BlockKind } from "@/lib/admin-schema";
-import { adminAddOrderNote, adminDeleteOrderNote, adminSetBlocked } from "@/lib/order-admin.functions";
+import { adminAddOrderNote, adminSetBlocked } from "@/lib/order-admin.functions";
 import { Panel } from "@/components/admin/kit";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
