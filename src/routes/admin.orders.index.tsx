@@ -76,30 +76,47 @@ function AdminOrdersPage() {
         ) : (
           <ul className="divide-y divide-border">
             {data?.map((o) => (
-              <li key={o.id}>
+              <li
+                key={o.id}
+                className="flex flex-wrap items-center justify-between gap-3 px-4 py-3.5 transition-colors duration-200 hover:bg-muted/40"
+              >
+                <div className="min-w-0 flex-1 space-y-1.5">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="text-[15px] font-bold text-foreground">{o.customer_name}</span>
+                    <StatusPill status={o.status} />
+                    <span className="rounded-md bg-muted px-1.5 py-0.5 font-mono text-xs text-muted-foreground">
+                      {o.order_number}
+                    </span>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+                    <span className="inline-flex items-center gap-1.5">
+                      <Clock className="size-3.5" />
+                      {formatBdDateTime(o.created_at)}
+                    </span>
+                    <span className="font-semibold tabular-nums text-primary">
+                      {adminPrice(o.total)}
+                    </span>
+                    <span className="inline-flex items-center gap-1.5 rounded-md bg-muted px-1.5 py-0.5 font-mono">
+                      <Globe className="size-3" />
+                      {(o as { customer_ip?: string | null }).customer_ip ?? "—"}
+                    </span>
+                  </div>
+                </div>
+
                 <Link
                   to="/admin/orders/$id"
                   params={{ id: o.id }}
-                  className="flex flex-wrap items-center justify-between gap-2 px-4 py-3 text-sm transition-colors duration-200 hover:bg-muted/50"
+                  className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-border bg-background px-3 py-1.5 text-xs font-semibold text-foreground transition-colors hover:border-primary/40 hover:bg-accent"
                 >
-                  <div className="min-w-40">
-                    <p className="font-semibold">{o.order_number}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {new Date(o.created_at).toLocaleString("en-GB")}
-                    </p>
-                  </div>
-                  <div className="min-w-40">
-                    <p>{o.customer_name}</p>
-                    <p className="text-xs text-muted-foreground">{o.customer_phone}</p>
-                  </div>
-                  <StatusPill status={o.status} />
-                  <span className="font-semibold tabular-nums">{adminPrice(o.total)}</span>
+                  <Eye className="size-3.5" />
+                  View
                 </Link>
               </li>
             ))}
           </ul>
         )}
       </Panel>
+
     </div>
   );
 }
