@@ -6,6 +6,8 @@ import { useLang } from "@/lib/language-context";
 import { pick, tr } from "@/lib/i18n";
 import { ProductGrid, ProductThumb } from "@/components/site/product-card";
 import { FaqList } from "@/components/site/faq-list";
+import { HeroSlider, readHeroSlides } from "@/components/site/hero-slider";
+
 import { Section } from "@/components/site/ui";
 
 export const Route = createFileRoute("/")({
