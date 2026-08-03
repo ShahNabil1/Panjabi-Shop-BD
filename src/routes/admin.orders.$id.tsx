@@ -21,6 +21,13 @@ import {
   SecurityCard,
 } from "@/components/admin/order/security-card";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 
 const updatableStatuses = ["no_response", "good_no_response", "hold", "cancelled"] as const;
