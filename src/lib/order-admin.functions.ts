@@ -29,7 +29,25 @@ export const adminOrderWorkspace = createServerFn({ method: "POST" })
     if (!order) return null;
 
     const o = order as unknown as Record<string, unknown>;
-    const [notes, sms, blocked] = await Promise.all([
+
+    // Record who opened the order, throttled to one entry per viewer per 15 min.
+    const who = await actorName(db, context.userId);
+    const since = new Date(Date.now() - 15 * 60 * 1000).toISOString();
+    const { data: recentViews } = await db
+      .from("order_activity")
+      .select("id, meta")
+      .eq("order_id", data.id)
+      .eq("kind", "view")
+      .gte("created_at", since)
+      .limit(20);
+    const alreadyViewed = (recentViews ?? []).some(
+      (r) => ((r as { meta?: { actor?: string } }).meta?.actor ?? "") === who,
+    );
+    if (!alreadyViewed) {
+      await logActivity(db, data.id, "view", `${who} viewed this order`, { actor: who });
+    }
+
+    const [notes, sms, blocked, activity] = await Promise.all([
       db
         .from("order_notes")
         .select("*")
@@ -49,10 +67,16 @@ export const adminOrderWorkspace = createServerFn({ method: "POST" })
             (v): v is string => typeof v === "string" && v.length > 0,
           ),
         ),
+      db
+        .from("order_activity")
+        .select("id, kind, message, meta, created_at")
+        .eq("order_id", data.id)
+        .order("created_at", { ascending: false })
+        .limit(200),
     ]);
 
     return {
-      order,
+      order: { ...(order as object), order_activity: activity.data ?? [] },
       notes: notes.data ?? [],
       sms: sms.data ?? [],
       blocked: (blocked.data ?? []) as Array<{ kind: string; value: string }>,
