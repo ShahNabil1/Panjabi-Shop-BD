@@ -18,7 +18,7 @@ export function Breadcrumbs({ items }: { items: Crumb[] }) {
             {item.to ? (
               <Link
                 to={item.to}
-                params={item.params}
+                {...(item.params ? { params: item.params } : {})}
                 className="truncate transition-colors hover:text-primary"
               >
                 {item.label}
