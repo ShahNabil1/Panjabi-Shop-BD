@@ -6,6 +6,7 @@ import { useLang } from "@/lib/language-context";
 import { pick, tr } from "@/lib/i18n";
 import { ProductGrid } from "@/components/site/product-card";
 import { NotFoundView } from "@/components/site/not-found-view";
+import { absoluteUrl } from "@/lib/site";
 import { Breadcrumbs, Prose, Section } from "@/components/site/ui";
 
 export const Route = createFileRoute("/c/$category/$subcategory")({
@@ -46,9 +47,35 @@ export const Route = createFileRoute("/c/$category/$subcategory")({
             "@context": "https://schema.org",
             "@type": "BreadcrumbList",
             itemListElement: [
-              { "@type": "ListItem", position: 1, name: c.name_bn, item: `/c/${params.category}` },
-              { "@type": "ListItem", position: 2, name: s.name_bn, item: url },
+              { "@type": "ListItem", position: 1, name: "হোম", item: absoluteUrl("/") },
+              {
+                "@type": "ListItem",
+                position: 2,
+                name: c.name_bn,
+                item: absoluteUrl(`/c/${params.category}`),
+              },
+              { "@type": "ListItem", position: 3, name: s.name_bn, item: absoluteUrl(url) },
             ],
+          }),
+        },
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "CollectionPage",
+            name: title,
+            description,
+            url: absoluteUrl(url),
+            mainEntity: {
+              "@type": "ItemList",
+              numberOfItems: loaderData.products.length,
+              itemListElement: loaderData.products.map((product, index) => ({
+                "@type": "ListItem",
+                position: index + 1,
+                url: absoluteUrl(`/p/${product.slug}`),
+                name: product.nameBn,
+              })),
+            },
           }),
         },
       ],
