@@ -2,10 +2,13 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { ArrowDown, ArrowUp, Trash2 } from "lucide-react";
 
 import { adminListSettings, adminSaveSetting } from "@/lib/admin.functions";
 import { getMediaStatus } from "@/lib/media.functions";
 import { AdminHeading, NumberField, Panel, TextField } from "@/components/admin/kit";
+import { ImageField } from "@/components/admin/image-upload";
+import { MAX_HERO_SLIDES, readHeroSlides, type HeroSlide } from "@/components/site/hero-slider";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/admin/settings")({
@@ -31,6 +34,7 @@ function SettingsAdmin() {
   const [general, setGeneral] = useState<Obj>({});
   const [contact, setContact] = useState<Obj>({});
   const [delivery, setDelivery] = useState<Obj>({});
+  const [slides, setSlides] = useState<HeroSlide[]>([]);
 
   useEffect(() => {
     if (!data) return;
@@ -39,7 +43,9 @@ function SettingsAdmin() {
     setGeneral(find("general"));
     setContact(find("contact"));
     setDelivery(find("delivery"));
+    setSlides(readHeroSlides(find("hero") as never));
   }, [data]);
+
 
   const save = useMutation({
     mutationFn: (input: { key: string; value: Obj }) => adminSaveSetting({ data: input }),
