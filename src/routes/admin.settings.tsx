@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { adminListSettings, adminSaveSetting } from "@/lib/admin.functions";
+import { getMediaStatus } from "@/lib/media.functions";
 import { AdminHeading, NumberField, Panel, TextField } from "@/components/admin/kit";
 import { Button } from "@/components/ui/button";
 
@@ -25,6 +26,7 @@ function n(map: Obj, key: string, fallback = 0) {
 function SettingsAdmin() {
   const qc = useQueryClient();
   const { data } = useQuery({ queryKey: ["admin", "settings"], queryFn: () => adminListSettings() });
+  const media = useQuery({ queryKey: ["admin", "media-status"], queryFn: () => getMediaStatus() });
 
   const [general, setGeneral] = useState<Obj>({});
   const [contact, setContact] = useState<Obj>({});
@@ -51,6 +53,15 @@ function SettingsAdmin() {
   return (
     <div className="space-y-6 pb-16">
       <AdminHeading title="সেটিংস" description="ব্র্যান্ড, যোগাযোগ ও ডেলিভারি চার্জ।" />
+
+      <Panel className="space-y-2">
+        <h2 className="text-sm font-bold">মিডিয়া স্টোরেজ (Cloudflare R2)</h2>
+        <p className="text-xs text-muted-foreground">
+          {media.data?.configured
+            ? "R2 কানেক্টেড — অ্যাডমিন প্যানেল থেকে ছবি সরাসরি আপলোড করা যাবে। আপলোডের আগে ব্রাউজারেই WebP কমপ্রেশন হয়।"
+            : "R2 কনফিগার করা নেই। ছবি আপলোড করতে R2 সিক্রেটগুলো যোগ করতে হবে।"}
+        </p>
+      </Panel>
 
       <Panel className="space-y-4">
         <h2 className="text-sm font-bold">সাধারণ</h2>
