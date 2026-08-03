@@ -13,7 +13,8 @@ import {
 import { useOrderPresence } from "@/lib/use-order-presence";
 import { useAuth } from "@/lib/auth-context";
 import { adminOrderWorkspace } from "@/lib/order-admin.functions";
-import { webOrderStatuses, smsTemplates, type OrderStatus } from "@/lib/admin-schema";
+import { webOrderStatuses, type OrderStatus } from "@/lib/admin-schema";
+import { adminListSmsTemplates } from "@/lib/sms-templates.functions";
 import { renderSmsTemplate, orderSmsVars } from "@/lib/sms-template";
 
 import { Panel, StatusPill, statusLabels } from "@/components/admin/kit";
@@ -118,6 +119,11 @@ function AdminOrderDetail() {
     queryFn: () => adminOrderWorkspace({ data: { id } }),
   });
 
+  const smsTemplates = useQuery({
+    queryKey: ["admin", "sms-templates"],
+    queryFn: () => adminListSmsTemplates(),
+  });
+
   const [pending, setPending] = useState<PendingStatus | "">("");
   const [reason, setReason] = useState("");
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -189,10 +195,11 @@ function AdminOrderDetail() {
     }>;
   };
 
-  const confirmSms = renderSmsTemplate(
-    smsTemplates.find((t) => t.id === "order_confirm")?.body ?? "",
-    orderSmsVars(order),
+  const confirmTemplate = (smsTemplates.data?.templates ?? []).find(
+    (t) => t.key === "order_confirm",
   );
+  const autoSmsEnabled = confirmTemplate?.enabled !== false;
+  const confirmSms = renderSmsTemplate(confirmTemplate?.body ?? "", orderSmsVars(order));
 
 
 
@@ -368,24 +375,28 @@ function AdminOrderDetail() {
                     Confirm order {order.order_number}
                   </DialogTitle>
                   <DialogDescription>
-                    This SMS will be sent to the customer and the order moves to Pending.
+                    {autoSmsEnabled
+                      ? "This SMS will be sent to the customer and the order moves to Pending."
+                      : "Auto SMS is turned off in Settings → SMS Templates. The order will move to Pending without any SMS."}
                   </DialogDescription>
                 </DialogHeader>
 
-                <div className="rounded-xl border border-border bg-muted/40 p-3">
-                  <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground">
-                    SMS preview
-                  </p>
-                  <p className="mt-2 whitespace-pre-wrap rounded-lg border border-border/70 bg-background p-3 text-sm leading-relaxed">
-                    {confirmSms}
-                  </p>
-                  <p className="mt-2 text-[11px] text-muted-foreground">
-                    To {order.customer_phone} · {confirmSms.length} chars ·{" "}
-                    {order.auto_sms_status === "sent"
-                      ? "Already sent for this order"
-                      : "Variables rendered with live order data"}
-                  </p>
-                </div>
+                {autoSmsEnabled ? (
+                  <div className="rounded-xl border border-border bg-muted/40 p-3">
+                    <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground">
+                      SMS preview
+                    </p>
+                    <p className="mt-2 whitespace-pre-wrap rounded-lg border border-border/70 bg-background p-3 text-sm leading-relaxed">
+                      {confirmSms}
+                    </p>
+                    <p className="mt-2 text-[11px] text-muted-foreground">
+                      To {order.customer_phone} · {confirmSms.length} chars ·{" "}
+                      {order.auto_sms_status === "sent"
+                        ? "Already sent for this order"
+                        : "Variables rendered with live order data"}
+                    </p>
+                  </div>
+                ) : null}
 
                 <DialogFooter className="gap-2 sm:gap-2">
                   <Button
@@ -408,18 +419,20 @@ function AdminOrderDetail() {
                     <CheckCircle2 className="size-4" />
                     Confirm only
                   </Button>
-                  <Button
-                    loading={update.isPending && !silent}
-                    disabled={update.isPending}
-                    onClick={() => {
-                      setSilent(false);
-                      update.mutate({ status: "pending" });
-                    }}
-                    className="bg-[hsl(143,85%,32%)] text-white hover:bg-[hsl(143,85%,27%)] focus-visible:ring-[hsl(143,85%,32%)]"
-                  >
-                    <CheckCircle2 className="size-4" />
-                    Send SMS & Confirm
-                  </Button>
+                  {autoSmsEnabled ? (
+                    <Button
+                      loading={update.isPending && !silent}
+                      disabled={update.isPending}
+                      onClick={() => {
+                        setSilent(false);
+                        update.mutate({ status: "pending" });
+                      }}
+                      className="bg-[hsl(143,85%,32%)] text-white hover:bg-[hsl(143,85%,27%)] focus-visible:ring-[hsl(143,85%,32%)]"
+                    >
+                      <CheckCircle2 className="size-4" />
+                      Send SMS & Confirm
+                    </Button>
+                  ) : null}
                 </DialogFooter>
               </DialogContent>
             </Dialog>
