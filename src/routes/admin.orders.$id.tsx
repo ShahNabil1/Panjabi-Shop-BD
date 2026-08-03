@@ -72,11 +72,18 @@ function AdminOrderDetail() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const [pending, setPending] = useState<PendingStatus | null>(null);
+  const [reason, setReason] = useState("");
+
   const update = useMutation({
-    mutationFn: (status: (typeof listOrderStatuses)[number] | (typeof webOrderStatuses)[number]) =>
-      adminUpdateOrderStatus({ data: { id, status } }),
+    mutationFn: (input: { status: OrderStatus; reason?: string }) =>
+      adminUpdateOrderStatus({
+        data: { id, status: input.status, ...(input.reason ? { reason: input.reason } : {}) },
+      }),
     onSuccess: async () => {
       toast.success("Status updated");
+      setPending(null);
+      setReason("");
       await qc.invalidateQueries({ queryKey: ["admin"] });
     },
     onError: (e: Error) => toast.error(e.message),
