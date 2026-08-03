@@ -146,10 +146,26 @@ export const landingPageSchema = z.object({
   meta_description: optText,
   og_image_url: optText,
   is_active: z.boolean().default(true),
+  seo: z
+    .object({
+      ogTitle: optText,
+      ogDescription: optText,
+      canonicalUrl: optText,
+      productJsonLd: z.boolean().default(true),
+      noindex: z.boolean().default(false),
+    })
+    .default({
+      ogTitle: null,
+      ogDescription: null,
+      canonicalUrl: null,
+      productJsonLd: true,
+      noindex: false,
+    }),
   bullets: z
     .array(z.object({ bn: z.string().trim().max(300), en: z.string().trim().max(300) }))
     .default([]),
 });
+
 
 export const faqSchema = z.object({
   id: uuid.optional(),
