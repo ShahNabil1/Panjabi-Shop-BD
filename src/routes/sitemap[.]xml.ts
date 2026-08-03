@@ -38,6 +38,9 @@ export const Route = createFileRoute("/sitemap.xml")({
         for (const p of data.promotions) {
           entries.push({ path: `/offers/${p.slug}`, changefreq: "daily", priority: "0.7" });
         }
+        for (const l of data.landings) {
+          entries.push({ path: `/lp/${l.slug}`, changefreq: "weekly", priority: "0.6" });
+        }
 
         const urls = entries.map((e) =>
           [
