@@ -30,6 +30,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 const updatableStatuses = ["no_response", "good_no_response", "hold", "cancelled"] as const;
 type PendingStatus = (typeof updatableStatuses)[number];
@@ -59,6 +67,7 @@ function AdminOrderDetail() {
 
   const [pending, setPending] = useState<PendingStatus | "">("");
   const [reason, setReason] = useState("");
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   const update = useMutation({
     mutationFn: (input: { status: OrderStatus; reason?: string }) =>
@@ -67,6 +76,7 @@ function AdminOrderDetail() {
       }),
     onSuccess: async () => {
       toast.success("Status updated");
+      setConfirmOpen(false);
       setPending("");
       setReason("");
       await qc.invalidateQueries({ queryKey: ["admin"] });
