@@ -139,7 +139,7 @@ export function CourierReport({ phone }: { phone: string }) {
         <p className="mt-3 text-sm text-muted-foreground">No courier data.</p>
       ) : (
         <>
-          <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+          <div className="-mx-1 mt-4 flex snap-x snap-mandatory gap-2.5 overflow-x-auto px-1 pb-2 sm:gap-3 [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-border [&>*]:min-w-[132px] [&>*]:flex-1 [&>*]:shrink-0 [&>*]:snap-start">
             <CourierTile
               name="Overall"
               theme={COURIER_THEME['all']!}
