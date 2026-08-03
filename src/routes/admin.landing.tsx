@@ -56,9 +56,17 @@ function emptyLanding(): LandingPageInput {
     meta_description: null,
     og_image_url: null,
     is_active: true,
+    seo: {
+      ogTitle: null,
+      ogDescription: null,
+      canonicalUrl: null,
+      productJsonLd: true,
+      noindex: false,
+    },
     bullets: [],
   };
 }
+
 
 function moveItem<T>(list: T[], from: number, to: number): T[] {
   if (to < 0 || to >= list.length) return list;
@@ -173,6 +181,56 @@ function LandingPagesAdmin() {
             value={draft.meta_description ?? ""}
             onChange={(v) => setDraft({ ...draft, meta_description: v || null })}
           />
+
+          <div className="space-y-3 rounded-2xl border border-border/70 bg-background/50 p-4">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                SEO & Social
+              </p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Overrides for this landing page only. Leave empty to fall back to meta
+                title/description.
+              </p>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <TextField
+                label="OG Title"
+                value={draft.seo.ogTitle ?? ""}
+                onChange={(v) => setDraft({ ...draft, seo: { ...draft.seo, ogTitle: v || null } })}
+                hint="Shown when shared on Facebook / Messenger"
+              />
+              <TextField
+                label="Canonical URL"
+                value={draft.seo.canonicalUrl ?? ""}
+                onChange={(v) =>
+                  setDraft({ ...draft, seo: { ...draft.seo, canonicalUrl: v || null } })
+                }
+                hint="Absolute URL. Defaults to this page's URL."
+              />
+            </div>
+            <AreaField
+              label="OG Description"
+              rows={3}
+              value={draft.seo.ogDescription ?? ""}
+              onChange={(v) =>
+                setDraft({ ...draft, seo: { ...draft.seo, ogDescription: v || null } })
+              }
+            />
+            <div className="grid gap-2 sm:grid-cols-2">
+              <ToggleField
+                label="Product JSON-LD (rich results)"
+                checked={draft.seo.productJsonLd}
+                onChange={(v) => setDraft({ ...draft, seo: { ...draft.seo, productJsonLd: v } })}
+              />
+              <ToggleField
+                label="Hide from search (noindex)"
+                checked={draft.seo.noindex}
+                onChange={(v) => setDraft({ ...draft, seo: { ...draft.seo, noindex: v } })}
+              />
+            </div>
+          </div>
+
+
 
           <div>
             <div className="flex items-center justify-between">
@@ -302,10 +360,19 @@ function LandingPagesAdmin() {
                     onClick={() => {
                       const content = (p.content ?? {}) as {
                         bullets?: Array<{ bn: string; en: string }>;
+                        seo?: Partial<LandingPageInput["seo"]>;
                       };
                       setDraft({
                         ...(p as unknown as LandingPageInput),
                         bullets: Array.isArray(content.bullets) ? content.bullets : [],
+                        seo: {
+                          ogTitle: content.seo?.ogTitle ?? null,
+                          ogDescription: content.seo?.ogDescription ?? null,
+                          canonicalUrl: content.seo?.canonicalUrl ?? null,
+                          productJsonLd: content.seo?.productJsonLd ?? true,
+                          noindex: content.seo?.noindex ?? false,
+                        },
+
                       });
                     }}
                   >

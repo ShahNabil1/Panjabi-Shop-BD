@@ -29,53 +29,60 @@ export const Route = createFileRoute("/lp/$slug")({
       return { meta: [{ title: "পেইজটি পাওয়া যায়নি" }, { name: "robots", content: "noindex" }] };
     }
     const { landing, product, images } = loaderData;
+    const seo = landing.seo;
     const title = landing.metaTitle || landing.headlineBn || product.nameBn;
     const description =
       landing.metaDescription ||
       product.shortBn ||
       `${product.nameBn} — ${formatPrice("bn", product.price)}. ক্যাশ অন ডেলিভারিতে অর্ডার করুন।`;
+    const ogTitle = seo.ogTitle || title;
+    const ogDescription = seo.ogDescription || description;
     const image = landing.ogImageUrl ?? images[0]?.url ?? null;
-    const url = `https://upoharkabbo.lovable.app/lp/${params.slug}`;
+    const url = seo.canonicalUrl || `https://upoharkabbo.lovable.app/lp/${params.slug}`;
 
     return {
       meta: [
         { title },
         { name: "description", content: description },
-        { property: "og:title", content: title },
-        { property: "og:description", content: description },
+        ...(seo.noindex ? [{ name: "robots", content: "noindex, nofollow" }] : []),
+        { property: "og:title", content: ogTitle },
+        { property: "og:description", content: ogDescription },
         { property: "og:type", content: "product" },
         { property: "og:url", content: url },
         ...(image ? [{ property: "og:image", content: image }] : []),
         ...(image ? [{ name: "twitter:image", content: image }] : []),
       ],
       links: [{ rel: "canonical", href: url }],
-      scripts: [
-        {
-          type: "application/ld+json",
-          children: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "Product",
-            name: product.nameBn,
-            alternateName: product.nameEn,
-            description,
-            sku: product.sku ?? undefined,
-            brand: product.brand ? { "@type": "Brand", name: product.brand } : undefined,
-            image: image ? [image] : undefined,
-            offers: {
-              "@type": "Offer",
-              price: product.price,
-              priceCurrency: "BDT",
-              availability:
-                product.stock > 0
-                  ? "https://schema.org/InStock"
-                  : "https://schema.org/OutOfStock",
-              url,
+      scripts: seo.productJsonLd
+        ? [
+            {
+              type: "application/ld+json",
+              children: JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "Product",
+                name: product.nameBn,
+                alternateName: product.nameEn,
+                description,
+                sku: product.sku ?? undefined,
+                brand: product.brand ? { "@type": "Brand", name: product.brand } : undefined,
+                image: image ? [image] : undefined,
+                offers: {
+                  "@type": "Offer",
+                  price: product.price,
+                  priceCurrency: "BDT",
+                  availability:
+                    product.stock > 0
+                      ? "https://schema.org/InStock"
+                      : "https://schema.org/OutOfStock",
+                  url,
+                },
+              }),
             },
-          }),
-        },
-      ],
+          ]
+        : [],
     };
   },
+
   notFoundComponent: () => <NotFoundView />,
   component: LandingPage,
 });
