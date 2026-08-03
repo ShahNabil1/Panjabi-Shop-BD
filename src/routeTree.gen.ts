@@ -12,13 +12,17 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SplatRouteImport } from './routes/$'
 import { Route as AboutRouteImport } from './routes/about'
+import { Route as CartRouteImport } from './routes/cart'
 import { Route as CatalogDotxmlRouteImport } from './routes/catalog[.]xml'
+import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as LpSlugRouteImport } from './routes/lp.$slug'
 import { Route as OffersIndexRouteImport } from './routes/offers.index'
 import { Route as OffersPromotionRouteImport } from './routes/offers.$promotion'
+import { Route as OrderOrderNumberRouteImport } from './routes/order.$orderNumber'
 import { Route as PProductRouteImport } from './routes/p.$product'
 import { Route as CCategoryIndexRouteImport } from './routes/c.$category.index'
 import { Route as CCategorySubcategoryRouteImport } from './routes/c.$category.$subcategory'
@@ -38,9 +42,19 @@ const AboutRoute = AboutRouteImport.update({
   path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CartRoute = CartRouteImport.update({
+  id: '/cart',
+  path: '/cart',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CatalogDotxmlRoute = CatalogDotxmlRouteImport.update({
   id: '/catalog.xml',
   path: '/catalog.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CheckoutRoute = CheckoutRouteImport.update({
+  id: '/checkout',
+  path: '/checkout',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContactRoute = ContactRouteImport.update({
@@ -63,6 +77,11 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LpSlugRoute = LpSlugRouteImport.update({
+  id: '/lp/$slug',
+  path: '/lp/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const OffersIndexRoute = OffersIndexRouteImport.update({
   id: '/offers/',
   path: '/offers/',
@@ -71,6 +90,11 @@ const OffersIndexRoute = OffersIndexRouteImport.update({
 const OffersPromotionRoute = OffersPromotionRouteImport.update({
   id: '/offers/$promotion',
   path: '/offers/$promotion',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OrderOrderNumberRoute = OrderOrderNumberRouteImport.update({
+  id: '/order/$orderNumber',
+  path: '/order/$orderNumber',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PProductRoute = PProductRouteImport.update({
@@ -93,12 +117,16 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
   '/about': typeof AboutRoute
+  '/cart': typeof CartRoute
   '/catalog.xml': typeof CatalogDotxmlRoute
+  '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
   '/faq': typeof FaqRoute
   '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/lp/$slug': typeof LpSlugRoute
   '/offers/$promotion': typeof OffersPromotionRoute
+  '/order/$orderNumber': typeof OrderOrderNumberRoute
   '/p/$product': typeof PProductRoute
   '/offers/': typeof OffersIndexRoute
   '/c/$category/$subcategory': typeof CCategorySubcategoryRoute
@@ -108,12 +136,16 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
   '/about': typeof AboutRoute
+  '/cart': typeof CartRoute
   '/catalog.xml': typeof CatalogDotxmlRoute
+  '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
   '/faq': typeof FaqRoute
   '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/lp/$slug': typeof LpSlugRoute
   '/offers/$promotion': typeof OffersPromotionRoute
+  '/order/$orderNumber': typeof OrderOrderNumberRoute
   '/p/$product': typeof PProductRoute
   '/offers': typeof OffersIndexRoute
   '/c/$category/$subcategory': typeof CCategorySubcategoryRoute
@@ -124,12 +156,16 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
   '/about': typeof AboutRoute
+  '/cart': typeof CartRoute
   '/catalog.xml': typeof CatalogDotxmlRoute
+  '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
   '/faq': typeof FaqRoute
   '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/lp/$slug': typeof LpSlugRoute
   '/offers/$promotion': typeof OffersPromotionRoute
+  '/order/$orderNumber': typeof OrderOrderNumberRoute
   '/p/$product': typeof PProductRoute
   '/offers/': typeof OffersIndexRoute
   '/c/$category/$subcategory': typeof CCategorySubcategoryRoute
@@ -141,12 +177,16 @@ export interface FileRouteTypes {
     | '/'
     | '/$'
     | '/about'
+    | '/cart'
     | '/catalog.xml'
+    | '/checkout'
     | '/contact'
     | '/faq'
     | '/search'
     | '/sitemap.xml'
+    | '/lp/$slug'
     | '/offers/$promotion'
+    | '/order/$orderNumber'
     | '/p/$product'
     | '/offers/'
     | '/c/$category/$subcategory'
@@ -156,12 +196,16 @@ export interface FileRouteTypes {
     | '/'
     | '/$'
     | '/about'
+    | '/cart'
     | '/catalog.xml'
+    | '/checkout'
     | '/contact'
     | '/faq'
     | '/search'
     | '/sitemap.xml'
+    | '/lp/$slug'
     | '/offers/$promotion'
+    | '/order/$orderNumber'
     | '/p/$product'
     | '/offers'
     | '/c/$category/$subcategory'
@@ -171,12 +215,16 @@ export interface FileRouteTypes {
     | '/'
     | '/$'
     | '/about'
+    | '/cart'
     | '/catalog.xml'
+    | '/checkout'
     | '/contact'
     | '/faq'
     | '/search'
     | '/sitemap.xml'
+    | '/lp/$slug'
     | '/offers/$promotion'
+    | '/order/$orderNumber'
     | '/p/$product'
     | '/offers/'
     | '/c/$category/$subcategory'
@@ -187,12 +235,16 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   SplatRoute: typeof SplatRoute
   AboutRoute: typeof AboutRoute
+  CartRoute: typeof CartRoute
   CatalogDotxmlRoute: typeof CatalogDotxmlRoute
+  CheckoutRoute: typeof CheckoutRoute
   ContactRoute: typeof ContactRoute
   FaqRoute: typeof FaqRoute
   SearchRoute: typeof SearchRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  LpSlugRoute: typeof LpSlugRoute
   OffersPromotionRoute: typeof OffersPromotionRoute
+  OrderOrderNumberRoute: typeof OrderOrderNumberRoute
   PProductRoute: typeof PProductRoute
   OffersIndexRoute: typeof OffersIndexRoute
   CCategorySubcategoryRoute: typeof CCategorySubcategoryRoute
@@ -222,11 +274,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/cart': {
+      id: '/cart'
+      path: '/cart'
+      fullPath: '/cart'
+      preLoaderRoute: typeof CartRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/catalog.xml': {
       id: '/catalog.xml'
       path: '/catalog.xml'
       fullPath: '/catalog.xml'
       preLoaderRoute: typeof CatalogDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/checkout': {
+      id: '/checkout'
+      path: '/checkout'
+      fullPath: '/checkout'
+      preLoaderRoute: typeof CheckoutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contact': {
@@ -257,6 +323,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/lp/$slug': {
+      id: '/lp/$slug'
+      path: '/lp/$slug'
+      fullPath: '/lp/$slug'
+      preLoaderRoute: typeof LpSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/offers/': {
       id: '/offers/'
       path: '/offers'
@@ -269,6 +342,13 @@ declare module '@tanstack/react-router' {
       path: '/offers/$promotion'
       fullPath: '/offers/$promotion'
       preLoaderRoute: typeof OffersPromotionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/order/$orderNumber': {
+      id: '/order/$orderNumber'
+      path: '/order/$orderNumber'
+      fullPath: '/order/$orderNumber'
+      preLoaderRoute: typeof OrderOrderNumberRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/p/$product': {
@@ -299,12 +379,16 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   SplatRoute: SplatRoute,
   AboutRoute: AboutRoute,
+  CartRoute: CartRoute,
   CatalogDotxmlRoute: CatalogDotxmlRoute,
+  CheckoutRoute: CheckoutRoute,
   ContactRoute: ContactRoute,
   FaqRoute: FaqRoute,
   SearchRoute: SearchRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  LpSlugRoute: LpSlugRoute,
   OffersPromotionRoute: OffersPromotionRoute,
+  OrderOrderNumberRoute: OrderOrderNumberRoute,
   PProductRoute: PProductRoute,
   OffersIndexRoute: OffersIndexRoute,
   CCategorySubcategoryRoute: CCategorySubcategoryRoute,

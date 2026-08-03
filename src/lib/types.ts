@@ -46,3 +46,4 @@ export type PromotionPageData = NonNullable<Awaited<ReturnType<Catalog["fetchPro
 export type PromotionListData = Awaited<ReturnType<Catalog["fetchPromotionList"]>>;
 export type FaqData = Awaited<ReturnType<Catalog["fetchFaqs"]>>;
 export type SearchData = Awaited<ReturnType<Catalog["fetchSearch"]>>;
+export type LandingPageData = NonNullable<Awaited<ReturnType<Catalog["fetchLandingPage"]>>>;

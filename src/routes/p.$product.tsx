@@ -9,6 +9,7 @@ import { ProductGrid, ProductThumb } from "@/components/site/product-card";
 import { NotFoundView } from "@/components/site/not-found-view";
 import { FaqList } from "@/components/site/faq-list";
 import { Breadcrumbs, Prose, Section } from "@/components/site/ui";
+import { AddToCartBar } from "@/components/site/add-to-cart";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/p/$product")({
@@ -102,7 +103,7 @@ export const Route = createFileRoute("/p/$product")({
 
 function ProductPage() {
   const { lang } = useLang();
-  const { product, images, variants, category, subcategory, related } =
+  const { product, images, variants, category, subcategory, related, landingSlug } =
     Route.useLoaderData() as ProductPageData;
   const [active, setActive] = useState(0);
   const [selected, setSelected] = useState<Record<string, string>>({});
@@ -120,6 +121,14 @@ function ProductPage() {
     list.push(v);
     groups.set(key, list);
   }
+
+  const selectedIds = Object.values(selected);
+  const activeVariant =
+    variants.find((v) => selectedIds.includes(v.id)) ??
+    (groups.size === 1 ? (variants[0] ?? null) : null);
+  const unitPrice = product.price + Number(activeVariant?.price_delta ?? 0);
+
+
 
   const productFaqs = (product.faq ?? []).map((f, i) => ({
     id: String(i),
@@ -279,6 +288,38 @@ function ProductPage() {
                   </div>
                 ))}
               </div>
+            ) : null}
+
+            <AddToCartBar
+              className="mt-6"
+              stock={activeVariant ? activeVariant.stock : product.stock}
+              item={{
+                productId: product.id,
+                slug: product.slug,
+                nameBn: product.nameBn,
+                nameEn: product.nameEn,
+                image: images[0]?.url ?? null,
+                price: unitPrice,
+                stock: activeVariant ? activeVariant.stock : product.stock,
+                sku: product.sku,
+                variantId: activeVariant?.id ?? null,
+                variantLabelBn: activeVariant
+                  ? `${activeVariant.group_name_bn}: ${activeVariant.value_bn}`
+                  : null,
+                variantLabelEn: activeVariant
+                  ? `${activeVariant.group_name_en}: ${activeVariant.value_en}`
+                  : null,
+              }}
+            />
+
+            {landingSlug ? (
+              <Link
+                to="/lp/$slug"
+                params={{ slug: landingSlug }}
+                className="mt-3 block text-center text-sm font-semibold text-primary underline-offset-4 hover:underline"
+              >
+                {tr(lang, "orderNow2")}
+              </Link>
             ) : null}
 
             <div className="mt-7 rounded-lg border border-border bg-surface p-4">

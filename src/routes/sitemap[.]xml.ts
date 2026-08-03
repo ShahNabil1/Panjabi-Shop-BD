@@ -3,8 +3,7 @@ import type {} from "@tanstack/react-start";
 
 import { fetchSitemapData } from "@/lib/catalog.server";
 
-// TODO: replace with your project URL once a project name or custom domain is set.
-const BASE_URL = "";
+const BASE_URL = "https://upoharkabbo.lovable.app";
 
 type Entry = { path: string; changefreq?: string; priority?: string };
 
@@ -38,6 +37,9 @@ export const Route = createFileRoute("/sitemap.xml")({
         }
         for (const p of data.promotions) {
           entries.push({ path: `/offers/${p.slug}`, changefreq: "daily", priority: "0.7" });
+        }
+        for (const l of data.landings) {
+          entries.push({ path: `/lp/${l.slug}`, changefreq: "weekly", priority: "0.6" });
         }
 
         const urls = entries.map((e) =>

@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import { useLang } from "@/lib/language-context";
 import type { CategoryWithSubs } from "@/lib/types";
 import type { Lang } from "@/lib/i18n";
-import { pick, tr } from "@/lib/i18n";
+import { formatNumber, pick, tr } from "@/lib/i18n";
+import { useCart } from "@/lib/cart-context";
 import { cn } from "@/lib/utils";
 
 export type SiteData = {
@@ -99,7 +100,35 @@ function SearchBox({ onDone }: { onDone?: () => void }) {
   );
 }
 
+function CartButton({ className }: { className?: string }) {
+  const { lang } = useLang();
+  const { count, ready } = useCart();
+
+  return (
+    <Link
+      to="/cart"
+      aria-label={tr(lang, "cart")}
+      className={cn(
+        "relative grid h-10 w-10 place-items-center rounded-sm border border-border transition-colors hover:border-primary hover:text-primary",
+        className,
+      )}
+    >
+      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.7">
+        <path d="M3 4h2l2.3 11.2a1.5 1.5 0 0 0 1.5 1.2h8.2a1.5 1.5 0 0 0 1.5-1.2L20 7H6" strokeLinecap="round" strokeLinejoin="round" />
+        <circle cx="9.5" cy="20" r="1.2" />
+        <circle cx="17.5" cy="20" r="1.2" />
+      </svg>
+      {ready && count > 0 ? (
+        <span className="absolute -right-1.5 -top-1.5 grid h-5 min-w-5 place-items-center rounded-full bg-primary px-1 text-[11px] font-bold text-primary-foreground">
+          {formatNumber(lang, count)}
+        </span>
+      ) : null}
+    </Link>
+  );
+}
+
 export function SiteHeader() {
+
   const { lang } = useLang();
   const { categories, brand, tagline } = useSiteData();
   const [open, setOpen] = useState(false);
@@ -196,7 +225,10 @@ export function SiteHeader() {
         </div>
 
         <nav className="ml-4 hidden items-center gap-5 lg:flex">{navLinks}</nav>
+
+        <CartButton className="ml-auto shrink-0 lg:ml-4" />
       </div>
+
 
       <div className="mx-auto max-w-6xl px-4 pb-3 lg:hidden">
         <SearchBox />

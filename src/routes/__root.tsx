@@ -17,6 +17,8 @@ import { tr } from "../lib/i18n";
 import { SiteHeader } from "../components/site/site-header";
 import { SiteFooter } from "../components/site/site-footer";
 import { NotFoundView } from "../components/site/not-found-view";
+import { CartProvider } from "../lib/cart-context";
+import { Toaster } from "../components/ui/sonner";
 
 function str(value: unknown, fallback: string) {
   return typeof value === "string" && value.trim() ? value : fallback;
@@ -98,10 +100,13 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <LanguageProvider initialLang={lang}>
-        <Chrome>
-          {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-          <Outlet />
-        </Chrome>
+        <CartProvider>
+          <Chrome>
+            {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+            <Outlet />
+          </Chrome>
+          <Toaster position="top-center" richColors closeButton />
+        </CartProvider>
       </LanguageProvider>
     </QueryClientProvider>
   );
