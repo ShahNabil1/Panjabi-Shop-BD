@@ -475,12 +475,17 @@ function CreateOrderPage() {
                   </span>
                   <button
                     type="button"
-                    onClick={() => setLines((prev) => prev.filter((x) => x.key !== l.key))}
-                    className="text-muted-foreground transition-colors hover:text-destructive"
+                    onClick={() => {
+                      setLines((prev) => prev.filter((x) => x.key !== l.key));
+                      toast.success(`${l.name} removed`);
+                    }}
+                    className="grid size-9 shrink-0 place-items-center rounded-lg border border-border/70 text-muted-foreground transition-all duration-150 hover:border-destructive/40 hover:bg-destructive/10 hover:text-destructive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-destructive/40 active:scale-90 active:bg-destructive active:text-white"
                     aria-label="Remove item"
+                    title="Remove item"
                   >
                     <Trash2 className="size-4" />
                   </button>
+
                 </li>
               ))}
               {lines.length === 0 ? (
