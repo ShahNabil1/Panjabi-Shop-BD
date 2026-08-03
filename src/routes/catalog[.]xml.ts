@@ -55,7 +55,7 @@ export const Route = createFileRoute("/catalog.xml")({
           "  <channel>",
           "    <title>Tantghor Product Catalogue</title>",
           `    <link>${BASE_URL}/</link>`,
-          "    <description>Handwoven products from Bangladeshi weavers.</description>",
+          "    <description>Curated gift combos and gift boxes for every occasion.</description>",
           ...items,
           "  </channel>",
           "</rss>",

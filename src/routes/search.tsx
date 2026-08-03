@@ -19,7 +19,7 @@ export const Route = createFileRoute("/search")({
     return {
       meta: [
         { title },
-        { name: "description", content: "উপহারকাব্যের পণ্য ক্যাটালগে নাম, ব্র্যান্ড বা এসকেইউ দিয়ে খুঁজুন।" },
+        { name: "description", content: "উপহারকাব্যের গিফট কম্বো ক্যাটালগে নাম, ব্র্যান্ড বা এসকেইউ দিয়ে খুঁজুন।" },
         { name: "robots", content: "noindex, follow" },
         { property: "og:title", content: title },
         { property: "og:url", content: "/search" },
