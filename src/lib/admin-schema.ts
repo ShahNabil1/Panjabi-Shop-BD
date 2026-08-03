@@ -267,3 +267,12 @@ export function mirrorLang<T>(input: T): T {
   };
   return walk(input) as T;
 }
+
+export const productSearchSchema = z.object({ query: z.string().trim().max(80).default("") });
+
+export const customerLookupSchema = z.object({
+  phone: z
+    .string()
+    .trim()
+    .regex(/^01[3-9]\d{8}$/),
+});
