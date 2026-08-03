@@ -153,16 +153,17 @@ export function ActivityLog({ entries }: { entries: ActivityEntry[] }) {
             })}
           </ol>
 
-          {sorted.length > 12 ? (
+          {sorted.length > visible.length ? (
             <Button
               size="sm"
               variant="outline"
               className="mt-3 w-full"
-              onClick={() => setShowAll((v) => !v)}
+              onClick={() => setLimit((v) => v + 10)}
             >
-              {showAll ? "Show less" : `Show all ${sorted.length} events`}
+              View more ({sorted.length - visible.length} left)
             </Button>
           ) : null}
+
         </>
       )}
     </Panel>
