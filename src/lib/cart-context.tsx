@@ -21,11 +21,18 @@ export type CartItem = {
 
 export type NewCartItem = Omit<CartItem, "key">;
 
+export type CartStep = "cart" | "checkout";
+
 type CartContextValue = {
   items: CartItem[];
   count: number;
   subtotal: number;
   ready: boolean;
+  open: boolean;
+  step: CartStep;
+  openCart: (step?: CartStep) => void;
+  closeCart: () => void;
+  setStep: (step: CartStep) => void;
   add: (item: NewCartItem) => void;
   setQuantity: (key: string, quantity: number) => void;
   remove: (key: string) => void;
