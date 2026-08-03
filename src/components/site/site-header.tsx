@@ -99,7 +99,35 @@ function SearchBox({ onDone }: { onDone?: () => void }) {
   );
 }
 
+function CartButton({ className }: { className?: string }) {
+  const { lang } = useLang();
+  const { count, ready } = useCart();
+
+  return (
+    <Link
+      to="/cart"
+      aria-label={tr(lang, "cart")}
+      className={cn(
+        "relative grid h-10 w-10 place-items-center rounded-sm border border-border transition-colors hover:border-primary hover:text-primary",
+        className,
+      )}
+    >
+      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.7">
+        <path d="M3 4h2l2.3 11.2a1.5 1.5 0 0 0 1.5 1.2h8.2a1.5 1.5 0 0 0 1.5-1.2L20 7H6" strokeLinecap="round" strokeLinejoin="round" />
+        <circle cx="9.5" cy="20" r="1.2" />
+        <circle cx="17.5" cy="20" r="1.2" />
+      </svg>
+      {ready && count > 0 ? (
+        <span className="absolute -right-1.5 -top-1.5 grid h-5 min-w-5 place-items-center rounded-full bg-primary px-1 text-[11px] font-bold text-primary-foreground">
+          {formatNumber(lang, count)}
+        </span>
+      ) : null}
+    </Link>
+  );
+}
+
 export function SiteHeader() {
+
   const { lang } = useLang();
   const { categories, brand, tagline } = useSiteData();
   const [open, setOpen] = useState(false);
