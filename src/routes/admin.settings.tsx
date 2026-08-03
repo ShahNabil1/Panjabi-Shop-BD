@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { ArrowDown, ArrowUp, Trash2 } from "lucide-react";
+import { ArrowDown, ArrowUp, ImagePlus, Trash2 } from "lucide-react";
 
 import { adminListSettings, adminSaveSetting } from "@/lib/admin.functions";
 import { getMediaStatus } from "@/lib/media.functions";
@@ -50,7 +50,7 @@ function SettingsAdmin() {
   const save = useMutation({
     mutationFn: (input: { key: string; value: Obj }) => adminSaveSetting({ data: input }),
     onSuccess: async () => {
-      toast.success("সেটিংস সেভ হয়েছে");
+      toast.success("Settings saved");
       await qc.invalidateQueries({ queryKey: ["admin", "settings"] });
     },
     onError: (e: Error) => toast.error(e.message),
@@ -58,81 +58,87 @@ function SettingsAdmin() {
 
   return (
     <div className="space-y-6 pb-16">
-      <AdminHeading title="সেটিংস" description="হিরো ব্যানার, ব্র্যান্ড, যোগাযোগ ও ডেলিভারি চার্জ।" />
+      <AdminHeading
+        title="Settings"
+        description="Hero banner, brand, contact and delivery charges."
+      />
 
       <Panel className="space-y-4">
         <div>
-          <h2 className="text-sm font-bold">হিরো ব্যানার স্লাইডার</h2>
+          <h2 className="ig-text text-sm font-bold">Hero banner slider</h2>
           <p className="mt-1 text-xs text-muted-foreground">
-            সর্বনিম্ন ১টি, সর্বোচ্চ {MAX_HERO_SLIDES}টি ব্যানার। ছবিগুলো R2-এর{" "}
-            <code className="rounded bg-muted px-1">hero/</code> ফোল্ডারে যাবে। লিংক দিলে ব্যানারে
-            ক্লিক করলেই সেই পেইজে যাবে (যেমন <code className="rounded bg-muted px-1">/c/gift-combo</code>)।
+            At least 1, up to {MAX_HERO_SLIDES} banners. Images are stored in the{" "}
+            <code className="rounded bg-muted px-1">hero/</code> folder on R2. Adding a link makes
+            the banner clickable (e.g. <code className="rounded bg-muted px-1">/c/gift-combo</code>).
           </p>
         </div>
 
         <div className="space-y-3">
           {slides.map((slide, i) => (
-            <div key={i} className="space-y-3 rounded-lg border border-border p-3">
+            <div
+              key={i}
+              className="admin-rise space-y-3 rounded-xl border border-border/70 bg-background/40 p-3 transition-all duration-200 hover:border-primary/30"
+            >
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold">ব্যানার {i + 1}</span>
+                <span className="ig-text text-xs font-bold">Banner {i + 1}</span>
                 <div className="flex items-center gap-1">
                   <button
                     type="button"
                     disabled={i === 0}
-                    aria-label="উপরে"
+                    aria-label="Move up"
                     onClick={() => {
                       const next = slides.slice();
                       const [row] = next.splice(i, 1);
                       next.splice(i - 1, 0, row!);
                       setSlides(next);
                     }}
-                    className="rounded-md border border-border p-1 disabled:opacity-40"
+                    className="rounded-lg border border-border/80 p-1 transition-colors hover:border-primary/40 hover:bg-muted disabled:opacity-40"
                   >
                     <ArrowUp className="size-3.5" />
                   </button>
                   <button
                     type="button"
                     disabled={i === slides.length - 1}
-                    aria-label="নিচে"
+                    aria-label="Move down"
                     onClick={() => {
                       const next = slides.slice();
                       const [row] = next.splice(i, 1);
                       next.splice(i + 1, 0, row!);
                       setSlides(next);
                     }}
-                    className="rounded-md border border-border p-1 disabled:opacity-40"
+                    className="rounded-lg border border-border/80 p-1 transition-colors hover:border-primary/40 hover:bg-muted disabled:opacity-40"
                   >
                     <ArrowDown className="size-3.5" />
                   </button>
                   <button
                     type="button"
-                    aria-label="মুছুন"
+                    aria-label="Remove"
                     onClick={() => setSlides(slides.filter((_, j) => j !== i))}
-                    className="rounded-md border border-border p-1 text-destructive"
+                    className="rounded-lg border border-border/80 p-1 text-destructive transition-colors hover:bg-destructive/10"
                   >
                     <Trash2 className="size-3.5" />
                   </button>
                 </div>
               </div>
               <ImageField
-                label="ব্যানার ছবি"
+                label="Banner image"
                 folder="hero"
                 value={slide.url || null}
                 onChange={(url) =>
                   setSlides(slides.map((s, j) => (j === i ? { ...s, url: url ?? "" } : s)))
                 }
-                hint="প্রস্তাবিত সাইজ ২১:৯ (যেমন ১৯২০×৮২৩)।"
+                hint="Recommended aspect ratio 21:9 (e.g. 1920×823)."
               />
               <div className="grid gap-3 sm:grid-cols-2">
                 <TextField
-                  label="লিংক (ঐচ্ছিক)"
+                  label="Link (optional)"
                   value={slide.link ?? ""}
                   onChange={(v) =>
                     setSlides(slides.map((s, j) => (j === i ? { ...s, link: v || null } : s)))
                   }
                 />
                 <TextField
-                  label="Alt টেক্সট (ঐচ্ছিক)"
+                  label="Alt text (optional)"
                   value={slide.alt ?? ""}
                   onChange={(v) =>
                     setSlides(slides.map((s, j) => (j === i ? { ...s, alt: v || null } : s)))
@@ -148,46 +154,49 @@ function SettingsAdmin() {
             variant="outline"
             disabled={slides.length >= MAX_HERO_SLIDES}
             onClick={() => setSlides([...slides, { url: "", link: null, alt: null }])}
+            className="transition-transform duration-200 hover:-translate-y-0.5"
           >
-            ব্যানার যোগ করুন
+            <ImagePlus className="size-4" />
+            Add banner
           </Button>
           <Button
             disabled={save.isPending}
             onClick={() => {
               const clean = slides.filter((s) => s.url.trim());
               if (clean.length === 0) {
-                toast.error("অন্তত ১টি ব্যানার ছবি দিন।");
+                toast.error("Add at least one banner image.");
                 return;
               }
               setSlides(clean);
               save.mutate({ key: "hero", value: { slides: clean.slice(0, MAX_HERO_SLIDES) } });
             }}
+            className="transition-transform duration-200 hover:-translate-y-0.5"
           >
-            সেভ করুন
+            Save
           </Button>
         </div>
       </Panel>
 
 
       <Panel className="space-y-2">
-        <h2 className="text-sm font-bold">মিডিয়া স্টোরেজ (Cloudflare R2)</h2>
+        <h2 className="ig-text text-sm font-bold">Media storage (Cloudflare R2)</h2>
         <p className="text-xs text-muted-foreground">
           {media.data?.configured
-            ? "R2 কানেক্টেড — অ্যাডমিন প্যানেল থেকে ছবি সরাসরি আপলোড করা যাবে। আপলোডের আগে ব্রাউজারেই WebP কমপ্রেশন হয়।"
-            : "R2 কনফিগার করা নেই। ছবি আপলোড করতে R2 সিক্রেটগুলো যোগ করতে হবে।"}
+            ? "R2 connected — images can be uploaded directly from the admin panel. Files are WebP-compressed in the browser before upload."
+            : "R2 is not configured. Add the R2 secrets to enable image uploads."}
         </p>
       </Panel>
 
       <Panel className="space-y-4">
-        <h2 className="text-sm font-bold">সাধারণ</h2>
+        <h2 className="ig-text text-sm font-bold">General</h2>
         <div className="grid gap-3 sm:grid-cols-2">
           <TextField
-            label="ব্র্যান্ড নাম"
+            label="Brand name"
             value={str(general, "brand_name")}
             onChange={(v) => setGeneral({ ...general, brand_name: v })}
           />
           <TextField
-            label="ট্যাগলাইন"
+            label="Tagline"
             value={str(general, "tagline")}
             onChange={(v) => setGeneral({ ...general, tagline: v })}
           />
@@ -195,26 +204,27 @@ function SettingsAdmin() {
         <Button
           disabled={save.isPending}
           onClick={() => save.mutate({ key: "general", value: general })}
+          className="transition-transform duration-200 hover:-translate-y-0.5"
         >
-          সেভ করুন
+          Save
         </Button>
       </Panel>
 
       <Panel className="space-y-4">
-        <h2 className="text-sm font-bold">যোগাযোগ</h2>
+        <h2 className="ig-text text-sm font-bold">Contact</h2>
         <div className="grid gap-3 sm:grid-cols-3">
           <TextField
-            label="ফোন"
+            label="Phone"
             value={str(contact, "phone")}
             onChange={(v) => setContact({ ...contact, phone: v })}
           />
           <TextField
-            label="ইমেইল"
+            label="Email"
             value={str(contact, "email")}
             onChange={(v) => setContact({ ...contact, email: v })}
           />
           <TextField
-            label="ঠিকানা"
+            label="Address"
             value={str(contact, "address")}
             onChange={(v) => setContact({ ...contact, address: v })}
           />
@@ -222,26 +232,27 @@ function SettingsAdmin() {
         <Button
           disabled={save.isPending}
           onClick={() => save.mutate({ key: "contact", value: contact })}
+          className="transition-transform duration-200 hover:-translate-y-0.5"
         >
-          সেভ করুন
+          Save
         </Button>
       </Panel>
 
       <Panel className="space-y-4">
-        <h2 className="text-sm font-bold">ডেলিভারি চার্জ</h2>
+        <h2 className="ig-text text-sm font-bold">Delivery charges</h2>
         <div className="grid gap-3 sm:grid-cols-3">
           <NumberField
-            label="ঢাকার ভেতরে (৳)"
+            label="Inside Dhaka (৳)"
             value={n(delivery, "inside_dhaka", 60)}
             onChange={(v) => setDelivery({ ...delivery, inside_dhaka: v })}
           />
           <NumberField
-            label="ঢাকার বাইরে (৳)"
+            label="Outside Dhaka (৳)"
             value={n(delivery, "outside_dhaka", 120)}
             onChange={(v) => setDelivery({ ...delivery, outside_dhaka: v })}
           />
           <NumberField
-            label="ফ্রি ডেলিভারি (৳ এর উপরে)"
+            label="Free delivery above (৳)"
             value={n(delivery, "free_above", 0)}
             onChange={(v) => setDelivery({ ...delivery, free_above: v })}
           />
@@ -249,8 +260,9 @@ function SettingsAdmin() {
         <Button
           disabled={save.isPending}
           onClick={() => save.mutate({ key: "delivery", value: delivery })}
+          className="transition-transform duration-200 hover:-translate-y-0.5"
         >
-          সেভ করুন
+          Save
         </Button>
       </Panel>
     </div>

@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
@@ -16,9 +16,10 @@ export function AdminHeading({
   action?: ReactNode;
 }) {
   return (
-    <div className="flex flex-wrap items-start justify-between gap-3 border-b border-border pb-4">
-      <div>
-        <h1 className="text-lg font-bold tracking-tight sm:text-xl">{title}</h1>
+    <div className="admin-rise flex flex-wrap items-start justify-between gap-3 rounded-2xl border border-border/70 bg-card/80 p-5 shadow-[0_18px_45px_-38px_rgba(238,42,123,0.9)] backdrop-blur">
+      <div className="relative pl-4">
+        <span className="ig-gradient absolute left-0 top-1 h-[calc(100%-0.5rem)] w-1 rounded-full" />
+        <h1 className="text-xl font-bold tracking-tight sm:text-2xl">{title}</h1>
         {description ? (
           <p className="mt-1 text-sm text-muted-foreground">{description}</p>
         ) : null}
@@ -28,9 +29,23 @@ export function AdminHeading({
   );
 }
 
-export function Panel({ className, children }: { className?: string; children: ReactNode }) {
+export function Panel({
+  className,
+  children,
+  style,
+}: {
+  className?: string;
+  children: ReactNode;
+  style?: CSSProperties;
+}) {
   return (
-    <div className={cn("rounded-lg border border-border bg-card p-4 sm:p-5", className)}>
+    <div
+      style={style}
+      className={cn(
+        "admin-rise rounded-2xl border border-border/70 bg-card p-4 shadow-[0_16px_40px_-34px_rgba(98,40,215,0.8)] transition-all duration-300 hover:border-primary/30 hover:shadow-[0_22px_50px_-30px_rgba(238,42,123,0.55)] sm:p-5",
+        className,
+      )}
+    >
       {children}
     </div>
   );
@@ -48,8 +63,8 @@ export function Field({
   className?: string;
 }) {
   return (
-    <div className={cn("space-y-1.5", className)}>
-      <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+    <div className={cn("group/field space-y-1.5", className)}>
+      <Label className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground transition-colors group-focus-within/field:text-primary">
         {label}
       </Label>
       {children}
@@ -57,6 +72,9 @@ export function Field({
     </div>
   );
 }
+
+const inputClass =
+  "rounded-xl border-border/80 bg-background/70 transition-all duration-200 focus-visible:border-primary/60 focus-visible:ring-primary/25";
 
 export function TextField({
   label,
@@ -78,6 +96,7 @@ export function TextField({
   return (
     <Field label={label} {...(hint ? { hint } : {})} {...(className ? { className } : {})}>
       <Input
+        className={inputClass}
         type={type}
         value={value}
         placeholder={placeholder ?? ""}
@@ -103,6 +122,7 @@ export function NumberField({
   return (
     <Field label={label} {...(hint ? { hint } : {})}>
       <Input
+        className={inputClass}
         type="number"
         step={step ?? 1}
         value={Number.isFinite(value) ? value : 0}
@@ -127,7 +147,12 @@ export function AreaField({
 }) {
   return (
     <Field label={label} {...(hint ? { hint } : {})}>
-      <Textarea rows={rows} value={value} onChange={(e) => onChange(e.target.value)} />
+      <Textarea
+        className={inputClass}
+        rows={rows}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+      />
     </Field>
   );
 }
@@ -142,7 +167,14 @@ export function ToggleField({
   onChange: (checked: boolean) => void;
 }) {
   return (
-    <label className="flex items-center justify-between gap-3 rounded-md border border-border px-3 py-2.5">
+    <label
+      className={cn(
+        "flex cursor-pointer items-center justify-between gap-3 rounded-xl border px-3.5 py-2.5 transition-all duration-300",
+        checked
+          ? "ig-gradient-soft border-primary/40"
+          : "border-border bg-background/60 hover:border-primary/30",
+      )}
+    >
       <span className="text-sm font-medium">{label}</span>
       <Switch checked={checked} onCheckedChange={onChange} />
     </label>
@@ -151,39 +183,39 @@ export function ToggleField({
 
 export function EmptyState({ title, hint }: { title: string; hint?: string }) {
   return (
-    <div className="rounded-lg border border-dashed border-border px-6 py-14 text-center">
-      <p className="text-sm font-semibold">{title}</p>
+    <div className="admin-rise rounded-2xl border border-dashed border-primary/25 bg-background/50 px-6 py-14 text-center">
+      <p className="ig-text text-sm font-bold">{title}</p>
       {hint ? <p className="mt-1 text-sm text-muted-foreground">{hint}</p> : null}
     </div>
   );
 }
 
 const statusStyles: Record<string, string> = {
-  pending: "bg-amber-100 text-amber-900",
-  confirmed: "bg-sky-100 text-sky-900",
-  processing: "bg-indigo-100 text-indigo-900",
-  shipped: "bg-violet-100 text-violet-900",
-  delivered: "bg-emerald-100 text-emerald-900",
-  cancelled: "bg-rose-100 text-rose-900",
-  returned: "bg-stone-200 text-stone-800",
+  pending: "bg-amber-100 text-amber-900 ring-amber-200",
+  confirmed: "bg-sky-100 text-sky-900 ring-sky-200",
+  processing: "bg-indigo-100 text-indigo-900 ring-indigo-200",
+  shipped: "bg-violet-100 text-violet-900 ring-violet-200",
+  delivered: "bg-emerald-100 text-emerald-900 ring-emerald-200",
+  cancelled: "bg-rose-100 text-rose-900 ring-rose-200",
+  returned: "bg-stone-200 text-stone-800 ring-stone-300",
 };
 
 export const statusLabels: Record<string, string> = {
-  pending: "পেন্ডিং",
-  confirmed: "কনফার্মড",
-  processing: "প্রসেসিং",
-  shipped: "শিপড",
-  delivered: "ডেলিভারড",
-  cancelled: "বাতিল",
-  returned: "রিটার্ন",
+  pending: "Pending",
+  confirmed: "Confirmed",
+  processing: "Processing",
+  shipped: "Shipped",
+  delivered: "Delivered",
+  cancelled: "Cancelled",
+  returned: "Returned",
 };
 
 export function StatusPill({ status }: { status: string }) {
   return (
     <span
       className={cn(
-        "inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold",
-        statusStyles[status] ?? "bg-muted text-muted-foreground",
+        "inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold ring-1 transition-transform duration-200 hover:scale-105",
+        statusStyles[status] ?? "bg-muted text-muted-foreground ring-border",
       )}
     >
       {statusLabels[status] ?? status}

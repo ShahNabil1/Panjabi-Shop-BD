@@ -1,6 +1,6 @@
 import { useCallback, useRef, useState } from "react";
 import { toast } from "sonner";
-import { ImagePlus, Loader2, Upload } from "lucide-react";
+import { ImagePlus, Loader2, Upload, X } from "lucide-react";
 
 import { compressImage, formatBytes } from "@/lib/image-compress";
 import { createUploadTicket } from "@/lib/media.functions";
@@ -23,9 +23,9 @@ async function uploadOne(file: File, folder: Folder): Promise<string> {
     headers: { "content-type": compressed.contentType },
     body: compressed.blob,
   });
-  if (!res.ok) throw new Error(`আপলোড ব্যর্থ (${res.status})`);
+  if (!res.ok) throw new Error(`Upload failed (${res.status})`);
   toast.success(
-    `আপলোড হয়েছে — ${formatBytes(compressed.originalSize)} → ${formatBytes(compressed.size)}`,
+    `Uploaded — ${formatBytes(compressed.originalSize)} → ${formatBytes(compressed.size)}`,
   );
   return ticket.publicUrl;
 }
@@ -44,7 +44,7 @@ export function useImageUpload(folder: Folder) {
           try {
             urls.push(await uploadOne(file, folder));
           } catch (err) {
-            toast.error(err instanceof Error ? err.message : "আপলোড ব্যর্থ");
+            toast.error(err instanceof Error ? err.message : "Upload failed");
           }
         }
       } finally {
@@ -61,7 +61,7 @@ export function useImageUpload(folder: Folder) {
 export function ImageUploadButton({
   folder,
   multiple = false,
-  label = "আপলোড",
+  label = "Upload",
   className,
   onUploaded,
 }: {
@@ -81,12 +81,12 @@ export function ImageUploadButton({
         disabled={busy}
         onClick={() => inputRef.current?.click()}
         className={cn(
-          "inline-flex items-center gap-1.5 rounded-md border border-border bg-card px-3 py-1.5 text-xs font-semibold transition-colors hover:bg-muted disabled:opacity-60",
+          "inline-flex items-center gap-1.5 rounded-xl border border-border/80 bg-card px-3 py-1.5 text-xs font-semibold transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/40 hover:bg-muted disabled:opacity-60",
           className,
         )}
       >
         {busy ? <Loader2 className="size-3.5 animate-spin" /> : <Upload className="size-3.5" />}
-        {busy ? "আপলোড হচ্ছে…" : label}
+        {busy ? "Uploading…" : label}
       </button>
       <input
         ref={inputRef}
@@ -130,7 +130,9 @@ export function ImageField({
 
   return (
     <label className="block space-y-1.5">
-      <span className="text-xs font-semibold text-muted-foreground">{label}</span>
+      <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+        {label}
+      </span>
       <div
         onDragOver={(e) => {
           e.preventDefault();
@@ -143,11 +145,11 @@ export function ImageField({
           void handleFiles(Array.from(e.dataTransfer.files));
         }}
         className={cn(
-          "flex items-center gap-3 rounded-lg border border-dashed border-border bg-muted/30 p-2.5 transition-colors",
-          dragging && "border-primary bg-primary/5",
+          "flex items-center gap-3 rounded-xl border border-dashed border-border/80 bg-muted/30 p-2.5 transition-all duration-200",
+          dragging && "border-primary bg-primary/5 ig-ring",
         )}
       >
-        <div className="flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-md border border-border bg-card">
+        <div className="flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-border/80 bg-card">
           {value ? (
             <img src={value} alt="" className="size-full object-cover" />
           ) : (
@@ -157,31 +159,32 @@ export function ImageField({
         <div className="min-w-0 flex-1 space-y-1.5">
           <input
             value={value ?? ""}
-            placeholder="https://… অথবা ফাইল ড্রপ করুন"
+            placeholder="https://… or drop a file here"
             onChange={(e) => onChange(e.target.value || null)}
-            className="w-full rounded-md border border-border bg-card px-2.5 py-1.5 text-xs outline-none focus:border-primary"
+            className="w-full rounded-lg border border-border/80 bg-card px-2.5 py-1.5 text-xs outline-none transition-colors focus:border-primary/60"
           />
           <div className="flex items-center gap-2">
             <button
               type="button"
               disabled={busy}
               onClick={() => inputRef.current?.click()}
-              className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card px-2.5 py-1 text-[11px] font-semibold hover:bg-muted disabled:opacity-60"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-border/80 bg-card px-2.5 py-1 text-[11px] font-semibold transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/40 hover:bg-muted disabled:opacity-60"
             >
               {busy ? (
                 <Loader2 className="size-3 animate-spin" />
               ) : (
                 <Upload className="size-3" />
               )}
-              {busy ? "আপলোড হচ্ছে…" : "ছবি আপলোড"}
+              {busy ? "Uploading…" : "Upload image"}
             </button>
             {value ? (
               <button
                 type="button"
                 onClick={() => onChange(null)}
-                className="text-[11px] text-muted-foreground underline-offset-2 hover:underline"
+                className="inline-flex items-center gap-1 text-[11px] text-muted-foreground transition-colors hover:text-destructive"
               >
-                সরান
+                <X className="size-3" />
+                Remove
               </button>
             ) : null}
           </div>

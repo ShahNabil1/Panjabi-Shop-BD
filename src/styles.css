@@ -242,3 +242,112 @@
     margin: 14mm;
   }
 }
+
+/* ---------------------------------------------------------------
+ * Admin panel theme — Instagram-inspired white / pink / violet.
+ * Scoped to .admin-scope so the storefront theme is untouched.
+ * --------------------------------------------------------------- */
+.admin-scope {
+  --radius: 0.85rem;
+
+  --background: oklch(0.985 0.008 330);
+  --foreground: oklch(0.24 0.04 320);
+  --surface: oklch(0.975 0.014 335);
+  --surface-foreground: oklch(0.24 0.04 320);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.24 0.04 320);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.24 0.04 320);
+
+  --primary: oklch(0.56 0.223 348);
+  --primary-foreground: oklch(0.99 0.005 330);
+  --secondary: oklch(0.955 0.024 340);
+  --secondary-foreground: oklch(0.35 0.09 340);
+  --muted: oklch(0.962 0.016 335);
+  --muted-foreground: oklch(0.52 0.045 330);
+  --accent: oklch(0.94 0.045 340);
+  --accent-foreground: oklch(0.36 0.13 340);
+  --destructive: oklch(0.58 0.21 20);
+  --destructive-foreground: oklch(0.99 0.005 330);
+  --success: oklch(0.6 0.13 155);
+  --success-foreground: oklch(0.99 0.005 330);
+
+  --border: oklch(0.915 0.022 335);
+  --input: oklch(0.915 0.022 335);
+  --ring: oklch(0.56 0.223 348);
+
+  --ig-gradient: linear-gradient(
+    135deg,
+    #f9ce34 0%,
+    #ee2a7b 45%,
+    #b134c8 72%,
+    #6228d7 100%
+  );
+  --ig-gradient-soft: linear-gradient(
+    135deg,
+    rgba(249, 206, 52, 0.14) 0%,
+    rgba(238, 42, 123, 0.16) 45%,
+    rgba(98, 40, 215, 0.16) 100%
+  );
+  font-family: "Times New Roman", Times, serif;
+}
+
+@utility ig-gradient {
+  background-image: var(--ig-gradient);
+}
+
+@utility ig-gradient-soft {
+  background-image: var(--ig-gradient-soft);
+}
+
+@utility ig-text {
+  background-image: var(--ig-gradient);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+@utility ig-ring {
+  box-shadow: 0 10px 30px -18px rgba(238, 42, 123, 0.75);
+}
+
+.admin-scope ::selection {
+  background-color: #ee2a7b;
+  color: #fff;
+}
+
+@keyframes admin-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes admin-shimmer {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 200% 50%;
+  }
+}
+
+.admin-rise {
+  animation: admin-rise 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.admin-shimmer {
+  background-size: 200% 200%;
+  animation: admin-shimmer 6s linear infinite alternate;
+}
+
+/* Always-visible toast close button */
+[data-sonner-toast] [data-close-button] {
+  opacity: 1 !important;
+  transform: none !important;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}

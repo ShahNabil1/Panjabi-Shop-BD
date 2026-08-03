@@ -172,3 +172,36 @@ export type SubcategoryInput = z.infer<typeof subcategorySchema>;
 export type PromotionInput = z.infer<typeof promotionSchema>;
 export type LandingPageInput = z.infer<typeof landingPageSchema>;
 export type FaqInput = z.infer<typeof faqSchema>;
+
+/**
+ * The admin panel exposes a single input per concept instead of separate
+ * Bangla/English fields. This mirrors whichever value was provided into its
+ * counterpart column so the storefront language toggle always has content.
+ */
+export function mirrorLang<T>(input: T): T {
+  const walk = (value: unknown): unknown => {
+    if (Array.isArray(value)) return value.map(walk);
+    if (!value || typeof value !== "object") return value;
+    const obj: Record<string, unknown> = {};
+    for (const [k, v] of Object.entries(value as Record<string, unknown>)) obj[k] = walk(v);
+    const filled = (v: unknown) => typeof v === "string" && v.trim().length > 0;
+    for (const key of Object.keys(obj)) {
+      if (key.endsWith("_bn")) {
+        const en = `${key.slice(0, -3)}_en`;
+        if (en in obj || filled(obj[key])) {
+          if (!filled(obj[en]) && filled(obj[key])) obj[en] = obj[key];
+        }
+      }
+      if (key.endsWith("_en")) {
+        const bn = `${key.slice(0, -3)}_bn`;
+        if (!filled(obj[bn]) && filled(obj[key])) obj[bn] = obj[key];
+      }
+    }
+    if ("bn" in obj || "en" in obj) {
+      if (!filled(obj["bn"]) && filled(obj["en"])) obj["bn"] = obj["en"];
+      if (!filled(obj["en"]) && filled(obj["bn"])) obj["en"] = obj["bn"];
+    }
+    return obj;
+  };
+  return walk(input) as T;
+}
