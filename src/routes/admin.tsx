@@ -167,7 +167,7 @@ function AdminLayout() {
           <img
             src={logoMark}
             alt="Upoharkabbo"
-            className="h-14 w-auto object-contain brightness-0 invert"
+            className="h-14 w-auto rounded-xl bg-white object-contain px-3 py-2 ring-1 ring-white/15"
           />
         </Link>
       </div>
