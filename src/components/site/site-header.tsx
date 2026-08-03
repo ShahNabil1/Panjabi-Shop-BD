@@ -199,13 +199,13 @@ export function SiteHeader() {
         </div>
       </div>
 
-      <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-3">
+      <div className="mx-auto grid max-w-6xl grid-cols-[3rem_minmax(0,1fr)_3rem] items-center gap-2 px-4 py-3 lg:flex lg:gap-3">
         <button
           type="button"
           onClick={() => setOpen((v) => !v)}
           aria-label="Menu"
           aria-expanded={open}
-          className="shrink-0 rounded-sm border border-border p-2 lg:hidden"
+          className="w-fit shrink-0 rounded-sm border border-border p-2 lg:hidden"
         >
           <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2">
             {open ? (
@@ -216,17 +216,19 @@ export function SiteHeader() {
           </svg>
         </button>
 
-        <Link to="/" className="flex min-w-0 shrink-0 items-center" aria-label={brand}>
+        <Link
+          to="/"
+          className="flex min-w-0 items-center justify-center lg:shrink-0 lg:justify-start"
+          aria-label={brand}
+        >
           <img
             src={logoMark}
             alt={brand}
             width={1040}
             height={375}
-            className="h-14 w-auto shrink-0 object-contain sm:h-16 lg:h-[4.5rem]"
+            className="h-12 w-auto max-w-full object-contain min-[380px]:h-14 sm:h-16 lg:h-[4.5rem]"
           />
         </Link>
-
-
 
         <div className="ml-auto hidden max-w-md flex-1 lg:block">
           <SearchBox />
@@ -234,8 +236,9 @@ export function SiteHeader() {
 
         <nav className="ml-4 hidden items-center gap-5 lg:flex">{navLinks}</nav>
 
-        <CartButton className="ml-auto shrink-0 lg:ml-4" />
+        <CartButton className="justify-self-end lg:ml-auto lg:shrink-0" />
       </div>
+
 
 
       <div className="mx-auto max-w-6xl px-4 pb-3 lg:hidden">
