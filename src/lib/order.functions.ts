@@ -132,6 +132,7 @@ export const placeOrder = createServerFn({ method: "POST" })
         payment_method: "cod",
         status: "pending",
         source: data.source,
+        customer_ip: clientIp,
       })
       .select("id, order_number")
       .single();
