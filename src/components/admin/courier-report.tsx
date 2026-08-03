@@ -51,7 +51,7 @@ function CourierTile({
   const pct = Math.max(0, Math.min(100, Math.round(Number(ratio) || 0)));
   const color = rateColor(pct);
   return (
-    <div className="w-[178px] shrink-0 snap-start overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+    <div className="w-full overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
       <div
         className="flex items-center justify-center gap-1.5 px-2 py-1.5"
         style={{ background: `linear-gradient(135deg, ${theme.from}, ${theme.to})` }}
@@ -139,7 +139,7 @@ export function CourierReport({ phone }: { phone: string }) {
         <p className="mt-3 text-sm text-muted-foreground">No courier data.</p>
       ) : (
         <>
-          <div className="mt-4 flex snap-x snap-mandatory gap-2 overflow-x-auto pb-2 [scrollbar-width:thin] justify-start xl:justify-center">
+          <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
             <CourierTile
               name="Overall"
               theme={COURIER_THEME['all']!}
