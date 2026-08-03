@@ -198,7 +198,11 @@ function AdminOrderDetail() {
                 <X className="size-4 text-muted-foreground" />
               </button>
             ) : null}
-            <Button asChild size="sm" variant="outline">
+            <Button
+              asChild
+              size="sm"
+              className="border-0 bg-gradient-to-r from-indigo-500 via-violet-500 to-fuchsia-500 text-white shadow-md shadow-indigo-500/20 transition-all hover:brightness-110 hover:shadow-lg hover:shadow-indigo-500/30 active:scale-95"
+            >
               <Link
                 to="/invoice/$orderNumber"
                 params={{ orderNumber: order.order_number }}
