@@ -29,42 +29,12 @@ function AdminOverviewPage() {
   });
 
   const stats = [
-    {
-      label: "Total revenue",
-      value: adminPrice(data?.revenue ?? 0),
-      icon: BadgeDollarSign,
-      gradient: "from-primary to-accent",
-    },
-    {
-      label: "Total orders",
-      value: String(data?.orderCount ?? 0),
-      icon: Package,
-      gradient: "from-accent to-primary",
-    },
-    {
-      label: "Pending orders",
-      value: String(data?.pending ?? 0),
-      icon: Clock,
-      gradient: "from-amber-500 to-primary",
-    },
-    {
-      label: "Products",
-      value: String(data?.productCount ?? 0),
-      icon: Boxes,
-      gradient: "from-primary to-violet-500",
-    },
-    {
-      label: "Categories",
-      value: String(data?.categoryCount ?? 0),
-      icon: Layers,
-      gradient: "from-violet-500 to-accent",
-    },
-    {
-      label: "Promotions",
-      value: String(data?.promotionCount ?? 0),
-      icon: Sparkles,
-      gradient: "from-accent to-amber-500",
-    },
+    { label: "Total revenue", value: adminPrice(data?.revenue ?? 0), icon: BadgeDollarSign },
+    { label: "Total orders", value: String(data?.orderCount ?? 0), icon: Package },
+    { label: "Pending orders", value: String(data?.pending ?? 0), icon: Clock },
+    { label: "Products", value: String(data?.productCount ?? 0), icon: Boxes },
+    { label: "Categories", value: String(data?.categoryCount ?? 0), icon: Layers },
+    { label: "Promotions", value: String(data?.promotionCount ?? 0), icon: Sparkles },
   ];
 
   return (
@@ -75,26 +45,18 @@ function AdminOverviewPage() {
         {stats.map((s, i) => (
           <div
             key={s.label}
-            className="admin-rise group relative overflow-hidden rounded-2xl border border-border/70 bg-card p-4 shadow-[0_16px_40px_-34px_rgba(98,40,215,0.8)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_22px_50px_-30px_rgba(238,42,123,0.55)]"
+            className="admin-rise rounded-2xl border border-border bg-card p-4 transition-colors duration-200 hover:border-primary/25"
             style={{ animationDelay: `${i * 60}ms` }}
           >
             <div
               className={cn(
-                "absolute -right-6 -top-6 size-20 rounded-full bg-gradient-to-br opacity-20 blur-2xl transition-opacity duration-300 group-hover:opacity-30",
-                s.gradient,
-              )}
-            />
-            <div
-              className={cn(
-                "ig-gradient inline-flex size-9 items-center justify-center rounded-xl text-primary-foreground shadow-sm",
+                "inline-flex size-9 items-center justify-center rounded-xl bg-muted text-muted-foreground",
               )}
             >
-              <s.icon className="size-4.5" />
+              <s.icon className="size-4.5" strokeWidth={1.75} />
             </div>
-            <p className="mt-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-              {s.label}
-            </p>
-            <p className="mt-1 text-lg font-bold tabular-nums">
+            <p className="mt-3 text-xs font-medium text-muted-foreground">{s.label}</p>
+            <p className="mt-1 text-lg font-bold tabular-nums text-foreground">
               {isLoading ? (
                 <span className="admin-shimmer inline-block h-5 w-16 rounded-md bg-muted" />
               ) : (
@@ -104,6 +66,7 @@ function AdminOverviewPage() {
           </div>
         ))}
       </div>
+
 
       <Panel>
         <h2 className="ig-text text-sm font-bold">Recent orders</h2>
