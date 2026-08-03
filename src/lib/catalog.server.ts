@@ -1,0 +1,408 @@
+import type { CategoryRow, SettingsMap, SettingValue, SubcategoryRow } from "./types";
+import {
+  PRODUCT_CARD_SELECT,
+  createPublicServerClient,
+  toProductCard,
+  type ProductCard,
+  type RawProductCard,
+} from "./supabase-public";
+
+const CATEGORY_SELECT =
+  "id, slug, name_bn, name_en, description_bn, description_en, image_url, meta_title, meta_description, sort_order";
+const SUBCATEGORY_SELECT =
+  "id, category_id, slug, name_bn, name_en, description_bn, description_en, image_url, meta_title, meta_description, sort_order";
+
+function cards(rows: unknown): ProductCard[] {
+  return ((rows ?? []) as RawProductCard[]).map(toProductCard);
+}
+
+export async function fetchHome() {
+  const db = createPublicServerClient();
+
+  const [settingsRes, categoriesRes, subcategoriesRes, promoRes, featuredRes, faqRes] =
+    await Promise.all([
+      db.from("site_settings").select("key, value"),
+      db.from("categories").select(CATEGORY_SELECT).order("sort_order"),
+      db.from("subcategories").select(SUBCATEGORY_SELECT).order("sort_order"),
+      db
+        .from("promotions")
+        .select(
+          `id, slug, title_bn, title_en, subtitle_bn, subtitle_en, type, banner_url, sort_order,
+           promotion_products(sort_order, products(${PRODUCT_CARD_SELECT}))`,
+        )
+        .eq("show_on_home", true)
+        .order("sort_order"),
+      db
+        .from("products")
+        .select(PRODUCT_CARD_SELECT)
+        .eq("is_active", true)
+        .order("sort_order")
+        .limit(12),
+      db.from("faqs").select("id, question_bn, question_en, answer_bn, answer_en").order("sort_order"),
+    ]);
+
+  const settings: SettingsMap = {};
+  for (const row of settingsRes.data ?? []) {
+    settings[row.key] = (row.value ?? {}) as Record<string, SettingValue>;
+  }
+
+  const subcategories = (subcategoriesRes.data ?? []) as SubcategoryRow[];
+  const categories = ((categoriesRes.data ?? []) as CategoryRow[]).map((c) => ({
+    ...c,
+    subcategories: subcategories.filter((s) => s.category_id === c.id),
+  }));
+
+  const promotions = (promoRes.data ?? []).map((p) => {
+    const links = (p.promotion_products ?? []) as Array<{
+      sort_order: number;
+      products: RawProductCard | null;
+    }>;
+    return {
+      id: p.id,
+      slug: p.slug,
+      titleBn: p.title_bn,
+      titleEn: p.title_en,
+      subtitleBn: p.subtitle_bn,
+      subtitleEn: p.subtitle_en,
+      type: p.type,
+      bannerUrl: p.banner_url,
+      products: links
+        .slice()
+        .sort((a, b) => a.sort_order - b.sort_order)
+        .map((l) => l.products)
+        .filter((x): x is RawProductCard => Boolean(x))
+        .map(toProductCard),
+    };
+  });
+
+  return {
+    settings,
+    categories,
+    promotions: promotions.filter((p) => p.products.length > 0),
+    featured: cards(featuredRes.data),
+    faqs: faqRes.data ?? [],
+  };
+}
+
+export async function fetchLayoutData() {
+  const db = createPublicServerClient();
+  const [settingsRes, categoriesRes, subcategoriesRes] = await Promise.all([
+    db.from("site_settings").select("key, value"),
+    db.from("categories").select(CATEGORY_SELECT).order("sort_order"),
+    db.from("subcategories").select(SUBCATEGORY_SELECT).order("sort_order"),
+  ]);
+
+  const settings: SettingsMap = {};
+  for (const row of settingsRes.data ?? []) {
+    settings[row.key] = (row.value ?? {}) as Record<string, SettingValue>;
+  }
+
+  const subcategories = (subcategoriesRes.data ?? []) as SubcategoryRow[];
+  const categories = ((categoriesRes.data ?? []) as CategoryRow[]).map((c) => ({
+    ...c,
+    subcategories: subcategories.filter((s) => s.category_id === c.id),
+  }));
+
+  return { settings, categories };
+}
+
+export async function fetchCategoryPage(slug: string) {
+  const db = createPublicServerClient();
+  const { data: category } = await db
+    .from("categories")
+    .select(CATEGORY_SELECT)
+    .eq("slug", slug)
+    .eq("is_active", true)
+    .maybeSingle();
+
+  if (!category) return null;
+
+  const [subRes, productRes] = await Promise.all([
+    db
+      .from("subcategories")
+      .select(SUBCATEGORY_SELECT)
+      .eq("category_id", category.id)
+      .eq("is_active", true)
+      .order("sort_order"),
+    db
+      .from("products")
+      .select(PRODUCT_CARD_SELECT)
+      .eq("category_id", category.id)
+      .eq("is_active", true)
+      .order("sort_order"),
+  ]);
+
+  return {
+    category: category as CategoryRow,
+    subcategories: (subRes.data ?? []) as SubcategoryRow[],
+    products: cards(productRes.data),
+  };
+}
+
+export async function fetchSubcategoryPage(categorySlug: string, subcategorySlug: string) {
+  const db = createPublicServerClient();
+  const { data: category } = await db
+    .from("categories")
+    .select(CATEGORY_SELECT)
+    .eq("slug", categorySlug)
+    .eq("is_active", true)
+    .maybeSingle();
+
+  if (!category) return null;
+
+  const { data: subcategory } = await db
+    .from("subcategories")
+    .select(SUBCATEGORY_SELECT)
+    .eq("category_id", category.id)
+    .eq("slug", subcategorySlug)
+    .eq("is_active", true)
+    .maybeSingle();
+
+  if (!subcategory) return null;
+
+  const [subsRes, productRes] = await Promise.all([
+    db
+      .from("subcategories")
+      .select(SUBCATEGORY_SELECT)
+      .eq("category_id", category.id)
+      .eq("is_active", true)
+      .order("sort_order"),
+    db
+      .from("products")
+      .select(PRODUCT_CARD_SELECT)
+      .eq("subcategory_id", subcategory.id)
+      .eq("is_active", true)
+      .order("sort_order"),
+  ]);
+
+  return {
+    category: category as CategoryRow,
+    subcategory: subcategory as SubcategoryRow,
+    subcategories: (subsRes.data ?? []) as SubcategoryRow[],
+    products: cards(productRes.data),
+  };
+}
+
+export async function fetchProduct(slug: string) {
+  const db = createPublicServerClient();
+  const { data: product } = await db
+    .from("products")
+    .select(
+      `id, slug, name_bn, name_en, short_description_bn, short_description_en,
+       description_bn, description_en, specs, faq, price, compare_at_price, stock, sku, brand,
+       badge_bn, badge_en, rating, review_count, meta_title, meta_description, og_image_url,
+       category_id, subcategory_id,
+       product_images(id, url, alt_bn, alt_en, sort_order),
+       product_variants(id, group_name_bn, group_name_en, value_bn, value_en, price_delta, stock, sort_order, is_active)`,
+    )
+    .eq("slug", slug)
+    .eq("is_active", true)
+    .maybeSingle();
+
+  if (!product) return null;
+
+  const [catRes, subRes, relatedRes, landingRes] = await Promise.all([
+    db.from("categories").select(CATEGORY_SELECT).eq("id", product.category_id).maybeSingle(),
+    product.subcategory_id
+      ? db
+          .from("subcategories")
+          .select(SUBCATEGORY_SELECT)
+          .eq("id", product.subcategory_id)
+          .maybeSingle()
+      : Promise.resolve({ data: null }),
+    db
+      .from("products")
+      .select(PRODUCT_CARD_SELECT)
+      .eq("category_id", product.category_id)
+      .eq("is_active", true)
+      .neq("id", product.id)
+      .order("sort_order")
+      .limit(4),
+    db
+      .from("landing_pages")
+      .select("slug")
+      .eq("product_id", product.id)
+      .eq("is_active", true)
+      .maybeSingle(),
+  ]);
+
+  const images = [...(product.product_images ?? [])].sort((a, b) => a.sort_order - b.sort_order);
+  const variants = [...(product.product_variants ?? [])]
+    .filter((v) => v.is_active)
+    .sort((a, b) => a.sort_order - b.sort_order);
+
+  return {
+    product: {
+      id: product.id,
+      slug: product.slug,
+      nameBn: product.name_bn,
+      nameEn: product.name_en,
+      shortBn: product.short_description_bn,
+      shortEn: product.short_description_en,
+      descriptionBn: product.description_bn,
+      descriptionEn: product.description_en,
+      specs: (product.specs ?? []) as Array<Record<string, string>>,
+      faq: (product.faq ?? []) as Array<Record<string, string>>,
+      price: Number(product.price),
+      compareAtPrice: product.compare_at_price == null ? null : Number(product.compare_at_price),
+      stock: product.stock,
+      sku: product.sku,
+      brand: product.brand,
+      badgeBn: product.badge_bn,
+      badgeEn: product.badge_en,
+      rating: Number(product.rating),
+      reviewCount: product.review_count,
+      metaTitle: product.meta_title,
+      metaDescription: product.meta_description,
+      ogImageUrl: product.og_image_url,
+    },
+    images,
+    variants,
+    category: (catRes.data ?? null) as CategoryRow | null,
+    subcategory: (subRes.data ?? null) as SubcategoryRow | null,
+    related: cards(relatedRes.data),
+    landingSlug: landingRes.data?.slug ?? null,
+  };
+}
+
+export async function fetchPromotion(slug: string) {
+  const db = createPublicServerClient();
+  const { data: promotion } = await db
+    .from("promotions")
+    .select(
+      `id, slug, title_bn, title_en, subtitle_bn, subtitle_en, banner_url, meta_title, meta_description,
+       promotion_products(sort_order, products(${PRODUCT_CARD_SELECT}))`,
+    )
+    .eq("slug", slug)
+    .eq("is_active", true)
+    .maybeSingle();
+
+  if (!promotion) return null;
+
+  const links = (promotion.promotion_products ?? []) as Array<{
+    sort_order: number;
+    products: RawProductCard | null;
+  }>;
+
+  return {
+    promotion: {
+      id: promotion.id,
+      slug: promotion.slug,
+      titleBn: promotion.title_bn,
+      titleEn: promotion.title_en,
+      subtitleBn: promotion.subtitle_bn,
+      subtitleEn: promotion.subtitle_en,
+      bannerUrl: promotion.banner_url,
+      metaTitle: promotion.meta_title,
+      metaDescription: promotion.meta_description,
+    },
+    products: links
+      .slice()
+      .sort((a, b) => a.sort_order - b.sort_order)
+      .map((l) => l.products)
+      .filter((x): x is RawProductCard => Boolean(x))
+      .map(toProductCard),
+  };
+}
+
+export async function fetchPromotionList() {
+  const db = createPublicServerClient();
+  const { data } = await db
+    .from("promotions")
+    .select("id, slug, title_bn, title_en, subtitle_bn, subtitle_en, banner_url")
+    .eq("is_active", true)
+    .order("sort_order");
+  return data ?? [];
+}
+
+export async function fetchFaqs() {
+  const db = createPublicServerClient();
+  const { data } = await db
+    .from("faqs")
+    .select("id, question_bn, question_en, answer_bn, answer_en")
+    .eq("is_active", true)
+    .order("sort_order");
+  return data ?? [];
+}
+
+export async function fetchSearch(query: string) {
+  const term = query.trim();
+  if (!term) return { query: term, products: [] as ProductCard[] };
+
+  const db = createPublicServerClient();
+  const escaped = term.replace(/[%_,()]/g, " ").trim();
+  if (!escaped) return { query: term, products: [] as ProductCard[] };
+
+  const { data } = await db
+    .from("products")
+    .select(PRODUCT_CARD_SELECT)
+    .eq("is_active", true)
+    .or(
+      `name_bn.ilike.%${escaped}%,name_en.ilike.%${escaped}%,brand.ilike.%${escaped}%,sku.ilike.%${escaped}%`,
+    )
+    .order("sort_order")
+    .limit(40);
+
+  return { query: term, products: cards(data) };
+}
+
+export async function fetchPopularProducts(limit = 4) {
+  const db = createPublicServerClient();
+  const { data } = await db
+    .from("products")
+    .select(PRODUCT_CARD_SELECT)
+    .eq("is_active", true)
+    .order("review_count", { ascending: false })
+    .limit(limit);
+  return cards(data);
+}
+
+export async function fetchSitemapData() {
+  const db = createPublicServerClient();
+  const [cats, subs, prods, landings, promos] = await Promise.all([
+    db.from("categories").select("slug, updated_at").eq("is_active", true),
+    db.from("subcategories").select("slug, updated_at, categories(slug)").eq("is_active", true),
+    db.from("products").select("slug, updated_at").eq("is_active", true),
+    db.from("landing_pages").select("slug, updated_at").eq("is_active", true),
+    db.from("promotions").select("slug, updated_at").eq("is_active", true),
+  ]);
+  return {
+    categories: cats.data ?? [],
+    subcategories: (subs.data ?? []) as Array<{
+      slug: string;
+      updated_at: string;
+      categories: { slug: string } | null;
+    }>,
+    products: prods.data ?? [],
+    landings: landings.data ?? [],
+    promotions: promos.data ?? [],
+  };
+}
+
+export async function fetchCatalogFeed() {
+  const db = createPublicServerClient();
+  const { data } = await db
+    .from("products")
+    .select(
+      "id, slug, name_bn, name_en, short_description_bn, short_description_en, price, compare_at_price, stock, sku, brand, product_images(url, sort_order), categories(name_en)",
+    )
+    .eq("is_active", true)
+    .order("sort_order");
+  return (data ?? []) as Array<{
+    id: string;
+    slug: string;
+    name_bn: string;
+    name_en: string;
+    short_description_bn: string | null;
+    short_description_en: string | null;
+    price: number | string;
+    compare_at_price: number | string | null;
+    stock: number;
+    sku: string | null;
+    brand: string | null;
+    product_images: Array<{ url: string; sort_order: number }> | null;
+    categories: { name_en: string } | null;
+  }>;
+}
+
+export type { CategoryRow, SubcategoryRow, SettingsMap, SettingValue };

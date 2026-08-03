@@ -1,0 +1,73 @@
+import { createFileRoute, notFound } from "@tanstack/react-router";
+
+import { getPromotionPage } from "@/lib/catalog.functions";
+import type { PromotionPageData } from "@/lib/types";
+import { useLang } from "@/lib/language-context";
+import { pick, tr } from "@/lib/i18n";
+import { ProductGrid } from "@/components/site/product-card";
+import { NotFoundView } from "@/components/site/not-found-view";
+import { Breadcrumbs, Section } from "@/components/site/ui";
+
+export const Route = createFileRoute("/offers/$promotion")({
+  loader: async ({ params }): Promise<PromotionPageData> => {
+    const data = await getPromotionPage({ data: { slug: params.promotion } });
+    if (!data) throw notFound();
+    return data;
+  },
+  head: ({ params, loaderData }) => {
+    if (!loaderData) {
+      return { meta: [{ title: "অফারটি পাওয়া যায়নি" }, { name: "robots", content: "noindex" }] };
+    }
+    const p = loaderData.promotion;
+    const title = p.metaTitle || `${p.titleBn} | ${p.titleEn}`;
+    const description = p.metaDescription || p.subtitleBn || `${p.titleBn} — সীমিত সময়ের অফার।`;
+    const url = `/offers/${params.promotion}`;
+    return {
+      meta: [
+        { title },
+        { name: "description", content: description },
+        { property: "og:title", content: title },
+        { property: "og:description", content: description },
+        { property: "og:url", content: url },
+        ...(p.bannerUrl ? [{ property: "og:image", content: p.bannerUrl }] : []),
+        ...(p.bannerUrl ? [{ name: "twitter:image", content: p.bannerUrl }] : []),
+      ],
+      links: [{ rel: "canonical", href: url }],
+    };
+  },
+  notFoundComponent: () => <NotFoundView />,
+  component: PromotionPage,
+});
+
+function PromotionPage() {
+  const { lang } = useLang();
+  const { promotion, products } = Route.useLoaderData() as PromotionPageData;
+  const title = pick(lang, promotion.titleBn, promotion.titleEn);
+  const subtitle = pick(lang, promotion.subtitleBn, promotion.subtitleEn);
+
+  return (
+    <Section>
+      <Breadcrumbs
+        items={[
+          { label: tr(lang, "home"), to: "/" },
+          { label: tr(lang, "offers"), to: "/offers" },
+          { label: title },
+        ]}
+      />
+      <h1 className="mt-3 text-2xl font-bold tracking-tight sm:text-3xl">{title}</h1>
+      {subtitle ? <p className="mt-2 text-sm text-muted-foreground">{subtitle}</p> : null}
+
+      {promotion.bannerUrl ? (
+        <img
+          src={promotion.bannerUrl}
+          alt={title}
+          className="mt-5 aspect-16/6 w-full rounded-lg border border-border object-cover"
+        />
+      ) : null}
+
+      <div className="mt-8">
+        <ProductGrid products={products} />
+      </div>
+    </Section>
+  );
+}
