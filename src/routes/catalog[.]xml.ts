@@ -34,8 +34,8 @@ export const Route = createFileRoute("/catalog.xml")({
             `      <g:link>${BASE_URL}/p/${esc(p.slug)}</g:link>`,
             image ? `      <g:image_link>${esc(image)}</g:image_link>` : null,
             `      <g:availability>${p.stock > 0 ? "in stock" : "out of stock"}</g:availability>`,
-            `      <g:price>${Number(p.price).toFixed(2)} BDT</g:price>`,
-            p.compare_at_price
+            `      <g:price>${Number(p.compare_at_price ?? p.price).toFixed(2)} BDT</g:price>`,
+            p.compare_at_price && Number(p.compare_at_price) > Number(p.price)
               ? `      <g:sale_price>${Number(p.price).toFixed(2)} BDT</g:sale_price>`
               : null,
             `      <g:condition>new</g:condition>`,
