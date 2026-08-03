@@ -37,6 +37,7 @@ type Line = {
   sku: string | null;
   unitPrice: number;
   quantity: number;
+  imageUrl: string | null;
 };
 
 function money(n: number) {
@@ -130,6 +131,7 @@ function CreateOrderPage() {
       name_bn: string;
       sku: string | null;
       price: number | string;
+      product_images?: Array<{ url: string; sort_order: number | null }>;
       product_variants?: Array<{
         id: string;
         value_bn: string;
@@ -142,6 +144,10 @@ function CreateOrderPage() {
     variantId: string | null,
   ) => {
     const variant = product.product_variants?.find((v) => v.id === variantId) ?? null;
+    const imageUrl =
+      [...(product.product_images ?? [])].sort(
+        (a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0),
+      )[0]?.url ?? null;
     const unitPrice = Number(product.price) + Number(variant?.price_delta ?? 0);
     const key = `${product.id}:${variantId ?? "-"}`;
     setLines((prev) => {
@@ -160,6 +166,7 @@ function CreateOrderPage() {
           sku: variant?.sku ?? product.sku,
           unitPrice,
           quantity: 1,
+          imageUrl,
         },
       ];
     });
@@ -356,17 +363,34 @@ function CreateOrderPage() {
               <ul className="mt-3 max-h-64 space-y-1.5 overflow-y-auto">
                 {(products.data ?? []).map((p) => {
                   const variants = (p.product_variants ?? []).filter((v) => v.is_active);
+                  const thumb = [...(p.product_images ?? [])].sort(
+                    (a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0),
+                  )[0]?.url;
                   return (
                     <li
                       key={p.id}
                       className="rounded-xl border border-border/70 bg-background px-3 py-2"
                     >
                       <div className="flex flex-wrap items-center justify-between gap-2">
-                        <div className="min-w-0">
-                          <p className="truncate text-sm font-semibold">{p.name_bn}</p>
-                          <p className="text-xs text-muted-foreground">
-                            {p.sku ?? "—"} · {money(Number(p.price))} · stock {p.stock}
-                          </p>
+                        <div className="flex min-w-0 items-center gap-3">
+                          {thumb ? (
+                            <img
+                              src={thumb}
+                              alt={p.name_bn}
+                              loading="lazy"
+                              className="size-11 shrink-0 rounded-lg border border-border/70 object-cover"
+                            />
+                          ) : (
+                            <div className="grid size-11 shrink-0 place-items-center rounded-lg border border-dashed border-border text-[10px] text-muted-foreground">
+                              No img
+                            </div>
+                          )}
+                          <div className="min-w-0">
+                            <p className="truncate text-sm font-semibold">{p.name_bn}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {p.sku ?? "—"} · {money(Number(p.price))} · stock {p.stock}
+                            </p>
+                          </div>
                         </div>
                         {variants.length === 0 ? (
                           <Button
@@ -407,6 +431,18 @@ function CreateOrderPage() {
             <ul className="mt-4 divide-y divide-border border-t border-border">
               {lines.map((l) => (
                 <li key={l.key} className="flex flex-wrap items-center gap-3 py-2.5">
+                  {l.imageUrl ? (
+                    <img
+                      src={l.imageUrl}
+                      alt={l.name}
+                      loading="lazy"
+                      className="size-10 shrink-0 rounded-lg border border-border/70 object-cover"
+                    />
+                  ) : (
+                    <div className="grid size-10 shrink-0 place-items-center rounded-lg border border-dashed border-border text-[10px] text-muted-foreground">
+                      No img
+                    </div>
+                  )}
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-semibold">
                       {l.name}
