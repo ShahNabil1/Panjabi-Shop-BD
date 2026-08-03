@@ -18,6 +18,7 @@ import {
   TextField,
   ToggleField,
 } from "@/components/admin/kit";
+import { ImageField } from "@/components/admin/image-upload";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -131,10 +132,11 @@ function LandingPagesAdmin() {
               onChange={(v) => setDraft({ ...draft, slug: slugify(v) })}
               hint="URL: /lp/your-slug"
             />
-            <TextField
-              label="OG image URL"
-              value={draft.og_image_url ?? ""}
-              onChange={(v) => setDraft({ ...draft, og_image_url: v || null })}
+            <ImageField
+              label="OG image (সোশ্যাল প্রিভিউ)"
+              folder="landing"
+              value={draft.og_image_url}
+              onChange={(v) => setDraft({ ...draft, og_image_url: v })}
             />
             <TextField
               label="হেডলাইন (বাংলা)"

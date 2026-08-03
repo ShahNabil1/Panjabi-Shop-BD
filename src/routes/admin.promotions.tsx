@@ -19,6 +19,7 @@ import {
   TextField,
   ToggleField,
 } from "@/components/admin/kit";
+import { ImageField } from "@/components/admin/image-upload";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -160,10 +161,11 @@ function PromotionsPage() {
               value={draft.subtitle_bn ?? ""}
               onChange={(v) => setDraft({ ...draft, subtitle_bn: v || null })}
             />
-            <TextField
-              label="ব্যানার URL"
-              value={draft.banner_url ?? ""}
-              onChange={(v) => setDraft({ ...draft, banner_url: v || null })}
+            <ImageField
+              label="ব্যানার ছবি"
+              folder="promotions"
+              value={draft.banner_url}
+              onChange={(v) => setDraft({ ...draft, banner_url: v })}
             />
             <TextField
               label="শুরু (YYYY-MM-DD)"

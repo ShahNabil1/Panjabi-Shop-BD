@@ -20,6 +20,7 @@ import {
   TextField,
   ToggleField,
 } from "@/components/admin/kit";
+import { ImageField } from "@/components/admin/image-upload";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -133,10 +134,11 @@ function TaxonomyPage() {
               value={cat.sort_order}
               onChange={(v) => setCat({ ...cat, sort_order: v })}
             />
-            <TextField
-              label="ছবির URL"
-              value={cat.image_url ?? ""}
-              onChange={(v) => setCat({ ...cat, image_url: v || null })}
+            <ImageField
+              label="ক্যাটাগরির ছবি"
+              folder="categories"
+              value={cat.image_url}
+              onChange={(v) => setCat({ ...cat, image_url: v })}
             />
             <TextField
               label="Meta title"
