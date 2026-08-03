@@ -10,6 +10,8 @@ import {
   LayoutDashboard,
   LogOut,
   Package,
+  PlusCircle,
+
   Rocket,
   Settings,
   ShoppingCart,
