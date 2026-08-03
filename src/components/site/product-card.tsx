@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 
 import { useLang } from "@/lib/language-context";
-import { discountPercent, formatNumber, formatPrice, pick, tr } from "@/lib/i18n";
+import { discountPercent, formatNumber, formatPrice, pick, toBnDigits, tr } from "@/lib/i18n";
 import type { ProductCard as ProductCardData } from "@/lib/supabase-public";
 import { cn } from "@/lib/utils";
 
@@ -91,7 +91,8 @@ export function ProductCard({ product }: { product: ProductCardData }) {
         </h3>
         {product.reviewCount > 0 ? (
           <p className="text-xs text-muted-foreground">
-            ★ {product.rating.toFixed(1)} · {product.reviewCount} {tr(lang, "reviews")}
+            ★ {lang === "bn" ? toBnDigits(product.rating.toFixed(1)) : product.rating.toFixed(1)} ·{" "}
+            {formatNumber(lang, product.reviewCount)} {tr(lang, "reviews")}
           </p>
         ) : null}
         <div className="mt-auto flex flex-wrap items-baseline gap-2 pt-1.5">

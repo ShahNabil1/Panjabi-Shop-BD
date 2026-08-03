@@ -4,7 +4,7 @@ import { useState } from "react";
 import { getProductPage } from "@/lib/catalog.functions";
 import type { ProductPageData } from "@/lib/types";
 import { useLang } from "@/lib/language-context";
-import { discountPercent, formatPrice, pick, tr } from "@/lib/i18n";
+import { discountPercent, formatPrice, pick, tr, formatNumber, toBnDigits } from "@/lib/i18n";
 import { ProductGrid, ProductThumb } from "@/components/site/product-card";
 import { NotFoundView } from "@/components/site/not-found-view";
 import { FaqList } from "@/components/site/faq-list";
@@ -199,7 +199,8 @@ function ProductPage() {
             <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
               {product.reviewCount > 0 ? (
                 <span>
-                  ★ {product.rating.toFixed(1)} · {product.reviewCount} {tr(lang, "reviews")}
+                  ★ {lang === "bn" ? toBnDigits(product.rating.toFixed(1)) : product.rating.toFixed(1)} ·{" "}
+                  {formatNumber(lang, product.reviewCount)} {tr(lang, "reviews")}
                 </span>
               ) : null}
               {product.brand ? (
@@ -226,7 +227,7 @@ function ProductPage() {
                     {formatPrice(lang, product.compareAtPrice)}
                   </span>
                   <span className="rounded-sm bg-foreground px-2 py-0.5 text-xs font-semibold text-background">
-                    {off}% {tr(lang, "off")}
+                    {formatNumber(lang, off)}% {tr(lang, "off")}
                   </span>
                 </>
               ) : null}
