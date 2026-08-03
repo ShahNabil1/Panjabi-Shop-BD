@@ -1,7 +1,7 @@
 import { Link, createFileRoute, useParams } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { CheckCircle2, FileText, History, MessageSquare, X } from "lucide-react";
+import { CheckCircle2, FileText, MessageSquare, X } from "lucide-react";
 import { useState } from "react";
 
 import { adminUpdateOrderStatus } from "@/lib/admin.functions";
@@ -12,6 +12,7 @@ import { renderSmsTemplate, orderSmsVars } from "@/lib/sms-template";
 import { Panel, StatusPill, statusLabels } from "@/components/admin/kit";
 import { BrandLoader } from "@/components/admin/brand-loader";
 import { CourierReport } from "@/components/admin/courier-report";
+import { ActivityLog } from "@/components/admin/order/activity-log";
 import { CustomerCard } from "@/components/admin/order/customer-card";
 import { DeliveryNoteCard, ItemsCard } from "@/components/admin/order/items-card";
 import { CommunicationLog, SmsCard } from "@/components/admin/order/sms-card";
@@ -110,7 +111,13 @@ function AdminOrderDetail() {
     auto_sms_status: string;
     source: string;
     order_items: OrderItemRow[];
-    order_activity?: Array<{ id: string; kind: string; message: string | null; created_at: string }>;
+    order_activity?: Array<{
+      id: string;
+      kind: string;
+      message: string | null;
+      meta?: unknown;
+      created_at: string;
+    }>;
   };
 
   const confirmSms = renderSmsTemplate(
