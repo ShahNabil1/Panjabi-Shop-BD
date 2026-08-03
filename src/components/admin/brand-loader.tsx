@@ -1,10 +1,12 @@
 import { cn } from "@/lib/utils";
+import { useEffect, useState } from "react";
 
 interface BrandLoaderProps {
   message?: string;
   size?: "sm" | "md" | "lg" | "xl";
   className?: string;
   fullScreen?: boolean;
+  showProgress?: boolean;
 }
 
 const sizeMap = {
@@ -14,12 +16,47 @@ const sizeMap = {
   xl: "size-28",
 };
 
-export function BrandLoader({ message, size = "md", className, fullScreen }: BrandLoaderProps) {
+export function BrandLoader({
+  message = "Loading",
+  size = "md",
+  className,
+  fullScreen,
+  showProgress = true,
+}: BrandLoaderProps) {
+  const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    if (!showProgress) return;
+    let raf = 0;
+    const duration = 2200;
+
+    const loop = () => {
+      const start = Date.now();
+      const tick = () => {
+        const elapsed = Date.now() - start;
+        const pct = Math.min(100, Math.round((elapsed / duration) * 100));
+        setProgress(pct);
+        if (pct < 100) {
+          raf = requestAnimationFrame(tick);
+        } else {
+          setTimeout(() => {
+            setProgress(0);
+            raf = requestAnimationFrame(loop);
+          }, 260);
+        }
+      };
+      raf = requestAnimationFrame(tick);
+    };
+
+    loop();
+    return () => cancelAnimationFrame(raf);
+  }, [showProgress]);
+
   const wrapper = (
-    <div className={cn("flex flex-col items-center justify-center gap-4", className)}>
+    <div className={cn("flex flex-col items-center justify-center gap-5", className)}>
       <div className="relative">
-        <div className="absolute -inset-3 animate-ping rounded-full bg-primary/10" />
-        <div className="absolute -inset-1 animate-pulse rounded-full bg-primary/5" />
+        <div className="absolute -inset-4 animate-ping rounded-full bg-primary/10" />
+        <div className="absolute -inset-2 animate-pulse rounded-full bg-primary/5" />
         <img
           src="/favicon.png"
           alt="Upoharkabbo"
@@ -29,7 +66,17 @@ export function BrandLoader({ message, size = "md", className, fullScreen }: Bra
           )}
         />
       </div>
-      {message && <p className="text-sm font-medium text-muted-foreground">{message}</p>}
+      <div className="flex w-full min-w-0 flex-col items-center gap-3">
+        <p className="text-sm font-medium tracking-wide text-muted-foreground">{message}</p>
+        {showProgress && (
+          <div className="w-44 overflow-hidden rounded-full bg-muted p-0.5 sm:w-52">
+            <div
+              className="loader-progress h-1.5 rounded-full bg-gradient-to-r from-primary via-accent to-primary shadow-[0_0_12px_rgba(238,42,123,0.35)]"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+        )}
+      </div>
     </div>
   );
 
