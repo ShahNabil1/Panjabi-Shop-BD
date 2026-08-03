@@ -90,15 +90,10 @@ export function SmsCard({ orderId, phone }: { orderId: string; phone: string }) 
       {open ? (
         <div className="border-t border-border">
           <div className="w-full space-y-4 p-5">
-            <div className="flex items-center justify-between">
-              <h3 className="flex items-center gap-2 text-sm font-bold">
-                <MessageSquare className="size-4 text-primary" />
-                Send SMS to customer
-              </h3>
-              <button aria-label="Close" onClick={() => setOpen(false)}>
-                <X className="size-4 text-muted-foreground" />
-              </button>
-            </div>
+            <h3 className="flex items-center gap-2 text-sm font-bold">
+              <MessageSquare className="size-4 text-primary" />
+              Send SMS to customer
+            </h3>
 
             <div className="space-y-1.5">
               <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
