@@ -281,6 +281,38 @@ function ProductPage() {
               </div>
             ) : null}
 
+            <AddToCartBar
+              className="mt-6"
+              stock={activeVariant ? activeVariant.stock : product.stock}
+              item={{
+                productId: product.id,
+                slug: product.slug,
+                nameBn: product.nameBn,
+                nameEn: product.nameEn,
+                image: images[0]?.url ?? null,
+                price: unitPrice,
+                stock: activeVariant ? activeVariant.stock : product.stock,
+                sku: product.sku,
+                variantId: activeVariant?.id ?? null,
+                variantLabelBn: activeVariant
+                  ? `${activeVariant.group_name_bn}: ${activeVariant.value_bn}`
+                  : null,
+                variantLabelEn: activeVariant
+                  ? `${activeVariant.group_name_en}: ${activeVariant.value_en}`
+                  : null,
+              }}
+            />
+
+            {landingSlug ? (
+              <Link
+                to="/lp/$slug"
+                params={{ slug: landingSlug }}
+                className="mt-3 block text-center text-sm font-semibold text-primary underline-offset-4 hover:underline"
+              >
+                {tr(lang, "orderNow2")}
+              </Link>
+            ) : null}
+
             <div className="mt-7 rounded-lg border border-border bg-surface p-4">
               <p className="text-sm font-semibold">{tr(lang, "cod")}</p>
               <p className="mt-1 text-sm text-muted-foreground">
