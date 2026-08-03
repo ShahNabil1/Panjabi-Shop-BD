@@ -68,7 +68,7 @@ function AdminOrdersPage() {
 
       <Panel className="p-0">
         {isLoading ? (
-          <p className="p-6 text-sm text-muted-foreground">Loading…</p>
+          <BrandLoader size="md" message="Loading orders…" className="py-8" />
         ) : (data?.length ?? 0) === 0 ? (
           <div className="p-4">
             <EmptyState title="No orders found" />
