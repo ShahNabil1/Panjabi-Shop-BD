@@ -193,7 +193,7 @@ function TaxonomyPage() {
           />
           <div className="flex gap-2 pt-1">
             <Button
-              disabled={saveCat.isPending}
+              loading={saveCat.isPending}
               onClick={() => saveCat.mutate(cat)}
               className="ig-gradient transition-transform duration-300 hover:scale-[1.02]"
             >
@@ -308,7 +308,7 @@ function TaxonomyPage() {
           />
           <div className="flex gap-2 pt-1">
             <Button
-              disabled={saveSub.isPending}
+              loading={saveSub.isPending}
               onClick={() => saveSub.mutate(sub)}
               className="ig-gradient transition-transform duration-300 hover:scale-[1.02]"
             >

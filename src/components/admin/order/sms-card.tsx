@@ -180,7 +180,8 @@ export function SmsCard({ orderId, phone }: { orderId: string; phone: string }) 
               </Button>
               <Button
                 size="sm"
-                disabled={send.isPending || message.trim().length === 0}
+                loading={send.isPending}
+                disabled={message.trim().length === 0}
                 onClick={() => send.mutate()}
               >
                 <Send className="size-3.5" />
@@ -273,7 +274,7 @@ export function CommunicationLog({
                 {log.status !== "sent" ? (
                   <button
                     type="button"
-                    disabled={retry.isPending}
+                    loading={retry.isPending}
                     onClick={() => retry.mutate(log.id)}
                     className="ml-auto inline-flex items-center gap-1.5 rounded-lg border border-border bg-background px-2.5 py-1 font-semibold text-foreground transition-colors hover:border-primary/40 hover:bg-accent"
                   >

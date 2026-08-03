@@ -101,7 +101,7 @@ function FaqsAdmin() {
           </div>
           <div className="flex gap-2 pt-1">
             <Button
-              disabled={save.isPending}
+              loading={save.isPending}
               onClick={() => save.mutate(draft)}
               className="ig-gradient transition-transform duration-300 hover:scale-[1.02]"
             >

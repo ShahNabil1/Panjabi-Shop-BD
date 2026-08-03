@@ -108,7 +108,7 @@ function AdminProductsPage() {
                       size="sm"
                       variant="ghost"
                       className="rounded-xl text-muted-foreground hover:text-destructive"
-                      disabled={remove.isPending}
+                      loading={remove.isPending}
                       onClick={() => {
                         if (confirm("Delete this product?")) remove.mutate(p.id);
                       }}

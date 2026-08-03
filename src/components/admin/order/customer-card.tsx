@@ -77,7 +77,7 @@ export function CustomerCard({ order }: { order: OrderCustomer }) {
               <X className="size-3.5" />
               Cancel
             </Button>
-            <Button size="sm" disabled={save.isPending} onClick={() => save.mutate()}>
+            <Button size="sm" loading={save.isPending} onClick={() => save.mutate()}>
               <Save className="size-3.5" />
               Save
             </Button>

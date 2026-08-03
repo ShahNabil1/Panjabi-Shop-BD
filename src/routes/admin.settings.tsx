@@ -160,7 +160,7 @@ function SettingsAdmin() {
             Add banner
           </Button>
           <Button
-            disabled={save.isPending}
+            loading={save.isPending}
             onClick={() => {
               const clean = slides.filter((s) => s.url.trim());
               if (clean.length === 0) {
@@ -202,7 +202,7 @@ function SettingsAdmin() {
           />
         </div>
         <Button
-          disabled={save.isPending}
+          loading={save.isPending}
           onClick={() => save.mutate({ key: "general", value: general })}
           className="transition-transform duration-200 hover:-translate-y-0.5"
         >
@@ -230,7 +230,7 @@ function SettingsAdmin() {
           />
         </div>
         <Button
-          disabled={save.isPending}
+          loading={save.isPending}
           onClick={() => save.mutate({ key: "contact", value: contact })}
           className="transition-transform duration-200 hover:-translate-y-0.5"
         >
@@ -258,7 +258,7 @@ function SettingsAdmin() {
           />
         </div>
         <Button
-          disabled={save.isPending}
+          loading={save.isPending}
           onClick={() => save.mutate({ key: "delivery", value: delivery })}
           className="transition-transform duration-200 hover:-translate-y-0.5"
         >
