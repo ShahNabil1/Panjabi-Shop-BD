@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Package, Plus, Save, Search, Trash2, Truck } from "lucide-react";
 
+import { advanceMethods } from "@/lib/admin-schema";
 import { adminSearchProducts } from "@/lib/admin.functions";
 import { adminSaveDeliveryNote, adminSaveOrderItems } from "@/lib/order-admin.functions";
 import { Panel } from "@/components/admin/kit";
