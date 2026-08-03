@@ -80,9 +80,9 @@ export function OrdersBoard({
           />
         </div>
         <div className="flex flex-wrap gap-1.5">
-          {["", ...statuses].map((s) => (
+          {statuses.map((s) => (
             <button
-              key={s || "all"}
+              key={s}
               onClick={() => setStatus(s)}
               className={cn(
                 "rounded-full px-3 py-1.5 text-xs font-semibold transition-all duration-200 hover:-translate-y-0.5",
@@ -91,7 +91,7 @@ export function OrdersBoard({
                   : "bg-muted text-muted-foreground hover:bg-muted/70",
               )}
             >
-              {s ? statusLabels[s] : "All"}
+              {statusLabels[s]}
             </button>
           ))}
         </div>
