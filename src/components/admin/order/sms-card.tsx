@@ -73,8 +73,8 @@ export function SmsCard({ orderId, phone }: { orderId: string; phone: string }) 
 
   return (
     <>
-      <Panel className="p-0">
-        <div className="flex items-center justify-between gap-3 rounded-2xl bg-gradient-to-r from-slate-800 via-slate-800 to-indigo-800 px-4 py-3.5">
+      <Panel className="overflow-hidden p-0">
+        <div className="flex items-center justify-between gap-3 bg-gradient-to-r from-slate-800 via-slate-800 to-indigo-800 px-4 py-3.5">
           <div className="flex items-center gap-3">
             <span className="grid size-9 place-items-center rounded-xl bg-white/15">
               <Send className="size-4 text-white" />
@@ -90,16 +90,15 @@ export function SmsCard({ orderId, phone }: { orderId: string; phone: string }) 
           <Button
             size="sm"
             className="rounded-full bg-white/20 text-white hover:bg-white/30"
-            onClick={() => setOpen(true)}
+            onClick={() => setOpen((v) => !v)}
           >
-            Open
+            {open ? "Close" : "Open"}
           </Button>
         </div>
-      </Panel>
 
       {open ? (
-        <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-4">
-          <div className="w-full max-w-2xl space-y-4 rounded-2xl border border-border bg-card p-5 shadow-xl">
+        <div className="border-t border-border">
+          <div className="w-full space-y-4 p-5">
             <div className="flex items-center justify-between">
               <h3 className="flex items-center gap-2 text-sm font-bold">
                 <MessageSquare className="size-4 text-primary" />
