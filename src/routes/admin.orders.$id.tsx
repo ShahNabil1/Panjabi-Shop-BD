@@ -228,7 +228,8 @@ function AdminOrderDetail() {
                 <Button
                   size="sm"
                   variant={pending === "hold" ? "default" : "destructive"}
-                  disabled={update.isPending || reason.trim().length === 0}
+                  loading={update.isPending}
+                  disabled={reason.trim().length === 0}
                   onClick={() => update.mutate({ status: pending, reason: reason.trim() })}
                 >
                   {pending === "hold" ? "Confirm Hold" : "Confirm Cancel"}
@@ -240,7 +241,7 @@ function AdminOrderDetail() {
           <div className="flex justify-end">
             <Button
               size="sm"
-              disabled={update.isPending}
+              loading={update.isPending}
               onClick={() => update.mutate({ status: pending })}
             >
               Confirm change to {statusLabels[pending]}
@@ -269,7 +270,7 @@ function AdminOrderDetail() {
             </div>
             <Button
               size="lg"
-              disabled={update.isPending}
+              loading={update.isPending}
               onClick={() => update.mutate({ status: "pending" })}
               className="w-full"
             >
