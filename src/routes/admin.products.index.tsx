@@ -5,6 +5,7 @@ import { ImageOff, Pencil, Plus, Trash2 } from "lucide-react";
 
 import { adminDeleteProduct, adminListProducts } from "@/lib/admin.functions";
 import { AdminHeading, EmptyState, Panel } from "@/components/admin/kit";
+import { BrandLoader } from "@/components/admin/brand-loader";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { formatPrice } from "@/lib/i18n";
