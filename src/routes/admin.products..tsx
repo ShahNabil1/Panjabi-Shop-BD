@@ -27,7 +27,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-export const Route = createFileRoute("/admin/products/$id")({
+export const Route = createFileRoute("/admin/products/")({
   component: ProductEditor,
 });
 

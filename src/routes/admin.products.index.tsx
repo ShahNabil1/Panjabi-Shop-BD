@@ -1,10 +1,12 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { ImageOff, Pencil, Plus, Trash2 } from "lucide-react";
 
 import { adminDeleteProduct, adminListProducts } from "@/lib/admin.functions";
 import { AdminHeading, EmptyState, Panel } from "@/components/admin/kit";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { formatPrice } from "@/lib/i18n";
 
 export const Route = createFileRoute("/admin/products/")({
@@ -21,7 +23,7 @@ function AdminProductsPage() {
   const remove = useMutation({
     mutationFn: (id: string) => adminDeleteProduct({ data: { id } }),
     onSuccess: async () => {
-      toast.success("প্রোডাক্ট মুছে ফেলা হয়েছে");
+      toast.success("Product deleted");
       await qc.invalidateQueries({ queryKey: ["admin", "products"] });
     },
     onError: (e: Error) => toast.error(e.message),
@@ -30,12 +32,12 @@ function AdminProductsPage() {
   return (
     <div className="space-y-5">
       <AdminHeading
-        title="প্রোডাক্ট"
-        description="প্রোডাক্ট যোগ করুন, ছবি ও ভ্যারিয়েন্ট আপডেট করুন।"
+        title="Products"
+        description="Add products, update images and variants."
         action={
-          <Button asChild size="sm">
+          <Button asChild size="sm" className="ig-gradient rounded-xl transition-transform duration-300 hover:scale-[1.03]">
             <Link to="/admin/products/$id" params={{ id: "new" }}>
-              নতুন প্রোডাক্ট
+              <Plus className="mr-1.5 size-4" /> New product
             </Link>
           </Button>
         }
@@ -43,20 +45,28 @@ function AdminProductsPage() {
 
       <Panel className="p-0">
         {isLoading ? (
-          <p className="p-6 text-sm text-muted-foreground">লোড হচ্ছে…</p>
+          <div className="space-y-2 p-4">
+            {[0, 1, 2].map((i) => (
+              <div key={i} className="admin-shimmer h-16 rounded-xl bg-muted/50" />
+            ))}
+          </div>
         ) : (data?.length ?? 0) === 0 ? (
           <div className="p-4">
-            <EmptyState title="কোনো প্রোডাক্ট নেই" hint="উপরে নতুন প্রোডাক্ট বাটনে ক্লিক করুন।" />
+            <EmptyState title="No products yet" hint="Click the New product button above to get started." />
           </div>
         ) : (
           <ul className="divide-y divide-border">
-            {data?.map((p) => {
+            {data?.map((p, idx) => {
               const image = [...(p.product_images ?? [])].sort(
                 (a, b) => a.sort_order - b.sort_order,
               )[0];
               return (
-                <li key={p.id} className="flex items-center gap-3 px-4 py-3">
-                  <div className="size-12 shrink-0 overflow-hidden rounded-md bg-muted">
+                <li
+                  key={p.id}
+                  className="admin-rise group flex items-center gap-3 px-4 py-3 transition-all duration-300 hover:-translate-y-0.5 hover:bg-muted/40"
+                  style={{ animationDelay: `${Math.min(idx, 8) * 40}ms` }}
+                >
+                  <div className="size-14 shrink-0 overflow-hidden rounded-xl bg-muted transition-transform duration-300 group-hover:scale-105">
                     {image ? (
                       <img
                         src={image.url}
@@ -64,32 +74,49 @@ function AdminProductsPage() {
                         className="size-full object-cover"
                         loading="lazy"
                       />
-                    ) : null}
+                    ) : (
+                      <div className="flex size-full items-center justify-center text-muted-foreground">
+                        <ImageOff className="size-4" />
+                      </div>
+                    )}
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-semibold">{p.name_bn}</p>
-                    <p className="truncate text-xs text-muted-foreground">
-                      /{p.slug} · স্টক {p.stock} · {p.is_active ? "অ্যাক্টিভ" : "ইনঅ্যাক্টিভ"}
+                    <p className="mt-0.5 flex items-center gap-2 truncate text-xs text-muted-foreground">
+                      <span>/{p.slug}</span>
+                      <span aria-hidden>·</span>
+                      <span>Stock {p.stock}</span>
+                      <span
+                        className={cn(
+                          "inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold ring-1",
+                          p.is_active
+                            ? "bg-emerald-100 text-emerald-900 ring-emerald-200"
+                            : "bg-stone-200 text-stone-800 ring-stone-300",
+                        )}
+                      >
+                        {p.is_active ? "Active" : "Inactive"}
+                      </span>
                     </p>
                   </div>
-                  <span className="text-sm font-semibold tabular-nums">
+                  <span className="ig-text text-sm font-bold tabular-nums">
                     {formatPrice("bn", p.price)}
                   </span>
                   <div className="flex gap-1">
-                    <Button asChild size="sm" variant="outline">
+                    <Button asChild size="sm" variant="outline" className="rounded-xl">
                       <Link to="/admin/products/$id" params={{ id: p.id }}>
-                        এডিট
+                        <Pencil className="mr-1.5 size-3.5" /> Edit
                       </Link>
                     </Button>
                     <Button
                       size="sm"
                       variant="ghost"
+                      className="rounded-xl text-muted-foreground hover:text-destructive"
                       disabled={remove.isPending}
                       onClick={() => {
-                        if (confirm("এই প্রোডাক্টটি মুছে ফেলবেন?")) remove.mutate(p.id);
+                        if (confirm("Delete this product?")) remove.mutate(p.id);
                       }}
                     >
-                      মুছুন
+                      <Trash2 className="size-4" />
                     </Button>
                   </div>
                 </li>
