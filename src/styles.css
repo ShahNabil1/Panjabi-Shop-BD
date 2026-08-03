@@ -250,30 +250,30 @@
 .admin-scope {
   --radius: 0.85rem;
 
-  --background: oklch(0.995 0.003 330);
-  --foreground: oklch(0.18 0.005 320);
-  --surface: oklch(0.988 0.006 335);
-  --surface-foreground: oklch(0.18 0.005 320);
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.16 0.004 320);
+  --surface: oklch(1 0 0);
+  --surface-foreground: oklch(0.16 0.004 320);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.18 0.005 320);
+  --card-foreground: oklch(0.16 0.004 320);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.18 0.005 320);
+  --popover-foreground: oklch(0.16 0.004 320);
 
   --primary: oklch(0.63 0.17 348);
   --primary-foreground: oklch(1 0 0);
-  --secondary: oklch(0.975 0.012 340);
-  --secondary-foreground: oklch(0.24 0.02 340);
-  --muted: oklch(0.978 0.008 335);
-  --muted-foreground: oklch(0.42 0.02 330);
-  --accent: oklch(0.968 0.022 340);
-  --accent-foreground: oklch(0.26 0.05 340);
+  --secondary: oklch(0.985 0.005 340);
+  --secondary-foreground: oklch(0.22 0.015 340);
+  --muted: oklch(0.988 0.004 335);
+  --muted-foreground: oklch(0.44 0.015 330);
+  --accent: oklch(0.982 0.012 340);
+  --accent-foreground: oklch(0.24 0.04 340);
   --destructive: oklch(0.63 0.17 20);
   --destructive-foreground: oklch(1 0 0);
   --success: oklch(0.66 0.1 155);
   --success-foreground: oklch(1 0 0);
 
-  --border: oklch(0.945 0.01 335);
-  --input: oklch(0.945 0.01 335);
+  --border: oklch(0.955 0.006 335);
+  --input: oklch(0.955 0.006 335);
   --ring: oklch(0.63 0.17 348);
 
   --ig-gradient: linear-gradient(
