@@ -360,10 +360,19 @@ function LandingPagesAdmin() {
                     onClick={() => {
                       const content = (p.content ?? {}) as {
                         bullets?: Array<{ bn: string; en: string }>;
+                        seo?: Partial<LandingPageInput["seo"]>;
                       };
                       setDraft({
                         ...(p as unknown as LandingPageInput),
                         bullets: Array.isArray(content.bullets) ? content.bullets : [],
+                        seo: {
+                          ogTitle: content.seo?.ogTitle ?? null,
+                          ogDescription: content.seo?.ogDescription ?? null,
+                          canonicalUrl: content.seo?.canonicalUrl ?? null,
+                          productJsonLd: content.seo?.productJsonLd ?? true,
+                          noindex: content.seo?.noindex ?? false,
+                        },
+
                       });
                     }}
                   >
