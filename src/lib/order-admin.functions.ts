@@ -287,6 +287,7 @@ export const adminSetBlocked = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => blockSchema.parse(input))
   .handler(async ({ data, context }) => {
     const db = await requireAdmin(context.supabase, context.userId);
+    const who = await actorName(db, context.userId);
 
     if (data.action === "block") {
       const { error } = await db.from("blocked_identifiers").upsert(
@@ -310,13 +311,16 @@ export const adminSetBlocked = createServerFn({ method: "POST" })
       }
     }
 
-    await db.from("order_activity").insert({
-      order_id: data.orderId,
-      kind: "security",
-      message: `${data.action === "block" ? "Blocked" : "Unblocked"} ${data.targets
-        .map((t) => t.kind)
-        .join(", ")}`,
-    });
+    const list = data.targets.map((t) => `${t.kind} ${t.value}`).join(", ");
+    await logActivity(
+      db,
+      data.orderId,
+      "security",
+      `${who} ${data.action === "block" ? "blocked" : "unblocked"} ${list}${
+        data.action === "block" && data.reason ? ` — ${data.reason}` : ""
+      }`,
+      { actor: who },
+    );
     return { ok: true };
   });
 
