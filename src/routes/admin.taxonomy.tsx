@@ -211,7 +211,7 @@ function TaxonomyPage() {
         <Panel className="p-0">
           <h2 className="border-b border-border p-4 text-sm font-bold">Categories</h2>
           {isLoading ? (
-            <p className="admin-shimmer p-4 text-sm text-muted-foreground">Loading…</p>
+            <BrandLoader size="md" message="Loading categories…" className="py-6" />
           ) : (data?.categories ?? []).length === 0 ? (
             <div className="p-4">
               <EmptyState title="No categories yet" hint="Create your first category on the left." />
