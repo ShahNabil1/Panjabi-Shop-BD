@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SplatRouteImport } from './routes/$'
 import { Route as AboutRouteImport } from './routes/about'
+import { Route as CartRouteImport } from './routes/cart'
 import { Route as CatalogDotxmlRouteImport } from './routes/catalog[.]xml'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as FaqRouteImport } from './routes/faq'
@@ -36,6 +37,11 @@ const SplatRoute = SplatRouteImport.update({
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
   path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CartRoute = CartRouteImport.update({
+  id: '/cart',
+  path: '/cart',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CatalogDotxmlRoute = CatalogDotxmlRouteImport.update({
@@ -93,6 +99,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
   '/about': typeof AboutRoute
+  '/cart': typeof CartRoute
   '/catalog.xml': typeof CatalogDotxmlRoute
   '/contact': typeof ContactRoute
   '/faq': typeof FaqRoute
@@ -108,6 +115,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
   '/about': typeof AboutRoute
+  '/cart': typeof CartRoute
   '/catalog.xml': typeof CatalogDotxmlRoute
   '/contact': typeof ContactRoute
   '/faq': typeof FaqRoute
@@ -124,6 +132,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
   '/about': typeof AboutRoute
+  '/cart': typeof CartRoute
   '/catalog.xml': typeof CatalogDotxmlRoute
   '/contact': typeof ContactRoute
   '/faq': typeof FaqRoute
@@ -141,6 +150,7 @@ export interface FileRouteTypes {
     | '/'
     | '/$'
     | '/about'
+    | '/cart'
     | '/catalog.xml'
     | '/contact'
     | '/faq'
@@ -156,6 +166,7 @@ export interface FileRouteTypes {
     | '/'
     | '/$'
     | '/about'
+    | '/cart'
     | '/catalog.xml'
     | '/contact'
     | '/faq'
@@ -171,6 +182,7 @@ export interface FileRouteTypes {
     | '/'
     | '/$'
     | '/about'
+    | '/cart'
     | '/catalog.xml'
     | '/contact'
     | '/faq'
@@ -187,6 +199,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   SplatRoute: typeof SplatRoute
   AboutRoute: typeof AboutRoute
+  CartRoute: typeof CartRoute
   CatalogDotxmlRoute: typeof CatalogDotxmlRoute
   ContactRoute: typeof ContactRoute
   FaqRoute: typeof FaqRoute
@@ -220,6 +233,13 @@ declare module '@tanstack/react-router' {
       path: '/about'
       fullPath: '/about'
       preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cart': {
+      id: '/cart'
+      path: '/cart'
+      fullPath: '/cart'
+      preLoaderRoute: typeof CartRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/catalog.xml': {
@@ -299,6 +319,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   SplatRoute: SplatRoute,
   AboutRoute: AboutRoute,
+  CartRoute: CartRoute,
   CatalogDotxmlRoute: CatalogDotxmlRoute,
   ContactRoute: ContactRoute,
   FaqRoute: FaqRoute,
