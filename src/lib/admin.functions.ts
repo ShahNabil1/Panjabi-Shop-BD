@@ -144,13 +144,15 @@ export const adminUpdateOrderStatus = createServerFn({ method: "POST" })
       if (o && o["auto_sms_status"] !== "sent") {
         const { deliverSms, renderSmsTemplate } = await import("./sms.server");
         const { smsTemplates } = await import("./admin-schema");
+        const { SITE_URL } = await import("./site");
         const tpl = smsTemplates.find((t) => t.id === "order_confirm")?.body ?? "";
+        const orderNo = String(o["order_number"] ?? "");
         const message = renderSmsTemplate(tpl, {
           name: String(o["customer_name"] ?? ""),
-          order_no: String(o["order_number"] ?? ""),
+          order_no: orderNo,
           amount: String(Number(o["total"] ?? 0)),
           phone: String(o["customer_phone"] ?? ""),
-          receipt_url: "",
+          receipt_url: orderNo ? `${SITE_URL}/invoice/${orderNo}` : "",
         });
         const result = await deliverSms(db, {
           orderId: data.id,
