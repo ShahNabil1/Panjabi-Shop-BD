@@ -1,0 +1,293 @@
+import { Link, createFileRoute, notFound } from "@tanstack/react-router";
+import { useMemo, useState } from "react";
+
+import { getLandingPage } from "@/lib/catalog.functions";
+import { getDeliveryRates } from "@/lib/order.functions";
+import type { LandingPageData } from "@/lib/types";
+import { useLang } from "@/lib/language-context";
+import { discountPercent, formatNumber, formatPrice, pick, toBnDigits, tr } from "@/lib/i18n";
+import { ProductThumb } from "@/components/site/product-card";
+import { NotFoundView } from "@/components/site/not-found-view";
+import { FaqList } from "@/components/site/faq-list";
+import { CheckoutForm } from "@/components/site/checkout-form";
+import { QuantityStepper } from "@/components/site/add-to-cart";
+import { Prose } from "@/components/site/ui";
+import type { CartItem } from "@/lib/cart-context";
+import { cn } from "@/lib/utils";
+
+export const Route = createFileRoute("/lp/$slug")({
+  loader: async ({ params }) => {
+    const [data, rates] = await Promise.all([
+      getLandingPage({ data: { slug: params.slug } }),
+      getDeliveryRates(),
+    ]);
+    if (!data) throw notFound();
+    return { ...data, rates };
+  },
+  head: ({ params, loaderData }) => {
+    if (!loaderData) {
+      return { meta: [{ title: "পেইজটি পাওয়া যায়নি" }, { name: "robots", content: "noindex" }] };
+    }
+    const { landing, product, images } = loaderData;
+    const title = landing.metaTitle || landing.headlineBn || product.nameBn;
+    const description =
+      landing.metaDescription ||
+      product.shortBn ||
+      `${product.nameBn} — ${formatPrice("bn", product.price)}. ক্যাশ অন ডেলিভারিতে অর্ডার করুন।`;
+    const image = landing.ogImageUrl ?? images[0]?.url ?? null;
+    const url = `https://upoharkabbo.lovable.app/lp/${params.slug}`;
+
+    return {
+      meta: [
+        { title },
+        { name: "description", content: description },
+        { property: "og:title", content: title },
+        { property: "og:description", content: description },
+        { property: "og:type", content: "product" },
+        { property: "og:url", content: url },
+        ...(image ? [{ property: "og:image", content: image }] : []),
+        ...(image ? [{ name: "twitter:image", content: image }] : []),
+      ],
+      links: [{ rel: "canonical", href: url }],
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Product",
+            name: product.nameBn,
+            alternateName: product.nameEn,
+            description,
+            sku: product.sku ?? undefined,
+            brand: product.brand ? { "@type": "Brand", name: product.brand } : undefined,
+            image: image ? [image] : undefined,
+            offers: {
+              "@type": "Offer",
+              price: product.price,
+              priceCurrency: "BDT",
+              availability:
+                product.stock > 0
+                  ? "https://schema.org/InStock"
+                  : "https://schema.org/OutOfStock",
+              url,
+            },
+          }),
+        },
+      ],
+    };
+  },
+  notFoundComponent: () => <NotFoundView />,
+  component: LandingPage,
+});
+
+function LandingPage() {
+  const { lang } = useLang();
+  const { landing, product, images, variants, rates } = Route.useLoaderData() as LandingPageData & {
+    rates: { inside_dhaka: number; outside_dhaka: number; freeAbove: number };
+  };
+
+  const [variantId, setVariantId] = useState<string | null>(variants[0]?.id ?? null);
+  const [qty, setQty] = useState(1);
+
+  const activeVariant = variants.find((v) => v.id === variantId) ?? null;
+  const unitPrice = product.price + Number(activeVariant?.price_delta ?? 0);
+  const stock = activeVariant ? activeVariant.stock : product.stock;
+  const off = discountPercent(product.price, product.compareAtPrice);
+
+  const items = useMemo<CartItem[]>(
+    () => [
+      {
+        key: `${product.id}::${activeVariant?.id ?? "base"}`,
+        productId: product.id,
+        slug: product.slug,
+        nameBn: product.nameBn,
+        nameEn: product.nameEn,
+        image: images[0]?.url ?? null,
+        price: unitPrice,
+        quantity: Math.min(qty, stock > 0 ? stock : qty),
+        stock,
+        sku: activeVariant ? null : product.sku,
+        variantId: activeVariant?.id ?? null,
+        variantLabelBn: activeVariant
+          ? `${activeVariant.group_name_bn}: ${activeVariant.value_bn}`
+          : null,
+        variantLabelEn: activeVariant
+          ? `${activeVariant.group_name_en}: ${activeVariant.value_en}`
+          : null,
+      },
+    ],
+    [product, images, activeVariant, unitPrice, qty, stock],
+  );
+
+  const landingFaqs = (product.faq ?? []).map((f, i) => ({
+    id: String(i),
+    question_bn: f["question_bn"] ?? f["question"] ?? "",
+    question_en: f["question_en"] ?? f["question"] ?? "",
+    answer_bn: f["answer_bn"] ?? f["answer"] ?? "",
+    answer_en: f["answer_en"] ?? f["answer"] ?? "",
+  }));
+
+  const headline = pick(lang, landing.headlineBn, landing.headlineEn) || pick(lang, product.nameBn, product.nameEn);
+  const subheadline = pick(lang, landing.subheadlineBn, landing.subheadlineEn) || pick(lang, product.shortBn, product.shortEn);
+  const description = pick(lang, product.descriptionBn, product.descriptionEn);
+
+  return (
+    <div className="mx-auto max-w-4xl px-4 pb-16 pt-8 sm:px-6">
+      <header className="text-center">
+        <h1 className="text-2xl font-bold leading-snug tracking-tight sm:text-4xl">{headline}</h1>
+        {subheadline ? (
+          <p className="mx-auto mt-3 max-w-2xl text-[15px] leading-7 text-muted-foreground">
+            {subheadline}
+          </p>
+        ) : null}
+      </header>
+
+      <div className="mt-7 grid gap-6 sm:grid-cols-2">
+        <div className="grid gap-3">
+          {images.slice(0, 3).map((img, i) => (
+            <div
+              key={img.id}
+              className={cn(
+                "overflow-hidden rounded-lg border border-border bg-card",
+                i === 0 ? "aspect-4/5" : "aspect-video",
+              )}
+            >
+              <ProductThumb
+                src={img.url}
+                alt={pick(lang, img.alt_bn, img.alt_en) || headline}
+                label={product.nameEn}
+              />
+            </div>
+          ))}
+        </div>
+
+        <div>
+          <div className="flex flex-wrap items-baseline gap-3">
+            <span className="text-3xl font-bold text-primary">{formatPrice(lang, unitPrice)}</span>
+            {off > 0 ? (
+              <>
+                <span className="text-lg text-muted-foreground line-through">
+                  {formatPrice(lang, product.compareAtPrice)}
+                </span>
+                <span className="rounded-sm bg-foreground px-2 py-0.5 text-xs font-semibold text-background">
+                  {formatNumber(lang, off)}% {tr(lang, "off")}
+                </span>
+              </>
+            ) : null}
+          </div>
+
+          {product.reviewCount > 0 ? (
+            <p className="mt-2 text-sm text-muted-foreground">
+              ★ {lang === "bn" ? toBnDigits(product.rating.toFixed(1)) : product.rating.toFixed(1)} ·{" "}
+              {formatNumber(lang, product.reviewCount)} {tr(lang, "reviews")}
+            </p>
+          ) : null}
+
+          {landing.blocks.length > 0 ? (
+            <ul className="mt-5 grid gap-2">
+              {landing.blocks.map((block, i) => (
+                <li key={i} className="flex gap-2 text-[15px] leading-7">
+                  <span aria-hidden className="text-primary">
+                    ✓
+                  </span>
+                  <span>{pick(lang, block["text_bn"], block["text_en"])}</span>
+                </li>
+              ))}
+            </ul>
+          ) : null}
+
+          {variants.length > 0 ? (
+            <div className="mt-6">
+              <p className="mb-2 text-sm font-semibold">
+                {pick(lang, variants[0]?.group_name_bn, variants[0]?.group_name_en)}
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {variants.map((v) => (
+                  <button
+                    key={v.id}
+                    type="button"
+                    onClick={() => setVariantId(v.id)}
+                    className={cn(
+                      "rounded-sm border px-3.5 py-2 text-sm transition-colors",
+                      v.id === variantId
+                        ? "border-primary bg-primary/10 text-primary"
+                        : "border-border bg-card hover:border-primary",
+                    )}
+                  >
+                    {pick(lang, v.value_bn, v.value_en)}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : null}
+
+          <div className="mt-6 flex items-center gap-3">
+            <span className="text-sm font-semibold">{tr(lang, "quantity")}</span>
+            <QuantityStepper value={qty} onChange={setQty} max={stock} />
+          </div>
+
+          <a
+            href="#order"
+            className="mt-6 block rounded-sm bg-primary px-6 py-3.5 text-center text-base font-bold text-primary-foreground transition-colors hover:bg-primary/90"
+          >
+            {tr(lang, "orderNow2")}
+          </a>
+
+          <p className="mt-3 text-center text-xs text-muted-foreground">{tr(lang, "codNote")}</p>
+        </div>
+      </div>
+
+      {description ? (
+        <section className="mt-12 max-w-3xl">
+          <h2 className="text-lg font-bold">{tr(lang, "description")}</h2>
+          <Prose text={description} className="mt-3" />
+        </section>
+      ) : null}
+
+      {product.specs.length > 0 ? (
+        <section className="mt-10 max-w-3xl">
+          <h2 className="text-lg font-bold">{tr(lang, "specs")}</h2>
+          <dl className="mt-3 divide-y divide-border rounded-sm border border-border bg-card">
+            {product.specs.map((spec, i) => (
+              <div key={i} className="grid grid-cols-[40%_60%] gap-3 px-4 py-2.5 text-sm">
+                <dt className="text-muted-foreground">{pick(lang, spec["label_bn"], spec["label_en"])}</dt>
+                <dd className="font-medium">{pick(lang, spec["value_bn"], spec["value_en"])}</dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+      ) : null}
+
+      {landingFaqs.length > 0 ? (
+        <section className="mt-10 max-w-3xl">
+          <h2 className="text-lg font-bold">{tr(lang, "productFaq")}</h2>
+          <FaqList items={landingFaqs} className="mt-3" />
+        </section>
+      ) : null}
+
+      <section id="order" className="mt-12 scroll-mt-24">
+        <h2 className="text-xl font-bold">{tr(lang, "deliveryInfo")}</h2>
+        <p className="mt-1 text-sm text-muted-foreground">{tr(lang, "codNote")}</p>
+        <div className="mt-5 max-w-2xl">
+          {stock > 0 ? (
+            <CheckoutForm items={items} rates={rates} source="landing" compact />
+          ) : (
+            <p className="rounded-sm border border-border bg-secondary px-4 py-3 text-center text-sm font-semibold text-muted-foreground">
+              {tr(lang, "outOfStock")}
+            </p>
+          )}
+        </div>
+      </section>
+
+      <p className="mt-10 text-center text-sm">
+        <Link
+          to="/p/$product"
+          params={{ product: product.slug }}
+          className="font-semibold text-primary underline-offset-4 hover:underline"
+        >
+          {pick(lang, "সম্পূর্ণ প্রোডাক্ট পেইজ দেখুন", "See the full product page")}
+        </Link>
+      </p>
+    </div>
+  );
+}
