@@ -152,3 +152,33 @@ export async function getSmsBalance(): Promise<{ ok: boolean; balance: number | 
 export function renderSmsTemplate(template: string, vars: Record<string, string>): string {
   return template.replace(/\{\{\s*(\w+)\s*\}\}/g, (_m, key: string) => vars[key] ?? "");
 }
+
+import type { Db } from "./admin.server";
+
+/** Sends an SMS and records the attempt in `sms_logs`. Returns the gateway result. */
+export async function deliverSms(
+  db: Db,
+  input: {
+    orderId: string | null;
+    phone: string;
+    message: string;
+    isManual: boolean;
+    sentBy?: string | null;
+    sentByName?: string | null;
+  },
+): Promise<SmsResult> {
+  const result = await sendBulkSms(input.phone, input.message);
+  await db.from("sms_logs").insert({
+    order_id: input.orderId,
+    phone: input.phone,
+    message: input.message,
+    status: result.ok ? "sent" : "failed",
+    provider_code: result.code,
+    provider_response: result.raw ? `${result.message} — ${result.raw}` : result.message,
+    segments: result.segments,
+    is_manual: input.isManual,
+    sent_by: input.sentBy ?? null,
+    sent_by_name: input.sentByName ?? (input.isManual ? "Staff" : "System"),
+  } as never);
+  return result;
+}
