@@ -131,7 +131,7 @@ function AdminLayout() {
   const sidebar = (
     <div className="flex h-full flex-col">
       <div className="flex items-center gap-2 px-3 py-4">
-      <div className="flex items-center gap-2 px-3 py-4">
+
         <img
           src="/favicon.png"
           alt="Upoharkabbo"
