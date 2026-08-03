@@ -83,7 +83,10 @@ export const adminUpsertSmsTemplate = createServerFn({ method: "POST" })
         category: data.category,
       };
       if (!isSystem) patch["name"] = data.name;
-      const { error } = await db.from("sms_templates").update(patch).eq("id", data.id);
+      const { error } = await db
+        .from("sms_templates")
+        .update(patch as never)
+        .eq("id", data.id);
       if (error) throw new Error(error.message);
       return { id: data.id };
     }
