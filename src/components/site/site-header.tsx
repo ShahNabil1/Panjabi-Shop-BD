@@ -196,7 +196,10 @@ export function SiteHeader() {
         </div>
 
         <nav className="ml-4 hidden items-center gap-5 lg:flex">{navLinks}</nav>
+
+        <CartButton className="ml-auto shrink-0 lg:ml-4" />
       </div>
+
 
       <div className="mx-auto max-w-6xl px-4 pb-3 lg:hidden">
         <SearchBox />
