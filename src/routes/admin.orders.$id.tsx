@@ -477,7 +477,7 @@ function AdminOrderDetail() {
 
       {/* Another staff member already holds this order */}
       <Dialog open={!!blockedBy} onOpenChange={() => {}}>
-        <DialogContent className="sm:max-w-md" hideClose>
+        <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-base">
               <ShieldAlert className="size-4 text-rose-600" />
@@ -504,7 +504,7 @@ function AdminOrderDetail() {
 
       {/* We were taken over by someone else */}
       <Dialog open={!!evictedBy} onOpenChange={() => {}}>
-        <DialogContent className="sm:max-w-md" hideClose>
+        <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-base">
               <ShieldAlert className="size-4 text-rose-600" />
