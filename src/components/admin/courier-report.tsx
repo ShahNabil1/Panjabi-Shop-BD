@@ -145,7 +145,7 @@ export function CourierReport({ phone }: { phone: string }) {
           <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
             <CourierTile
               name="All"
-              theme={COURIER_THEME.all}
+              theme={COURIER_THEME['all']!}
               total={data.summary.total_parcel}
               delivered={data.summary.success_parcel}
               cancelled={data.summary.cancelled_parcel}
@@ -164,7 +164,7 @@ export function CourierReport({ phone }: { phone: string }) {
                   key={c.key}
                   name={c.name}
                   logo={c.logo}
-                  theme={COURIER_THEME[c.key.toLowerCase()] ?? COURIER_THEME.all}
+                  theme={COURIER_THEME[c.key.toLowerCase()] ?? COURIER_THEME['all']!}
                   total={c.total_parcel}
                   delivered={c.success_parcel}
                   cancelled={c.cancelled_parcel}
