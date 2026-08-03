@@ -115,13 +115,14 @@ export function OrdersBoard({
       <Panel className="p-0">
         {isLoading ? (
           <BrandLoader size="md" className="py-8" />
-        ) : (data?.length ?? 0) === 0 ? (
+        ) : total === 0 ? (
           <div className="p-4">
             <EmptyState title={emptyTitle} />
           </div>
         ) : (
           <ul className="divide-y divide-border">
-            {data?.map((o) => (
+            {rows.map((o) => (
+
               <li
                 key={o.id}
                 className="flex flex-wrap items-center justify-between gap-3 px-4 py-3.5 transition-colors duration-200 hover:bg-muted/40"
