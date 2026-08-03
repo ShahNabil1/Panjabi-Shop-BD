@@ -87,9 +87,10 @@ function actorOf(meta: unknown): string | null {
 }
 
 export function ActivityLog({ entries }: { entries: ActivityEntry[] }) {
-  const [showAll, setShowAll] = useState(false);
+  const [limit, setLimit] = useState(5);
   const sorted = [...entries].sort((a, b) => (a.created_at < b.created_at ? 1 : -1));
-  const visible = showAll ? sorted : sorted.slice(0, 12);
+  const visible = sorted.slice(0, limit);
+
 
   return (
     <Panel>
