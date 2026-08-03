@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Fingerprint, Globe, NotebookPen, Phone, Shield, ShieldCheck, ShieldX, Trash2 } from "lucide-react";
+import { Fingerprint, Globe, NotebookPen, Phone, Shield, ShieldCheck, ShieldX } from "lucide-react";
 
 import type { BlockKind } from "@/lib/admin-schema";
-import { adminAddOrderNote, adminDeleteOrderNote, adminSetBlocked } from "@/lib/order-admin.functions";
+import { adminAddOrderNote, adminSetBlocked } from "@/lib/order-admin.functions";
 import { Panel } from "@/components/admin/kit";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -196,12 +196,6 @@ export function InternalNotesCard({ orderId, notes }: { orderId: string; notes: 
     onError: (e: Error) => toast.error(e.message),
   });
 
-  const remove = useMutation({
-    mutationFn: (id: string) => adminDeleteOrderNote({ data: { id } }),
-    onSuccess: async () => qc.invalidateQueries({ queryKey: ["admin"] }),
-    onError: (e: Error) => toast.error(e.message),
-  });
-
   return (
     <Panel className="space-y-3">
       <h2 className="flex items-center gap-2 text-sm font-bold">
@@ -232,22 +226,12 @@ export function InternalNotesCard({ orderId, notes }: { orderId: string; notes: 
           {notes.map((n) => (
             <li
               key={n.id}
-              className="flex items-start justify-between gap-3 rounded-xl border border-border/70 bg-background/60 p-3"
+              className="rounded-xl border border-border/70 bg-background/60 p-3"
             >
-              <div className="min-w-0">
-                <p className="whitespace-pre-wrap text-sm">{n.body}</p>
-                <p className="mt-1 text-xs text-muted-foreground">
-                  {n.author_name ?? "Staff"} · {dt(n.created_at)}
-                </p>
-              </div>
-              <button
-                type="button"
-                aria-label="Delete note"
-                className="text-muted-foreground transition-colors hover:text-destructive"
-                onClick={() => remove.mutate(n.id)}
-              >
-                <Trash2 className="size-4" />
-              </button>
+              <p className="whitespace-pre-wrap text-sm">{n.body}</p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                {n.author_name ?? "Staff"} · {dt(n.created_at)}
+              </p>
             </li>
           ))}
         </ul>
