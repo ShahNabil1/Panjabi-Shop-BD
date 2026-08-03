@@ -257,34 +257,59 @@ function AdminOrderDetail() {
         ) : null}
 
         {isWeb ? (
-          <div className="space-y-3">
-            <div className="rounded-xl border border-border bg-muted/40 p-3">
-              <div className="flex items-center gap-2">
-                <MessageSquare className="size-4 text-primary" />
-                <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground">
-                  SMS preview — sent on confirm
-                </p>
-              </div>
-              <p className="mt-2 whitespace-pre-wrap rounded-lg border border-border/70 bg-background p-3 text-sm leading-relaxed">
-                {confirmSms}
-              </p>
-              <p className="mt-2 text-[11px] text-muted-foreground">
-                To {order.customer_phone} · {confirmSms.length} chars ·{" "}
-                {order.auto_sms_status === "sent"
-                  ? "Already sent for this order"
-                  : "Variables rendered with live order data"}
-              </p>
-            </div>
+          <>
             <Button
               size="lg"
-              loading={update.isPending}
-              onClick={() => update.mutate({ status: "pending" })}
-              className="w-full"
+              onClick={() => setConfirmOpen(true)}
+              className="w-full bg-[hsl(143,85%,32%)] text-white hover:bg-[hsl(143,85%,27%)] focus-visible:ring-[hsl(143,85%,32%)]"
             >
               <CheckCircle2 className="size-5" />
               Confirm Order
             </Button>
-          </div>
+
+            <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+              <DialogContent className="sm:max-w-lg">
+                <DialogHeader>
+                  <DialogTitle className="flex items-center gap-2 text-base">
+                    <MessageSquare className="size-4 text-[hsl(143,85%,32%)]" />
+                    Confirm order {order.order_number}
+                  </DialogTitle>
+                  <DialogDescription>
+                    This SMS will be sent to the customer and the order moves to Pending.
+                  </DialogDescription>
+                </DialogHeader>
+
+                <div className="rounded-xl border border-border bg-muted/40 p-3">
+                  <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground">
+                    SMS preview
+                  </p>
+                  <p className="mt-2 whitespace-pre-wrap rounded-lg border border-border/70 bg-background p-3 text-sm leading-relaxed">
+                    {confirmSms}
+                  </p>
+                  <p className="mt-2 text-[11px] text-muted-foreground">
+                    To {order.customer_phone} · {confirmSms.length} chars ·{" "}
+                    {order.auto_sms_status === "sent"
+                      ? "Already sent for this order"
+                      : "Variables rendered with live order data"}
+                  </p>
+                </div>
+
+                <DialogFooter>
+                  <Button variant="ghost" onClick={() => setConfirmOpen(false)}>
+                    Cancel
+                  </Button>
+                  <Button
+                    loading={update.isPending}
+                    onClick={() => update.mutate({ status: "pending" })}
+                    className="bg-[hsl(143,85%,32%)] text-white hover:bg-[hsl(143,85%,27%)] focus-visible:ring-[hsl(143,85%,32%)]"
+                  >
+                    <CheckCircle2 className="size-4" />
+                    Send SMS & Confirm
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          </>
         ) : null}
 
       </Panel>
