@@ -98,10 +98,13 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <LanguageProvider initialLang={lang}>
-        <Chrome>
-          {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-          <Outlet />
-        </Chrome>
+        <CartProvider>
+          <Chrome>
+            {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+            <Outlet />
+          </Chrome>
+          <Toaster position="top-center" richColors closeButton />
+        </CartProvider>
       </LanguageProvider>
     </QueryClientProvider>
   );
