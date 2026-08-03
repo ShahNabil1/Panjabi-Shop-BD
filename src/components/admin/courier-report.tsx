@@ -154,7 +154,7 @@ export function CourierReport({ phone }: { phone: string }) {
                   aria-label="Refresh courier data"
                   onClick={() => refresh.mutate()}
                   disabled={refresh.isPending}
-                  className="ml-1 grid size-6 place-items-center rounded-full text-white/90 transition hover:bg-white/20 hover:text-white disabled:opacity-50"
+                  className="ml-1 grid size-6 place-items-center rounded-full text-white/90 transition active:scale-90 hover:bg-white/20 hover:text-white disabled:opacity-50"
                 >
                   <RefreshCw className={cn("size-4", refresh.isPending && "animate-spin")} />
                 </button>
