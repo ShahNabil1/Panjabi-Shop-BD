@@ -65,34 +65,15 @@ export function CourierReport({ phone }: { phone: string }) {
         <p className="mt-3 text-sm text-muted-foreground">No courier data.</p>
       ) : (
         <>
-          <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
-            <div className="flex flex-col items-center rounded-xl border border-border bg-muted/40 p-2 text-center">
-              <p className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground">
-                All
-              </p>
-              <div className="mt-1.5 grid w-full grid-cols-3 gap-1 text-[11px]">
-                <div>
-                  <p className="font-bold text-foreground tabular-nums">{data.summary.total_parcel}</p>
-                  <p className="text-[10px] font-medium text-muted-foreground">Total</p>
-                </div>
-                <div>
-                  <p className="font-bold text-emerald-700 tabular-nums">{data.summary.success_parcel}</p>
-                  <p className="text-[10px] font-medium text-muted-foreground">Delivered</p>
-                </div>
-                <div>
-                  <p className="font-bold text-rose-700 tabular-nums">{data.summary.cancelled_parcel}</p>
-                  <p className="text-[10px] font-medium text-muted-foreground">Cancelled</p>
-                </div>
-              </div>
-              <span
-                className={cn(
-                  "mt-2 inline-block rounded-full px-2 py-0.5 text-xs font-bold ring-1 tabular-nums",
-                  ratioTone(data.summary.success_ratio),
-                )}
-              >
-                {data.summary.success_ratio}%
-              </span>
-            </div>
+          <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+            <CourierTile
+              name="All"
+              theme={COURIER_THEME.all}
+              total={data.summary.total_parcel}
+              delivered={data.summary.success_parcel}
+              cancelled={data.summary.cancelled_parcel}
+              ratio={data.summary.success_ratio}
+            />
 
             {data.couriers
               .filter((c) => VISIBLE_COURIERS.includes(c.key.toLowerCase()))
@@ -102,39 +83,16 @@ export function CourierReport({ phone }: { phone: string }) {
                   VISIBLE_COURIERS.indexOf(b.key.toLowerCase()),
               )
               .map((c) => (
-                <div
+                <CourierTile
                   key={c.key}
-                  className="flex flex-col items-center rounded-xl border border-border bg-card p-2 text-center"
-                >
-                  <p className="inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-wide text-muted-foreground">
-                    {c.logo ? (
-                      <img src={c.logo} alt="" className="size-3.5 rounded object-contain" />
-                    ) : null}
-                    {c.name}
-                  </p>
-                  <div className="mt-1.5 grid w-full grid-cols-3 gap-1 text-[11px]">
-                    <div>
-                      <p className="font-bold text-foreground tabular-nums">{c.total_parcel}</p>
-                      <p className="text-[10px] font-medium text-muted-foreground">Total</p>
-                    </div>
-                    <div>
-                      <p className="font-bold text-emerald-700 tabular-nums">{c.success_parcel}</p>
-                      <p className="text-[10px] font-medium text-muted-foreground">Delivered</p>
-                    </div>
-                    <div>
-                      <p className="font-bold text-rose-700 tabular-nums">{c.cancelled_parcel}</p>
-                      <p className="text-[10px] font-medium text-muted-foreground">Cancelled</p>
-                    </div>
-                  </div>
-                  <span
-                    className={cn(
-                      "mt-2 inline-block rounded-full px-2 py-0.5 text-xs font-bold ring-1 tabular-nums",
-                      ratioTone(c.success_ratio),
-                    )}
-                  >
-                    {c.success_ratio}%
-                  </span>
-                </div>
+                  name={c.name}
+                  logo={c.logo}
+                  theme={COURIER_THEME[c.key.toLowerCase()] ?? COURIER_THEME.all}
+                  total={c.total_parcel}
+                  delivered={c.success_parcel}
+                  cancelled={c.cancelled_parcel}
+                  ratio={c.success_ratio}
+                />
               ))}
           </div>
 
