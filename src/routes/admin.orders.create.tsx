@@ -37,6 +37,7 @@ type Line = {
   sku: string | null;
   unitPrice: number;
   quantity: number;
+  imageUrl: string | null;
 };
 
 function money(n: number) {
@@ -130,6 +131,7 @@ function CreateOrderPage() {
       name_bn: string;
       sku: string | null;
       price: number | string;
+      product_images?: Array<{ url: string; sort_order: number | null }>;
       product_variants?: Array<{
         id: string;
         value_bn: string;
@@ -142,6 +144,10 @@ function CreateOrderPage() {
     variantId: string | null,
   ) => {
     const variant = product.product_variants?.find((v) => v.id === variantId) ?? null;
+    const imageUrl =
+      [...(product.product_images ?? [])].sort(
+        (a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0),
+      )[0]?.url ?? null;
     const unitPrice = Number(product.price) + Number(variant?.price_delta ?? 0);
     const key = `${product.id}:${variantId ?? "-"}`;
     setLines((prev) => {
