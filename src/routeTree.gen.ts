@@ -19,6 +19,7 @@ import { Route as ContactRouteImport } from './routes/contact'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as LpSlugRouteImport } from './routes/lp.$slug'
 import { Route as OffersIndexRouteImport } from './routes/offers.index'
 import { Route as OffersPromotionRouteImport } from './routes/offers.$promotion'
 import { Route as OrderOrderNumberRouteImport } from './routes/order.$orderNumber'
@@ -76,6 +77,11 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LpSlugRoute = LpSlugRouteImport.update({
+  id: '/lp/$slug',
+  path: '/lp/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const OffersIndexRoute = OffersIndexRouteImport.update({
   id: '/offers/',
   path: '/offers/',
@@ -118,6 +124,7 @@ export interface FileRoutesByFullPath {
   '/faq': typeof FaqRoute
   '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/lp/$slug': typeof LpSlugRoute
   '/offers/$promotion': typeof OffersPromotionRoute
   '/order/$orderNumber': typeof OrderOrderNumberRoute
   '/p/$product': typeof PProductRoute
@@ -136,6 +143,7 @@ export interface FileRoutesByTo {
   '/faq': typeof FaqRoute
   '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/lp/$slug': typeof LpSlugRoute
   '/offers/$promotion': typeof OffersPromotionRoute
   '/order/$orderNumber': typeof OrderOrderNumberRoute
   '/p/$product': typeof PProductRoute
@@ -155,6 +163,7 @@ export interface FileRoutesById {
   '/faq': typeof FaqRoute
   '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/lp/$slug': typeof LpSlugRoute
   '/offers/$promotion': typeof OffersPromotionRoute
   '/order/$orderNumber': typeof OrderOrderNumberRoute
   '/p/$product': typeof PProductRoute
@@ -175,6 +184,7 @@ export interface FileRouteTypes {
     | '/faq'
     | '/search'
     | '/sitemap.xml'
+    | '/lp/$slug'
     | '/offers/$promotion'
     | '/order/$orderNumber'
     | '/p/$product'
@@ -193,6 +203,7 @@ export interface FileRouteTypes {
     | '/faq'
     | '/search'
     | '/sitemap.xml'
+    | '/lp/$slug'
     | '/offers/$promotion'
     | '/order/$orderNumber'
     | '/p/$product'
@@ -211,6 +222,7 @@ export interface FileRouteTypes {
     | '/faq'
     | '/search'
     | '/sitemap.xml'
+    | '/lp/$slug'
     | '/offers/$promotion'
     | '/order/$orderNumber'
     | '/p/$product'
@@ -230,6 +242,7 @@ export interface RootRouteChildren {
   FaqRoute: typeof FaqRoute
   SearchRoute: typeof SearchRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  LpSlugRoute: typeof LpSlugRoute
   OffersPromotionRoute: typeof OffersPromotionRoute
   OrderOrderNumberRoute: typeof OrderOrderNumberRoute
   PProductRoute: typeof PProductRoute
@@ -310,6 +323,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/lp/$slug': {
+      id: '/lp/$slug'
+      path: '/lp/$slug'
+      fullPath: '/lp/$slug'
+      preLoaderRoute: typeof LpSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/offers/': {
       id: '/offers/'
       path: '/offers'
@@ -366,6 +386,7 @@ const rootRouteChildren: RootRouteChildren = {
   FaqRoute: FaqRoute,
   SearchRoute: SearchRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  LpSlugRoute: LpSlugRoute,
   OffersPromotionRoute: OffersPromotionRoute,
   OrderOrderNumberRoute: OrderOrderNumberRoute,
   PProductRoute: PProductRoute,
