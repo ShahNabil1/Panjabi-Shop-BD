@@ -1,7 +1,8 @@
 import { Link } from "@tanstack/react-router";
+import { useState } from "react";
 
 import { useLang } from "@/lib/language-context";
-import { discountPercent, formatPrice, pick, tr } from "@/lib/i18n";
+import { discountPercent, formatNumber, formatPrice, pick, tr } from "@/lib/i18n";
 import type { ProductCard as ProductCardData } from "@/lib/supabase-public";
 import { cn } from "@/lib/utils";
 
@@ -16,16 +17,20 @@ export function ProductThumb({
   label: string;
   className?: string;
 }) {
-  if (src) {
+  const [failed, setFailed] = useState(false);
+
+  if (src && !failed) {
     return (
       <img
         src={src}
         alt={alt}
         loading="lazy"
+        onError={() => setFailed(true)}
         className={cn("h-full w-full object-cover", className)}
       />
     );
   }
+
   return (
     <div
       aria-hidden
