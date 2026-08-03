@@ -46,7 +46,7 @@ function AdminProductsPage() {
 
       <Panel className="p-0">
         {isLoading ? (
-          <BrandLoader size="md" message="Loading products…" className="py-8" />
+          <BrandLoader size="md" className="py-8" />
         ) : (data?.length ?? 0) === 0 ? (
           <div className="p-4">
             <EmptyState title="No products yet" hint="Click the New product button above to get started." />
