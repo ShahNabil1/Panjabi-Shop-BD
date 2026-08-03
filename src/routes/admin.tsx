@@ -21,6 +21,7 @@ import { useAuth } from "@/lib/auth-context";
 import { checkIsAdmin } from "@/lib/admin.functions";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import logoMark from "@/assets/upoharkabbo-logo.png";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
