@@ -70,6 +70,7 @@ export function AddToCartBar({
     toast.success(tr(lang, "added"), {
       description: pick(lang, item.nameBn, item.nameEn),
     });
+    openCart("cart");
   };
 
   if (soldOut) {
