@@ -226,7 +226,7 @@ export function SiteHeader() {
             alt={brand}
             width={1040}
             height={375}
-            className="h-12 w-auto max-w-full object-contain xs:h-14 sm:h-16 lg:h-[4.5rem]"
+            className="h-12 w-auto max-w-full object-contain min-[380px]:h-14 sm:h-16 lg:h-[4.5rem]"
           />
         </Link>
 
