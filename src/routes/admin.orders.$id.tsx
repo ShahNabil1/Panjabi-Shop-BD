@@ -250,7 +250,12 @@ function AdminOrderDetail() {
                 </Button>
                 <Button
                   size="sm"
-                  variant={pending === "hold" ? "default" : "destructive"}
+                  variant={pending === "hold" ? "outline" : "destructive"}
+                  className={
+                    pending === "hold"
+                      ? "border-amber-500/30 bg-amber-500 text-white hover:bg-amber-600 hover:text-white"
+                      : undefined
+                  }
                   loading={update.isPending}
                   disabled={reason.trim().length === 0}
                   onClick={() => update.mutate({ status: pending, reason: reason.trim() })}
