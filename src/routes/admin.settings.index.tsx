@@ -11,7 +11,7 @@ import { ImageField } from "@/components/admin/image-upload";
 import { MAX_HERO_SLIDES, readHeroSlides, type HeroSlide } from "@/components/site/hero-slider";
 import { Button } from "@/components/ui/button";
 
-export const Route = createFileRoute("/admin/settings")({
+export const Route = createFileRoute("/admin/settings/")({
   component: SettingsAdmin,
 });
 
