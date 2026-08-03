@@ -1,6 +1,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   Outlet,
+  useRouterState,
   createRootRouteWithContext,
   useRouter,
   HeadContent,
@@ -18,6 +19,7 @@ import { SiteHeader } from "../components/site/site-header";
 import { SiteFooter } from "../components/site/site-footer";
 import { NotFoundView } from "../components/site/not-found-view";
 import { CartProvider } from "../lib/cart-context";
+import { AuthProvider } from "../lib/auth-context";
 import { Toaster } from "../components/ui/sonner";
 
 function str(value: unknown, fallback: string) {
@@ -34,10 +36,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       lang,
       categories: layout.categories,
       brand: str(general["brand_name"], "তাঁতঘর"),
-      tagline: str(
-        general["tagline"],
-        "সারা দেশে ক্যাশ অন ডেলিভারি · ৪৮ ঘণ্টায় ডেলিভারি",
-      ),
+      tagline: str(general["tagline"], "সারা দেশে ক্যাশ অন ডেলিভারি · ৪৮ ঘণ্টায় ডেলিভারি"),
       contact: {
         phone: str(contactSetting["phone"], ""),
         email: str(contactSetting["email"], ""),
@@ -84,6 +83,13 @@ function RootShell({ children }: { children: ReactNode }) {
 }
 
 function Chrome({ children }: { children: ReactNode }) {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const bare = pathname.startsWith("/admin") || pathname.startsWith("/auth");
+
+  if (bare) {
+    return <div className="min-h-screen">{children}</div>;
+  }
+
   return (
     <div className="flex min-h-screen flex-col">
       <SiteHeader />
@@ -100,13 +106,15 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <LanguageProvider initialLang={lang}>
-        <CartProvider>
-          <Chrome>
-            {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-            <Outlet />
-          </Chrome>
-          <Toaster position="top-center" richColors closeButton />
-        </CartProvider>
+        <AuthProvider>
+          <CartProvider>
+            <Chrome>
+              {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+              <Outlet />
+            </Chrome>
+            <Toaster position="top-center" richColors closeButton />
+          </CartProvider>
+        </AuthProvider>
       </LanguageProvider>
     </QueryClientProvider>
   );
