@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button";
 import { ratioTone } from "@/components/admin/courier-status";
 import { cn } from "@/lib/utils";
 
+const VISIBLE_COURIERS = ["steadfast", "pathao", "redx", "carrybee"];
+
 export function CourierReport({ phone }: { phone: string }) {
   const qc = useQueryClient();
 
@@ -63,61 +65,69 @@ export function CourierReport({ phone }: { phone: string }) {
         <p className="mt-3 text-sm text-muted-foreground">No courier data.</p>
       ) : (
         <>
-          <div className="mt-3 flex flex-wrap items-center gap-3">
-            <span
-              className={cn(
-                "rounded-full px-3 py-1 text-sm font-bold ring-1 tabular-nums",
-                ratioTone(data.summary.success_ratio),
-              )}
-            >
-              {data.summary.success_ratio}%
-            </span>
-            <span className="text-sm text-muted-foreground">
-              Total <b className="text-foreground tabular-nums">{data.summary.total_parcel}</b> ·
-              Delivered{" "}
-              <b className="text-emerald-700 tabular-nums">{data.summary.success_parcel}</b> ·
-              Cancelled{" "}
-              <b className="text-rose-700 tabular-nums">{data.summary.cancelled_parcel}</b>
-            </span>
+          <div className="mt-4 grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-5">
+            <div className="rounded-2xl border border-border bg-muted/40 p-3">
+              <p className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground">
+                All
+              </p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Total <b className="text-foreground tabular-nums">{data.summary.total_parcel}</b>
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Delivered{" "}
+                <b className="text-emerald-700 tabular-nums">{data.summary.success_parcel}</b>
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Cancelled{" "}
+                <b className="text-rose-700 tabular-nums">{data.summary.cancelled_parcel}</b>
+              </p>
+              <span
+                className={cn(
+                  "mt-2 inline-block rounded-full px-2.5 py-1 text-sm font-bold ring-1 tabular-nums",
+                  ratioTone(data.summary.success_ratio),
+                )}
+              >
+                {data.summary.success_ratio}%
+              </span>
+            </div>
+
+            {data.couriers
+              .filter((c) => VISIBLE_COURIERS.includes(c.key.toLowerCase()))
+              .sort(
+                (a, b) =>
+                  VISIBLE_COURIERS.indexOf(a.key.toLowerCase()) -
+                  VISIBLE_COURIERS.indexOf(b.key.toLowerCase()),
+              )
+              .map((c) => (
+                <div key={c.key} className="rounded-2xl border border-border bg-card p-3">
+                  <p className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wide text-muted-foreground">
+                    {c.logo ? (
+                      <img src={c.logo} alt="" className="size-4 rounded object-contain" />
+                    ) : null}
+                    {c.name}
+                  </p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Total <b className="text-foreground tabular-nums">{c.total_parcel}</b>
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Delivered{" "}
+                    <b className="text-emerald-700 tabular-nums">{c.success_parcel}</b>
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Cancelled <b className="text-rose-700 tabular-nums">{c.cancelled_parcel}</b>
+                  </p>
+                  <span
+                    className={cn(
+                      "mt-2 inline-block rounded-full px-2.5 py-1 text-sm font-bold ring-1 tabular-nums",
+                      ratioTone(c.success_ratio),
+                    )}
+                  >
+                    {c.success_ratio}%
+                  </span>
+                </div>
+              ))}
           </div>
 
-          <div className="mt-4 overflow-x-auto">
-            <table className="w-full min-w-[420px] text-sm">
-              <thead>
-                <tr className="text-left text-[11px] uppercase tracking-wide text-muted-foreground">
-                  <th className="py-1.5 font-semibold">Courier</th>
-                  <th className="py-1.5 text-right font-semibold">Total</th>
-                  <th className="py-1.5 text-right font-semibold">Delivered</th>
-                  <th className="py-1.5 text-right font-semibold">Cancelled</th>
-                  <th className="py-1.5 text-right font-semibold">Ratio</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border">
-                {data.couriers.map((c) => (
-                  <tr key={c.key}>
-                    <td className="py-2">
-                      <span className="inline-flex items-center gap-2">
-                        {c.logo ? (
-                          <img src={c.logo} alt={c.name} className="size-5 rounded object-contain" />
-                        ) : null}
-                        <span className="font-medium">{c.name}</span>
-                      </span>
-                    </td>
-                    <td className="py-2 text-right tabular-nums">{c.total_parcel}</td>
-                    <td className="py-2 text-right tabular-nums text-emerald-700">
-                      {c.success_parcel}
-                    </td>
-                    <td className="py-2 text-right tabular-nums text-rose-700">
-                      {c.cancelled_parcel}
-                    </td>
-                    <td className="py-2 text-right font-semibold tabular-nums">
-                      {c.success_ratio}%
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
 
           {data.reports.length > 0 ? (
             <div className="mt-4 space-y-2 border-t border-border pt-3">
