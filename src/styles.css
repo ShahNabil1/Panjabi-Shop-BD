@@ -224,3 +224,19 @@
     color: var(--color-primary-foreground);
   }
 }
+
+/* Invoice / receipt printing */
+@media print {
+  html,
+  body {
+    background: #fff;
+  }
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  @page {
+    size: A4;
+    margin: 14mm;
+  }
+}
