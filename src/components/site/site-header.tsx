@@ -215,16 +215,16 @@ export function SiteHeader() {
           </svg>
         </button>
 
-        <Link to="/" className="flex min-w-0 shrink-0 items-center gap-2">
+        <Link to="/" className="flex min-w-0 shrink-0 items-center" aria-label={brand}>
           <img
             src={logoMark}
             alt={brand}
-            width={40}
-            height={40}
-            className="h-9 w-9 shrink-0 object-contain"
+            width={1040}
+            height={375}
+            className="h-9 w-auto shrink-0 object-contain sm:h-10"
           />
-          <span className="truncate text-lg font-bold tracking-tight">{brand}</span>
         </Link>
+
 
 
         <div className="ml-auto hidden max-w-md flex-1 lg:block">
