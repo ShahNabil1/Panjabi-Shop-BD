@@ -131,9 +131,12 @@ function AdminLayout() {
   const sidebar = (
     <div className="flex h-full flex-col">
       <div className="flex items-center gap-2 px-3 py-4">
-        <span className="ig-gradient admin-shimmer grid size-9 shrink-0 place-items-center rounded-xl text-sm font-bold text-white">
-          উ
-        </span>
+      <div className="flex items-center gap-2 px-3 py-4">
+        <img
+          src="/favicon.png"
+          alt="Upoharkabbo"
+          className="size-9 shrink-0 rounded-full bg-white object-contain ring-1 ring-border"
+        />
         <span
           className={cn(
             "min-w-0 overflow-hidden whitespace-nowrap transition-all duration-300",
@@ -148,14 +151,12 @@ function AdminLayout() {
       <nav className="flex-1 space-y-5 overflow-y-auto px-2 pb-4">
         {sections.map((section) => (
           <div key={section.title}>
-            <p
-              className={cn(
-                "px-2 pb-1.5 text-[10px] font-bold uppercase tracking-[0.16em] text-muted-foreground transition-all duration-300",
-                collapsed && "text-center tracking-normal opacity-60",
-              )}
-            >
-              {collapsed ? "•••" : section.title}
-            </p>
+            {!collapsed && (
+              <p className="px-2 pb-1.5 text-[10px] font-bold uppercase tracking-[0.16em] text-muted-foreground">
+                {section.title}
+              </p>
+            )}
+
             <ul className="space-y-1">
               {section.items.map((item) => {
                 const active = isActive(item);
