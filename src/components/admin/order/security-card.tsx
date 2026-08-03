@@ -124,6 +124,7 @@ export function SecurityCard({
             size="sm"
             disabled={selected.length === 0 || mutate.isPending}
             onClick={() => mutate.mutate("unblock")}
+            className="bg-[hsl(143,85%,32%)] text-white hover:bg-[hsl(143,85%,27%)] focus-visible:ring-[hsl(143,85%,32%)]"
           >
             <ShieldCheck className="size-3.5" />
             Unblock
