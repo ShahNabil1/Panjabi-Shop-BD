@@ -19,6 +19,18 @@ function adminPrice(value: number | string | null | undefined) {
   return `৳ ${n.toLocaleString("en-US")}`;
 }
 
+function formatBdDateTime(value: string) {
+  return new Date(value).toLocaleString("en-US", {
+    timeZone: "Asia/Dhaka",
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  });
+}
+
 function AdminOrdersPage() {
   const [status, setStatus] = useState<string>("");
   const [search, setSearch] = useState("");
