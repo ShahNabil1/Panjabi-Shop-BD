@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      blocked_identifiers: {
+        Row: {
+          blocked_by: string | null
+          created_at: string
+          id: string
+          kind: string
+          reason: string | null
+          updated_at: string
+          value: string
+        }
+        Insert: {
+          blocked_by?: string | null
+          created_at?: string
+          id?: string
+          kind: string
+          reason?: string | null
+          updated_at?: string
+          value: string
+        }
+        Update: {
+          blocked_by?: string | null
+          created_at?: string
+          id?: string
+          kind?: string
+          reason?: string | null
+          updated_at?: string
+          value?: string
+        }
+        Relationships: []
+      }
       categories: {
         Row: {
           created_at: string
@@ -291,11 +321,51 @@ export type Database = {
           },
         ]
       }
+      order_notes: {
+        Row: {
+          author_id: string | null
+          author_name: string | null
+          body: string
+          created_at: string
+          id: string
+          order_id: string
+          updated_at: string
+        }
+        Insert: {
+          author_id?: string | null
+          author_name?: string | null
+          body: string
+          created_at?: string
+          id?: string
+          order_id: string
+          updated_at?: string
+        }
+        Update: {
+          author_id?: string | null
+          author_name?: string | null
+          body?: string
+          created_at?: string
+          id?: string
+          order_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_notes_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       orders: {
         Row: {
           address_line: string
           advance_amount: number
           advance_method: string | null
+          alt_phone: string | null
+          auto_sms_status: string
           city: string
           created_at: string
           customer_email: string | null
@@ -304,8 +374,13 @@ export type Database = {
           customer_phone: string
           delivery_area: string | null
           delivery_charge: number
+          delivery_note: string | null
           delivery_partner: string | null
+          device_fingerprint: string | null
           discount: number
+          district: string | null
+          division: string | null
+          fulfillment_status: string
           id: string
           invoice_r2_key: string | null
           note: string | null
@@ -315,6 +390,7 @@ export type Database = {
           status: Database["public"]["Enums"]["order_status"]
           subtotal: number
           total: number
+          upazila: string | null
           updated_at: string
           user_id: string | null
         }
@@ -322,6 +398,8 @@ export type Database = {
           address_line: string
           advance_amount?: number
           advance_method?: string | null
+          alt_phone?: string | null
+          auto_sms_status?: string
           city: string
           created_at?: string
           customer_email?: string | null
@@ -330,8 +408,13 @@ export type Database = {
           customer_phone: string
           delivery_area?: string | null
           delivery_charge?: number
+          delivery_note?: string | null
           delivery_partner?: string | null
+          device_fingerprint?: string | null
           discount?: number
+          district?: string | null
+          division?: string | null
+          fulfillment_status?: string
           id?: string
           invoice_r2_key?: string | null
           note?: string | null
@@ -341,6 +424,7 @@ export type Database = {
           status?: Database["public"]["Enums"]["order_status"]
           subtotal?: number
           total?: number
+          upazila?: string | null
           updated_at?: string
           user_id?: string | null
         }
@@ -348,6 +432,8 @@ export type Database = {
           address_line?: string
           advance_amount?: number
           advance_method?: string | null
+          alt_phone?: string | null
+          auto_sms_status?: string
           city?: string
           created_at?: string
           customer_email?: string | null
@@ -356,8 +442,13 @@ export type Database = {
           customer_phone?: string
           delivery_area?: string | null
           delivery_charge?: number
+          delivery_note?: string | null
           delivery_partner?: string | null
+          device_fingerprint?: string | null
           discount?: number
+          district?: string | null
+          division?: string | null
+          fulfillment_status?: string
           id?: string
           invoice_r2_key?: string | null
           note?: string | null
@@ -367,6 +458,7 @@ export type Database = {
           status?: Database["public"]["Enums"]["order_status"]
           subtotal?: number
           total?: number
+          upazila?: string | null
           updated_at?: string
           user_id?: string | null
         }
@@ -720,6 +812,62 @@ export type Database = {
           value?: Json
         }
         Relationships: []
+      }
+      sms_logs: {
+        Row: {
+          created_at: string
+          id: string
+          is_manual: boolean
+          message: string
+          order_id: string | null
+          phone: string
+          provider_code: string | null
+          provider_response: string | null
+          segments: number
+          sent_by: string | null
+          sent_by_name: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_manual?: boolean
+          message: string
+          order_id?: string | null
+          phone: string
+          provider_code?: string | null
+          provider_response?: string | null
+          segments?: number
+          sent_by?: string | null
+          sent_by_name?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_manual?: boolean
+          message?: string
+          order_id?: string | null
+          phone?: string
+          provider_code?: string | null
+          provider_response?: string | null
+          segments?: number
+          sent_by?: string | null
+          sent_by_name?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sms_logs_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       subcategories: {
         Row: {
