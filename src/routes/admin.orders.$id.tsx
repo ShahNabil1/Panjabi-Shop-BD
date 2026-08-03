@@ -255,6 +255,8 @@ function AdminOrderDetail() {
         orderId={order.id}
         deliveryCharge={Number(order.delivery_charge ?? 0)}
         discount={Number(order.discount ?? 0)}
+        advanceAmount={Number(order.advance_amount ?? 0)}
+        advanceMethod={order.advance_method}
         initialItems={(order.order_items ?? []).map((i) => ({
           productId: i.product_id,
           productName: i.product_name,
