@@ -18,6 +18,7 @@ import {
 
 import { useAuth } from "@/lib/auth-context";
 import { checkIsAdmin } from "@/lib/admin.functions";
+import { BrandLoader } from "@/components/admin/brand-loader";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import logoMark from "@/assets/upoharkabbo-logo.png";
@@ -98,9 +99,8 @@ function AdminLayout() {
 
   if (loading || !session || isAdmin.isLoading) {
     return (
-      <div className="admin-scope flex min-h-[70vh] flex-col items-center justify-center gap-3 bg-background">
-        <span className="ig-gradient admin-shimmer size-10 animate-pulse rounded-2xl" />
-        <p className="text-sm text-muted-foreground">Loading dashboard…</p>
+      <div className="admin-scope flex min-h-[70vh] flex-col items-center justify-center bg-background">
+        <BrandLoader size="lg" message="Loading dashboard…" />
       </div>
     );
   }

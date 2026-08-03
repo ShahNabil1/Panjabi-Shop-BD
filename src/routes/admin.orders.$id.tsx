@@ -6,6 +6,7 @@ import { FileText, ArrowLeft } from "lucide-react";
 import { adminGetOrder, adminUpdateOrderStatus } from "@/lib/admin.functions";
 import { orderStatuses } from "@/lib/admin-schema";
 import { AdminHeading, Panel, StatusPill, statusLabels } from "@/components/admin/kit";
+import { BrandLoader } from "@/components/admin/brand-loader";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/admin/orders/$id")({
@@ -46,7 +47,7 @@ function AdminOrderDetail() {
     onError: (e: Error) => toast.error(e.message),
   });
 
-  if (isLoading) return <p className="text-sm text-muted-foreground">Loading…</p>;
+  if (isLoading) return <BrandLoader size="md" message="Loading order…" className="py-8" />;
   if (!data) {
     return (
       <div className="space-y-4">

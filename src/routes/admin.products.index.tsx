@@ -5,6 +5,7 @@ import { ImageOff, Pencil, Plus, Trash2 } from "lucide-react";
 
 import { adminDeleteProduct, adminListProducts } from "@/lib/admin.functions";
 import { AdminHeading, EmptyState, Panel } from "@/components/admin/kit";
+import { BrandLoader } from "@/components/admin/brand-loader";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { formatPrice } from "@/lib/i18n";
@@ -45,11 +46,7 @@ function AdminProductsPage() {
 
       <Panel className="p-0">
         {isLoading ? (
-          <div className="space-y-2 p-4">
-            {[0, 1, 2].map((i) => (
-              <div key={i} className="admin-shimmer h-16 rounded-xl bg-muted/50" />
-            ))}
-          </div>
+          <BrandLoader size="md" message="Loading products…" className="py-8" />
         ) : (data?.length ?? 0) === 0 ? (
           <div className="p-4">
             <EmptyState title="No products yet" hint="Click the New product button above to get started." />

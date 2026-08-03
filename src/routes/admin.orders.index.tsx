@@ -6,6 +6,7 @@ import { Search } from "lucide-react";
 import { adminListOrders } from "@/lib/admin.functions";
 import { orderStatuses } from "@/lib/admin-schema";
 import { AdminHeading, EmptyState, Panel, StatusPill, statusLabels } from "@/components/admin/kit";
+import { BrandLoader } from "@/components/admin/brand-loader";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
@@ -67,7 +68,7 @@ function AdminOrdersPage() {
 
       <Panel className="p-0">
         {isLoading ? (
-          <p className="p-6 text-sm text-muted-foreground">Loading…</p>
+          <BrandLoader size="md" message="Loading orders…" className="py-8" />
         ) : (data?.length ?? 0) === 0 ? (
           <div className="p-4">
             <EmptyState title="No orders found" />
