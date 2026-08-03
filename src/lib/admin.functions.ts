@@ -123,15 +123,23 @@ export const adminUpdateOrderStatus = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => orderStatusSchema.parse(input))
   .handler(async ({ data, context }) => {
     const db = await requireAdmin(context.supabase, context.userId);
+    const { actorName, logActivity } = await import("./admin.server");
+    const who = await actorName(db, context.userId);
+    const { data: prev } = await db
+      .from("orders")
+      .select("status")
+      .eq("id", data.id)
+      .maybeSingle();
+    const before = (prev as { status?: string } | null)?.status ?? "—";
     const { error } = await db.from("orders").update({ status: data.status }).eq("id", data.id);
     if (error) throw new Error(error.message);
-    await db.from("order_activity").insert({
-      order_id: data.id,
-      kind: "status",
-      message: data.reason
-        ? `Status changed to ${data.status} — ${data.reason}`
-        : `Status changed to ${data.status}`,
-    });
+    await logActivity(
+      db,
+      data.id,
+      "status",
+      `${who} changed status ${before} → ${data.status}${data.reason ? ` — ${data.reason}` : ""}`,
+      { actor: who, meta: { from: before, to: data.status, reason: data.reason ?? null } },
+    );
 
     // Auto confirmation SMS once an order moves into the confirmed pipeline.
     if (data.status === "pending" || data.status === "confirmed") {
