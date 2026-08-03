@@ -1,0 +1,133 @@
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import type { ReactNode } from "react";
+
+const CART_KEY = "tantghor_cart_v1";
+
+export type CartItem = {
+  key: string;
+  productId: string;
+  slug: string;
+  nameBn: string;
+  nameEn: string;
+  image: string | null;
+  price: number;
+  quantity: number;
+  stock: number;
+  sku: string | null;
+  variantId: string | null;
+  variantLabelBn: string | null;
+  variantLabelEn: string | null;
+};
+
+export type NewCartItem = Omit<CartItem, "key">;
+
+type CartContextValue = {
+  items: CartItem[];
+  count: number;
+  subtotal: number;
+  ready: boolean;
+  add: (item: NewCartItem) => void;
+  setQuantity: (key: string, quantity: number) => void;
+  remove: (key: string) => void;
+  clear: () => void;
+};
+
+const CartContext = createContext<CartContextValue | null>(null);
+
+function itemKey(productId: string, variantId: string | null) {
+  return `${productId}::${variantId ?? "base"}`;
+}
+
+function isCartItem(value: unknown): value is CartItem {
+  if (!value || typeof value !== "object") return false;
+  const v = value as Record<string, unknown>;
+  return (
+    typeof v["productId"] === "string" &&
+    typeof v["slug"] === "string" &&
+    typeof v["price"] === "number" &&
+    typeof v["quantity"] === "number"
+  );
+}
+
+function readStorage(): CartItem[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = window.localStorage.getItem(CART_KEY);
+    if (!raw) return [];
+    const parsed: unknown = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter(isCartItem).map((item) => ({
+      ...item,
+      key: item.key || itemKey(item.productId, item.variantId ?? null),
+      quantity: Math.max(1, Math.min(99, Math.round(item.quantity))),
+    }));
+  } catch {
+    return [];
+  }
+}
+
+export function CartProvider({ children }: { children: ReactNode }) {
+  const [items, setItems] = useState<CartItem[]>([]);
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    setItems(readStorage());
+    setReady(true);
+  }, []);
+
+  useEffect(() => {
+    if (!ready) return;
+    try {
+      window.localStorage.setItem(CART_KEY, JSON.stringify(items));
+    } catch {
+      /* storage unavailable — cart stays in memory */
+    }
+  }, [items, ready]);
+
+  const add = useCallback((incoming: NewCartItem) => {
+    const key = itemKey(incoming.productId, incoming.variantId);
+    setItems((prev) => {
+      const existing = prev.find((i) => i.key === key);
+      if (existing) {
+        const max = existing.stock > 0 ? existing.stock : 99;
+        return prev.map((i) =>
+          i.key === key
+            ? { ...i, quantity: Math.min(max, i.quantity + incoming.quantity) }
+            : i,
+        );
+      }
+      return [...prev, { ...incoming, key }];
+    });
+  }, []);
+
+  const setQuantity = useCallback((key: string, quantity: number) => {
+    setItems((prev) =>
+      prev.flatMap((i) => {
+        if (i.key !== key) return [i];
+        const max = i.stock > 0 ? i.stock : 99;
+        const next = Math.min(max, Math.max(0, Math.round(quantity)));
+        return next <= 0 ? [] : [{ ...i, quantity: next }];
+      }),
+    );
+  }, []);
+
+  const remove = useCallback((key: string) => {
+    setItems((prev) => prev.filter((i) => i.key !== key));
+  }, []);
+
+  const clear = useCallback(() => setItems([]), []);
+
+  const value = useMemo<CartContextValue>(() => {
+    const count = items.reduce((sum, i) => sum + i.quantity, 0);
+    const subtotal = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
+    return { items, count, subtotal, ready, add, setQuantity, remove, clear };
+  }, [items, ready, add, setQuantity, remove, clear]);
+
+  return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
+}
+
+export function useCart(): CartContextValue {
+  const ctx = useContext(CartContext);
+  if (!ctx) throw new Error("useCart must be used inside CartProvider");
+  return ctx;
+}
