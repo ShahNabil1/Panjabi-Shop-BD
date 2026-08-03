@@ -8,7 +8,8 @@ import {
   ShoppingBag,
   StickyNote,
   Truck,
-, ShieldAlert} from "lucide-react";
+  ShieldAlert,
+} from "lucide-react";
 
 import { Panel } from "@/components/admin/kit";
 import { Button } from "@/components/ui/button";
