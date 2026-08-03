@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import { useLang } from "@/lib/language-context";
 import type { CategoryWithSubs } from "@/lib/types";
 import type { Lang } from "@/lib/i18n";
-import { pick, tr } from "@/lib/i18n";
+import { formatNumber, pick, tr } from "@/lib/i18n";
+import { useCart } from "@/lib/cart-context";
 import { cn } from "@/lib/utils";
 
 export type SiteData = {
