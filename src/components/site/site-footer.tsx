@@ -21,7 +21,7 @@ export function SiteFooter() {
               loading="lazy"
               width={1040}
               height={375}
-              className="h-10 w-auto shrink-0 object-contain"
+              className="h-16 w-auto shrink-0 object-contain sm:h-20"
             />
           </div>
 
