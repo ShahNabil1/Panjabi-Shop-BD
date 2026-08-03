@@ -1,16 +1,27 @@
 import { Link, createFileRoute, useParams } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { FileText, ArrowLeft, CheckCircle2, History } from "lucide-react";
+import { FileText, CheckCircle2, History } from "lucide-react";
 import { useState } from "react";
 
 import { adminEditOrder, adminGetOrder, adminUpdateOrderStatus } from "@/lib/admin.functions";
-import { listOrderStatuses, webOrderStatuses } from "@/lib/admin-schema";
+import { webOrderStatuses, type OrderStatus } from "@/lib/admin-schema";
 import { TextField, AreaField, NumberField } from "@/components/admin/kit";
 import { AdminHeading, Panel, StatusPill, statusLabels } from "@/components/admin/kit";
 import { BrandLoader } from "@/components/admin/brand-loader";
 import { CourierReport } from "@/components/admin/courier-report";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+const updatableStatuses = ["no_response", "good_no_response", "hold", "cancelled"] as const;
+type PendingStatus = (typeof updatableStatuses)[number] | "pending";
 
 export const Route = createFileRoute("/admin/orders/$id")({
   component: AdminOrderDetail,
