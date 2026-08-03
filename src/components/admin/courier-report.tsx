@@ -51,21 +51,21 @@ function CourierTile({
   const pct = Math.max(0, Math.min(100, Math.round(Number(ratio) || 0)));
   const color = rateColor(pct);
   return (
-    <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+    <div className="w-[178px] shrink-0 snap-start overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
       <div
-        className="flex items-center justify-center gap-2 px-3 py-2.5"
+        className="flex items-center justify-center gap-1.5 px-2 py-1.5"
         style={{ background: `linear-gradient(135deg, ${theme.from}, ${theme.to})` }}
       >
-        {logo ? <img src={logo} alt="" className="size-5 rounded bg-white/95 object-contain" /> : null}
-        <p className="text-[15px] font-extrabold tracking-tight" style={{ color: theme.text }}>
+        {logo ? <img src={logo} alt="" className="size-4 rounded bg-white/95 object-contain" /> : null}
+        <p className="truncate text-[13px] font-extrabold tracking-tight" style={{ color: theme.text }}>
           {name}
         </p>
         {action}
       </div>
 
-      <div className="space-y-1.5 px-3.5 pt-3 pb-2">
+      <div className="space-y-0.5 px-2.5 pt-2 pb-1.5">
         <Row label="Success Rate">
-          <span className="text-[15px] font-extrabold tabular-nums" style={{ color: hasData ? color : "#94a3b8" }}>
+          <span className="text-[13px] font-extrabold tabular-nums" style={{ color: hasData ? color : "#94a3b8" }}>
             {hasData ? `${pct}%` : "—"}
           </span>
         </Row>
@@ -74,8 +74,8 @@ function CourierTile({
         <Row label="Cancelled">{cancelled}</Row>
       </div>
 
-      <div className="px-3.5 pb-3.5">
-        <div className="h-2 w-full overflow-hidden rounded-full bg-slate-200">
+      <div className="px-2.5 pb-2.5">
+        <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-200">
           <div
             className="h-full rounded-full transition-all duration-500"
             style={{ width: `${hasData ? pct : 0}%`, background: color }}
@@ -89,11 +89,12 @@ function CourierTile({
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="flex items-baseline justify-between gap-2">
-      <span className="text-[13px] font-semibold text-slate-500">{label}</span>
-      <span className="text-[15px] font-extrabold tabular-nums text-slate-900">{children}</span>
+      <span className="text-[12px] font-semibold text-slate-500">{label}</span>
+      <span className="text-[13px] font-extrabold tabular-nums text-slate-900">{children}</span>
     </div>
   );
 }
+
 
 export function CourierReport({ phone }: { phone: string }) {
   const qc = useQueryClient();
@@ -138,7 +139,7 @@ export function CourierReport({ phone }: { phone: string }) {
         <p className="mt-3 text-sm text-muted-foreground">No courier data.</p>
       ) : (
         <>
-          <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+          <div className="mt-4 flex snap-x snap-mandatory gap-2 overflow-x-auto pb-2 [scrollbar-width:thin] justify-start xl:justify-center">
             <CourierTile
               name="Overall"
               theme={COURIER_THEME['all']!}
