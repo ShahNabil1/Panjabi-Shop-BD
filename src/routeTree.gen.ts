@@ -10,33 +10,193 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SplatRouteImport } from './routes/$'
+import { Route as AboutRouteImport } from './routes/about'
+import { Route as CatalogDotxmlRouteImport } from './routes/catalog[.]xml'
+import { Route as ContactRouteImport } from './routes/contact'
+import { Route as FaqRouteImport } from './routes/faq'
+import { Route as SearchRouteImport } from './routes/search'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as OffersIndexRouteImport } from './routes/offers.index'
+import { Route as OffersPromotionRouteImport } from './routes/offers.$promotion'
+import { Route as PProductRouteImport } from './routes/p.$product'
+import { Route as CCategoryIndexRouteImport } from './routes/c.$category.index'
+import { Route as CCategorySubcategoryRouteImport } from './routes/c.$category.$subcategory'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SplatRoute = SplatRouteImport.update({
+  id: '/$',
+  path: '/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CatalogDotxmlRoute = CatalogDotxmlRouteImport.update({
+  id: '/catalog.xml',
+  path: '/catalog.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FaqRoute = FaqRouteImport.update({
+  id: '/faq',
+  path: '/faq',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SearchRoute = SearchRouteImport.update({
+  id: '/search',
+  path: '/search',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OffersIndexRoute = OffersIndexRouteImport.update({
+  id: '/offers/',
+  path: '/offers/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OffersPromotionRoute = OffersPromotionRouteImport.update({
+  id: '/offers/$promotion',
+  path: '/offers/$promotion',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PProductRoute = PProductRouteImport.update({
+  id: '/p/$product',
+  path: '/p/$product',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CCategoryIndexRoute = CCategoryIndexRouteImport.update({
+  id: '/c/$category/',
+  path: '/c/$category/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CCategorySubcategoryRoute = CCategorySubcategoryRouteImport.update({
+  id: '/c/$category/$subcategory',
+  path: '/c/$category/$subcategory',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/$': typeof SplatRoute
+  '/about': typeof AboutRoute
+  '/catalog.xml': typeof CatalogDotxmlRoute
+  '/contact': typeof ContactRoute
+  '/faq': typeof FaqRoute
+  '/search': typeof SearchRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/offers/$promotion': typeof OffersPromotionRoute
+  '/p/$product': typeof PProductRoute
+  '/offers/': typeof OffersIndexRoute
+  '/c/$category/$subcategory': typeof CCategorySubcategoryRoute
+  '/c/$category/': typeof CCategoryIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/$': typeof SplatRoute
+  '/about': typeof AboutRoute
+  '/catalog.xml': typeof CatalogDotxmlRoute
+  '/contact': typeof ContactRoute
+  '/faq': typeof FaqRoute
+  '/search': typeof SearchRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/offers/$promotion': typeof OffersPromotionRoute
+  '/p/$product': typeof PProductRoute
+  '/offers': typeof OffersIndexRoute
+  '/c/$category/$subcategory': typeof CCategorySubcategoryRoute
+  '/c/$category': typeof CCategoryIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/$': typeof SplatRoute
+  '/about': typeof AboutRoute
+  '/catalog.xml': typeof CatalogDotxmlRoute
+  '/contact': typeof ContactRoute
+  '/faq': typeof FaqRoute
+  '/search': typeof SearchRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/offers/$promotion': typeof OffersPromotionRoute
+  '/p/$product': typeof PProductRoute
+  '/offers/': typeof OffersIndexRoute
+  '/c/$category/$subcategory': typeof CCategorySubcategoryRoute
+  '/c/$category/': typeof CCategoryIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/$'
+    | '/about'
+    | '/catalog.xml'
+    | '/contact'
+    | '/faq'
+    | '/search'
+    | '/sitemap.xml'
+    | '/offers/$promotion'
+    | '/p/$product'
+    | '/offers/'
+    | '/c/$category/$subcategory'
+    | '/c/$category/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/$'
+    | '/about'
+    | '/catalog.xml'
+    | '/contact'
+    | '/faq'
+    | '/search'
+    | '/sitemap.xml'
+    | '/offers/$promotion'
+    | '/p/$product'
+    | '/offers'
+    | '/c/$category/$subcategory'
+    | '/c/$category'
+  id:
+    | '__root__'
+    | '/'
+    | '/$'
+    | '/about'
+    | '/catalog.xml'
+    | '/contact'
+    | '/faq'
+    | '/search'
+    | '/sitemap.xml'
+    | '/offers/$promotion'
+    | '/p/$product'
+    | '/offers/'
+    | '/c/$category/$subcategory'
+    | '/c/$category/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  SplatRoute: typeof SplatRoute
+  AboutRoute: typeof AboutRoute
+  CatalogDotxmlRoute: typeof CatalogDotxmlRoute
+  ContactRoute: typeof ContactRoute
+  FaqRoute: typeof FaqRoute
+  SearchRoute: typeof SearchRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  OffersPromotionRoute: typeof OffersPromotionRoute
+  PProductRoute: typeof PProductRoute
+  OffersIndexRoute: typeof OffersIndexRoute
+  CCategorySubcategoryRoute: typeof CCategorySubcategoryRoute
+  CCategoryIndexRoute: typeof CCategoryIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,22 +208,108 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/$': {
+      id: '/$'
+      path: '/$'
+      fullPath: '/$'
+      preLoaderRoute: typeof SplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/catalog.xml': {
+      id: '/catalog.xml'
+      path: '/catalog.xml'
+      fullPath: '/catalog.xml'
+      preLoaderRoute: typeof CatalogDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/faq': {
+      id: '/faq'
+      path: '/faq'
+      fullPath: '/faq'
+      preLoaderRoute: typeof FaqRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/search': {
+      id: '/search'
+      path: '/search'
+      fullPath: '/search'
+      preLoaderRoute: typeof SearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/offers/': {
+      id: '/offers/'
+      path: '/offers'
+      fullPath: '/offers/'
+      preLoaderRoute: typeof OffersIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/offers/$promotion': {
+      id: '/offers/$promotion'
+      path: '/offers/$promotion'
+      fullPath: '/offers/$promotion'
+      preLoaderRoute: typeof OffersPromotionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/p/$product': {
+      id: '/p/$product'
+      path: '/p/$product'
+      fullPath: '/p/$product'
+      preLoaderRoute: typeof PProductRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/c/$category/': {
+      id: '/c/$category/'
+      path: '/c/$category'
+      fullPath: '/c/$category/'
+      preLoaderRoute: typeof CCategoryIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/c/$category/$subcategory': {
+      id: '/c/$category/$subcategory'
+      path: '/c/$category/$subcategory'
+      fullPath: '/c/$category/$subcategory'
+      preLoaderRoute: typeof CCategorySubcategoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  SplatRoute: SplatRoute,
+  AboutRoute: AboutRoute,
+  CatalogDotxmlRoute: CatalogDotxmlRoute,
+  ContactRoute: ContactRoute,
+  FaqRoute: FaqRoute,
+  SearchRoute: SearchRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
+  OffersPromotionRoute: OffersPromotionRoute,
+  PProductRoute: PProductRoute,
+  OffersIndexRoute: OffersIndexRoute,
+  CCategorySubcategoryRoute: CCategorySubcategoryRoute,
+  CCategoryIndexRoute: CCategoryIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
