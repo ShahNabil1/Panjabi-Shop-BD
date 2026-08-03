@@ -75,10 +75,7 @@ export function SmsCard({ orderId, phone }: { orderId: string; phone: string }) 
             </span>
             <div>
               <p className="text-sm font-bold text-white">Send SMS to customer</p>
-              <p className="text-xs text-white/70">
-                Ready → {phone}
-                {balance?.ok ? ` · Balance ${balance.balance}` : balance ? ` · ${balance.message}` : ""}
-              </p>
+              <p className="text-xs text-white/70">Ready → {phone}</p>
             </div>
           </div>
           <Button
