@@ -56,9 +56,17 @@ function emptyLanding(): LandingPageInput {
     meta_description: null,
     og_image_url: null,
     is_active: true,
+    seo: {
+      ogTitle: null,
+      ogDescription: null,
+      canonicalUrl: null,
+      productJsonLd: true,
+      noindex: false,
+    },
     bullets: [],
   };
 }
+
 
 function moveItem<T>(list: T[], from: number, to: number): T[] {
   if (to < 0 || to >= list.length) return list;
