@@ -110,6 +110,23 @@ export function ItemsCard({
     initialAdvanceMethod ?? advanceMethods[0],
   );
 
+  const snapshot = (
+    list: EditableItem[],
+    d: number,
+    a: number,
+    m: string,
+  ) =>
+    JSON.stringify({
+      items: list.map(({ image: _image, ...rest }) => rest),
+      discount: Number(d) || 0,
+      advance: Number(a) || 0,
+      method: (Number(a) || 0) > 0 ? m : null,
+    });
+
+  const [savedSnapshot, setSavedSnapshot] = useState(() =>
+    snapshot(initialItems, initialDiscount, initialAdvance ?? 0, initialAdvanceMethod ?? advanceMethods[0]),
+  );
+
   const { data: results } = useQuery({
     queryKey: ["admin", "product-search", query],
     queryFn: () => adminSearchProducts({ data: { query } }),
@@ -120,6 +137,9 @@ export function ItemsCard({
   const total = Math.max(0, subtotal + deliveryCharge - discount);
   const paidAdvance = Math.min(advance, total);
   const due = Math.max(0, total - paidAdvance);
+
+  const currentSnapshot = snapshot(items, discount, paidAdvance, advanceMethod);
+  const isDirty = currentSnapshot !== savedSnapshot;
 
   const save = useMutation({
     mutationFn: () =>
@@ -137,6 +157,7 @@ export function ItemsCard({
         },
       }),
     onSuccess: async () => {
+      setSavedSnapshot(currentSnapshot);
       toast.success("Items updated");
       await qc.invalidateQueries({ queryKey: ["admin"] });
     },
@@ -145,6 +166,8 @@ export function ItemsCard({
 
   const patch = (index: number, next: Partial<EditableItem>) =>
     setItems(items.map((it, i) => (i === index ? { ...it, ...next } : it)));
+
+
 
 
   return (
