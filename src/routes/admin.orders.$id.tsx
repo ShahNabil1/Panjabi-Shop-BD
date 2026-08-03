@@ -128,6 +128,8 @@ function AdminOrderDetail() {
         </div>
       </Panel>
 
+      <CourierReport phone={order.customer_phone} />
+
       <div className="grid gap-4 lg:grid-cols-2">
         <Panel>
           <h2 className="ig-text text-sm font-bold">Customer</h2>
