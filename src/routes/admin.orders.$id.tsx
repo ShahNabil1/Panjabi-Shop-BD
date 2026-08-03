@@ -94,6 +94,8 @@ function AdminOrderDetail() {
     delivery_partner: string | null;
     delivery_charge: number | string;
     discount: number | string;
+    advance_amount?: number | string | null;
+    advance_method?: string | null;
     fulfillment_status: string;
     auto_sms_status: string;
     source: string;
