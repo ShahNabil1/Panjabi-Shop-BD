@@ -124,14 +124,14 @@ export const placeOrder = createServerFn({ method: "POST" })
         status: "pending",
         source: data.source,
       })
-      .select("order_number")
+      .select("id, order_number")
       .single();
 
     if (orderError || !order) throw new Error("ORDER_FAILED");
 
     const { error: itemsError } = await supabaseAdmin.from("order_items").insert(
       lines.map((l) => ({
-        order_id: undefined as never,
+        order_id: order.id,
         product_id: l.product.id,
         product_name: l.product.name_bn,
         product_slug: l.product.slug,
@@ -140,7 +140,7 @@ export const placeOrder = createServerFn({ method: "POST" })
         unit_price: l.unitPrice,
         quantity: l.quantity,
         line_total: l.lineTotal,
-      })) as never,
+      })),
     );
 
     if (itemsError) throw new Error("ORDER_ITEMS_FAILED");
@@ -149,6 +149,14 @@ export const placeOrder = createServerFn({ method: "POST" })
   });
 
 /** Order receipt lookup — requires both the order number and the phone used. */
+/** Public delivery-charge configuration, used to preview totals at checkout. */
+export const getDeliveryRates = createServerFn({ method: "GET" }).handler(async () => {
+  const { createPublicServerClient } = await import("./supabase-public");
+  const db = createPublicServerClient();
+  const { data } = await db.from("site_settings").select("value").eq("key", "delivery").maybeSingle();
+  return deliveryRates(data?.value);
+});
+
 export const getOrderSummary = createServerFn({ method: "GET" })
   .inputValidator((input: unknown) => orderLookupSchema.parse(input))
   .handler(async ({ data }): Promise<OrderSummary | null> => {
