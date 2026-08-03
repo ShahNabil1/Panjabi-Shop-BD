@@ -51,24 +51,12 @@ export function CourierStatusBar() {
 
       <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-muted-foreground">
         {p && p.ok ? (
-          <>
-            <span>
-              Free:{" "}
-              <span className="font-semibold text-foreground tabular-nums">
-                {p.remainingFreeCalls}/{p.callLimit}
-              </span>
+          <span>
+            Overall:{" "}
+            <span className="font-semibold text-foreground tabular-nums">
+              {p.remainingFreeCalls + p.remainingPaidCalls}/{p.callLimit + p.paidLimit}
             </span>
-            <span>
-              Paid:{" "}
-              <span className="font-semibold text-foreground tabular-nums">
-                {p.remainingPaidCalls}/{p.paidLimit}
-              </span>
-            </span>
-            <span>
-              Used:{" "}
-              <span className="font-semibold text-foreground tabular-nums">{p.apiCalls}</span>
-            </span>
-          </>
+          </span>
         ) : p && !p.ok ? (
           <span className="text-rose-700">{p.message}</span>
         ) : (
