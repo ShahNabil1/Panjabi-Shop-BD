@@ -278,21 +278,43 @@ function ProductEditor() {
       </Panel>
 
       <Panel>
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-2">
           <h2 className="text-sm font-bold">ছবি</h2>
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() =>
-              set("images", [
-                ...draft.images,
-                { url: "", alt_bn: null, alt_en: null, sort_order: draft.images.length },
-              ])
-            }
-          >
-            ছবি যোগ করুন
-          </Button>
+          <div className="flex items-center gap-2">
+            <ImageUploadButton
+              folder="products"
+              multiple
+              label="ছবি আপলোড"
+              onUploaded={(urls) =>
+                set("images", [
+                  ...draft.images,
+                  ...urls.map((url, k) => ({
+                    url,
+                    alt_bn: null,
+                    alt_en: null,
+                    sort_order: draft.images.length + k,
+                  })),
+                ])
+              }
+            />
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() =>
+                set("images", [
+                  ...draft.images,
+                  { url: "", alt_bn: null, alt_en: null, sort_order: draft.images.length },
+                ])
+              }
+            >
+              URL দিয়ে যোগ
+            </Button>
+          </div>
         </div>
+        <p className="mt-1 text-[11px] text-muted-foreground">
+          আপলোডের আগে ব্রাউজারেই ছবি WebP-তে কমপ্রেস হয় (সর্বোচ্চ ২০০০px)।
+        </p>
+
         <div className="mt-3 space-y-2">
           {draft.images.map((img, i) => (
             <div key={i} className="flex flex-wrap items-center gap-2">
