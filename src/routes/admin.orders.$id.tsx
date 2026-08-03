@@ -1,10 +1,17 @@
-import { Link, createFileRoute, useParams } from "@tanstack/react-router";
+import { Link, createFileRoute, useNavigate, useParams, useSearch } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { CheckCircle2, FileText, MessageSquare, X } from "lucide-react";
-import { useState } from "react";
+import { ArrowLeft, CheckCircle2, FileText, MessageSquare, ShieldAlert, UserRound, X } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 
 import { adminUpdateOrderStatus } from "@/lib/admin.functions";
+import {
+  adminClaimOrder,
+  adminHeartbeatOrder,
+  adminReleaseOrder,
+} from "@/lib/presence.functions";
+import { useOrderPresence } from "@/lib/use-order-presence";
+import { useAuth } from "@/lib/auth-context";
 import { adminOrderWorkspace } from "@/lib/order-admin.functions";
 import { webOrderStatuses, smsTemplates, type OrderStatus } from "@/lib/admin-schema";
 import { renderSmsTemplate, orderSmsVars } from "@/lib/sms-template";
@@ -43,6 +50,9 @@ const updatableStatuses = ["no_response", "good_no_response", "hold", "cancelled
 type PendingStatus = (typeof updatableStatuses)[number];
 
 export const Route = createFileRoute("/admin/orders/$id")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    takeover: search["takeover"] ? 1 : undefined,
+  }),
   component: AdminOrderDetail,
 });
 
@@ -58,7 +68,50 @@ type OrderItemRow = {
 
 function AdminOrderDetail() {
   const { id } = useParams({ from: "/admin/orders/$id" });
+  const { takeover } = useSearch({ from: "/admin/orders/$id" });
+  const navigate = useNavigate();
   const qc = useQueryClient();
+  const { user } = useAuth();
+
+  // ---- Live presence: claim the order, heartbeat, release, react to takeovers ----
+  const presence = useOrderPresence([id]);
+  const held = presence[id];
+  const [blockedBy, setBlockedBy] = useState<string | null>(null);
+  const [evictedBy, setEvictedBy] = useState<string | null>(null);
+  const ownsRef = useRef(false);
+
+  const claim = async (force: boolean) => {
+    const res = await adminClaimOrder({ data: { id, ...(force ? { force: true } : {}) } });
+    if (res.ok) {
+      ownsRef.current = true;
+      setBlockedBy(null);
+    } else {
+      ownsRef.current = false;
+      setBlockedBy(res.heldBy);
+    }
+  };
+
+  useEffect(() => {
+    void claim(takeover === 1);
+    const beat = setInterval(() => {
+      if (ownsRef.current) void adminHeartbeatOrder({ data: { id } });
+    }, 25_000);
+    return () => {
+      clearInterval(beat);
+      if (ownsRef.current) void adminReleaseOrder({ data: { id } });
+      ownsRef.current = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
+
+  // Someone else claimed the order while we were inside it.
+  useEffect(() => {
+    if (!user || !held || !ownsRef.current) return;
+    if (held.user_id !== user.id) {
+      ownsRef.current = false;
+      setEvictedBy(held.actor_name);
+    }
+  }, [held, user]);
 
   const { data, isLoading } = useQuery({
     queryKey: ["admin", "order-workspace", id],
@@ -148,6 +201,21 @@ function AdminOrderDetail() {
 
   return (
     <div className="space-y-5">
+      <div className="flex items-center justify-between gap-3">
+        <Button asChild variant="outline" size="sm" className="rounded-xl">
+          <Link to="/admin/orders">
+            <ArrowLeft className="size-4" />
+            Back to orders
+          </Link>
+        </Button>
+        {held && user && held.user_id === user.id ? (
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-700 ring-1 ring-emerald-200">
+            <UserRound className="size-3.5" />
+            You are handling this order
+          </span>
+        ) : null}
+      </div>
+
       {/* Header: order number + status + status controls */}
       <Panel className="space-y-4">
         <div className="flex flex-wrap items-start justify-between gap-4">
@@ -406,6 +474,65 @@ function AdminOrderDetail() {
       <CommunicationLog logs={data.sms as never[]} autoStatus={order.auto_sms_status} />
 
       <ActivityLog entries={order.order_activity ?? []} />
+
+      {/* Another staff member already holds this order */}
+      <Dialog open={!!blockedBy} onOpenChange={() => {}}>
+        <DialogContent className="sm:max-w-md" hideClose>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-base">
+              <ShieldAlert className="size-4 text-rose-600" />
+              Order already open
+            </DialogTitle>
+            <DialogDescription>
+              <span className="font-semibold text-foreground">{blockedBy}</span> is handling this
+              order right now. Taking over will remove them from this workspace immediately and log
+              the takeover.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 sm:gap-2">
+            <Button variant="outline" onClick={() => void navigate({ to: "/admin/orders" })}>
+              <ArrowLeft className="size-4" />
+              Back to orders
+            </Button>
+            <Button variant="destructive" onClick={() => void claim(true)}>
+              <ShieldAlert className="size-4" />
+              Takeover
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* We were taken over by someone else */}
+      <Dialog open={!!evictedBy} onOpenChange={() => {}}>
+        <DialogContent className="sm:max-w-md" hideClose>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-base">
+              <ShieldAlert className="size-4 text-rose-600" />
+              You were taken over
+            </DialogTitle>
+            <DialogDescription>
+              <span className="font-semibold text-foreground">{evictedBy}</span> has taken over this
+              order. You no longer have it open.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 sm:gap-2">
+            <Button variant="outline" onClick={() => void navigate({ to: "/admin/orders" })}>
+              <ArrowLeft className="size-4" />
+              Back to orders
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => {
+                setEvictedBy(null);
+                void claim(true);
+              }}
+            >
+              <ShieldAlert className="size-4" />
+              Takeover
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
