@@ -295,20 +295,6 @@
   color: var(--foreground);
 }
 
-/* Keep admin typography larger and near-black for readability */
-.admin-scope h1,
-.admin-scope h2,
-.admin-scope h3,
-.admin-scope h4,
-.admin-scope label,
-.admin-scope p,
-.admin-scope td,
-.admin-scope th,
-.admin-scope li,
-.admin-scope span:not([class*="ig-text"]) {
-  color: inherit;
-}
-
 .admin-scope .text-xs {
   font-size: 0.85rem;
 }
