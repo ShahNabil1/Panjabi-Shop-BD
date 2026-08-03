@@ -102,8 +102,16 @@ export const placeOrder = createServerFn({ method: "POST" })
 
     const subtotal = lines.reduce((sum, l) => sum + l.lineTotal, 0);
     const rates = deliveryRates(settingsRes.data?.value);
+
+    const { findUpazila } = await import("./bd-geo");
+    if (!findUpazila(data.division, data.district, data.upazila)) {
+      throw new Error("INVALID_LOCATION");
+    }
+    const deliveryArea: DeliveryArea =
+      data.district === "ঢাকা" || data.district === "Dhaka" ? "inside_dhaka" : "outside_dhaka";
+
     const deliveryCharge =
-      rates.freeAbove > 0 && subtotal >= rates.freeAbove ? 0 : rates[data.deliveryArea];
+      rates.freeAbove > 0 && subtotal >= rates.freeAbove ? 0 : rates[deliveryArea];
     const total = subtotal + deliveryCharge;
 
     const { data: order, error: orderError } = await supabaseAdmin
@@ -111,10 +119,11 @@ export const placeOrder = createServerFn({ method: "POST" })
       .insert({
         customer_name: data.customerName,
         customer_phone: data.customerPhone,
-        customer_email: data.customerEmail || null,
-        address_line: data.addressLine,
-        city: data.city,
-        delivery_area: data.deliveryArea,
+        customer_email: null,
+        address_line: `${data.addressLine}, ${data.upazila}, ${data.district}, ${data.division}`,
+        city: data.district,
+        delivery_area: deliveryArea,
+
         note: data.note || null,
         subtotal,
         delivery_charge: deliveryCharge,

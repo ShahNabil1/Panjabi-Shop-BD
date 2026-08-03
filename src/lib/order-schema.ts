@@ -15,10 +15,10 @@ export const placeOrderSchema = z.object({
     .string()
     .trim()
     .regex(/^01[3-9]\d{8}$/, "Invalid Bangladeshi mobile number"),
-  customerEmail: z.string().trim().email().max(160).optional().or(z.literal("")),
   addressLine: z.string().trim().min(6).max(300),
-  city: z.string().trim().min(2).max(80),
-  deliveryArea: z.enum(DELIVERY_AREAS),
+  division: z.string().trim().min(2).max(60),
+  district: z.string().trim().min(2).max(60),
+  upazila: z.string().trim().min(2).max(80),
   note: z.string().trim().max(500).optional().or(z.literal("")),
   source: z.enum(["website", "landing"]).default("website"),
   items: z.array(orderLineSchema).min(1).max(30),
