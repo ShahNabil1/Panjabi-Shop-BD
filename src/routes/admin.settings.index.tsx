@@ -5,7 +5,6 @@ import { toast } from "sonner";
 import { ArrowDown, ArrowUp, ImagePlus, Trash2 } from "lucide-react";
 
 import { adminListSettings, adminSaveSetting } from "@/lib/admin.functions";
-import { getMediaStatus } from "@/lib/media.functions";
 import { AdminHeading, NumberField, Panel, TextField } from "@/components/admin/kit";
 import { ImageField } from "@/components/admin/image-upload";
 import { MAX_HERO_SLIDES, readHeroSlides, type HeroSlide } from "@/components/site/hero-slider";
@@ -29,7 +28,6 @@ function n(map: Obj, key: string, fallback = 0) {
 function SettingsAdmin() {
   const qc = useQueryClient();
   const { data } = useQuery({ queryKey: ["admin", "settings"], queryFn: () => adminListSettings() });
-  const media = useQuery({ queryKey: ["admin", "media-status"], queryFn: () => getMediaStatus() });
 
   const [general, setGeneral] = useState<Obj>({});
   const [contact, setContact] = useState<Obj>({});
@@ -55,6 +53,8 @@ function SettingsAdmin() {
     },
     onError: (e: Error) => toast.error(e.message),
   });
+
+  const freeAll = delivery["free_all"] === true;
 
   return (
     <div className="space-y-6 pb-16">
@@ -178,15 +178,6 @@ function SettingsAdmin() {
       </Panel>
 
 
-      <Panel className="space-y-2">
-        <h2 className="ig-text text-sm font-bold">Media storage (Cloudflare R2)</h2>
-        <p className="text-xs text-muted-foreground">
-          {media.data?.configured
-            ? "R2 connected — images can be uploaded directly from the admin panel. Files are WebP-compressed in the browser before upload."
-            : "R2 is not configured. Add the R2 secrets to enable image uploads."}
-        </p>
-      </Panel>
-
       <Panel className="space-y-4">
         <h2 className="ig-text text-sm font-bold">General</h2>
         <div className="grid gap-3 sm:grid-cols-2">
@@ -240,7 +231,35 @@ function SettingsAdmin() {
 
       <Panel className="space-y-4">
         <h2 className="ig-text text-sm font-bold">Delivery charges</h2>
-        <div className="grid gap-3 sm:grid-cols-3">
+
+        <label className="flex cursor-pointer items-center justify-between gap-4 rounded-xl border border-border/70 bg-background/40 px-3 py-2.5 transition-colors hover:border-primary/30">
+          <span>
+            <span className="ig-text block text-sm font-bold">Free delivery for all orders</span>
+            <span className="block text-xs text-muted-foreground">
+              When on, every order ships free and checkout shows the charge as FREE.
+            </span>
+          </span>
+          <input
+            type="checkbox"
+            role="switch"
+            checked={freeAll}
+            onChange={(e) => setDelivery({ ...delivery, free_all: e.target.checked })}
+            className="peer sr-only"
+          />
+          <span className="relative inline-flex h-6 w-11 shrink-0 items-center rounded-full bg-muted transition-colors duration-200 peer-checked:bg-emerald-500 peer-focus-visible:ring-2 peer-focus-visible:ring-emerald-500/40">
+            <span
+              className={`absolute left-0.5 size-5 rounded-full bg-white shadow transition-transform duration-200 ${
+                freeAll ? "translate-x-5" : "translate-x-0"
+              }`}
+            />
+          </span>
+        </label>
+
+        <div
+          className={`grid gap-3 transition-opacity duration-200 sm:grid-cols-3 ${
+            freeAll ? "pointer-events-none opacity-50" : ""
+          }`}
+        >
           <NumberField
             label="Inside Dhaka (৳)"
             value={n(delivery, "inside_dhaka", 60)}
