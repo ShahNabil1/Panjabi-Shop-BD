@@ -11,7 +11,12 @@ import { ProductThumb } from "@/components/site/product-card";
 import { QuantityStepper } from "@/components/site/add-to-cart";
 import { cn } from "@/lib/utils";
 
-export type DeliveryRates = { inside_dhaka: number; outside_dhaka: number; freeAbove: number };
+export type DeliveryRates = {
+  inside_dhaka: number;
+  outside_dhaka: number;
+  freeAbove: number;
+  freeAll?: boolean;
+};
 
 const inputClass =
   "w-full rounded-sm border border-border bg-background px-3 py-2.5 text-[15px] outline-none transition-colors focus:border-primary";
@@ -137,7 +142,8 @@ export function CheckoutForm({
     () => items.reduce((sum, i) => sum + i.price * i.quantity, 0),
     [items],
   );
-  const delivery = rates.freeAbove > 0 && subtotal >= rates.freeAbove ? 0 : rates[area];
+  const delivery =
+    rates.freeAll || (rates.freeAbove > 0 && subtotal >= rates.freeAbove) ? 0 : rates[area];
   const total = subtotal + delivery;
 
   const validate = () => {

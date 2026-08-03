@@ -34,7 +34,9 @@ export type OrderSummary = {
   }>;
 };
 
-function deliveryRates(raw: unknown): Record<DeliveryArea, number> & { freeAbove: number } {
+function deliveryRates(
+  raw: unknown,
+): Record<DeliveryArea, number> & { freeAbove: number; freeAll: boolean } {
   const v = (raw ?? {}) as Record<string, unknown>;
   const num = (value: unknown, fallback: number) =>
     typeof value === "number" && Number.isFinite(value) && value >= 0 ? value : fallback;
@@ -42,6 +44,8 @@ function deliveryRates(raw: unknown): Record<DeliveryArea, number> & { freeAbove
     inside_dhaka: num(v["inside_dhaka"], 60),
     outside_dhaka: num(v["outside_dhaka"], 120),
     freeAbove: num(v["free_above"], 0),
+    // Global "free delivery" switch from Settings → Delivery charges.
+    freeAll: v["free_all"] === true,
   };
 }
 
@@ -125,7 +129,9 @@ export const placeOrder = createServerFn({ method: "POST" })
       data.district === "ঢাকা" || data.district === "Dhaka" ? "inside_dhaka" : "outside_dhaka";
 
     const deliveryCharge =
-      rates.freeAbove > 0 && subtotal >= rates.freeAbove ? 0 : rates[deliveryArea];
+      rates.freeAll || (rates.freeAbove > 0 && subtotal >= rates.freeAbove)
+        ? 0
+        : rates[deliveryArea];
     const total = subtotal + deliveryCharge;
 
     const { data: order, error: orderError } = await supabaseAdmin

@@ -90,7 +90,7 @@ export const Route = createFileRoute("/lp/$slug")({
 function LandingPage() {
   const { lang } = useLang();
   const { landing, product, images, variants, rates } = Route.useLoaderData() as LandingPageData & {
-    rates: { inside_dhaka: number; outside_dhaka: number; freeAbove: number };
+    rates: { inside_dhaka: number; outside_dhaka: number; freeAbove: number; freeAll?: boolean };
   };
 
   const [variantId, setVariantId] = useState<string | null>(variants[0]?.id ?? null);
