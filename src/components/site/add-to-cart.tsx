@@ -1,4 +1,3 @@
-import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -62,8 +61,7 @@ export function AddToCartBar({
   className?: string;
 }) {
   const { lang } = useLang();
-  const { add } = useCart();
-  const navigate = useNavigate();
+  const { add, openCart } = useCart();
   const [qty, setQty] = useState(1);
   const soldOut = stock <= 0;
 
@@ -101,7 +99,7 @@ export function AddToCartBar({
         type="button"
         onClick={() => {
           addItem();
-          void navigate({ to: "/checkout" });
+          openCart("checkout");
         }}
         className="min-w-36 flex-1 rounded-sm bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
       >
