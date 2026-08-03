@@ -14,6 +14,8 @@ import {
   TextField,
   ToggleField,
 } from "@/components/admin/kit";
+import { ImageField, ImageUploadButton } from "@/components/admin/image-upload";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
