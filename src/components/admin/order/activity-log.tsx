@@ -8,7 +8,7 @@ import {
   ShoppingBag,
   StickyNote,
   Truck,
-} from "lucide-react";
+, ShieldAlert} from "lucide-react";
 
 import { Panel } from "@/components/admin/kit";
 import { Button } from "@/components/ui/button";
@@ -51,6 +51,12 @@ const KINDS: Record<
     ring: "bg-rose-100 text-rose-700",
     text: "text-rose-900",
     label: "Security",
+  },
+  takeover: {
+    icon: ShieldAlert,
+    ring: "bg-rose-100 text-rose-700",
+    text: "text-rose-900",
+    label: "Takeover",
   },
   courier: { icon: Truck, ring: "bg-indigo-100 text-indigo-700", text: "text-indigo-900", label: "Courier" },
 };
