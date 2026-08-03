@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Package, Plus, Save, Search, Trash2, Truck } from "lucide-react";
 
+import { advanceMethods } from "@/lib/admin-schema";
 import { adminSearchProducts } from "@/lib/admin.functions";
 import { adminSaveDeliveryNote, adminSaveOrderItems } from "@/lib/order-admin.functions";
 import { Panel } from "@/components/admin/kit";
@@ -88,17 +89,26 @@ export function ItemsCard({
   orderId,
   initialItems,
   deliveryCharge,
-  discount,
+  discount: initialDiscount,
+  advanceAmount: initialAdvance,
+  advanceMethod: initialAdvanceMethod,
 }: {
   orderId: string;
   initialItems: EditableItem[];
   deliveryCharge: number;
   discount: number;
+  advanceAmount?: number;
+  advanceMethod?: string | null;
 }) {
   const qc = useQueryClient();
   const [items, setItems] = useState<EditableItem[]>(initialItems);
   const [adding, setAdding] = useState(false);
   const [query, setQuery] = useState("");
+  const [discount, setDiscount] = useState(initialDiscount);
+  const [advance, setAdvance] = useState(initialAdvance ?? 0);
+  const [advanceMethod, setAdvanceMethod] = useState<string>(
+    initialAdvanceMethod ?? advanceMethods[0],
+  );
 
   const { data: results } = useQuery({
     queryKey: ["admin", "product-search", query],
@@ -108,6 +118,8 @@ export function ItemsCard({
 
   const subtotal = items.reduce((s, i) => s + i.unitPrice * i.quantity, 0);
   const total = Math.max(0, subtotal + deliveryCharge - discount);
+  const paidAdvance = Math.min(advance, total);
+  const due = Math.max(0, total - paidAdvance);
 
   const save = useMutation({
     mutationFn: () =>
@@ -117,6 +129,11 @@ export function ItemsCard({
           items: items.map(({ image: _image, ...rest }) => rest),
           deliveryCharge,
           discount,
+          advanceAmount: paidAdvance,
+          advanceMethod:
+            paidAdvance > 0
+              ? (advanceMethod as (typeof advanceMethods)[number])
+              : null,
         },
       }),
     onSuccess: async () => {
@@ -128,6 +145,7 @@ export function ItemsCard({
 
   const patch = (index: number, next: Partial<EditableItem>) =>
     setItems(items.map((it, i) => (i === index ? { ...it, ...next } : it)));
+
 
   return (
     <Panel className="space-y-4">
@@ -260,26 +278,84 @@ export function ItemsCard({
         ))}
       </ul>
 
+      <div className="grid gap-3 rounded-xl border border-border/70 bg-background/60 p-3 sm:grid-cols-2">
+        <div className="space-y-1.5">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+            Discount (৳)
+          </p>
+          <Input
+            type="number"
+            min={0}
+            className="h-9 rounded-lg"
+            value={discount}
+            onChange={(e) => setDiscount(Math.max(0, Number(e.target.value)))}
+          />
+        </div>
+        <div className="space-y-1.5">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+            Advance (৳)
+          </p>
+          <div className="flex gap-2">
+            <Input
+              type="number"
+              min={0}
+              className="h-9 rounded-lg"
+              value={advance}
+              onChange={(e) => setAdvance(Math.max(0, Number(e.target.value)))}
+            />
+            {advance > 0 ? (
+              <select
+                className="h-9 rounded-lg border border-border/80 bg-background px-2 text-sm"
+                value={advanceMethod}
+                onChange={(e) => setAdvanceMethod(e.target.value)}
+              >
+                {advanceMethods.map((m) => (
+                  <option key={m} value={m}>
+                    {m}
+                  </option>
+                ))}
+              </select>
+            ) : null}
+          </div>
+          {advance > 0 ? (
+            <p className="text-[11px] text-muted-foreground">
+              Paid via {advanceMethod} · rest is cash on delivery
+            </p>
+          ) : null}
+        </div>
+      </div>
+
       <dl className="space-y-1.5 border-t border-dashed border-border pt-3 text-sm">
         <div className="flex justify-end gap-3">
           <dt className="text-muted-foreground">Subtotal:</dt>
-          <dd className="w-24 text-right font-semibold tabular-nums">{money(subtotal)}</dd>
+          <dd className="w-28 text-right font-semibold tabular-nums">{money(subtotal)}</dd>
         </div>
         <div className="flex justify-end gap-3">
           <dt className="text-muted-foreground">Shipping:</dt>
-          <dd className="w-24 text-right font-semibold tabular-nums">{money(deliveryCharge)}</dd>
+          <dd className="w-28 text-right font-semibold tabular-nums">{money(deliveryCharge)}</dd>
         </div>
         {discount > 0 ? (
-          <div className="flex justify-end gap-3">
-            <dt className="text-muted-foreground">Discount:</dt>
-            <dd className="w-24 text-right font-semibold tabular-nums">-{money(discount)}</dd>
+          <div className="flex justify-end gap-3 text-emerald-600">
+            <dt>Discount:</dt>
+            <dd className="w-28 text-right font-semibold tabular-nums">-{money(discount)}</dd>
           </div>
         ) : null}
-        <div className="flex justify-end gap-3 text-base">
-          <dt className="font-semibold">Total:</dt>
-          <dd className="w-24 text-right font-bold tabular-nums text-primary">{money(total)}</dd>
+        <div className="flex justify-end gap-3">
+          <dt className="text-muted-foreground">Total:</dt>
+          <dd className="w-28 text-right font-semibold tabular-nums">{money(total)}</dd>
+        </div>
+        {paidAdvance > 0 ? (
+          <div className="flex justify-end gap-3 text-emerald-600">
+            <dt>Advance ({advanceMethod}):</dt>
+            <dd className="w-28 text-right font-semibold tabular-nums">-{money(paidAdvance)}</dd>
+          </div>
+        ) : null}
+        <div className="flex justify-end gap-3 border-t border-border/70 pt-2 text-base">
+          <dt className="font-semibold">{paidAdvance > 0 ? "Due (COD):" : "Total:"}</dt>
+          <dd className="w-28 text-right font-bold tabular-nums text-primary">{money(due)}</dd>
         </div>
       </dl>
+
     </Panel>
   );
 }

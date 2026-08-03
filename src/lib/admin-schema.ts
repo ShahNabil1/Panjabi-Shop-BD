@@ -371,6 +371,8 @@ export const orderItemsSchema = z.object({
     .max(30),
   deliveryCharge: z.number().min(0).default(0),
   discount: z.number().min(0).default(0),
+  advanceAmount: z.number().min(0).default(0),
+  advanceMethod: z.enum(advanceMethods).nullable().default(null),
 });
 
 export const orderNoteSchema = z.object({

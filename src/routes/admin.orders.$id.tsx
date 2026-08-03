@@ -94,6 +94,8 @@ function AdminOrderDetail() {
     delivery_partner: string | null;
     delivery_charge: number | string;
     discount: number | string;
+    advance_amount?: number | string | null;
+    advance_method?: string | null;
     fulfillment_status: string;
     auto_sms_status: string;
     source: string;
@@ -255,6 +257,8 @@ function AdminOrderDetail() {
         orderId={order.id}
         deliveryCharge={Number(order.delivery_charge ?? 0)}
         discount={Number(order.discount ?? 0)}
+        advanceAmount={Number(order.advance_amount ?? 0)}
+        advanceMethod={order.advance_method ?? null}
         initialItems={(order.order_items ?? []).map((i) => ({
           productId: i.product_id,
           productName: i.product_name,
