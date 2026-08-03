@@ -122,6 +122,14 @@ function ProductPage() {
     groups.set(key, list);
   }
 
+  const selectedIds = Object.values(selected);
+  const activeVariant =
+    variants.find((v) => selectedIds.includes(v.id)) ??
+    (groups.size === 1 ? (variants[0] ?? null) : null);
+  const unitPrice = product.price + Number(activeVariant?.price_delta ?? 0);
+
+
+
   const productFaqs = (product.faq ?? []).map((f, i) => ({
     id: String(i),
     question_bn: f["question_bn"] ?? f["question"] ?? "",
