@@ -82,6 +82,8 @@ export const t = {
   added: { bn: "কার্টে যোগ হয়েছে", en: "Added to cart" },
   emptyCart: { bn: "আপনার কার্ট খালি।", en: "Your cart is empty." },
   continueShopping: { bn: "কেনাকাটা চালিয়ে যান", en: "Continue shopping" },
+  downloadInvoice: { bn: "ইনভয়েস ডাউনলোড", en: "Download invoice" },
+
   quantity: { bn: "পরিমাণ", en: "Quantity" },
   remove: { bn: "সরান", en: "Remove" },
   subtotal: { bn: "সাবটোটাল", en: "Subtotal" },
