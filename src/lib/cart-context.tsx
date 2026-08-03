@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 
-const CART_KEY = "tantghor_cart_v1";
+const CART_KEY = "upoharkabbo_cart_v1";
 
 export type CartItem = {
   key: string;
