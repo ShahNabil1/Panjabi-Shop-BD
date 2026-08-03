@@ -19,6 +19,7 @@ import { SiteHeader } from "../components/site/site-header";
 import { SiteFooter } from "../components/site/site-footer";
 import { NotFoundView } from "../components/site/not-found-view";
 import { CartProvider } from "../lib/cart-context";
+import { CartDrawer } from "@/components/site/cart-drawer";
 import { AuthProvider } from "../lib/auth-context";
 import { Toaster } from "../components/ui/sonner";
 import { SITE_URL } from "../lib/site";
@@ -176,6 +177,7 @@ function RootComponent() {
               {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
               <Outlet />
             </Chrome>
+            <CartDrawer />
             <Toaster position="top-center" richColors closeButton />
           </CartProvider>
         </AuthProvider>

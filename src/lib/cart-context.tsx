@@ -21,11 +21,18 @@ export type CartItem = {
 
 export type NewCartItem = Omit<CartItem, "key">;
 
+export type CartStep = "cart" | "checkout";
+
 type CartContextValue = {
   items: CartItem[];
   count: number;
   subtotal: number;
   ready: boolean;
+  open: boolean;
+  step: CartStep;
+  openCart: (step?: CartStep) => void;
+  closeCart: () => void;
+  setStep: (step: CartStep) => void;
   add: (item: NewCartItem) => void;
   setQuantity: (key: string, quantity: number) => void;
   remove: (key: string) => void;
@@ -69,6 +76,8 @@ function readStorage(): CartItem[] {
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [ready, setReady] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [step, setStep] = useState<CartStep>("cart");
 
   useEffect(() => {
     setItems(readStorage());
@@ -117,11 +126,32 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const clear = useCallback(() => setItems([]), []);
 
+  const openCart = useCallback((next: CartStep = "cart") => {
+    setStep(next);
+    setOpen(true);
+  }, []);
+
+  const closeCart = useCallback(() => setOpen(false), []);
+
   const value = useMemo<CartContextValue>(() => {
     const count = items.reduce((sum, i) => sum + i.quantity, 0);
     const subtotal = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
-    return { items, count, subtotal, ready, add, setQuantity, remove, clear };
-  }, [items, ready, add, setQuantity, remove, clear]);
+    return {
+      items,
+      count,
+      subtotal,
+      ready,
+      open,
+      step,
+      openCart,
+      closeCart,
+      setStep,
+      add,
+      setQuantity,
+      remove,
+      clear,
+    };
+  }, [items, ready, open, step, openCart, closeCart, add, setQuantity, remove, clear]);
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }

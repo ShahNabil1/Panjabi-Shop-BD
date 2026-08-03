@@ -104,11 +104,12 @@ function SearchBox({ onDone }: { onDone?: () => void }) {
 
 function CartButton({ className }: { className?: string }) {
   const { lang } = useLang();
-  const { count, ready } = useCart();
+  const { count, ready, openCart } = useCart();
 
   return (
-    <Link
-      to="/cart"
+    <button
+      type="button"
+      onClick={() => openCart("cart")}
       aria-label={tr(lang, "cart")}
       className={cn(
         "relative grid h-10 w-10 place-items-center rounded-sm border border-border transition-colors hover:border-primary hover:text-primary",
@@ -125,7 +126,7 @@ function CartButton({ className }: { className?: string }) {
           {formatNumber(lang, count)}
         </span>
       ) : null}
-    </Link>
+    </button>
   );
 }
 
