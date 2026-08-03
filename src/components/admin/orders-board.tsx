@@ -44,7 +44,18 @@ export function OrdersBoard({
   const [status, setStatus] = useState<string>(statuses[0]!);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
+  const PAGE_SIZE_KEY = "admin.orders.pageSize";
   const [pageSize, setPageSize] = useState(20);
+
+  useEffect(() => {
+    const saved = Number(localStorage.getItem(PAGE_SIZE_KEY));
+    if (saved && saved !== pageSize) setPageSize(saved);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem(PAGE_SIZE_KEY, String(pageSize));
+  }, [pageSize]);
 
   useEffect(() => {
     setPage(1);
