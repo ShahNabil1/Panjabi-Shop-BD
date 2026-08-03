@@ -128,7 +128,9 @@ export const adminUpdateOrderStatus = createServerFn({ method: "POST" })
     await db.from("order_activity").insert({
       order_id: data.id,
       kind: "status",
-      message: `Status changed to ${data.status}`,
+      message: data.reason
+        ? `Status changed to ${data.status} — ${data.reason}`
+        : `Status changed to ${data.status}`,
     });
     return { ok: true };
   });

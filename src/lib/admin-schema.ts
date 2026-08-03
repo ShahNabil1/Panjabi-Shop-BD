@@ -55,6 +55,7 @@ export const idSchema = z.object({ id: uuid });
 export const orderStatusSchema = z.object({
   id: uuid,
   status: z.enum(orderStatuses),
+  reason: z.string().trim().max(500).optional(),
 });
 
 export const orderListSchema = z.object({

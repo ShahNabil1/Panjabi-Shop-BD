@@ -1,16 +1,27 @@
 import { Link, createFileRoute, useParams } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { FileText, ArrowLeft, CheckCircle2, History } from "lucide-react";
+import { FileText, CheckCircle2, History } from "lucide-react";
 import { useState } from "react";
 
 import { adminEditOrder, adminGetOrder, adminUpdateOrderStatus } from "@/lib/admin.functions";
-import { listOrderStatuses, webOrderStatuses } from "@/lib/admin-schema";
+import { webOrderStatuses, type OrderStatus } from "@/lib/admin-schema";
 import { TextField, AreaField, NumberField } from "@/components/admin/kit";
 import { AdminHeading, Panel, StatusPill, statusLabels } from "@/components/admin/kit";
 import { BrandLoader } from "@/components/admin/brand-loader";
 import { CourierReport } from "@/components/admin/courier-report";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+const updatableStatuses = ["no_response", "good_no_response", "hold", "cancelled"] as const;
+type PendingStatus = (typeof updatableStatuses)[number] | "pending";
 
 export const Route = createFileRoute("/admin/orders/$id")({
   component: AdminOrderDetail,
@@ -61,11 +72,18 @@ function AdminOrderDetail() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const [pending, setPending] = useState<PendingStatus | null>(null);
+  const [reason, setReason] = useState("");
+
   const update = useMutation({
-    mutationFn: (status: (typeof listOrderStatuses)[number] | (typeof webOrderStatuses)[number]) =>
-      adminUpdateOrderStatus({ data: { id, status } }),
+    mutationFn: (input: { status: OrderStatus; reason?: string }) =>
+      adminUpdateOrderStatus({
+        data: { id, status: input.status, ...(input.reason ? { reason: input.reason } : {}) },
+      }),
     onSuccess: async () => {
       toast.success("Status updated");
+      setPending(null);
+      setReason("");
       await qc.invalidateQueries({ queryKey: ["admin"] });
     },
     onError: (e: Error) => toast.error(e.message),
@@ -129,7 +147,8 @@ function AdminOrderDetail() {
         description={new Date(order.created_at).toLocaleString("en-GB")}
 
         action={
-          <div className="flex gap-2">
+          <div className="flex items-center gap-2">
+            <StatusPill status={order.status} />
             <Button asChild size="sm">
               <Link
                 to="/invoice/$orderNumber"
@@ -141,44 +160,81 @@ function AdminOrderDetail() {
                 Invoice
               </Link>
             </Button>
-            <Button asChild variant="outline" size="sm">
-              <Link to="/admin/orders">
-                <ArrowLeft className="size-4" />
-                Back
-              </Link>
-            </Button>
           </div>
         }
       />
 
-      <Panel>
-        <div className="flex flex-wrap items-center gap-2">
-          <StatusPill status={order.status} />
-          {isWeb ? (
+      <Panel className="space-y-4">
+        {isWeb ? (
+          <Button
+            size="lg"
+            disabled={update.isPending}
+            onClick={() => update.mutate({ status: "pending" })}
+            className="w-full"
+          >
+            <CheckCircle2 className="size-5" />
+            Confirm Order
+          </Button>
+        ) : null}
+
+        <div className="space-y-3">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+            Update status
+          </p>
+          <Select
+            value={pending ?? ""}
+            onValueChange={(v) => {
+              setPending(v as PendingStatus);
+              setReason("");
+            }}
+          >
+            <SelectTrigger className="max-w-sm rounded-xl">
+              <SelectValue placeholder="Select a status" />
+            </SelectTrigger>
+            <SelectContent>
+              {updatableStatuses.map((s) => (
+                <SelectItem key={s} value={s} disabled={s === order.status}>
+                  {statusLabels[s]}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          {pending === "hold" || pending === "cancelled" ? (
+            <div
+              className={
+                pending === "hold"
+                  ? "max-w-sm space-y-2 rounded-xl border border-amber-300 bg-amber-50 p-3"
+                  : "max-w-sm space-y-2 rounded-xl border border-rose-300 bg-rose-50 p-3"
+              }
+            >
+              <Input
+                value={reason}
+                onChange={(e) => setReason(e.target.value)}
+                placeholder={pending === "hold" ? "Reason for hold" : "Reason for cancellation"}
+                className="h-9 rounded-lg border-border/70 bg-white/80 text-sm"
+              />
+              <Button
+                size="sm"
+                variant={pending === "hold" ? "default" : "destructive"}
+                disabled={update.isPending || reason.trim().length === 0}
+                onClick={() => update.mutate({ status: pending, reason: reason.trim() })}
+              >
+                {pending === "hold" ? "Hold" : "Cancel Order"}
+              </Button>
+            </div>
+          ) : pending ? (
             <Button
               size="sm"
               disabled={update.isPending}
-              onClick={() => update.mutate("pending")}
-              className="transition-transform duration-200 hover:-translate-y-0.5"
+              onClick={() => update.mutate({ status: pending })}
             >
-              <CheckCircle2 className="size-4" />
-              Confirm order
+              Confirm change to {statusLabels[pending]}
             </Button>
           ) : null}
-          {(isWeb ? webOrderStatuses : listOrderStatuses).map((s) => (
-            <Button
-              key={s}
-              size="sm"
-              variant={s === order.status ? "default" : "outline"}
-              disabled={update.isPending || s === order.status}
-              onClick={() => update.mutate(s)}
-              className="transition-transform duration-200 hover:-translate-y-0.5"
-            >
-              {statusLabels[s]}
-            </Button>
-          ))}
         </div>
       </Panel>
+
 
       {isWeb ? (
         <Panel>
