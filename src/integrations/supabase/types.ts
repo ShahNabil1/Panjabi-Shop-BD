@@ -199,6 +199,41 @@ export type Database = {
           },
         ]
       }
+      order_activity: {
+        Row: {
+          created_at: string
+          id: string
+          kind: string
+          message: string
+          meta: Json
+          order_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          kind?: string
+          message: string
+          meta?: Json
+          order_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          kind?: string
+          message?: string
+          meta?: Json
+          order_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_activity_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       order_items: {
         Row: {
           created_at: string
@@ -790,6 +825,10 @@ export type Database = {
         | "delivered"
         | "cancelled"
         | "returned"
+        | "incomplete"
+        | "no_response"
+        | "good_no_response"
+        | "hold"
       promotion_type: "offer" | "featured" | "flash" | "new_arrival"
     }
     CompositeTypes: {
@@ -927,6 +966,10 @@ export const Constants = {
         "delivered",
         "cancelled",
         "returned",
+        "incomplete",
+        "no_response",
+        "good_no_response",
+        "hold",
       ],
       promotion_type: ["offer", "featured", "flash", "new_arrival"],
     },

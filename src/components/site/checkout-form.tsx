@@ -1,11 +1,11 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { useCart, type CartItem } from "@/lib/cart-context";
 import { useLang } from "@/lib/language-context";
 import { formatNumber, formatPrice, pick, tr } from "@/lib/i18n";
-import { placeOrder } from "@/lib/order.functions";
+import { captureIncompleteOrder, placeOrder } from "@/lib/order.functions";
 import { BD_DIVISIONS } from "@/lib/bd-geo";
 import { ProductThumb } from "@/components/site/product-card";
 import { QuantityStepper } from "@/components/site/add-to-cart";
@@ -73,6 +73,53 @@ export function CheckoutForm({
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [pending, setPending] = useState(false);
   const [failed, setFailed] = useState(false);
+  const placedRef = useRef(false);
+  const capturedRef = useRef("");
+
+  // Abandoned checkout capture: a valid phone number with items in the cart is
+  // reported to the admin panel when the visitor leaves without ordering.
+  const snapshot = useRef({ name, phone, address, division, district, upazila, note, items, source });
+  snapshot.current = { name, phone, address, division, district, upazila, note, items, source };
+
+  useEffect(() => {
+    const flush = () => {
+      const s = snapshot.current;
+      if (placedRef.current) return;
+      if (!/^01[3-9]\d{8}$/.test(s.phone.trim())) return;
+      if (!s.items.length) return;
+      const key = `${s.phone.trim()}|${s.items.map((i) => `${i.productId}:${i.variantId ?? ""}:${i.quantity}`).join(",")}|${s.name}|${s.address}`;
+      if (capturedRef.current === key) return;
+      capturedRef.current = key;
+      void captureIncompleteOrder({
+        data: {
+          customerPhone: s.phone.trim(),
+          customerName: s.name.trim(),
+          addressLine: s.address.trim(),
+          division: s.division,
+          district: s.district,
+          upazila: s.upazila,
+          note: s.note.trim(),
+          source: s.source,
+          items: s.items.map((i) => ({
+            productId: i.productId,
+            variantId: i.variantId,
+            quantity: i.quantity,
+          })),
+        },
+      }).catch(() => undefined);
+    };
+
+    const onHide = () => {
+      if (document.visibilityState === "hidden") flush();
+    };
+    document.addEventListener("visibilitychange", onHide);
+    window.addEventListener("pagehide", flush);
+    return () => {
+      document.removeEventListener("visibilitychange", onHide);
+      window.removeEventListener("pagehide", flush);
+      flush();
+    };
+  }, []);
 
   const divisionObj = useMemo(
     () => BD_DIVISIONS.find((d) => d.bn === division) ?? null,
@@ -131,6 +178,7 @@ export function CheckoutForm({
           })),
         },
       });
+      placedRef.current = true;
       onPlaced?.();
       clear();
       void navigate({

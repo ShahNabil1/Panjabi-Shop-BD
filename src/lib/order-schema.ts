@@ -30,3 +30,21 @@ export const orderLookupSchema = z.object({
   orderNumber: z.string().trim().min(4).max(40),
   phone: z.string().trim().min(6).max(20),
 });
+
+/** Partial checkout capture — only the phone number is strictly required. */
+export const incompleteOrderSchema = z.object({
+  customerPhone: z
+    .string()
+    .trim()
+    .regex(/^01[3-9]\d{8}$/, "Invalid Bangladeshi mobile number"),
+  customerName: z.string().trim().max(80).optional().default(""),
+  addressLine: z.string().trim().max(300).optional().default(""),
+  division: z.string().trim().max(60).optional().default(""),
+  district: z.string().trim().max(60).optional().default(""),
+  upazila: z.string().trim().max(80).optional().default(""),
+  note: z.string().trim().max(500).optional().default(""),
+  source: z.enum(["website", "landing"]).default("website"),
+  items: z.array(orderLineSchema).min(1).max(30),
+});
+
+export type IncompleteOrderInput = z.infer<typeof incompleteOrderSchema>;

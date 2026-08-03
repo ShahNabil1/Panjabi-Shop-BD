@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 
-import { orderLookupSchema, placeOrderSchema } from "./order-schema";
+import { incompleteOrderSchema, orderLookupSchema, placeOrderSchema } from "./order-schema";
 import type { DeliveryArea } from "./order-schema";
 
 export type PlacedOrder = {
@@ -144,7 +144,7 @@ export const placeOrder = createServerFn({ method: "POST" })
         discount: 0,
         total,
         payment_method: "cod",
-        status: "pending",
+        status: "processing",
         source: data.source,
         customer_ip: clientIp,
       })
@@ -168,6 +168,13 @@ export const placeOrder = createServerFn({ method: "POST" })
     );
 
     if (itemsError) throw new Error("ORDER_ITEMS_FAILED");
+
+    // A completed order clears any abandoned checkout captured for this phone.
+    await supabaseAdmin
+      .from("orders")
+      .delete()
+      .eq("customer_phone", data.customerPhone)
+      .eq("status", "incomplete");
 
     return { orderNumber: order.order_number, subtotal, deliveryCharge, discount: 0, total };
   });
@@ -224,4 +231,173 @@ export const getOrderSummary = createServerFn({ method: "GET" })
         lineTotal: Number(i.line_total),
       })),
     };
+  });
+
+
+/** Stable fingerprint of an abandoned checkout, used to de-duplicate captures. */
+function captureSignature(input: {
+  name: string;
+  address: string;
+  items: Array<{ product_name: string; variant_label: string | null; quantity: number }>;
+}) {
+  const items = input.items
+    .map((i) => `${i.product_name}|${i.variant_label ?? ""}|${i.quantity}`)
+    .sort()
+    .join("~");
+  return `${input.name.trim().toLowerCase()}#${input.address.trim().toLowerCase()}#${items}`;
+}
+
+/**
+ * Captures an abandoned checkout (valid phone entered, order never placed).
+ * Repeat visits from the same number update the existing record and append an
+ * activity log entry instead of creating duplicate orders.
+ */
+export const captureIncompleteOrder = createServerFn({ method: "POST" })
+  .inputValidator((input: unknown) => incompleteOrderSchema.parse(input))
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    const productIds = [...new Set(data.items.map((i) => i.productId))];
+    const variantIds = [...new Set(data.items.map((i) => i.variantId).filter(Boolean))] as string[];
+
+    const [productsRes, variantsRes] = await Promise.all([
+      supabaseAdmin
+        .from("products")
+        .select("id, slug, name_bn, price, sku")
+        .in("id", productIds),
+      variantIds.length
+        ? supabaseAdmin
+            .from("product_variants")
+            .select("id, product_id, value_bn, group_name_bn, price_delta, sku")
+            .in("id", variantIds)
+        : Promise.resolve({ data: [], error: null }),
+    ]);
+
+    const products = productsRes.data ?? [];
+    const variants = variantsRes.data ?? [];
+    if (!products.length) return { ok: false as const };
+
+    const lines = data.items.flatMap((item) => {
+      const product = products.find((p) => p.id === item.productId);
+      if (!product) return [];
+      const variant = item.variantId ? variants.find((v) => v.id === item.variantId) : null;
+      const unitPrice = Number(product.price) + Number(variant?.price_delta ?? 0);
+      return [
+        {
+          product_id: product.id,
+          product_name: product.name_bn,
+          product_slug: product.slug,
+          variant_label: variant ? `${variant.group_name_bn}: ${variant.value_bn}` : null,
+          sku: variant?.sku ?? product.sku,
+          unit_price: unitPrice,
+          quantity: item.quantity,
+          line_total: unitPrice * item.quantity,
+        },
+      ];
+    });
+    if (!lines.length) return { ok: false as const };
+
+    const subtotal = lines.reduce((sum, l) => sum + l.line_total, 0);
+    const addressLine = [data.addressLine, data.upazila, data.district, data.division]
+      .filter(Boolean)
+      .join(", ");
+    const name = data.customerName || "Unknown";
+
+    // Never capture when the same number already placed a real order in the last day.
+    const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+    const { data: recent } = await supabaseAdmin
+      .from("orders")
+      .select("id")
+      .eq("customer_phone", data.customerPhone)
+      .neq("status", "incomplete")
+      .gte("created_at", since)
+      .limit(1);
+    if (recent && recent.length) return { ok: false as const };
+
+    const { data: existing } = await supabaseAdmin
+      .from("orders")
+      .select("id, customer_name, address_line, order_items(product_name, variant_label, quantity)")
+      .eq("customer_phone", data.customerPhone)
+      .eq("status", "incomplete")
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    const nextSignature = captureSignature({ name, address: addressLine, items: lines });
+
+    if (existing) {
+      const prevSignature = captureSignature({
+        name: existing.customer_name ?? "",
+        address: existing.address_line ?? "",
+        items: (existing.order_items ?? []) as Array<{
+          product_name: string;
+          variant_label: string | null;
+          quantity: number;
+        }>,
+      });
+
+      if (prevSignature !== nextSignature) {
+        await supabaseAdmin
+          .from("orders")
+          .update({
+            customer_name: name,
+            address_line: addressLine,
+            city: data.district || "—",
+            note: data.note || null,
+            subtotal,
+            total: subtotal,
+            source: data.source,
+          })
+          .eq("id", existing.id);
+        await supabaseAdmin.from("order_items").delete().eq("order_id", existing.id);
+        await supabaseAdmin
+          .from("order_items")
+          .insert(lines.map((l) => ({ ...l, order_id: existing.id })));
+      }
+
+      await supabaseAdmin.from("order_activity").insert({
+        order_id: existing.id,
+        kind: prevSignature === nextSignature ? "revisit" : "update",
+        message:
+          prevSignature === nextSignature
+            ? "Customer returned and left checkout again with the same details"
+            : "Customer returned with updated checkout details",
+        meta: { source: data.source, subtotal },
+      });
+
+      return { ok: true as const, deduplicated: true };
+    }
+
+    const { data: order } = await supabaseAdmin
+      .from("orders")
+      .insert({
+        customer_name: name,
+        customer_phone: data.customerPhone,
+        address_line: addressLine || "—",
+        city: data.district || "—",
+        note: data.note || null,
+        subtotal,
+        delivery_charge: 0,
+        discount: 0,
+        total: subtotal,
+        payment_method: "cod",
+        status: "incomplete",
+        source: data.source,
+      })
+      .select("id")
+      .single();
+
+    if (!order) return { ok: false as const };
+
+    await supabaseAdmin
+      .from("order_items")
+      .insert(lines.map((l) => ({ ...l, order_id: order.id })));
+    await supabaseAdmin.from("order_activity").insert({
+      order_id: order.id,
+      kind: "capture",
+      message: "Abandoned checkout captured from the website",
+      meta: { source: data.source, subtotal },
+    });
+
+    return { ok: true as const, deduplicated: false };
   });

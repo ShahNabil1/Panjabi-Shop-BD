@@ -1,10 +1,12 @@
 import { Link, createFileRoute, useParams } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { FileText, ArrowLeft } from "lucide-react";
+import { FileText, ArrowLeft, CheckCircle2, History } from "lucide-react";
+import { useState } from "react";
 
-import { adminGetOrder, adminUpdateOrderStatus } from "@/lib/admin.functions";
-import { orderStatuses } from "@/lib/admin-schema";
+import { adminEditOrder, adminGetOrder, adminUpdateOrderStatus } from "@/lib/admin.functions";
+import { listOrderStatuses, webOrderStatuses } from "@/lib/admin-schema";
+import { TextField, AreaField, NumberField } from "@/components/admin/kit";
 import { AdminHeading, Panel, StatusPill, statusLabels } from "@/components/admin/kit";
 import { BrandLoader } from "@/components/admin/brand-loader";
 import { CourierReport } from "@/components/admin/courier-report";
@@ -38,8 +40,29 @@ function AdminOrderDetail() {
     queryFn: () => adminGetOrder({ data: { id } }),
   });
 
+  const [edited, setEdited] = useState<null | {
+    customerName: string;
+    customerPhone: string;
+    addressLine: string;
+    note: string;
+    discount: number;
+    deliveryCharge: number;
+  }>(null);
+
+  const save = useMutation({
+    mutationFn: () => {
+      if (!edited) throw new Error("Nothing to save");
+      return adminEditOrder({ data: { id, ...edited } });
+    },
+    onSuccess: async () => {
+      toast.success("Order updated");
+      await qc.invalidateQueries({ queryKey: ["admin"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
   const update = useMutation({
-    mutationFn: (status: (typeof orderStatuses)[number]) =>
+    mutationFn: (status: (typeof listOrderStatuses)[number] | (typeof webOrderStatuses)[number]) =>
       adminUpdateOrderStatus({ data: { id, status } }),
     onSuccess: async () => {
       toast.success("Status updated");
@@ -78,7 +101,24 @@ function AdminOrderDetail() {
     payment_method: string;
     source: string;
     order_items: OrderItem[];
+    order_activity?: Array<{
+      id: string;
+      kind: string;
+      message: string | null;
+      created_at: string;
+    }>;
   };
+
+  const isWeb = (webOrderStatuses as readonly string[]).includes(order.status);
+  const form = edited ?? {
+    customerName: order.customer_name,
+    customerPhone: order.customer_phone,
+    addressLine: order.address_line,
+    note: order.note ?? "",
+    discount: Number(order.discount ?? 0),
+    deliveryCharge: Number(order.delivery_charge ?? 0),
+  };
+  const setForm = setEdited;
 
   return (
     <div className="space-y-5">
@@ -114,7 +154,18 @@ function AdminOrderDetail() {
       <Panel>
         <div className="flex flex-wrap items-center gap-2">
           <StatusPill status={order.status} />
-          {orderStatuses.map((s) => (
+          {isWeb ? (
+            <Button
+              size="sm"
+              disabled={update.isPending}
+              onClick={() => update.mutate("pending")}
+              className="transition-transform duration-200 hover:-translate-y-0.5"
+            >
+              <CheckCircle2 className="size-4" />
+              Confirm order
+            </Button>
+          ) : null}
+          {(isWeb ? webOrderStatuses : listOrderStatuses).map((s) => (
             <Button
               key={s}
               size="sm"
@@ -127,6 +178,52 @@ function AdminOrderDetail() {
             </Button>
           ))}
         </div>
+      </Panel>
+
+      {isWeb ? (
+        <Panel>
+          <h2 className="ig-text text-sm font-bold">Edit customer details</h2>
+          <div className="mt-3 grid gap-3 sm:grid-cols-2">
+            <TextField label="Customer name" value={form.customerName} onChange={(v) => setForm({ ...form, customerName: v })} />
+            <TextField label="Phone" value={form.customerPhone} onChange={(v) => setForm({ ...form, customerPhone: v })} />
+            <div className="sm:col-span-2">
+              <AreaField label="Address" value={form.addressLine} onChange={(v) => setForm({ ...form, addressLine: v })} />
+            </div>
+            <NumberField label="Delivery charge" value={form.deliveryCharge} onChange={(v) => setForm({ ...form, deliveryCharge: v })} />
+            <NumberField label="Discount" value={form.discount} onChange={(v) => setForm({ ...form, discount: v })} />
+            <div className="sm:col-span-2">
+              <AreaField label="Note" value={form.note} onChange={(v) => setForm({ ...form, note: v })} />
+            </div>
+          </div>
+          <div className="mt-3">
+            <Button size="sm" disabled={save.isPending} onClick={() => save.mutate()}>
+              Save changes
+            </Button>
+          </div>
+        </Panel>
+      ) : null}
+
+      <Panel>
+        <h2 className="ig-text flex items-center gap-2 text-sm font-bold">
+          <History className="size-4" />
+          Activity log
+        </h2>
+        {(order.order_activity ?? []).length === 0 ? (
+          <p className="mt-2 text-sm text-muted-foreground">No activity recorded yet.</p>
+        ) : (
+          <ul className="mt-3 space-y-2 text-sm">
+            {[...(order.order_activity ?? [])]
+              .sort((a, b) => (a.created_at < b.created_at ? 1 : -1))
+              .map((a) => (
+                <li key={a.id} className="flex flex-wrap justify-between gap-2 border-b border-border pb-2 last:border-0">
+                  <span>{a.message ?? a.kind}</span>
+                  <span className="text-xs text-muted-foreground">
+                    {new Date(a.created_at).toLocaleString("en-GB", { timeZone: "Asia/Dhaka" })}
+                  </span>
+                </li>
+              ))}
+          </ul>
+        )}
       </Panel>
 
       <CourierReport phone={order.customer_phone} />

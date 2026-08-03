@@ -223,6 +223,10 @@ const statusStyles: Record<string, string> = {
   pending: "bg-slate-100 text-slate-800 ring-slate-200",
   confirmed: "bg-sky-100 text-sky-900 ring-sky-200",
   processing: "bg-indigo-100 text-indigo-900 ring-indigo-200",
+  incomplete: "bg-orange-100 text-orange-900 ring-orange-200",
+  no_response: "bg-zinc-100 text-zinc-800 ring-zinc-200",
+  good_no_response: "bg-teal-100 text-teal-900 ring-teal-200",
+  hold: "bg-fuchsia-100 text-fuchsia-900 ring-fuchsia-200",
   shipped: "bg-violet-100 text-violet-900 ring-violet-200",
   delivered: "bg-emerald-100 text-emerald-900 ring-emerald-200",
   cancelled: "bg-rose-100 text-rose-900 ring-rose-200",
@@ -233,11 +237,16 @@ export const statusLabels: Record<string, string> = {
   pending: "Pending",
   confirmed: "Confirmed",
   processing: "Processing",
+  incomplete: "Incomplete",
+  no_response: "No Response",
+  good_no_response: "Good But No Response",
+  hold: "Hold",
   shipped: "Shipped",
   delivered: "Delivered",
   cancelled: "Cancelled",
   returned: "Returned",
 };
+
 
 export function StatusPill({ status }: { status: string }) {
   return (

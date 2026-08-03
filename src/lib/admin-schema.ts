@@ -4,12 +4,40 @@ export const orderStatuses = [
   "pending",
   "confirmed",
   "processing",
+  "incomplete",
+  "no_response",
+  "good_no_response",
+  "hold",
   "shipped",
   "delivered",
   "cancelled",
   "returned",
 ] as const;
 export type OrderStatus = (typeof orderStatuses)[number];
+
+/** Statuses shown on the Web Orders screen (incoming website / landing traffic). */
+export const webOrderStatuses = [
+  "processing",
+  "incomplete",
+  "no_response",
+  "good_no_response",
+  "hold",
+  "cancelled",
+] as const;
+
+/** Statuses shown on the Order List screen (confirmed fulfilment pipeline). */
+export const listOrderStatuses = [
+  "pending",
+  "confirmed",
+  "shipped",
+  "delivered",
+  "cancelled",
+  "returned",
+] as const;
+
+export const orderBuckets = ["web", "list"] as const;
+export type OrderBucket = (typeof orderBuckets)[number];
+
 
 export const promotionTypes = ["offer", "featured", "flash", "new_arrival"] as const;
 
@@ -31,8 +59,24 @@ export const orderStatusSchema = z.object({
 
 export const orderListSchema = z.object({
   status: z.enum(orderStatuses).optional(),
+  bucket: z.enum(orderBuckets).optional(),
   search: z.string().trim().max(120).optional(),
 });
+
+/** Edit of an incomplete / web order captured before confirmation. */
+export const adminEditOrderSchema = z.object({
+  id: uuid,
+  customerName: z.string().trim().min(2).max(80),
+  customerPhone: z
+    .string()
+    .trim()
+    .regex(/^01[3-9]\d{8}$/, "Invalid Bangladeshi mobile number"),
+  addressLine: z.string().trim().min(4).max(300),
+  note: z.string().trim().max(500).optional().default(""),
+  discount: z.number().min(0).default(0),
+  deliveryCharge: z.number().min(0).default(0),
+});
+
 
 export const orderSources = [
   "Facebook",
