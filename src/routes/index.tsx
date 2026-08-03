@@ -12,23 +12,31 @@ export const Route = createFileRoute("/")({
   loader: async (): Promise<HomeData> => getHomeData(),
   head: () => ({
     meta: [
-      { title: "উপহারকাব্য — দেশীয় তাঁতের পোশাক ও ঘর সাজানোর সামগ্রী" },
+      { title: "উপহারকাব্য — গিফট কম্বো ও উপহার সামগ্রীর অনলাইন শপ" },
       {
         name: "description",
         content:
-          "বাংলাদেশের তাঁতিদের হাতে বোনা শাড়ি, পাঞ্জাবি ও ঘর সাজানোর সামগ্রী। সারা দেশে ক্যাশ অন ডেলিভারি।",
+          "জন্মদিন, বিবাহবার্ষিকী কিংবা কর্পোরেট — প্রতিটি উপলক্ষের জন্য সাজানো গিফট কম্বো ও উপহার বক্স। সারা দেশে ক্যাশ অন ডেলিভারি।",
       },
-      { property: "og:title", content: "উপহারকাব্য — দেশীয় তাঁতের পোশাক ও ঘর সাজানোর সামগ্রী" },
+      { property: "og:title", content: "উপহারকাব্য — গিফট কম্বো ও উপহার সামগ্রীর অনলাইন শপ" },
       {
         property: "og:description",
-        content: "হাতে বোনা দেশীয় পণ্য, সরাসরি তাঁতির কাছ থেকে। ক্যাশ অন ডেলিভারি সারা দেশে।",
+        content: "প্রতিটি উপলক্ষের জন্য যত্নে সাজানো গিফট কম্বো। সারা দেশে ক্যাশ অন ডেলিভারি।",
       },
-      { property: "og:url", content: "/" },
+      { property: "og:url", content: "https://upoharkabbo.lovable.app/" },
+      { property: "og:image", content: "https://upoharkabbo.lovable.app/og-image.jpg" },
+      { name: "twitter:image", content: "https://upoharkabbo.lovable.app/og-image.jpg" },
     ],
-    links: [{ rel: "canonical", href: "/" }],
+    links: [{ rel: "canonical", href: "https://upoharkabbo.lovable.app/" }],
   }),
   component: HomePage,
 });
+
+const HERO_POINTS = [
+  { bn: "যত্নে সাজানো গিফট বক্স", en: "Curated gift boxes" },
+  { bn: "ফ্রি উপহার মোড়ক ও কার্ড", en: "Free wrapping & card" },
+  { bn: "সারা দেশে ডেলিভারি", en: "Nationwide delivery" },
+];
 
 function HomePage() {
   const { lang } = useLang();
@@ -36,48 +44,75 @@ function HomePage() {
 
   return (
     <>
-      <section className="border-b border-border bg-surface">
-        <div className="mx-auto grid max-w-6xl gap-8 px-4 py-12 sm:py-16 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
+      <section className="relative overflow-hidden border-b border-border bg-surface">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-accent/20 blur-3xl"
+        />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -bottom-28 -left-20 h-72 w-72 rounded-full bg-primary/10 blur-3xl"
+        />
+        <div className="relative mx-auto grid max-w-6xl gap-10 px-4 py-14 sm:py-20 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
           <div className="min-w-0">
-            <span className="inline-block rounded-sm border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
+            <span className="inline-flex items-center gap-2 rounded-full border border-accent/40 bg-accent/15 px-3.5 py-1.5 text-xs font-semibold text-accent-foreground">
+              <span className="h-1.5 w-1.5 rounded-full bg-primary" />
               {tr(lang, "cod")}
             </span>
-            <h1 className="mt-4 text-3xl font-bold leading-tight tracking-tight sm:text-4xl lg:text-5xl">
-              {lang === "bn"
-                ? "তাঁতির হাতে বোনা, আপনার ঘরে পৌঁছে দেওয়া"
-                : "Handwoven by artisans, delivered to your door"}
+            <h1 className="mt-5 text-3xl font-bold leading-tight tracking-tight sm:text-4xl lg:text-[3.25rem]">
+              {lang === "bn" ? (
+                <>
+                  উপহার হোক <span className="text-primary">একটা কবিতার মতো</span>
+                </>
+              ) : (
+                <>
+                  Let every gift read <span className="text-primary">like a poem</span>
+                </>
+              )}
             </h1>
-            <p className="mt-4 max-w-xl text-[15px] leading-7 text-muted-foreground">
+            <p className="mt-5 max-w-xl text-[15px] leading-7 text-muted-foreground">
               {lang === "bn"
-                ? "সিরাজগঞ্জ, টাঙ্গাইল আর নরসিংদীর তাঁতিদের কাছ থেকে সরাসরি সংগ্রহ করা পণ্য। কোনো মধ্যস্বত্বভোগী নেই, তাই দামও কম।"
-                : "Sourced straight from weaving families in Sirajganj, Tangail and Narsingdi. No middlemen, so the price stays fair."}
+                ? "জন্মদিন, বিবাহবার্ষিকী, ঈদ কিংবা কর্পোরেট — প্রতিটি উপলক্ষের জন্য হাতে বাছাই করা গিফট কম্বো ও উপহার বক্স, সুন্দর মোড়কে সাজিয়ে পাঠানো হয়।"
+                : "Birthdays, anniversaries, Eid or corporate — hand-picked gift combos and boxes, wrapped beautifully and sent ready to give."}
             </p>
-            <div className="mt-7 flex flex-wrap gap-3">
+            <ul className="mt-6 flex flex-wrap gap-x-5 gap-y-2 text-sm text-muted-foreground">
+              {HERO_POINTS.map((point) => (
+                <li key={point.en} className="flex items-center gap-2">
+                  <svg viewBox="0 0 20 20" className="h-4 w-4 text-primary" fill="currentColor">
+                    <path d="M8.2 13.6 5 10.4l1.2-1.2 2 2 5.6-5.6L15 6.8z" />
+                  </svg>
+                  {pick(lang, point.bn, point.en)}
+                </li>
+              ))}
+            </ul>
+            <div className="mt-8 flex flex-wrap gap-3">
               {data.categories[0] ? (
                 <Link
                   to="/c/$category"
                   params={{ category: data.categories[0].slug }}
-                  className="rounded-sm bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
+                  className="rounded-full bg-primary px-7 py-3 text-sm font-semibold text-primary-foreground shadow-[var(--shadow-card)] transition-opacity hover:opacity-90"
                 >
                   {tr(lang, "shopNow")}
                 </Link>
               ) : null}
               <Link
                 to="/offers"
-                className="rounded-sm border border-border bg-card px-6 py-3 text-sm font-semibold transition-colors hover:bg-secondary"
+                className="rounded-full border border-border bg-card px-7 py-3 text-sm font-semibold transition-colors hover:bg-secondary"
               >
                 {tr(lang, "offers")}
               </Link>
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            {data.featured.slice(0, 4).map((p) => (
+          <div className="grid grid-cols-2 gap-3 sm:gap-4">
+            {data.featured.slice(0, 4).map((p, i) => (
               <Link
                 key={p.id}
                 to="/p/$product"
                 params={{ product: p.slug }}
-                className="aspect-square overflow-hidden rounded-lg border border-border bg-card"
+                className={`overflow-hidden rounded-2xl border border-border bg-card shadow-[var(--shadow-card)] transition-transform hover:-translate-y-1 ${
+                  i % 3 === 0 ? "aspect-4/5" : "aspect-square"
+                }`}
               >
                 <ProductThumb
                   src={p.image}
@@ -89,6 +124,7 @@ function HomePage() {
           </div>
         </div>
       </section>
+
 
       <Section title={tr(lang, "allCategories")}>
         <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
