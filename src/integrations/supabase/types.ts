@@ -65,6 +65,45 @@ export type Database = {
         }
         Relationships: []
       }
+      courier_checks: {
+        Row: {
+          cancelled_parcel: number
+          checked_at: string
+          created_at: string
+          data: Json
+          id: string
+          phone: string
+          success_parcel: number
+          success_ratio: number
+          total_parcel: number
+          updated_at: string
+        }
+        Insert: {
+          cancelled_parcel?: number
+          checked_at?: string
+          created_at?: string
+          data?: Json
+          id?: string
+          phone: string
+          success_parcel?: number
+          success_ratio?: number
+          total_parcel?: number
+          updated_at?: string
+        }
+        Update: {
+          cancelled_parcel?: number
+          checked_at?: string
+          created_at?: string
+          data?: Json
+          id?: string
+          phone?: string
+          success_parcel?: number
+          success_ratio?: number
+          total_parcel?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       faqs: {
         Row: {
           answer_bn: string

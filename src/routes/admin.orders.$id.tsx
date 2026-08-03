@@ -7,6 +7,7 @@ import { adminGetOrder, adminUpdateOrderStatus } from "@/lib/admin.functions";
 import { orderStatuses } from "@/lib/admin-schema";
 import { AdminHeading, Panel, StatusPill, statusLabels } from "@/components/admin/kit";
 import { BrandLoader } from "@/components/admin/brand-loader";
+import { CourierReport } from "@/components/admin/courier-report";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/admin/orders/$id")({
@@ -127,6 +128,8 @@ function AdminOrderDetail() {
           ))}
         </div>
       </Panel>
+
+      <CourierReport phone={order.customer_phone} />
 
       <div className="grid gap-4 lg:grid-cols-2">
         <Panel>

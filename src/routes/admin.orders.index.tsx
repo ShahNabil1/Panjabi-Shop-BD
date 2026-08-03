@@ -8,6 +8,8 @@ import { orderStatuses } from "@/lib/admin-schema";
 import { AdminHeading, EmptyState, Panel, StatusPill, statusLabels } from "@/components/admin/kit";
 import { BrandLoader } from "@/components/admin/brand-loader";
 import { Input } from "@/components/ui/input";
+import { courierCachedRatios } from "@/lib/courier.functions";
+import { CourierStatusBar, ratioTone } from "@/components/admin/courier-status";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/admin/orders/")({
@@ -46,9 +48,22 @@ function AdminOrdersPage() {
       }),
   });
 
+  const phones = [...new Set((data ?? []).map((o) => o.customer_phone))];
+  const { data: ratios } = useQuery({
+    queryKey: ["admin", "courier", "ratios", phones.join(",")],
+    queryFn: () => courierCachedRatios({ data: { phones } }),
+    enabled: phones.length > 0,
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+  });
+
   return (
     <div className="space-y-5">
       <AdminHeading title="Orders" description="View all orders and update their status." />
+
+      <CourierStatusBar />
+
+
 
       <div className="admin-rise flex flex-wrap items-center gap-3 rounded-2xl border border-border/70 bg-card p-3">
         <div className="relative max-w-xs flex-1 min-w-[200px]">
@@ -99,6 +114,16 @@ function AdminOrdersPage() {
                     <span className="rounded-md bg-muted px-1.5 py-0.5 font-mono text-xs text-muted-foreground">
                       {o.order_number}
                     </span>
+                    {ratios?.[o.customer_phone] !== undefined ? (
+                      <span
+                        className={cn(
+                          "rounded-full px-2 py-0.5 text-xs font-bold ring-1 tabular-nums",
+                          ratioTone(ratios[o.customer_phone] as number),
+                        )}
+                      >
+                        {ratios[o.customer_phone]}%
+                      </span>
+                    ) : null}
                   </div>
                   <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
                     <span className="inline-flex items-center gap-1.5">
