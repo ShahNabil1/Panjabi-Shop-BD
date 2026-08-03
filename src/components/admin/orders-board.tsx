@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Search, Clock, Globe, Eye } from "lucide-react";
 
 import { adminListOrders } from "@/lib/admin.functions";
@@ -11,6 +11,8 @@ import { Input } from "@/components/ui/input";
 import { courierCachedRatios } from "@/lib/courier.functions";
 import { CourierStatusBar, ratioTone } from "@/components/admin/courier-status";
 import { cn } from "@/lib/utils";
+import { Pagination } from "@/components/admin/pagination";
+
 
 function adminPrice(value: number | string | null | undefined) {
   const n = Number(value ?? 0);
@@ -41,6 +43,12 @@ export function OrdersBoard({
 }) {
   const [status, setStatus] = useState<string>(statuses[0]!);
   const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(20);
+
+  useEffect(() => {
+    setPage(1);
+  }, [status, search, pageSize]);
 
   const { data, isLoading } = useQuery({
     queryKey: ["admin", "orders", bucket, status, search],
@@ -54,7 +62,13 @@ export function OrdersBoard({
       }),
   });
 
-  const phones = [...new Set((data ?? []).map((o) => o.customer_phone))];
+  const all = data ?? [];
+  const total = all.length;
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  const current = Math.min(Math.max(1, page), totalPages);
+  const rows = all.slice((current - 1) * pageSize, current * pageSize);
+
+  const phones = [...new Set(rows.map((o) => o.customer_phone))];
   const { data: ratios } = useQuery({
     queryKey: ["admin", "courier", "ratios", phones.join(",")],
     queryFn: () => courierCachedRatios({ data: { phones } }),
@@ -62,6 +76,7 @@ export function OrdersBoard({
     staleTime: 5 * 60 * 1000,
     refetchOnWindowFocus: false,
   });
+
 
   return (
     <div className="space-y-5">
@@ -100,13 +115,14 @@ export function OrdersBoard({
       <Panel className="p-0">
         {isLoading ? (
           <BrandLoader size="md" className="py-8" />
-        ) : (data?.length ?? 0) === 0 ? (
+        ) : total === 0 ? (
           <div className="p-4">
             <EmptyState title={emptyTitle} />
           </div>
         ) : (
           <ul className="divide-y divide-border">
-            {data?.map((o) => (
+            {rows.map((o) => (
+
               <li
                 key={o.id}
                 className="flex flex-wrap items-center justify-between gap-3 px-4 py-3.5 transition-colors duration-200 hover:bg-muted/40"
@@ -157,6 +173,17 @@ export function OrdersBoard({
           </ul>
         )}
       </Panel>
+
+      {total > 0 ? (
+        <Pagination
+          page={current}
+          pageSize={pageSize}
+          total={total}
+          onPageChange={setPage}
+          onPageSizeChange={setPageSize}
+        />
+      ) : null}
     </div>
+
   );
 }
