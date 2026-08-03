@@ -14,17 +14,17 @@ export function SiteFooter() {
     <footer className="mt-16 border-t border-border bg-surface">
       <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 sm:grid-cols-2 lg:grid-cols-4">
         <div className="min-w-0">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center">
             <img
               src={logoMark}
               alt={brand}
               loading="lazy"
-              width={36}
-              height={36}
-              className="h-8 w-8 shrink-0 object-contain"
+              width={1040}
+              height={375}
+              className="h-10 w-auto shrink-0 object-contain"
             />
-            <span className="truncate text-base font-bold">{brand}</span>
           </div>
+
 
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{tagline}</p>
         </div>
