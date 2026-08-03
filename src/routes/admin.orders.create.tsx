@@ -356,17 +356,34 @@ function CreateOrderPage() {
               <ul className="mt-3 max-h-64 space-y-1.5 overflow-y-auto">
                 {(products.data ?? []).map((p) => {
                   const variants = (p.product_variants ?? []).filter((v) => v.is_active);
+                  const thumb = [...(p.product_images ?? [])].sort(
+                    (a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0),
+                  )[0]?.url;
                   return (
                     <li
                       key={p.id}
                       className="rounded-xl border border-border/70 bg-background px-3 py-2"
                     >
                       <div className="flex flex-wrap items-center justify-between gap-2">
-                        <div className="min-w-0">
-                          <p className="truncate text-sm font-semibold">{p.name_bn}</p>
-                          <p className="text-xs text-muted-foreground">
-                            {p.sku ?? "—"} · {money(Number(p.price))} · stock {p.stock}
-                          </p>
+                        <div className="flex min-w-0 items-center gap-3">
+                          {thumb ? (
+                            <img
+                              src={thumb}
+                              alt={p.name_bn}
+                              loading="lazy"
+                              className="size-11 shrink-0 rounded-lg border border-border/70 object-cover"
+                            />
+                          ) : (
+                            <div className="grid size-11 shrink-0 place-items-center rounded-lg border border-dashed border-border text-[10px] text-muted-foreground">
+                              No img
+                            </div>
+                          )}
+                          <div className="min-w-0">
+                            <p className="truncate text-sm font-semibold">{p.name_bn}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {p.sku ?? "—"} · {money(Number(p.price))} · stock {p.stock}
+                            </p>
+                          </div>
                         </div>
                         {variants.length === 0 ? (
                           <Button
