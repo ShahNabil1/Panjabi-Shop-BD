@@ -25,7 +25,6 @@ import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminFaqsRouteImport } from './routes/admin.faqs'
 import { Route as AdminLandingRouteImport } from './routes/admin.landing'
 import { Route as AdminPromotionsRouteImport } from './routes/admin.promotions'
-import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AdminTaxonomyRouteImport } from './routes/admin.taxonomy'
 import { Route as InvoiceOrderNumberRouteImport } from './routes/invoice.$orderNumber'
 import { Route as LpSlugRouteImport } from './routes/lp.$slug'
@@ -39,6 +38,7 @@ import { Route as AdminOrdersCreateRouteImport } from './routes/admin.orders.cre
 import { Route as AdminOrdersListRouteImport } from './routes/admin.orders.list'
 import { Route as AdminProductsIndexRouteImport } from './routes/admin.products.index'
 import { Route as AdminProductsIdRouteImport } from './routes/admin.products.$id'
+import { Route as AdminSettingsIndexRouteImport } from './routes/admin.settings.index'
 import { Route as CCategoryIndexRouteImport } from './routes/c.$category.index'
 import { Route as CCategorySubcategoryRouteImport } from './routes/c.$category.$subcategory'
 
@@ -122,11 +122,6 @@ const AdminPromotionsRoute = AdminPromotionsRouteImport.update({
   path: '/promotions',
   getParentRoute: () => AdminRoute,
 } as any)
-const AdminSettingsRoute = AdminSettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
-  getParentRoute: () => AdminRoute,
-} as any)
 const AdminTaxonomyRoute = AdminTaxonomyRouteImport.update({
   id: '/taxonomy',
   path: '/taxonomy',
@@ -192,6 +187,11 @@ const AdminProductsIdRoute = AdminProductsIdRouteImport.update({
   path: '/products/$id',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminSettingsIndexRoute = AdminSettingsIndexRouteImport.update({
+  id: '/settings/',
+  path: '/settings/',
+  getParentRoute: () => AdminRoute,
+} as any)
 const CCategoryIndexRoute = CCategoryIndexRouteImport.update({
   id: '/c/$category/',
   path: '/c/$category/',
@@ -219,7 +219,6 @@ export interface FileRoutesByFullPath {
   '/admin/faqs': typeof AdminFaqsRoute
   '/admin/landing': typeof AdminLandingRoute
   '/admin/promotions': typeof AdminPromotionsRoute
-  '/admin/settings': typeof AdminSettingsRoute
   '/admin/taxonomy': typeof AdminTaxonomyRoute
   '/invoice/$orderNumber': typeof InvoiceOrderNumberRoute
   '/lp/$slug': typeof LpSlugRoute
@@ -235,6 +234,7 @@ export interface FileRoutesByFullPath {
   '/c/$category/$subcategory': typeof CCategorySubcategoryRoute
   '/admin/orders/': typeof AdminOrdersIndexRoute
   '/admin/products/': typeof AdminProductsIndexRoute
+  '/admin/settings/': typeof AdminSettingsIndexRoute
   '/c/$category/': typeof CCategoryIndexRoute
 }
 export interface FileRoutesByTo {
@@ -252,7 +252,6 @@ export interface FileRoutesByTo {
   '/admin/faqs': typeof AdminFaqsRoute
   '/admin/landing': typeof AdminLandingRoute
   '/admin/promotions': typeof AdminPromotionsRoute
-  '/admin/settings': typeof AdminSettingsRoute
   '/admin/taxonomy': typeof AdminTaxonomyRoute
   '/invoice/$orderNumber': typeof InvoiceOrderNumberRoute
   '/lp/$slug': typeof LpSlugRoute
@@ -268,6 +267,7 @@ export interface FileRoutesByTo {
   '/c/$category/$subcategory': typeof CCategorySubcategoryRoute
   '/admin/orders': typeof AdminOrdersIndexRoute
   '/admin/products': typeof AdminProductsIndexRoute
+  '/admin/settings': typeof AdminSettingsIndexRoute
   '/c/$category': typeof CCategoryIndexRoute
 }
 export interface FileRoutesById {
@@ -287,7 +287,6 @@ export interface FileRoutesById {
   '/admin/faqs': typeof AdminFaqsRoute
   '/admin/landing': typeof AdminLandingRoute
   '/admin/promotions': typeof AdminPromotionsRoute
-  '/admin/settings': typeof AdminSettingsRoute
   '/admin/taxonomy': typeof AdminTaxonomyRoute
   '/invoice/$orderNumber': typeof InvoiceOrderNumberRoute
   '/lp/$slug': typeof LpSlugRoute
@@ -303,6 +302,7 @@ export interface FileRoutesById {
   '/c/$category/$subcategory': typeof CCategorySubcategoryRoute
   '/admin/orders/': typeof AdminOrdersIndexRoute
   '/admin/products/': typeof AdminProductsIndexRoute
+  '/admin/settings/': typeof AdminSettingsIndexRoute
   '/c/$category/': typeof CCategoryIndexRoute
 }
 export interface FileRouteTypes {
@@ -323,7 +323,6 @@ export interface FileRouteTypes {
     | '/admin/faqs'
     | '/admin/landing'
     | '/admin/promotions'
-    | '/admin/settings'
     | '/admin/taxonomy'
     | '/invoice/$orderNumber'
     | '/lp/$slug'
@@ -339,6 +338,7 @@ export interface FileRouteTypes {
     | '/c/$category/$subcategory'
     | '/admin/orders/'
     | '/admin/products/'
+    | '/admin/settings/'
     | '/c/$category/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -356,7 +356,6 @@ export interface FileRouteTypes {
     | '/admin/faqs'
     | '/admin/landing'
     | '/admin/promotions'
-    | '/admin/settings'
     | '/admin/taxonomy'
     | '/invoice/$orderNumber'
     | '/lp/$slug'
@@ -372,6 +371,7 @@ export interface FileRouteTypes {
     | '/c/$category/$subcategory'
     | '/admin/orders'
     | '/admin/products'
+    | '/admin/settings'
     | '/c/$category'
   id:
     | '__root__'
@@ -390,7 +390,6 @@ export interface FileRouteTypes {
     | '/admin/faqs'
     | '/admin/landing'
     | '/admin/promotions'
-    | '/admin/settings'
     | '/admin/taxonomy'
     | '/invoice/$orderNumber'
     | '/lp/$slug'
@@ -406,6 +405,7 @@ export interface FileRouteTypes {
     | '/c/$category/$subcategory'
     | '/admin/orders/'
     | '/admin/products/'
+    | '/admin/settings/'
     | '/c/$category/'
   fileRoutesById: FileRoutesById
 }
@@ -546,13 +546,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminPromotionsRouteImport
       parentRoute: typeof AdminRoute
     }
-    '/admin/settings': {
-      id: '/admin/settings'
-      path: '/settings'
-      fullPath: '/admin/settings'
-      preLoaderRoute: typeof AdminSettingsRouteImport
-      parentRoute: typeof AdminRoute
-    }
     '/admin/taxonomy': {
       id: '/admin/taxonomy'
       path: '/taxonomy'
@@ -644,6 +637,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminProductsIdRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/settings/': {
+      id: '/admin/settings/'
+      path: '/settings'
+      fullPath: '/admin/settings/'
+      preLoaderRoute: typeof AdminSettingsIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/c/$category/': {
       id: '/c/$category/'
       path: '/c/$category'
@@ -665,7 +665,6 @@ interface AdminRouteChildren {
   AdminFaqsRoute: typeof AdminFaqsRoute
   AdminLandingRoute: typeof AdminLandingRoute
   AdminPromotionsRoute: typeof AdminPromotionsRoute
-  AdminSettingsRoute: typeof AdminSettingsRoute
   AdminTaxonomyRoute: typeof AdminTaxonomyRoute
   AdminIndexRoute: typeof AdminIndexRoute
   AdminOrdersIdRoute: typeof AdminOrdersIdRoute
@@ -674,13 +673,13 @@ interface AdminRouteChildren {
   AdminProductsIdRoute: typeof AdminProductsIdRoute
   AdminOrdersIndexRoute: typeof AdminOrdersIndexRoute
   AdminProductsIndexRoute: typeof AdminProductsIndexRoute
+  AdminSettingsIndexRoute: typeof AdminSettingsIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminFaqsRoute: AdminFaqsRoute,
   AdminLandingRoute: AdminLandingRoute,
   AdminPromotionsRoute: AdminPromotionsRoute,
-  AdminSettingsRoute: AdminSettingsRoute,
   AdminTaxonomyRoute: AdminTaxonomyRoute,
   AdminIndexRoute: AdminIndexRoute,
   AdminOrdersIdRoute: AdminOrdersIdRoute,
@@ -689,6 +688,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminProductsIdRoute: AdminProductsIdRoute,
   AdminOrdersIndexRoute: AdminOrdersIndexRoute,
   AdminProductsIndexRoute: AdminProductsIndexRoute,
+  AdminSettingsIndexRoute: AdminSettingsIndexRoute,
 }
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
