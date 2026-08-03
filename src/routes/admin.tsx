@@ -131,7 +131,7 @@ function AdminLayout() {
 
   const sidebar = (
     <div className="flex h-full flex-col">
-      <div className="flex items-center px-3 py-4">
+      <div className="flex min-h-[5.5rem] items-center justify-center px-3 py-5">
         <Link
           to="/"
           title="Upoharkabbo"
@@ -140,7 +140,7 @@ function AdminLayout() {
           <img
             src="/favicon.png"
             alt="Upoharkabbo"
-            className="size-9 rounded-full bg-white object-contain ring-1 ring-border"
+            className="size-14 rounded-full bg-white object-contain p-1 ring-1 ring-border"
           />
         </Link>
         <Link
@@ -151,7 +151,7 @@ function AdminLayout() {
           <img
             src={logoMark}
             alt="Upoharkabbo"
-            className="h-11 w-auto object-contain"
+            className="h-16 w-auto object-contain"
           />
         </Link>
       </div>
