@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Copy, MessageSquare, RotateCw, Send } from "lucide-react";
 
-import { smsTemplates, smsVariables } from "@/lib/admin-schema";
+import { adminListSmsTemplates } from "@/lib/sms-templates.functions";
 import { adminRetrySms, adminSendSms } from "@/lib/order-admin.functions";
 import { Panel } from "@/components/admin/kit";
 import { Button } from "@/components/ui/button";
@@ -51,6 +51,19 @@ export function SmsCard({ orderId, phone }: { orderId: string; phone: string }) 
   const [message, setMessage] = useState("");
 
   const seg = segmentInfo(message);
+
+  const tplQuery = useQuery({
+    queryKey: ["admin", "sms-templates"],
+    queryFn: () => adminListSmsTemplates(),
+  });
+  const smsTemplates = tplQuery.data?.templates ?? [];
+  const smsVariables = smsTemplates.find((t) => t.key === "order_confirm")?.variables ?? [
+    "name",
+    "order_no",
+    "amount",
+    "phone",
+    "receipt_url",
+  ];
 
   const send = useMutation({
     mutationFn: () => adminSendSms({ data: { orderId, phone, message } }),
@@ -111,7 +124,7 @@ export function SmsCard({ orderId, phone }: { orderId: string; phone: string }) 
                 <option value="">— Select or write your own —</option>
                 {smsTemplates.map((t) => (
                   <option key={t.id} value={t.id}>
-                    {t.label}
+                    {t.name}
                   </option>
                 ))}
               </select>
