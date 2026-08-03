@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Copy, MessageSquare, RotateCw, Send, X } from "lucide-react";
+import { Copy, MessageSquare, RotateCw, Send } from "lucide-react";
 
 import { smsTemplates, smsVariables } from "@/lib/admin-schema";
-import { adminRetrySms, adminSendSms, adminSmsBalance } from "@/lib/order-admin.functions";
+import { adminRetrySms, adminSendSms } from "@/lib/order-admin.functions";
 import { Panel } from "@/components/admin/kit";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -50,12 +50,6 @@ export function SmsCard({ orderId, phone }: { orderId: string; phone: string }) 
   const [template, setTemplate] = useState("");
   const [message, setMessage] = useState("");
 
-  const { data: balance } = useQuery({
-    queryKey: ["admin", "sms", "balance"],
-    queryFn: () => adminSmsBalance(),
-    staleTime: 5 * 60 * 1000,
-    refetchOnWindowFocus: false,
-  });
   const seg = segmentInfo(message);
 
   const send = useMutation({
@@ -81,10 +75,7 @@ export function SmsCard({ orderId, phone }: { orderId: string; phone: string }) 
             </span>
             <div>
               <p className="text-sm font-bold text-white">Send SMS to customer</p>
-              <p className="text-xs text-white/70">
-                Ready → {phone}
-                {balance?.ok ? ` · Balance ${balance.balance}` : balance ? ` · ${balance.message}` : ""}
-              </p>
+              <p className="text-xs text-white/70">Ready → {phone}</p>
             </div>
           </div>
           <Button
@@ -99,15 +90,10 @@ export function SmsCard({ orderId, phone }: { orderId: string; phone: string }) 
       {open ? (
         <div className="border-t border-border">
           <div className="w-full space-y-4 p-5">
-            <div className="flex items-center justify-between">
-              <h3 className="flex items-center gap-2 text-sm font-bold">
-                <MessageSquare className="size-4 text-primary" />
-                Send SMS to customer
-              </h3>
-              <button aria-label="Close" onClick={() => setOpen(false)}>
-                <X className="size-4 text-muted-foreground" />
-              </button>
-            </div>
+            <h3 className="flex items-center gap-2 text-sm font-bold">
+              <MessageSquare className="size-4 text-primary" />
+              Send SMS to customer
+            </h3>
 
             <div className="space-y-1.5">
               <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
