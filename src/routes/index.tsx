@@ -21,7 +21,7 @@ export const Route = createFileRoute("/")({
       { property: "og:title", content: "উপহারকাব্য — গিফট কম্বো ও উপহার সামগ্রীর অনলাইন শপ" },
       {
         property: "og:description",
-        content: "প্রতিটি উপলক্ষের জন্য যত্নে সাজানো গিফট কম্বো। সারা দেশে ক্যাশ অন ডেলিভারি।",
+        content: "জন্মদিন, বিবাহবার্ষিকী কিংবা কর্পোরেট — প্রতিটি উপলক্ষের জন্য সাজানো গিফট কম্বো ও উপহার বক্স। সারা দেশে ক্যাশ অন ডেলিভারি।",
       },
       { property: "og:url", content: "https://upoharkabbo.lovable.app/" },
       { property: "og:image", content: "https://upoharkabbo.lovable.app/og-image.jpg" },
