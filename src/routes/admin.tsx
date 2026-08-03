@@ -259,15 +259,15 @@ function AdminLayout() {
       {/* Desktop sidebar */}
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-40 hidden bg-slate-950 shadow-2xl shadow-black/40 transition-[width] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] lg:block",
-          collapsed ? "w-[72px]" : "w-64",
+          "fixed inset-y-0 left-0 z-40 hidden bg-[#0a0a0a] shadow-2xl shadow-black/40 transition-[width] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] lg:block",
+          collapsed ? "w-20" : "w-72",
         )}
       >
         {sidebar}
         <button
           onClick={() => setCollapsed((v) => !v)}
           aria-label="Toggle sidebar"
-          className="absolute -right-3 top-20 z-10 grid size-6 place-items-center rounded-full border border-border bg-card text-muted-foreground shadow transition-all duration-300 hover:scale-110 hover:text-primary"
+          className="absolute -right-3 top-24 z-10 grid size-6 place-items-center rounded-full border border-border bg-card text-muted-foreground shadow transition-all duration-300 hover:scale-110 hover:text-primary"
         >
           <ChevronLeft className={cn("size-4 transition-transform duration-500", collapsed && "rotate-180")} />
         </button>
@@ -292,13 +292,13 @@ function AdminLayout() {
       <div
         onClick={() => setMobileOpen(false)}
         className={cn(
-          "fixed inset-0 z-40 bg-slate-950/50 backdrop-blur-sm transition-opacity duration-300 lg:hidden",
+          "fixed inset-0 z-40 bg-black/60 backdrop-blur-sm transition-opacity duration-300 lg:hidden",
           mobileOpen ? "opacity-100" : "pointer-events-none opacity-0",
         )}
       />
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-50 w-72 bg-slate-950 text-slate-100 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] lg:hidden",
+          "fixed inset-y-0 left-0 z-50 w-80 bg-[#0a0a0a] text-slate-100 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] lg:hidden",
           mobileOpen ? "translate-x-0" : "-translate-x-full",
         )}
       >
@@ -315,7 +315,7 @@ function AdminLayout() {
       <div
         className={cn(
           "transition-[padding] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
-          collapsed ? "lg:pl-[72px]" : "lg:pl-64",
+          collapsed ? "lg:pl-20" : "lg:pl-72",
         )}
       >
         <main key={pathname} className="admin-rise mx-auto w-full max-w-6xl space-y-6 px-4 py-6 lg:px-10 lg:py-10">
