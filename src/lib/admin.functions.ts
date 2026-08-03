@@ -385,3 +385,129 @@ export const adminSaveSetting = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true };
   });
+
+/** Product search for the manual order builder — matches product name or SKU. */
+export const adminSearchProducts = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => productSearchSchema.parse(input))
+  .handler(async ({ data, context }) => {
+    const db = await requireAdmin(context.supabase, context.userId);
+    const q = data.query.replace(/[%,]/g, "").trim();
+    let query = db
+      .from("products")
+      .select(
+        "id, name_bn, name_en, sku, price, stock, product_images(url, sort_order), product_variants(id, value_bn, group_name_bn, sku, price_delta, stock, is_active)",
+      )
+      .eq("is_active", true)
+      .order("sort_order")
+      .limit(20);
+    if (q) query = query.or(`name_bn.ilike.%${q}%,name_en.ilike.%${q}%,sku.ilike.%${q}%`);
+    return unwrap(await query);
+  });
+
+/** Most recent order for a phone number — powers the "Fill" auto-complete button. */
+export const adminLookupCustomer = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => customerLookupSchema.parse(input))
+  .handler(async ({ data, context }) => {
+    const db = await requireAdmin(context.supabase, context.userId);
+    const { data: rows } = await db
+      .from("orders")
+      .select("customer_name, customer_phone, address_line, city, note, source, created_at")
+      .eq("customer_phone", data.phone)
+      .order("created_at", { ascending: false })
+      .limit(1);
+    const last = rows?.[0];
+    if (!last) return null;
+    const { count } = await db
+      .from("orders")
+      .select("id", { count: "exact", head: true })
+      .eq("customer_phone", data.phone);
+    return { ...last, orderCount: count ?? 1 };
+  });
+
+/** Creates a manual (admin-placed) order. Prices are re-resolved server-side. */
+export const adminCreateOrder = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => adminCreateOrderSchema.parse(input))
+  .handler(async ({ data, context }) => {
+    const db = await requireAdmin(context.supabase, context.userId);
+
+    const productIds = [...new Set(data.items.map((i) => i.productId))];
+    const variantIds = [
+      ...new Set(data.items.map((i) => i.variantId).filter((v): v is string => Boolean(v))),
+    ];
+
+    const [productsRes, variantsRes] = await Promise.all([
+      db.from("products").select("id, slug, name_bn, price, sku").in("id", productIds),
+      variantIds.length
+        ? db
+            .from("product_variants")
+            .select("id, product_id, group_name_bn, value_bn, sku, price_delta")
+            .in("id", variantIds)
+        : Promise.resolve({ data: [], error: null }),
+    ]);
+    if (productsRes.error) throw new Error(productsRes.error.message);
+
+    const products = productsRes.data ?? [];
+    const variants = (variantsRes.data ?? []) as Array<{
+      id: string;
+      product_id: string;
+      group_name_bn: string;
+      value_bn: string;
+      sku: string | null;
+      price_delta: number | string;
+    }>;
+
+    const lines = data.items.map((item) => {
+      const product = products.find((p) => p.id === item.productId);
+      if (!product) throw new Error("Product not found");
+      const variant = item.variantId ? variants.find((v) => v.id === item.variantId) : null;
+      const unitPrice = item.unitPrice;
+      return { product, variant, quantity: item.quantity, unitPrice, lineTotal: unitPrice * item.quantity };
+    });
+
+    const subtotal = lines.reduce((sum, l) => sum + l.lineTotal, 0);
+    const total = Math.max(0, subtotal + data.deliveryCharge - data.discount);
+
+    const { data: order, error } = await db
+      .from("orders")
+      .insert({
+        customer_name: data.customerName,
+        customer_phone: data.customerPhone,
+        address_line: `${data.addressLine}, ${data.upazila}, ${data.district}, ${data.division}`,
+        city: data.district,
+        delivery_area: data.district === "ঢাকা" ? "inside_dhaka" : "outside_dhaka",
+        note: data.note || null,
+        subtotal,
+        delivery_charge: data.deliveryCharge,
+        discount: data.discount,
+        total,
+        advance_amount: data.advanceAmount,
+        advance_method: data.advanceAmount > 0 ? data.advanceMethod : null,
+        delivery_partner: data.deliveryPartner,
+        payment_method: data.advanceAmount > 0 ? "partial_advance" : "cod",
+        status: "pending",
+        source: data.source,
+      })
+      .select("id, order_number")
+      .single();
+    if (error || !order) throw new Error(error?.message ?? "Order creation failed");
+
+    const { error: itemsError } = await db.from("order_items").insert(
+      lines.map((l) => ({
+        order_id: order.id,
+        product_id: l.product.id,
+        product_name: l.product.name_bn,
+        product_slug: l.product.slug,
+        variant_label: l.variant ? `${l.variant.group_name_bn}: ${l.variant.value_bn}` : null,
+        sku: l.variant?.sku ?? l.product.sku,
+        unit_price: l.unitPrice,
+        quantity: l.quantity,
+        line_total: l.lineTotal,
+      })),
+    );
+    if (itemsError) throw new Error(itemsError.message);
+
+    return { id: order.id as string, orderNumber: order.order_number as string };
+  });
