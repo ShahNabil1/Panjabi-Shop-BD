@@ -141,13 +141,13 @@ function AdminLayout() {
 
   const sidebar = (
     <div className="relative flex h-full flex-col">
-      {/* Ambient glow */}
+      {/* Ambient glow — warm neutral, no deep blue */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute -left-16 -top-32 h-64 w-64 rounded-full bg-indigo-500/20 blur-3xl" />
+        <div className="absolute -left-16 -top-32 h-64 w-64 rounded-full bg-white/[0.03] blur-3xl" />
         <div className="absolute -right-16 top-1/3 h-48 w-48 rounded-full bg-fuchsia-500/10 blur-3xl" />
       </div>
 
-      <div className="relative flex min-h-[5.5rem] items-center justify-center border-b border-white/10 px-3 py-5">
+      <div className="relative flex min-h-[7rem] items-center justify-center border-b border-white/10 px-4 py-6">
         <Link
           to="/"
           title="Upoharkabbo"
@@ -156,7 +156,7 @@ function AdminLayout() {
           <img
             src="/favicon.png"
             alt="Upoharkabbo"
-            className="size-11 rounded-xl bg-white object-contain p-1 ring-1 ring-white/15"
+            className="size-12 rounded-xl bg-white object-contain p-1.5 ring-1 ring-white/15"
           />
         </Link>
         <Link
@@ -167,7 +167,7 @@ function AdminLayout() {
           <img
             src={logoMark}
             alt="Upoharkabbo"
-            className="h-14 w-auto rounded-xl bg-white object-contain px-3 py-2 ring-1 ring-white/15"
+            className="h-16 w-auto rounded-xl bg-white object-contain px-4 py-2.5 ring-1 ring-white/15"
           />
         </Link>
       </div>
