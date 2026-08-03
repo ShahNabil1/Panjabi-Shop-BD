@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { Copy, MessageSquare, RotateCw, Send } from "lucide-react";
 
 import { smsTemplates, smsVariables } from "@/lib/admin-schema";
-import { adminRetrySms, adminSendSms, adminSmsBalance } from "@/lib/order-admin.functions";
+import { adminRetrySms, adminSendSms } from "@/lib/order-admin.functions";
 import { Panel } from "@/components/admin/kit";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
