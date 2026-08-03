@@ -43,6 +43,12 @@ export function OrdersBoard({
 }) {
   const [status, setStatus] = useState<string>(statuses[0]!);
   const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(20);
+
+  useEffect(() => {
+    setPage(1);
+  }, [status, search, pageSize]);
 
   const { data, isLoading } = useQuery({
     queryKey: ["admin", "orders", bucket, status, search],
@@ -56,7 +62,13 @@ export function OrdersBoard({
       }),
   });
 
-  const phones = [...new Set((data ?? []).map((o) => o.customer_phone))];
+  const all = data ?? [];
+  const total = all.length;
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  const current = Math.min(Math.max(1, page), totalPages);
+  const rows = all.slice((current - 1) * pageSize, current * pageSize);
+
+  const phones = [...new Set(rows.map((o) => o.customer_phone))];
   const { data: ratios } = useQuery({
     queryKey: ["admin", "courier", "ratios", phones.join(",")],
     queryFn: () => courierCachedRatios({ data: { phones } }),
@@ -64,6 +76,7 @@ export function OrdersBoard({
     staleTime: 5 * 60 * 1000,
     refetchOnWindowFocus: false,
   });
+
 
   return (
     <div className="space-y-5">
