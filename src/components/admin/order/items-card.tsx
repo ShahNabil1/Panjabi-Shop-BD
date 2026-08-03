@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Package, Plus, Save, Search, Trash2, Truck } from "lucide-react";
+import { Check, Package, Plus, Save, Search, Trash2, Truck } from "lucide-react";
 
 import { advanceMethods } from "@/lib/admin-schema";
 import { adminSearchProducts } from "@/lib/admin.functions";
@@ -110,6 +110,23 @@ export function ItemsCard({
     initialAdvanceMethod ?? advanceMethods[0],
   );
 
+  const snapshot = (
+    list: EditableItem[],
+    d: number,
+    a: number,
+    m: string,
+  ) =>
+    JSON.stringify({
+      items: list.map(({ image: _image, ...rest }) => rest),
+      discount: Number(d) || 0,
+      advance: Number(a) || 0,
+      method: (Number(a) || 0) > 0 ? m : null,
+    });
+
+  const [savedSnapshot, setSavedSnapshot] = useState(() =>
+    snapshot(initialItems, initialDiscount, initialAdvance ?? 0, initialAdvanceMethod ?? advanceMethods[0]),
+  );
+
   const { data: results } = useQuery({
     queryKey: ["admin", "product-search", query],
     queryFn: () => adminSearchProducts({ data: { query } }),
@@ -120,6 +137,9 @@ export function ItemsCard({
   const total = Math.max(0, subtotal + deliveryCharge - discount);
   const paidAdvance = Math.min(advance, total);
   const due = Math.max(0, total - paidAdvance);
+
+  const currentSnapshot = snapshot(items, discount, paidAdvance, advanceMethod);
+  const isDirty = currentSnapshot !== savedSnapshot;
 
   const save = useMutation({
     mutationFn: () =>
@@ -137,6 +157,7 @@ export function ItemsCard({
         },
       }),
     onSuccess: async () => {
+      setSavedSnapshot(currentSnapshot);
       toast.success("Items updated");
       await qc.invalidateQueries({ queryKey: ["admin"] });
     },
@@ -145,6 +166,8 @@ export function ItemsCard({
 
   const patch = (index: number, next: Partial<EditableItem>) =>
     setItems(items.map((it, i) => (i === index ? { ...it, ...next } : it)));
+
+
 
 
   return (
@@ -159,10 +182,16 @@ export function ItemsCard({
             <Plus className="size-3.5" />
             Add Product
           </Button>
-          <Button size="sm" disabled={save.isPending} onClick={() => save.mutate()}>
-            <Save className="size-3.5" />
-            Save
+          <Button
+            size="sm"
+            variant={isDirty ? "default" : "secondary"}
+            disabled={save.isPending || !isDirty}
+            onClick={() => save.mutate()}
+          >
+            {isDirty ? <Save className="size-3.5" /> : <Check className="size-3.5" />}
+            {save.isPending ? "Saving…" : isDirty ? "Save" : "Saved"}
           </Button>
+
         </div>
       </div>
 
