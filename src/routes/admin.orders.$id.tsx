@@ -129,7 +129,8 @@ function AdminOrderDetail() {
         description={new Date(order.created_at).toLocaleString("en-GB")}
 
         action={
-          <div className="flex gap-2">
+          <div className="flex items-center gap-2">
+            <StatusPill status={order.status} />
             <Button asChild size="sm">
               <Link
                 to="/invoice/$orderNumber"
@@ -141,44 +142,81 @@ function AdminOrderDetail() {
                 Invoice
               </Link>
             </Button>
-            <Button asChild variant="outline" size="sm">
-              <Link to="/admin/orders">
-                <ArrowLeft className="size-4" />
-                Back
-              </Link>
-            </Button>
           </div>
         }
       />
 
-      <Panel>
-        <div className="flex flex-wrap items-center gap-2">
-          <StatusPill status={order.status} />
-          {isWeb ? (
+      <Panel className="space-y-4">
+        {isWeb ? (
+          <Button
+            size="lg"
+            disabled={update.isPending}
+            onClick={() => update.mutate({ status: "pending" })}
+            className="w-full"
+          >
+            <CheckCircle2 className="size-5" />
+            Confirm Order
+          </Button>
+        ) : null}
+
+        <div className="space-y-3">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+            Update status
+          </p>
+          <Select
+            value={pending ?? ""}
+            onValueChange={(v) => {
+              setPending(v as PendingStatus);
+              setReason("");
+            }}
+          >
+            <SelectTrigger className="max-w-sm rounded-xl">
+              <SelectValue placeholder="Select a status" />
+            </SelectTrigger>
+            <SelectContent>
+              {updatableStatuses.map((s) => (
+                <SelectItem key={s} value={s} disabled={s === order.status}>
+                  {statusLabels[s]}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          {pending === "hold" || pending === "cancelled" ? (
+            <div
+              className={
+                pending === "hold"
+                  ? "max-w-sm space-y-2 rounded-xl border border-amber-300 bg-amber-50 p-3"
+                  : "max-w-sm space-y-2 rounded-xl border border-rose-300 bg-rose-50 p-3"
+              }
+            >
+              <Input
+                value={reason}
+                onChange={(e) => setReason(e.target.value)}
+                placeholder={pending === "hold" ? "Reason for hold" : "Reason for cancellation"}
+                className="h-9 rounded-lg border-border/70 bg-white/80 text-sm"
+              />
+              <Button
+                size="sm"
+                variant={pending === "hold" ? "default" : "destructive"}
+                disabled={update.isPending || reason.trim().length === 0}
+                onClick={() => update.mutate({ status: pending, reason: reason.trim() })}
+              >
+                {pending === "hold" ? "Hold" : "Cancel Order"}
+              </Button>
+            </div>
+          ) : pending ? (
             <Button
               size="sm"
               disabled={update.isPending}
-              onClick={() => update.mutate("pending")}
-              className="transition-transform duration-200 hover:-translate-y-0.5"
+              onClick={() => update.mutate({ status: pending })}
             >
-              <CheckCircle2 className="size-4" />
-              Confirm order
+              Confirm change to {statusLabels[pending]}
             </Button>
           ) : null}
-          {(isWeb ? webOrderStatuses : listOrderStatuses).map((s) => (
-            <Button
-              key={s}
-              size="sm"
-              variant={s === order.status ? "default" : "outline"}
-              disabled={update.isPending || s === order.status}
-              onClick={() => update.mutate(s)}
-              className="transition-transform duration-200 hover:-translate-y-0.5"
-            >
-              {statusLabels[s]}
-            </Button>
-          ))}
         </div>
       </Panel>
+
 
       {isWeb ? (
         <Panel>
