@@ -3,9 +3,7 @@ import { z } from "zod";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { requireAdmin, actorName, logActivity } from "./admin.server";
-
-/** A presence claim is considered live for this long without a heartbeat. */
-export const PRESENCE_TTL_MS = 75_000;
+import { PRESENCE_TTL_MS } from "./presence-shared";
 
 const claimSchema = z.object({ id: z.string().uuid(), force: z.boolean().optional() });
 const idOnly = z.object({ id: z.string().uuid() });

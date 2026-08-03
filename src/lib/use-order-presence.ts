@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 import { supabase } from "@/integrations/supabase/client";
-import { PRESENCE_TTL_MS } from "@/lib/presence.functions";
+import { PRESENCE_TTL_MS } from "@/lib/presence-shared";
 
 export type PresenceRow = {
   order_id: string;
