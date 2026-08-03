@@ -9,6 +9,8 @@ import {
   HelpCircle,
   LayoutDashboard,
   LogOut,
+  Menu,
+
   Package,
   PlusCircle,
 
