@@ -198,9 +198,12 @@ function ProductEditor() {
   return (
     <div className="space-y-5 pb-28">
       <AdminHeading
+        backTo="/admin/products"
+        backLabel="Products"
         title={isNew ? "New product" : draft.name_bn || "Edit product"}
         description="Name, pricing, images, variants and SEO details."
       />
+
 
       <Panel className="admin-rise">
         <SectionHeading title="Basics" />
