@@ -111,15 +111,60 @@ export function CartDrawer() {
         </header>
 
         {items.length === 0 ? (
-          <div className="flex flex-1 flex-col items-center justify-center gap-5 px-6 text-center">
-            <p className="text-muted-foreground">{tr(lang, "emptyCart")}</p>
-            <Link
-              to="/"
-              onClick={closeCart}
-              className="rounded-sm bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
-            >
-              {tr(lang, "continueShopping")}
-            </Link>
+          <div className="relative flex flex-1 flex-col items-center justify-center overflow-hidden px-6 text-center">
+            <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+              <div className="h-64 w-64 rounded-full bg-primary/5" />
+              <div className="absolute h-44 w-44 rounded-full bg-secondary" />
+            </div>
+
+            <div className="relative z-10 flex flex-col items-center gap-5">
+              <div className="grid h-24 w-24 place-items-center rounded-full bg-card shadow-lg ring-1 ring-border">
+                <svg
+                  viewBox="0 0 24 24"
+                  className="h-11 w-11 text-primary"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M6 7h15l-1.5 8.5a2 2 0 0 1-2 1.5H8.5a2 2 0 0 1-2-1.5L5 4H2" />
+                  <path d="M9 11V6a3 3 0 0 1 6 0v5" />
+                  <circle cx="9" cy="20" r="1" />
+                  <circle cx="17" cy="20" r="1" />
+                </svg>
+              </div>
+
+              <div className="max-w-[16rem]">
+                <h3 className="text-lg font-bold text-foreground">
+                  {tr(lang, "emptyCartTitle")}
+                </h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                  {tr(lang, "emptyCartBody")}
+                </p>
+              </div>
+
+              <div className="flex flex-col gap-3">
+                <Link
+                  to="/"
+                  onClick={closeCart}
+                  className="inline-flex items-center justify-center gap-2 rounded-sm bg-primary px-6 py-3 text-sm font-bold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90"
+                >
+                  <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                    <polyline points="9 22 9 12 15 12 15 22" />
+                  </svg>
+                  {tr(lang, "browseGifts")}
+                </Link>
+                <button
+                  type="button"
+                  onClick={closeCart}
+                  className="text-sm font-semibold text-muted-foreground transition-colors hover:text-primary"
+                >
+                  {tr(lang, "continueShopping")}
+                </button>
+              </div>
+            </div>
           </div>
         ) : checkout ? (
           <div className="flex-1 overflow-y-auto px-4 py-4">
