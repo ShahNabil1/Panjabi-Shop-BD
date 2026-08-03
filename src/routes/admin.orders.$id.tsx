@@ -51,9 +51,9 @@ const updatableStatuses = ["no_response", "good_no_response", "hold", "cancelled
 type PendingStatus = (typeof updatableStatuses)[number];
 
 export const Route = createFileRoute("/admin/orders/$id")({
-  validateSearch: (search: Record<string, unknown>) => ({
-    takeover: search["takeover"] ? 1 : undefined,
-  }),
+  validateSearch: (search: Record<string, unknown>): { takeover?: number } =>
+    search["takeover"] ? { takeover: 1 } : {},
+
   component: AdminOrderDetail,
 });
 
