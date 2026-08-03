@@ -89,25 +89,46 @@ export const adminUpdateOrderCustomer = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => orderCustomerSchema.parse(input))
   .handler(async ({ data, context }) => {
     const db = await requireAdmin(context.supabase, context.userId);
-    const { error } = await db
+    const who = await actorName(db, context.userId);
+
+    const { data: before } = await db
       .from("orders")
-      .update({
-        customer_name: data.customerName,
-        customer_phone: data.customerPhone,
-        alt_phone: data.altPhone,
-        division: data.division || null,
-        district: data.district || null,
-        upazila: data.upazila || null,
-        city: data.district || data.division || "—",
-        address_line: data.addressLine,
-      })
-      .eq("id", data.id);
+      .select("customer_name, customer_phone, alt_phone, division, district, upazila, address_line")
+      .eq("id", data.id)
+      .maybeSingle();
+
+    const after = {
+      customer_name: data.customerName,
+      customer_phone: data.customerPhone,
+      alt_phone: data.altPhone,
+      division: data.division || null,
+      district: data.district || null,
+      upazila: data.upazila || null,
+      city: data.district || data.division || "—",
+      address_line: data.addressLine,
+    };
+
+    const { error } = await db.from("orders").update(after).eq("id", data.id);
     if (error) throw new Error(error.message);
-    await db.from("order_activity").insert({
-      order_id: data.id,
-      kind: "edit",
-      message: "Customer & delivery details updated",
+
+    const changes = diffFields((before ?? {}) as Record<string, unknown>, after, {
+      customer_name: "Name",
+      customer_phone: "Phone",
+      alt_phone: "Alt phone",
+      division: "Division",
+      district: "District",
+      upazila: "Thana/Upazila",
+      address_line: "Address",
     });
+    await logActivity(
+      db,
+      data.id,
+      "edit",
+      changes.length > 0
+        ? `${who} updated customer details — ${changes.join(" · ")}`
+        : `${who} saved customer details (no changes)`,
+      { actor: who, meta: { changes } },
+    );
     return { ok: true };
   });
 
@@ -117,11 +138,27 @@ export const adminSaveDeliveryNote = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => orderDeliveryNoteSchema.parse(input))
   .handler(async ({ data, context }) => {
     const db = await requireAdmin(context.supabase, context.userId);
+    const who = await actorName(db, context.userId);
+    const { data: before } = await db
+      .from("orders")
+      .select("delivery_note")
+      .eq("id", data.id)
+      .maybeSingle();
+    const previous = (before as { delivery_note?: string | null } | null)?.delivery_note ?? "";
     const { error } = await db
       .from("orders")
       .update({ delivery_note: data.deliveryNote || null })
       .eq("id", data.id);
     if (error) throw new Error(error.message);
+    if (previous !== (data.deliveryNote || "")) {
+      await logActivity(
+        db,
+        data.id,
+        "edit",
+        `${who} updated the delivery note — ${previous || "—"} → ${data.deliveryNote || "—"}`,
+        { actor: who },
+      );
+    }
     return { ok: true };
   });
 
@@ -131,9 +168,20 @@ export const adminSaveOrderItems = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => orderItemsSchema.parse(input))
   .handler(async ({ data, context }) => {
     const db = await requireAdmin(context.supabase, context.userId);
+    const who = await actorName(db, context.userId);
 
     const subtotal = data.items.reduce((sum, i) => sum + i.unitPrice * i.quantity, 0);
     const total = Math.max(0, subtotal + data.deliveryCharge - data.discount);
+
+    const { data: beforeOrder } = await db
+      .from("orders")
+      .select("subtotal, total, discount, delivery_charge, advance_amount, advance_method")
+      .eq("id", data.id)
+      .maybeSingle();
+    const { data: beforeItems } = await db
+      .from("order_items")
+      .select("product_name, variant_label, quantity, unit_price")
+      .eq("order_id", data.id);
 
     const del = await db.from("order_items").delete().eq("order_id", data.id);
     if (del.error) throw new Error(del.error.message);
@@ -167,11 +215,37 @@ export const adminSaveOrderItems = createServerFn({ method: "POST" })
       .eq("id", data.id);
     if (upd.error) throw new Error(upd.error.message);
 
-    await db.from("order_activity").insert({
-      order_id: data.id,
-      kind: "edit",
-      message: `Items updated — new total ${total}`,
-    });
+    const label = (i: { product_name?: string; productName?: string; variant_label?: string | null; variantLabel?: string | null; quantity: number }) =>
+      `${i.product_name ?? i.productName}${(i.variant_label ?? i.variantLabel) ? ` (${i.variant_label ?? i.variantLabel})` : ""} ×${i.quantity}`;
+    const oldList = ((beforeItems ?? []) as Array<Record<string, never>>).map((i) => label(i as never));
+    const newList = data.items.map((i) => label(i as never));
+    const changes: string[] = [];
+    if (oldList.join(", ") !== newList.join(", ")) {
+      changes.push(`Products: ${oldList.join(", ") || "—"} → ${newList.join(", ") || "—"}`);
+    }
+    const b = (beforeOrder ?? {}) as Record<string, unknown>;
+    const money = (k: string, lbl: string, next: number) => {
+      if (Number(b[k] ?? 0) !== next) changes.push(`${lbl}: ৳${Number(b[k] ?? 0)} → ৳${next}`);
+    };
+    money("delivery_charge", "Shipping", data.deliveryCharge);
+    money("discount", "Discount", data.discount);
+    money("advance_amount", "Advance", advance);
+    money("total", "Total", total);
+    if ((b["advance_method"] ?? null) !== (advance > 0 ? data.advanceMethod : null)) {
+      changes.push(
+        `Advance method: ${String(b["advance_method"] ?? "—")} → ${advance > 0 ? data.advanceMethod : "—"}`,
+      );
+    }
+
+    await logActivity(
+      db,
+      data.id,
+      "edit",
+      changes.length > 0
+        ? `${who} updated the order items — ${changes.join(" · ")}`
+        : `${who} saved order items (no changes)`,
+      { actor: who, meta: { changes } },
+    );
     return { ok: true, subtotal, total };
   });
 
@@ -181,18 +255,17 @@ export const adminAddOrderNote = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => orderNoteSchema.parse(input))
   .handler(async ({ data, context }) => {
     const db = await requireAdmin(context.supabase, context.userId);
-    const { data: profile } = await db
-      .from("profiles")
-      .select("full_name")
-      .eq("id", context.userId)
-      .maybeSingle();
+    const who = await actorName(db, context.userId);
     const { error } = await db.from("order_notes").insert({
       order_id: data.orderId,
       author_id: context.userId,
-      author_name: (profile?.full_name as string | null) ?? "Staff",
+      author_name: who,
       body: data.body,
     });
     if (error) throw new Error(error.message);
+    await logActivity(db, data.orderId, "note", `${who} added an internal note — "${data.body}"`, {
+      actor: who,
+    });
     return { ok: true };
   });
 
