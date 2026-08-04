@@ -16,6 +16,7 @@ const saveSchema = z.object({
   provider: providerSchema,
   enabled: z.boolean().default(true),
   credentials: z.record(z.string(), z.string().max(500)),
+  noteTemplate: z.string().trim().max(500).optional().default(""),
   config: z.record(z.string(), z.union([z.string(), z.number(), z.boolean()])).default({}),
 });
 
@@ -31,6 +32,10 @@ export type DeliveryPartnerRow = {
   configured: boolean;
   /** Shared secret the courier must send back on webhook calls. */
   webhook_secret: string | null;
+  /** When true this partner is pre-selected everywhere a courier is picked. */
+  is_default: boolean;
+  /** Delivery note text applied automatically when this partner is selected. */
+  note_template: string;
 };
 
 function maskCreds(provider: DeliveryProvider, raw: Record<string, unknown>) {
@@ -118,6 +123,8 @@ export const adminListDeliveryPartners = createServerFn({ method: "GET" })
         connection_message: row.connection_message,
         last_checked_at: row.last_checked_at,
         webhook_secret: row.webhook_secret ?? null,
+        is_default: row.is_default ?? false,
+        note_template: row.note_template ?? "",
         configured: missingFields(provider, creds as Record<string, string>).length === 0,
       };
     });
@@ -185,6 +192,7 @@ export const adminSaveDeliveryPartner = createServerFn({ method: "POST" })
           ...check.extra,
         } as never,
         webhook_secret: secret,
+        note_template: data.noteTemplate || null,
         connection_ok: check.ok,
         connection_message: check.message,
         last_checked_at: new Date().toISOString(),
@@ -221,15 +229,45 @@ export const adminRemoveDeliveryPartner = createServerFn({ method: "POST" })
   });
 
 /** Partners available for order dispatch (enabled + verified). */
+export type ActiveDeliveryPartner = {
+  provider: DeliveryProvider;
+  isDefault: boolean;
+  noteTemplate: string;
+};
+
 export const adminActiveDeliveryPartners = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .handler(async ({ context }): Promise<DeliveryProvider[]> => {
+  .handler(async ({ context }): Promise<ActiveDeliveryPartner[]> => {
     const db = await requireAdmin(context.supabase, context.userId);
     const { data } = await db
       .from("delivery_partners")
-      .select("provider, enabled")
-      .eq("enabled", true);
-    return (data ?? []).map((r) => r.provider as DeliveryProvider);
+      .select("provider, enabled, is_default, note_template")
+      .eq("enabled", true)
+      .order("provider");
+    return (data ?? []).map((r) => ({
+      provider: r.provider as DeliveryProvider,
+      isDefault: r.is_default ?? false,
+      noteTemplate: r.note_template ?? "",
+    }));
+  });
+
+/** Marks one partner as the default; every other partner is unset. */
+export const adminSetDefaultDeliveryPartner = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => z.object({ provider: providerSchema }).parse(input))
+  .handler(async ({ data, context }) => {
+    const db = await requireAdmin(context.supabase, context.userId);
+    const { error: clearError } = await db
+      .from("delivery_partners")
+      .update({ is_default: false })
+      .neq("provider", data.provider);
+    if (clearError) throw new Error(clearError.message);
+    const { error } = await db
+      .from("delivery_partners")
+      .update({ is_default: true })
+      .eq("provider", data.provider);
+    if (error) throw new Error(error.message);
+    return { ok: true };
   });
 
 /**
