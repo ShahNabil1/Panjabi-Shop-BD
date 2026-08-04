@@ -256,6 +256,8 @@ export const adminTestCourierWebhook = createServerFn({ method: "POST" })
       };
     }
 
+    const { PATHAO_INTEGRATION_SECRET } = await import("@/lib/courier-webhook.server");
+
     // Always probe the real, branded public endpoint that couriers actually call —
     // never a local self-request, so the result can't be falsely optimistic.
     const url = `https://upoharkabbo.com/api/public/courier/${data.provider}`;
