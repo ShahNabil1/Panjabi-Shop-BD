@@ -79,6 +79,10 @@ export function FulfillmentCard({
   });
 
   const normalised = (courierStatus ?? "unknown") as CourierStatus;
+  const isPathao = (partner ?? "").toLowerCase() === "pathao";
+  const consignmentUrl = consignmentId
+    ? `https://merchant.pathao.com/courier/orders/${consignmentId}`
+    : null;
 
   return (
     <div className="grid gap-4 lg:grid-cols-2">
@@ -87,7 +91,14 @@ export function FulfillmentCard({
           Fulfillment
         </h2>
 
-        <div className="rounded-xl border border-border/70 bg-background/60 p-3">
+        <div
+          className={cn(
+            "rounded-xl border p-3",
+            isPathao
+              ? "border-[#E32227]/30 bg-gradient-to-br from-[#E32227]/[0.06] via-white to-white"
+              : "border-border/70 bg-background/60",
+          )}
+        >
           <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
             Physical shipment
           </p>
@@ -96,16 +107,25 @@ export function FulfillmentCard({
               {status === "pending" ? "Pending" : status.toUpperCase()}
             </span>
             {partner ? (
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-2.5 py-0.5 text-xs font-semibold">
-                <Truck className="size-3.5" />
-                {partner}
-              </span>
+              isPathao ? (
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-[#E32227] px-2.5 py-0.5 text-xs font-bold uppercase tracking-wide text-white shadow-sm">
+                  <Truck className="size-3.5" />
+                  Pathao
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-2.5 py-0.5 text-xs font-semibold">
+                  <Truck className="size-3.5" />
+                  {partner}
+                </span>
+              )
             ) : null}
             {courierStatus ? (
               <span
                 className={cn(
                   "inline-flex rounded-full px-2.5 py-0.5 text-xs font-bold ring-1",
-                  courierStatusTone(normalised),
+                  isPathao
+                    ? "bg-black text-white ring-black"
+                    : courierStatusTone(normalised),
                 )}
               >
                 {courierStatusLabels[normalised] ?? courierStatus}
@@ -114,38 +134,64 @@ export function FulfillmentCard({
           </div>
 
           {consignmentId ? (
-            <dl className="mt-3 grid gap-1 text-xs text-muted-foreground">
-              <div className="flex gap-2">
-                <dt className="font-semibold">Consignment</dt>
-                <dd className="font-mono text-foreground">{consignmentId}</dd>
-              </div>
-              {trackingCode ? (
-                <div className="flex gap-2">
-                  <dt className="font-semibold">Tracking</dt>
-                  <dd className="font-mono text-foreground">{trackingCode}</dd>
+            <div className="mt-3 space-y-3">
+              <div
+                className={cn(
+                  "rounded-lg border px-3 py-2.5",
+                  isPathao ? "border-[#E32227]/25 bg-white" : "border-border/70 bg-background",
+                )}
+              >
+                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+                  Consignment
+                </p>
+                <div className="mt-1 flex items-center gap-2">
+                  {isPathao && consignmentUrl ? (
+                    <a
+                      href={consignmentUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      title="Open in Pathao merchant panel"
+                      className="truncate font-mono text-lg font-extrabold tracking-tight text-black underline-offset-4 transition hover:text-[#E32227] hover:underline"
+                    >
+                      {consignmentId}
+                    </a>
+                  ) : (
+                    <span className="truncate font-mono text-lg font-extrabold tracking-tight text-foreground">
+                      {consignmentId}
+                    </span>
+                  )}
+                  <CopyButton value={consignmentId} accent={isPathao} />
                 </div>
-              ) : null}
-              {sentAt ? (
-                <div className="flex gap-2">
-                  <dt className="font-semibold">Sent</dt>
-                  <dd>
-                    {new Date(sentAt).toLocaleString("en-US", { timeZone: "Asia/Dhaka" })}
-                  </dd>
-                </div>
-              ) : null}
-              <div className="pt-1">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  loading={refresh.isPending}
-                  onClick={() => refresh.mutate()}
-                  className="active:scale-95"
-                >
-                  <RefreshCw className="size-4" />
-                  Refresh courier status
-                </Button>
               </div>
-            </dl>
+
+              <dl className="grid gap-1 text-xs text-muted-foreground">
+                {trackingCode ? (
+                  <div className="flex gap-2">
+                    <dt className="font-semibold">Tracking</dt>
+                    <dd className="font-mono text-foreground">{trackingCode}</dd>
+                  </div>
+                ) : null}
+                {sentAt ? (
+                  <div className="flex gap-2">
+                    <dt className="font-semibold">Sent</dt>
+                    <dd>
+                      {new Date(sentAt).toLocaleString("en-US", { timeZone: "Asia/Dhaka" })}
+                    </dd>
+                  </div>
+                ) : null}
+              </dl>
+
+              <Button
+                size="sm"
+                variant="outline"
+                loading={refresh.isPending}
+                onClick={() => refresh.mutate()}
+                className="active:scale-95"
+              >
+                <RefreshCw className="size-4" />
+                Refresh courier status
+              </Button>
+            </div>
           ) : orderStatus === "pending" ? (
             <div className="mt-3 space-y-2">
               <Button
