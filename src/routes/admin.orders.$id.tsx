@@ -241,6 +241,7 @@ function AdminOrderDetail() {
     advance_amount?: number | string | null;
     advance_method?: string | null;
     fulfillment_status: string;
+    scheduled_for?: string | null;
     courier_status?: string | null;
     courier_consignment_id?: string | null;
     courier_tracking_code?: string | null;
