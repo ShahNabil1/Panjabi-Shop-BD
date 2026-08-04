@@ -129,10 +129,10 @@ export function ImageUploadButton({
   folder: Folder;
   multiple?: boolean;
   label?: string;
-  className?: string;
+  className?: string | undefined;
   /** Route files through the advanced crop dialog first. */
   crop?: boolean;
-  cropPreset?: string;
+  cropPreset?: string | undefined;
   onUploaded: (urls: string[]) => void;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -186,9 +186,9 @@ export function CropExistingButton({
 }: {
   folder: Folder;
   url: string;
-  cropPreset?: string;
+  cropPreset?: string | undefined;
   onCropped: (newUrl: string) => void;
-  className?: string;
+  className?: string | undefined;
 }) {
   const [open, setOpen] = useState(false);
   const { busy, upload } = useImageUpload(folder);
@@ -240,7 +240,7 @@ export function ImageField({
   onChange: (url: string | null) => void;
   hint?: string;
   crop?: boolean;
-  cropPreset?: string;
+  cropPreset?: string | undefined;
 }) {
   const { busy, upload } = useImageUpload(folder);
   const [dragging, setDragging] = useState(false);

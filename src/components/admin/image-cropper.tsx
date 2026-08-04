@@ -66,8 +66,8 @@ export function ImageCropperDialog({
   onCropped,
 }: {
   src: string;
-  fileName?: string;
-  initialPreset?: string;
+  fileName?: string | undefined;
+  initialPreset?: string | undefined;
   onCancel: () => void;
   onCropped: (file: File) => void;
 }) {
