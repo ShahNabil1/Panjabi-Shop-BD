@@ -294,8 +294,40 @@ function PartnerCard({
             <Copy className="size-4" />
             Copy
           </Button>
+          <Button
+            type="button"
+            variant="outline"
+            disabled={pinging || !row?.webhook_secret}
+            className="shrink-0 active:scale-95"
+            onClick={() => void pingWebhook()}
+          >
+            {pinging ? (
+              <Loader2 className="size-4 animate-spin" />
+            ) : (
+              <Radio className="size-4" />
+            )}
+            Test webhook
+          </Button>
         </div>
+        {ping ? (
+          <div
+            className={cn(
+              "space-y-1 rounded-xl px-3 py-2 text-xs",
+              ping.ok
+                ? "bg-emerald-50 text-emerald-700"
+                : "bg-rose-50 text-rose-700",
+            )}
+          >
+            <p className="font-semibold">
+              Receiver responded {ping.status || "—"} {ping.ok ? "· signature accepted" : "· failed"}
+            </p>
+            <pre className="whitespace-pre-wrap break-all font-mono text-[11px] opacity-90">
+              {ping.body}
+            </pre>
+          </div>
+        ) : null}
       </div>
+
 
       {row?.webhook_secret ? (
         <div className="space-y-1.5">
