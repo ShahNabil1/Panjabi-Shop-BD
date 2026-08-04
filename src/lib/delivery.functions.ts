@@ -24,7 +24,7 @@ export type DeliveryPartnerRow = {
   enabled: boolean;
   /** Secret values are replaced with a mask; non-secret fields come back as-is. */
   credentials: Record<string, string>;
-  config: Record<string, unknown>;
+  stores: { store_id: number; store_name: string }[];
   connection_ok: boolean;
   connection_message: string | null;
   last_checked_at: string | null;
@@ -111,7 +111,8 @@ export const adminListDeliveryPartners = createServerFn({ method: "GET" })
         provider,
         enabled: row.enabled,
         credentials: maskCreds(provider, creds),
-        config: (row.config ?? {}) as Record<string, unknown>,
+        stores: (((row.config ?? {}) as Record<string, unknown>)["stores"] ??
+          []) as { store_id: number; store_name: string }[],
         connection_ok: row.connection_ok,
         connection_message: row.connection_message,
         last_checked_at: row.last_checked_at,
