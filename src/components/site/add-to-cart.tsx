@@ -63,6 +63,7 @@ export function AddToCartBar({
 }) {
   const { lang } = useLang();
   const { add, openCart } = useCart();
+  const navigate = useNavigate();
   const [qty, setQty] = useState(1);
   const soldOut = stock <= 0;
 
