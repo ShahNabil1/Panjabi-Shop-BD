@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { z } from "zod";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { requireAdmin, unwrap } from "./admin.server";
@@ -507,6 +508,100 @@ export const adminDeleteFaq = createServerFn({ method: "POST" })
     const { error } = await db.from("faqs").delete().eq("id", data.id);
     if (error) throw new Error(error.message);
     return { ok: true };
+  });
+
+export const adminGetCleanupStats = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z.object({ days: z.number().int().min(7).max(730).default(90) }).parse(input ?? {}),
+  )
+  .handler(async ({ data, context }) => {
+    const db = await requireAdmin(context.supabase, context.userId);
+    const cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - data.days);
+    const cutoffIso = cutoff.toISOString();
+
+    const [activity, webhooks, notes, consignments] = await Promise.all([
+      db
+        .from("order_activity")
+        .select("id", { count: "exact", head: true })
+        .in(
+          "order_id",
+          (await db.from("orders").select("id").lt("created_at", cutoffIso)).data?.map((r) => r.id) ?? [],
+        ),
+      db.from("courier_webhook_events").select("id", { count: "exact", head: true }).lt("created_at", cutoffIso),
+      db
+        .from("order_notes")
+        .select("id", { count: "exact", head: true })
+        .in(
+          "order_id",
+          (await db.from("orders").select("id").lt("created_at", cutoffIso)).data?.map((r) => r.id) ?? [],
+        ),
+      db
+        .from("order_consignments")
+        .select("id", { count: "exact", head: true })
+        .neq("raw", '{}')
+        .in(
+          "order_id",
+          (await db.from("orders").select("id").lt("created_at", cutoffIso)).data?.map((r) => r.id) ?? [],
+        ),
+    ]);
+
+    return {
+      cutoff: cutoffIso,
+      activityRows: activity.count ?? 0,
+      webhookRows: webhooks.count ?? 0,
+      noteRows: notes.count ?? 0,
+      rawPayloadRows: consignments.count ?? 0,
+    };
+  });
+
+export const adminRunCleanup = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z.object({ days: z.number().int().min(7).max(730).default(90) }).parse(input ?? {}),
+  )
+  .handler(async ({ data, context }) => {
+    const db = await requireAdmin(context.supabase, context.userId);
+    const { data: result, error } = await db.rpc("cleanup_old_order_logs", {
+      _retention_days: data.days,
+    });
+    if (error) throw new Error(error.message);
+
+    const now = new Date().toISOString();
+    await db
+      .from("site_settings")
+      .upsert(
+        {
+          key: "retention",
+          value: {
+            days: data.days,
+            enabled: true,
+            last_run: now,
+            last_result: result,
+          } as never,
+        },
+        { onConflict: "key" },
+      );
+
+    const r = result as {
+      success?: boolean;
+      cutoff?: string;
+      retention_days?: number;
+      deleted_activity?: number;
+      deleted_webhooks?: number;
+      deleted_notes?: number;
+      truncated_consignments?: number;
+    };
+    return {
+      success: r.success ?? true,
+      cutoff: r.cutoff ?? now,
+      retentionDays: r.retention_days ?? data.days,
+      deletedActivity: r.deleted_activity ?? 0,
+      deletedWebhooks: r.deleted_webhooks ?? 0,
+      deletedNotes: r.deleted_notes ?? 0,
+      truncatedConsignments: r.truncated_consignments ?? 0,
+    };
   });
 
 export const adminListSettings = createServerFn({ method: "GET" })

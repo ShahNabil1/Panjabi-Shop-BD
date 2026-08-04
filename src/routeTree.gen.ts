@@ -41,10 +41,12 @@ import { Route as AdminProductsIndexRouteImport } from './routes/admin.products.
 import { Route as AdminProductsIdRouteImport } from './routes/admin.products.$id'
 import { Route as AdminSettingsIndexRouteImport } from './routes/admin.settings.index'
 import { Route as AdminSettingsDeliveryRouteImport } from './routes/admin.settings.delivery'
+import { Route as AdminSettingsRetentionRouteImport } from './routes/admin.settings.retention'
 import { Route as AdminSettingsSmsTemplatesRouteImport } from './routes/admin.settings.sms-templates'
 import { Route as CCategoryIndexRouteImport } from './routes/c.$category.index'
 import { Route as CCategorySubcategoryRouteImport } from './routes/c.$category.$subcategory'
 import { Route as ApiPublicCourierProviderRouteImport } from './routes/api/public/courier.$provider'
+import { Route as ApiPublicHooksCleanupOldLogsRouteImport } from './routes/api/public/hooks/cleanup-old-logs'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -206,6 +208,11 @@ const AdminSettingsDeliveryRoute = AdminSettingsDeliveryRouteImport.update({
   path: '/settings/delivery',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminSettingsRetentionRoute = AdminSettingsRetentionRouteImport.update({
+  id: '/settings/retention',
+  path: '/settings/retention',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminSettingsSmsTemplatesRoute =
   AdminSettingsSmsTemplatesRouteImport.update({
     id: '/settings/sms-templates',
@@ -226,6 +233,12 @@ const ApiPublicCourierProviderRoute =
   ApiPublicCourierProviderRouteImport.update({
     id: '/api/public/courier/$provider',
     path: '/api/public/courier/$provider',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicHooksCleanupOldLogsRoute =
+  ApiPublicHooksCleanupOldLogsRouteImport.update({
+    id: '/api/public/hooks/cleanup-old-logs',
+    path: '/api/public/hooks/cleanup-old-logs',
     getParentRoute: () => rootRouteImport,
   } as any)
 
@@ -259,6 +272,7 @@ export interface FileRoutesByFullPath {
   '/admin/orders/list': typeof AdminOrdersListRoute
   '/admin/products/$id': typeof AdminProductsIdRoute
   '/admin/settings/delivery': typeof AdminSettingsDeliveryRoute
+  '/admin/settings/retention': typeof AdminSettingsRetentionRoute
   '/admin/settings/sms-templates': typeof AdminSettingsSmsTemplatesRoute
   '/c/$category/$subcategory': typeof CCategorySubcategoryRoute
   '/admin/orders/': typeof AdminOrdersIndexRoute
@@ -266,6 +280,7 @@ export interface FileRoutesByFullPath {
   '/admin/settings/': typeof AdminSettingsIndexRoute
   '/c/$category/': typeof CCategoryIndexRoute
   '/api/public/courier/$provider': typeof ApiPublicCourierProviderRoute
+  '/api/public/hooks/cleanup-old-logs': typeof ApiPublicHooksCleanupOldLogsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -296,6 +311,7 @@ export interface FileRoutesByTo {
   '/admin/orders/list': typeof AdminOrdersListRoute
   '/admin/products/$id': typeof AdminProductsIdRoute
   '/admin/settings/delivery': typeof AdminSettingsDeliveryRoute
+  '/admin/settings/retention': typeof AdminSettingsRetentionRoute
   '/admin/settings/sms-templates': typeof AdminSettingsSmsTemplatesRoute
   '/c/$category/$subcategory': typeof CCategorySubcategoryRoute
   '/admin/orders': typeof AdminOrdersIndexRoute
@@ -303,6 +319,7 @@ export interface FileRoutesByTo {
   '/admin/settings': typeof AdminSettingsIndexRoute
   '/c/$category': typeof CCategoryIndexRoute
   '/api/public/courier/$provider': typeof ApiPublicCourierProviderRoute
+  '/api/public/hooks/cleanup-old-logs': typeof ApiPublicHooksCleanupOldLogsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -335,6 +352,7 @@ export interface FileRoutesById {
   '/admin/orders/list': typeof AdminOrdersListRoute
   '/admin/products/$id': typeof AdminProductsIdRoute
   '/admin/settings/delivery': typeof AdminSettingsDeliveryRoute
+  '/admin/settings/retention': typeof AdminSettingsRetentionRoute
   '/admin/settings/sms-templates': typeof AdminSettingsSmsTemplatesRoute
   '/c/$category/$subcategory': typeof CCategorySubcategoryRoute
   '/admin/orders/': typeof AdminOrdersIndexRoute
@@ -342,6 +360,7 @@ export interface FileRoutesById {
   '/admin/settings/': typeof AdminSettingsIndexRoute
   '/c/$category/': typeof CCategoryIndexRoute
   '/api/public/courier/$provider': typeof ApiPublicCourierProviderRoute
+  '/api/public/hooks/cleanup-old-logs': typeof ApiPublicHooksCleanupOldLogsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -375,6 +394,7 @@ export interface FileRouteTypes {
     | '/admin/orders/list'
     | '/admin/products/$id'
     | '/admin/settings/delivery'
+    | '/admin/settings/retention'
     | '/admin/settings/sms-templates'
     | '/c/$category/$subcategory'
     | '/admin/orders/'
@@ -382,6 +402,7 @@ export interface FileRouteTypes {
     | '/admin/settings/'
     | '/c/$category/'
     | '/api/public/courier/$provider'
+    | '/api/public/hooks/cleanup-old-logs'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -412,6 +433,7 @@ export interface FileRouteTypes {
     | '/admin/orders/list'
     | '/admin/products/$id'
     | '/admin/settings/delivery'
+    | '/admin/settings/retention'
     | '/admin/settings/sms-templates'
     | '/c/$category/$subcategory'
     | '/admin/orders'
@@ -419,6 +441,7 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/c/$category'
     | '/api/public/courier/$provider'
+    | '/api/public/hooks/cleanup-old-logs'
   id:
     | '__root__'
     | '/'
@@ -450,6 +473,7 @@ export interface FileRouteTypes {
     | '/admin/orders/list'
     | '/admin/products/$id'
     | '/admin/settings/delivery'
+    | '/admin/settings/retention'
     | '/admin/settings/sms-templates'
     | '/c/$category/$subcategory'
     | '/admin/orders/'
@@ -457,6 +481,7 @@ export interface FileRouteTypes {
     | '/admin/settings/'
     | '/c/$category/'
     | '/api/public/courier/$provider'
+    | '/api/public/hooks/cleanup-old-logs'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -481,6 +506,7 @@ export interface RootRouteChildren {
   CCategorySubcategoryRoute: typeof CCategorySubcategoryRoute
   CCategoryIndexRoute: typeof CCategoryIndexRoute
   ApiPublicCourierProviderRoute: typeof ApiPublicCourierProviderRoute
+  ApiPublicHooksCleanupOldLogsRoute: typeof ApiPublicHooksCleanupOldLogsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -709,6 +735,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminSettingsDeliveryRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/settings/retention': {
+      id: '/admin/settings/retention'
+      path: '/settings/retention'
+      fullPath: '/admin/settings/retention'
+      preLoaderRoute: typeof AdminSettingsRetentionRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/settings/sms-templates': {
       id: '/admin/settings/sms-templates'
       path: '/settings/sms-templates'
@@ -737,6 +770,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicCourierProviderRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/cleanup-old-logs': {
+      id: '/api/public/hooks/cleanup-old-logs'
+      path: '/api/public/hooks/cleanup-old-logs'
+      fullPath: '/api/public/hooks/cleanup-old-logs'
+      preLoaderRoute: typeof ApiPublicHooksCleanupOldLogsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -752,6 +792,7 @@ interface AdminRouteChildren {
   AdminOrdersListRoute: typeof AdminOrdersListRoute
   AdminProductsIdRoute: typeof AdminProductsIdRoute
   AdminSettingsDeliveryRoute: typeof AdminSettingsDeliveryRoute
+  AdminSettingsRetentionRoute: typeof AdminSettingsRetentionRoute
   AdminSettingsSmsTemplatesRoute: typeof AdminSettingsSmsTemplatesRoute
   AdminOrdersIndexRoute: typeof AdminOrdersIndexRoute
   AdminProductsIndexRoute: typeof AdminProductsIndexRoute
@@ -770,6 +811,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminOrdersListRoute: AdminOrdersListRoute,
   AdminProductsIdRoute: AdminProductsIdRoute,
   AdminSettingsDeliveryRoute: AdminSettingsDeliveryRoute,
+  AdminSettingsRetentionRoute: AdminSettingsRetentionRoute,
   AdminSettingsSmsTemplatesRoute: AdminSettingsSmsTemplatesRoute,
   AdminOrdersIndexRoute: AdminOrdersIndexRoute,
   AdminProductsIndexRoute: AdminProductsIndexRoute,
@@ -800,6 +842,7 @@ const rootRouteChildren: RootRouteChildren = {
   CCategorySubcategoryRoute: CCategorySubcategoryRoute,
   CCategoryIndexRoute: CCategoryIndexRoute,
   ApiPublicCourierProviderRoute: ApiPublicCourierProviderRoute,
+  ApiPublicHooksCleanupOldLogsRoute: ApiPublicHooksCleanupOldLogsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

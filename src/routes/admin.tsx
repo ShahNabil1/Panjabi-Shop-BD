@@ -5,6 +5,7 @@ import {
   BadgePercent,
   Boxes,
   ChevronLeft,
+  Database,
   ExternalLink,
   HelpCircle,
   LayoutDashboard,
@@ -89,6 +90,7 @@ const sections: Array<{ title: string; items: NavItem[] }> = [
       { to: "/admin/settings", label: "Site Settings", icon: Settings, exact: true },
       { to: "/admin/settings/delivery", label: "Delivery Settings", icon: Truck },
       { to: "/admin/settings/sms-templates", label: "SMS Templates", icon: MessageSquareText },
+      { to: "/admin/settings/retention", label: "Data Cleanup", icon: Database },
 
     ],
   },
