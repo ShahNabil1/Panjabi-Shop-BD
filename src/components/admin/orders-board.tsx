@@ -95,7 +95,15 @@ export function OrdersBoard({
   statuses: readonly OrderStatus[];
   emptyTitle?: string;
 }) {
-  const [status, setStatus] = useState<string>(statuses[0]!);
+  /**
+   * Order List also exposes two payment views. They are not order statuses:
+   * they slice delivered / partial-delivered parcels by whether Pathao has
+   * already paid the money out (an `order.paid` invoice webhook arrived).
+   */
+  const tabs: readonly string[] =
+    bucket === "list" ? [...statuses, ...paymentFilters] : statuses;
+  const [status, setStatus] = useState<string>(tabs[0]!);
+  const isPaymentView = (paymentFilters as readonly string[]).includes(status);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const PAGE_SIZE_KEY = "admin.orders.pageSize";
@@ -121,7 +129,11 @@ export function OrdersBoard({
       adminListOrders({
         data: {
           bucket,
-          ...(status ? { status: status as OrderStatus } : {}),
+          ...(isPaymentView
+            ? { payment: status as PaymentFilter }
+            : status
+              ? { status: status as OrderStatus }
+              : {}),
           ...(search ? { search } : {}),
         },
       }),
