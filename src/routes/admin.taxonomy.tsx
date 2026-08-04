@@ -171,6 +171,7 @@ function TaxonomyPage() {
               folder="categories"
               value={cat.image_url}
               onChange={(v) => setCat({ ...cat, image_url: v })}
+              hint="আপলোড বা Crop চাপলে অ্যাডভান্স ক্রপ টুল খুলবে — কার্ড (4:5), স্কয়ার, 3:4 বা ওয়াইড রেশিও, জুম/ড্র্যাগ ও ডেস্কটপ-মোবাইল লাইভ প্রিভিউসহ।"
             />
           </div>
           <Field label="Description">
