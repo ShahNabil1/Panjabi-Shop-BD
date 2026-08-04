@@ -18,6 +18,7 @@ import {
   type CourierStatus,
 } from "@/lib/delivery-shared";
 import { CourierStatusBar, ratioTone } from "@/components/admin/courier-status";
+import { CourierApiStatusBar } from "@/components/admin/courier-api-status";
 import { CourierBadge } from "@/components/admin/courier-logo";
 import { cn } from "@/lib/utils";
 import { Pagination } from "@/components/admin/pagination";
