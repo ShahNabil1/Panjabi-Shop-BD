@@ -42,6 +42,19 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
 
+function humaniseEvent(raw?: string | null) {
+  if (!raw) return "Event";
+  const cleaned = raw.replace(/[._-]+/g, " ").trim();
+  if (!cleaned) return "Event";
+  if (/\s/.test(cleaned) === false && /[A-Z]/.test(cleaned.slice(1))) {
+    return cleaned.replace(/([a-z])([A-Z])/g, "$1 $2");
+  }
+  return cleaned
+    .split(/\s+/)
+    .map((w) => (w.length <= 2 ? w.toUpperCase() : w[0]!.toUpperCase() + w.slice(1)))
+    .join(" ");
+}
+
 
 export type NoteRow = {
   id: string;
