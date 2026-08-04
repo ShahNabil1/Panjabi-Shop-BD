@@ -729,6 +729,7 @@ export const adminCreateOrder = createServerFn({ method: "POST" })
         advance_amount: data.advanceAmount,
         advance_method: data.advanceAmount > 0 ? data.advanceMethod : null,
         delivery_partner: data.deliveryPartner,
+        delivery_note: data.deliveryNote || null,
         payment_method: data.advanceAmount > 0 ? "partial_advance" : "cod",
         status: "pending",
         source: data.source,

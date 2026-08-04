@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Plus, Search, Trash2, UserCheck } from "lucide-react";
 import { toast } from "sonner";
 
@@ -71,12 +71,34 @@ function CreateOrderPage() {
     useState<(typeof advanceMethods)[number]>("bKash");
   const [source, setSource] = useState<(typeof orderSources)[number]>("Facebook");
   const [deliveryPartner, setDeliveryPartner] = useState<string>("");
+  const [deliveryNoteOn, setDeliveryNoteOn] = useState(true);
+  const [deliveryNote, setDeliveryNote] = useState("");
 
   const activePartners = useQuery({
     queryKey: ["admin", "active-delivery-partners"],
     queryFn: () => adminActiveDeliveryPartners(),
     staleTime: 60_000,
   });
+
+  const partnerOptions = activePartners.data ?? [];
+
+  /** Applies a partner's saved note template to the delivery note field. */
+  const applyPartner = (label: string) => {
+    setDeliveryPartner(label);
+    const match = partnerOptions.find((p) => providerLabels[p.provider] === label);
+    setDeliveryNote(deliveryNoteOn ? (match?.noteTemplate ?? "") : "");
+  };
+
+  // Pre-select the default courier (and its note template) once partners load.
+  const defaultApplied = useRef(false);
+  useEffect(() => {
+    if (defaultApplied.current || partnerOptions.length === 0) return;
+    const fallback = partnerOptions.find((p) => p.isDefault);
+    if (!fallback) return;
+    defaultApplied.current = true;
+    setDeliveryPartner(providerLabels[fallback.provider]);
+    setDeliveryNote((prev) => (prev ? prev : fallback.noteTemplate));
+  }, [partnerOptions]);
 
   const phoneValid = /^01[3-9]\d{8}$/.test(phone.trim());
 
@@ -196,6 +218,7 @@ function CreateOrderPage() {
           advanceMethod: advanceAmount > 0 ? advanceMethod : null,
           source,
           deliveryPartner: deliveryPartner === "" ? null : deliveryPartner,
+          deliveryNote: deliveryNoteOn ? deliveryNote.trim() : "",
           items: lines.map((l) => ({
             productId: l.productId,
             variantId: l.variantId,
@@ -601,23 +624,55 @@ function CreateOrderPage() {
                 <select
                   className={input}
                   value={deliveryPartner}
-                  onChange={(e) => setDeliveryPartner(e.target.value)}
+                  onChange={(e) => applyPartner(e.target.value)}
                   disabled={activePartners.isLoading}
                 >
                   <option value="">Not selected</option>
-                  {(activePartners.data ?? []).map((p) => (
-                    <option key={p} value={providerLabels[p]}>
-                      {providerLabels[p]}
+                  {partnerOptions.map((p) => (
+                    <option key={p.provider} value={providerLabels[p.provider]}>
+                      {providerLabels[p.provider]}
+                      {p.isDefault ? " (default)" : ""}
                     </option>
                   ))}
                 </select>
-                {!activePartners.isLoading && (activePartners.data ?? []).length === 0 ? (
+                {!activePartners.isLoading && partnerOptions.length === 0 ? (
                   <span className="mt-1 block text-xs font-semibold text-muted-foreground">
                     No delivery partner is enabled yet — add one in Settings → Delivery.
                   </span>
                 ) : null}
               </label>
 
+              <div className="sm:col-span-2">
+                <label className="flex cursor-pointer items-center gap-2 text-sm font-semibold">
+                  <input
+                    type="checkbox"
+                    className="size-4 accent-primary"
+                    checked={deliveryNoteOn}
+                    onChange={(e) => {
+                      const on = e.target.checked;
+                      setDeliveryNoteOn(on);
+                      if (!on) setDeliveryNote("");
+                      else {
+                        const match = partnerOptions.find(
+                          (p) => providerLabels[p.provider] === deliveryPartner,
+                        );
+                        setDeliveryNote(match?.noteTemplate ?? "");
+                      }
+                    }}
+                  />
+                  Add delivery note
+                </label>
+                {deliveryNoteOn ? (
+                  <textarea
+                    rows={3}
+                    maxLength={500}
+                    className={cn(input, "mt-2 h-auto py-2")}
+                    placeholder="Sent to the courier as special instruction"
+                    value={deliveryNote}
+                    onChange={(e) => setDeliveryNote(e.target.value)}
+                  />
+                ) : null}
+              </div>
             </div>
 
             <Button

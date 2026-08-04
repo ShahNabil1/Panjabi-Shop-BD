@@ -412,7 +412,9 @@ export type Database = {
           credentials: Json
           enabled: boolean
           id: string
+          is_default: boolean
           last_checked_at: string | null
+          note_template: string | null
           provider: string
           updated_at: string
           webhook_secret: string | null
@@ -425,7 +427,9 @@ export type Database = {
           credentials?: Json
           enabled?: boolean
           id?: string
+          is_default?: boolean
           last_checked_at?: string | null
+          note_template?: string | null
           provider: string
           updated_at?: string
           webhook_secret?: string | null
@@ -438,7 +442,9 @@ export type Database = {
           credentials?: Json
           enabled?: boolean
           id?: string
+          is_default?: boolean
           last_checked_at?: string | null
+          note_template?: string | null
           provider?: string
           updated_at?: string
           webhook_secret?: string | null
