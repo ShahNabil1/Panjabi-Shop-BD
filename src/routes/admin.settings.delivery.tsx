@@ -33,6 +33,8 @@ import {
   type DeliveryProvider,
 } from "@/lib/delivery-shared";
 import { AdminHeading, Panel } from "@/components/admin/kit";
+import { CourierMark, courierKey } from "@/components/admin/courier-logo";
+
 import { BrandLoader } from "@/components/admin/brand-loader";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -246,9 +248,14 @@ function PartnerCard({
     <Panel className="space-y-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <span className="grid size-10 place-items-center rounded-xl bg-primary/10 text-primary">
-            <Truck className="size-5" />
-          </span>
+          {courierKey(provider) ? (
+            <CourierMark partner={provider} className="size-10" />
+          ) : (
+            <span className="grid size-10 place-items-center rounded-xl bg-primary/10 text-primary">
+              <Truck className="size-5" />
+            </span>
+          )}
+
           <div>
             <h3 className="text-base font-bold text-foreground">{providerLabels[provider]}</h3>
             <p className="text-xs text-muted-foreground">
