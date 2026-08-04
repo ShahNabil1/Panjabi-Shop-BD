@@ -65,9 +65,19 @@ export async function recordCouponRedemption(input: {
       coupon_id: input.couponId,
       order_id: input.orderId,
       phone: input.phone,
-      amount: input.amount,
+      discount_amount: input.amount,
     });
+    const { data: row } = await input.db
+      .from("coupons")
+      .select("uses_count")
+      .eq("id", input.couponId)
+      .maybeSingle();
+    await input.db
+      .from("coupons")
+      .update({ uses_count: Number(row?.uses_count ?? 0) + 1 })
+      .eq("id", input.couponId);
   } catch {
     /* redemption logging must never fail an order */
   }
 }
+
