@@ -49,8 +49,22 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-const updatableStatuses = ["no_response", "good_no_response", "hold", "cancelled"] as const;
+const updatableStatuses = [
+  "no_response",
+  "good_no_response",
+  "hold",
+  "pre_order",
+  "scheduled_order",
+  "cancelled",
+] as const;
 type PendingStatus = (typeof updatableStatuses)[number];
+
+/** `datetime-local` value for "one hour from now", used as the schedule default. */
+function defaultScheduleValue(): string {
+  const d = new Date(Date.now() + 60 * 60 * 1000);
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
 
 export const Route = createFileRoute("/admin/orders/$id")({
   validateSearch: (search: Record<string, unknown>): { takeover?: number; from?: "list" } => ({
