@@ -128,8 +128,6 @@ function RetentionSettings() {
             label="Retention window (days)"
             value={days}
             onChange={(v) => setDays(Math.max(7, Math.min(730, Math.round(v))))}
-            min={7}
-            max={730}
           />
           <div className="flex items-end">
             <p className="text-xs text-muted-foreground">
