@@ -15,7 +15,7 @@ import {
   TextField,
   ToggleField,
 } from "@/components/admin/kit";
-import { ImageUploadButton } from "@/components/admin/image-upload";
+import { CropExistingButton, ImageUploadButton } from "@/components/admin/image-upload";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -325,6 +325,8 @@ function ProductEditor() {
               <ImageUploadButton
                 folder="products"
                 multiple
+                crop
+                cropPreset="card"
                 label="Upload images"
                 onUploaded={(urls) =>
                   set("images", [
@@ -355,7 +357,9 @@ function ProductEditor() {
           }
         />
         <p className="mb-3 text-[11px] text-muted-foreground">
-          Images are compressed to WebP in-browser before upload (max 2000px).
+          আপলোডের আগে অ্যাডভান্স ক্রপ টুলে কার্ড (4:5), স্কয়ার, প্রোডাক্ট পেইজ (3:4), ল্যান্ডিং (16:9)
+          বা OG রেশিওতে ছবি ফ্রেম করা যায় — লাইভ ডিভাইস প্রিভিউসহ। সব ছবি ব্রাউজারেই WebP-তে
+          কমপ্রেস হয় (সর্বোচ্চ 2000px)।
         </p>
 
         {draft.images.length === 0 ? (
@@ -403,6 +407,19 @@ function ProductEditor() {
                     )
                   }
                 />
+                {img.url ? (
+                  <CropExistingButton
+                    folder="products"
+                    url={img.url}
+                    cropPreset={i === 0 ? "card" : "square"}
+                    onCropped={(u) =>
+                      set(
+                        "images",
+                        draft.images.map((x, j) => (j === i ? { ...x, url: u } : x)),
+                      )
+                    }
+                  />
+                ) : null}
                 <Button
                   size="sm"
                   variant="ghost"
