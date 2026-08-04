@@ -203,3 +203,67 @@ export const adminRefreshCourierStatus = createServerFn({ method: "POST" })
       return { ok: false, message: (error as Error).message };
     }
   });
+
+export type CourierWebhookEvent = {
+  id: string;
+  provider: string;
+  event: string | null;
+  status: string | null;
+  message: string | null;
+  createdAt: string;
+  payload: unknown;
+};
+
+/** Full A→Z webhook event history for one order (newest first). */
+export const adminOrderWebhookEvents = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => z.object({ orderId: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }): Promise<CourierWebhookEvent[]> => {
+    const db = await requireAdmin(context.supabase, context.userId);
+    const { normaliseCourierStatus } = await import("./delivery-shared");
+
+    const { data: row } = await db
+      .from("orders")
+      .select("order_number, courier_consignment_id")
+      .eq("id", data.orderId)
+      .maybeSingle();
+    const order = row as { order_number: string; courier_consignment_id: string | null } | null;
+    if (!order) return [];
+
+    const filters = [`merchant_order_id.eq.${order.order_number}`];
+    if (order.courier_consignment_id) {
+      filters.push(`consignment_id.eq.${order.courier_consignment_id}`);
+    }
+
+    const { data: rows, error } = await db
+      .from("courier_webhook_events")
+      .select("id, provider, event, payload, created_at")
+      .or(filters.join(","))
+      .order("created_at", { ascending: false })
+      .limit(200);
+    if (error) throw new Error(error.message);
+
+    return (rows ?? []).map((r) => {
+      const payload = (r.payload ?? {}) as Record<string, unknown>;
+      const raw =
+        (payload["order_status"] as string) ??
+        (payload["status"] as string) ??
+        (payload["delivery_status"] as string) ??
+        r.event ??
+        null;
+      return {
+        id: r.id as string,
+        provider: r.provider as string,
+        event: (r.event as string) ?? null,
+        status: raw ? normaliseCourierStatus(r.provider as string, raw) : null,
+        message:
+          (payload["reason"] as string) ??
+          (payload["note"] as string) ??
+          (payload["message"] as string) ??
+          raw ??
+          null,
+        createdAt: r.created_at as string,
+        payload: r.payload,
+      };
+    });
+  });
