@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Fingerprint, Globe, NotebookPen, Phone, Shield, ShieldCheck, ShieldX, Truck, RefreshCw } from "lucide-react";
+import { Check, Copy, Fingerprint, Globe, NotebookPen, Phone, Shield, ShieldCheck, ShieldX, Truck, RefreshCw } from "lucide-react";
 
 import type { BlockKind } from "@/lib/admin-schema";
 import { adminAddOrderNote, adminSetBlocked } from "@/lib/order-admin.functions";
@@ -34,6 +34,34 @@ const dt = (value: string) =>
     minute: "2-digit",
     hour12: true,
   });
+
+/** Small copy-to-clipboard control that flips to a tick for a moment. */
+function CopyButton({ value, accent }: { value: string; accent?: boolean }) {
+  const [copied, setCopied] = useState(false);
+  return (
+    <button
+      type="button"
+      aria-label={copied ? "Copied" : "Copy consignment"}
+      title={copied ? "Copied" : "Copy"}
+      onClick={() => {
+        void navigator.clipboard.writeText(value).then(() => {
+          setCopied(true);
+          setTimeout(() => setCopied(false), 1600);
+        });
+      }}
+      className={cn(
+        "grid size-7 shrink-0 place-items-center rounded-md border transition active:scale-90",
+        copied
+          ? "border-emerald-300 bg-emerald-50 text-emerald-600"
+          : accent
+            ? "border-[#E32227]/30 text-[#E32227] hover:bg-[#E32227]/10"
+            : "border-border text-muted-foreground hover:bg-muted",
+      )}
+    >
+      {copied ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}
+    </button>
+  );
+}
 
 /** Fulfillment placeholder — courier booking becomes functional in a later phase. */
 export function FulfillmentCard({
