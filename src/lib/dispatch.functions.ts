@@ -178,6 +178,7 @@ export const adminRefreshCourierStatus = createServerFn({ method: "POST" })
         const info = await pathaoOrderInfo(creds, token, order.courier_consignment_id);
         const d = (info["data"] ?? {}) as Record<string, unknown>;
         raw = (d["order_status"] as string) ?? "unknown";
+        liveFee = pathaoFeeFromInfo(d);
       } else {
         return { ok: false, message: "Live status sync is not available for this courier" };
       }
