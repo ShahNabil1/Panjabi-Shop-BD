@@ -363,6 +363,12 @@ export const adminPathaoDeliveryCost = createServerFn({ method: "GET" })
       const total =
         deliveryFee + codFee + additional + compensation - discount - promoDiscount;
 
+      await db
+        .from("order_consignments")
+        .update({ total_cost: total })
+        .eq("order_id", data.orderId)
+        .eq("provider", "pathao");
+
       return {
         ok: true,
         paid: Boolean(invoiceId),
