@@ -73,7 +73,7 @@ function DeliverySettings() {
     <div className="space-y-6">
       <AdminHeading
         title="Delivery Settings"
-        subtitle="Connect courier accounts, verify credentials live and copy the webhook URL."
+        description="Connect courier accounts, verify credentials live and copy the webhook URL."
       />
 
       <Panel className="flex flex-wrap items-end gap-3">
