@@ -148,6 +148,9 @@ export const adminUpdateOrderStatus = createServerFn({ method: "POST" })
       .from("orders")
       .update({
         status: data.status,
+        // A schedule only belongs to the scheduled_order status; any other
+        // status clears it so the cron job never resurrects the order.
+        scheduled_for: data.status === "scheduled_order" ? (data.scheduledFor ?? null) : null,
         ...(data.deliveryPartner ? { delivery_partner: data.deliveryPartner } : {}),
       })
       .eq("id", data.id);
