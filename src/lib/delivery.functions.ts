@@ -29,6 +29,8 @@ export type DeliveryPartnerRow = {
   connection_message: string | null;
   last_checked_at: string | null;
   configured: boolean;
+  /** Shared secret the courier must send back on webhook calls. */
+  webhook_secret: string | null;
 };
 
 function maskCreds(provider: DeliveryProvider, raw: Record<string, unknown>) {
@@ -116,6 +118,7 @@ export const adminListDeliveryPartners = createServerFn({ method: "GET" })
         connection_ok: row.connection_ok,
         connection_message: row.connection_message,
         last_checked_at: row.last_checked_at,
+        webhook_secret: row.webhook_secret ?? null,
         configured: missingFields(provider, creds as Record<string, string>).length === 0,
       };
     });
