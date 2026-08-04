@@ -156,6 +156,9 @@ export const adminRefreshCourierStatus = createServerFn({ method: "POST" })
     try {
       const partner = await loadPartner(db, provider);
       let raw = "unknown";
+      let liveFee: number | null = null;
+      const { pathaoFeeFromInfo } = await import("./dispatch.server");
+
 
       if (provider === "steadfast") {
         const { steadfastStatusByCid } = await import("./steadfast.server");
