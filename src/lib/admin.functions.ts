@@ -88,7 +88,7 @@ export const adminListOrders = createServerFn({ method: "POST" })
     let q = db
       .from("orders")
       .select(
-        "id, order_number, customer_name, customer_phone, city, total, status, source, customer_ip, created_at, delivery_partner, courier_status, courier_consignment_id",
+        "id, order_number, customer_name, customer_phone, city, total, status, source, customer_ip, created_at, delivery_partner, courier_status, courier_consignment_id, order_consignments(provider, delivery_fee, cod_amount, status)",
       )
       .order("created_at", { ascending: false })
       .limit(200);
