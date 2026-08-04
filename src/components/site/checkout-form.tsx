@@ -238,7 +238,9 @@ export function CheckoutForm({
           district,
           upazila,
           note: note.trim(),
+          couponCode: appliedCode ?? "",
           source,
+
           items: items.map((i) => ({
             productId: i.productId,
             variantId: i.variantId,
