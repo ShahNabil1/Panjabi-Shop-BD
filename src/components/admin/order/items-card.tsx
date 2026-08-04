@@ -108,6 +108,7 @@ export function ItemsCard({
   discount: initialDiscount,
   advanceAmount: initialAdvance,
   advanceMethod: initialAdvanceMethod,
+  locked = false,
 }: {
   orderId: string;
   initialItems: EditableItem[];
@@ -115,6 +116,7 @@ export function ItemsCard({
   discount: number;
   advanceAmount?: number;
   advanceMethod?: string | null;
+  locked?: boolean;
 }) {
   const qc = useQueryClient();
   const [items, setItems] = useState<EditableItem[]>(initialItems);
