@@ -10,11 +10,11 @@ export type PathaoCreds = {
   client_secret: string;
   username: string;
   password: string;
-  base_url?: string;
 };
 
-function base(creds: PathaoCreds) {
-  return (creds.base_url || DEFAULT_BASE).replace(/\/+$/, "");
+/** Pathao production API host is fixed. */
+function base(_creds: PathaoCreds) {
+  return DEFAULT_BASE;
 }
 
 async function parse(res: Response, label: string) {
