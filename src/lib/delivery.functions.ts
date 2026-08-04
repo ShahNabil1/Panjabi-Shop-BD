@@ -332,7 +332,7 @@ export const adminCourierConnections = createServerFn({ method: "GET" })
     return Promise.all(
       DELIVERY_PROVIDERS.map(async (provider) => {
         const row = rows.find((r) => r.provider === provider);
-        const creds = ((row?.credentials ?? {}) as Record<string, string>) ?? {};
+        const creds = (row?.credentials ?? {}) as Record<string, string>;
         const configured = missingFields(provider, creds).length === 0;
         const checkedAt = new Date().toISOString();
         if (!row) {
