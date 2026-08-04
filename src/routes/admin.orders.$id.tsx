@@ -557,6 +557,14 @@ function AdminOrderDetail() {
             .find((x) => x !== null && x !== undefined);
           return v === null || v === undefined ? null : Number(v);
         })()}
+        returnConsignmentId={(() => {
+          const rows = (
+            order as unknown as {
+              order_consignments?: Array<{ return_consignment_id?: string | null }>;
+            }
+          ).order_consignments;
+          return rows?.map((r) => r.return_consignment_id).find((x) => !!x) ?? null;
+        })()}
         orderTotal={order.total != null ? Number(order.total) : null}
       />
 
