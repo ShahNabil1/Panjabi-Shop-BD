@@ -227,6 +227,13 @@ function CreateOrderPage() {
         <div className="space-y-5">
           <Panel>
             <h2 className="text-sm font-bold">Customer</h2>
+
+            {phoneValid ? (
+              <div className="mt-3">
+                <CourierReport phone={phone.trim()} />
+              </div>
+            ) : null}
+
             <div className="mt-3 grid gap-4 sm:grid-cols-2">
               <label className="block">
                 <Label>Phone number</Label>
@@ -342,7 +349,7 @@ function CreateOrderPage() {
             </label>
           </Panel>
 
-          {phoneValid ? <CourierReport phone={phone.trim()} /> : null}
+
 
           <Panel>
             <h2 className="text-sm font-bold">Items</h2>
