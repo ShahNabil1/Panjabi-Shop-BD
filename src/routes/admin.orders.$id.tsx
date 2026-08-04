@@ -59,11 +59,11 @@ const updatableStatuses = [
 ] as const;
 type PendingStatus = (typeof updatableStatuses)[number];
 
-/** `datetime-local` value for "one hour from now", used as the schedule default. */
+/** `date` input value for tomorrow, used as the schedule default. */
 function defaultScheduleValue(): string {
-  const d = new Date(Date.now() + 60 * 60 * 1000);
+  const d = new Date(Date.now() + 24 * 60 * 60 * 1000);
   const pad = (n: number) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 }
 
 export const Route = createFileRoute("/admin/orders/$id")({
@@ -442,13 +442,14 @@ function AdminOrderDetail() {
               Schedule this order
             </p>
             <input
-              type="datetime-local"
+              type="date"
+              min={new Date().toISOString().slice(0, 10)}
               className="w-full rounded-lg border border-border/70 bg-white/80 px-3 py-2 text-sm outline-none focus:border-primary"
               value={scheduleAt}
               onChange={(e) => setScheduleAt(e.target.value)}
             />
             <p className="text-xs text-muted-foreground">
-              The order stays in Scheduled Order and moves to Processing automatically at this time.
+              The order stays in Scheduled Order and moves to Processing automatically on this date.
             </p>
             <div className="flex items-center justify-end gap-2">
               <Button size="sm" variant="ghost" onClick={() => setPending("")}>
@@ -461,7 +462,7 @@ function AdminOrderDetail() {
                 onClick={() =>
                   update.mutate({
                     status: "scheduled_order",
-                    scheduledFor: new Date(scheduleAt).toISOString(),
+                    scheduledFor: new Date(`${scheduleAt}T00:00:00`).toISOString(),
                   })
                 }
               >
