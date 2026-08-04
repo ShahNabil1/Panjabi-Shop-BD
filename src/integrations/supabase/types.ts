@@ -1450,6 +1450,10 @@ export type Database = {
         }
         Returns: Json
       }
+      cleanup_old_order_logs: {
+        Args: { _retention_days?: number }
+        Returns: Json
+      }
       courier_webhook_apply: {
         Args: {
           _consignment_id: string
