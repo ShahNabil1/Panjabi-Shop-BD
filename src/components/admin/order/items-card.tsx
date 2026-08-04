@@ -195,26 +195,32 @@ export function ItemsCard({
           <Package className="size-4 text-primary" />
           Items
         </h2>
-        <div className="flex items-center gap-2">
-          <Button size="sm" variant="outline" onClick={() => setAdding((v) => !v)}>
-            <Plus className="size-3.5" />
-            Add Product
-          </Button>
-          <Button
-            size="sm"
-            variant={isDirty ? "default" : "secondary"}
-            loading={save.isPending}
-            disabled={!isDirty}
-            onClick={() => save.mutate()}
-          >
-            {isDirty ? <Save className="size-3.5" /> : <Check className="size-3.5" />}
-            {save.isPending ? "Saving…" : isDirty ? "Save" : "Saved"}
-          </Button>
-
-        </div>
+        {locked ? (
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-2.5 py-1 text-[11px] font-semibold text-muted-foreground ring-1 ring-border">
+            <Lock className="size-3" />
+            Locked — sent to courier
+          </span>
+        ) : (
+          <div className="flex items-center gap-2">
+            <Button size="sm" variant="outline" onClick={() => setAdding((v) => !v)}>
+              <Plus className="size-3.5" />
+              Add Product
+            </Button>
+            <Button
+              size="sm"
+              variant={isDirty ? "default" : "secondary"}
+              loading={save.isPending}
+              disabled={!isDirty}
+              onClick={() => save.mutate()}
+            >
+              {isDirty ? <Save className="size-3.5" /> : <Check className="size-3.5" />}
+              {save.isPending ? "Saving…" : isDirty ? "Save" : "Saved"}
+            </Button>
+          </div>
+        )}
       </div>
 
-      {adding ? (
+      {adding && !locked ? (
         <div className="space-y-2 rounded-xl border border-border/70 bg-background/60 p-3">
           <div className="relative">
             <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
