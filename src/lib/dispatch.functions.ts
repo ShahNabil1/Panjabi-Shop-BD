@@ -211,7 +211,7 @@ export type CourierWebhookEvent = {
   status: string | null;
   message: string | null;
   createdAt: string;
-  payload: unknown;
+  payloadJson: string;
 };
 
 /** Full A→Z webhook event history for one order (newest first). */
@@ -255,7 +255,9 @@ export const adminOrderWebhookEvents = createServerFn({ method: "GET" })
         id: r.id as string,
         provider: r.provider as string,
         event: (r.event as string) ?? null,
-        status: raw ? normaliseCourierStatus(r.provider as string, raw) : null,
+        status: raw
+          ? normaliseCourierStatus(r.provider as "steadfast" | "pathao" | "carrybee", raw)
+          : null,
         message:
           (payload["reason"] as string) ??
           (payload["note"] as string) ??
@@ -263,7 +265,7 @@ export const adminOrderWebhookEvents = createServerFn({ method: "GET" })
           raw ??
           null,
         createdAt: r.created_at as string,
-        payload: r.payload,
+        payloadJson: JSON.stringify(r.payload ?? {}, null, 2),
       };
     });
   });
