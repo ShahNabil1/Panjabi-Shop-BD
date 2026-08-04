@@ -421,6 +421,39 @@ function AdminOrderDetail() {
               </div>
             </div>
           </div>
+        ) : pending === "scheduled_order" ? (
+          <div className="ml-auto max-w-md space-y-2 rounded-xl border border-cyan-300 bg-cyan-50 p-3">
+            <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-cyan-800">
+              Schedule this order
+            </p>
+            <input
+              type="datetime-local"
+              className="w-full rounded-lg border border-border/70 bg-white/80 px-3 py-2 text-sm outline-none focus:border-primary"
+              value={scheduleAt}
+              onChange={(e) => setScheduleAt(e.target.value)}
+            />
+            <p className="text-xs text-muted-foreground">
+              The order stays in Scheduled Order and moves to Processing automatically at this time.
+            </p>
+            <div className="flex items-center justify-end gap-2">
+              <Button size="sm" variant="ghost" onClick={() => setPending("")}>
+                Back
+              </Button>
+              <Button
+                size="sm"
+                loading={update.isPending}
+                disabled={!scheduleAt}
+                onClick={() =>
+                  update.mutate({
+                    status: "scheduled_order",
+                    scheduledFor: new Date(scheduleAt).toISOString(),
+                  })
+                }
+              >
+                Schedule order
+              </Button>
+            </div>
+          </div>
         ) : pending ? (
           <div className="flex justify-end">
             <Button
