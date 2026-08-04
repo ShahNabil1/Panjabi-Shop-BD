@@ -18,6 +18,7 @@ import { BD_DIVISIONS } from "@/lib/bd-geo";
 import { ProductThumb } from "@/components/site/product-card";
 import { QuantityStepper } from "@/components/site/add-to-cart";
 import { cn } from "@/lib/utils";
+import { normalizePhoneInput } from "@/lib/phone";
 
 export type DeliveryRates = {
   inside_dhaka: number;
@@ -280,11 +281,11 @@ export function CheckoutForm({
           <input
             className={cn(inputClass, "font-en")}
             value={phone}
-            onChange={(e) => setPhone(e.target.value)}
+            onChange={(e) => setPhone(normalizePhoneInput(e.target.value))}
             inputMode="numeric"
             autoComplete="tel"
             placeholder="01XXXXXXXXX"
-            maxLength={14}
+            maxLength={11}
             required
           />
         </Field>

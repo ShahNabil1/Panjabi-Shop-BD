@@ -9,6 +9,7 @@ import { AdminHeading, NumberField, Panel, TextField } from "@/components/admin/
 import { ImageField } from "@/components/admin/image-upload";
 import { MAX_HERO_SLIDES, readHeroSlides, type HeroSlide } from "@/components/site/hero-slider";
 import { Button } from "@/components/ui/button";
+import { normalizeContactPhoneInput } from "@/lib/phone";
 
 export const Route = createFileRoute("/admin/settings/")({
   component: SettingsAdmin,
@@ -206,7 +207,7 @@ function SettingsAdmin() {
           <TextField
             label="Phone"
             value={str(contact, "phone")}
-            onChange={(v) => setContact({ ...contact, phone: v })}
+            onChange={(v) => setContact({ ...contact, phone: normalizeContactPhoneInput(v) })}
           />
           <TextField
             label="Email"
