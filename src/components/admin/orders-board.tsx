@@ -335,6 +335,33 @@ export function OrdersBoard({
                         </span>
                       );
                     })()}
+                    {(() => {
+                      const collected = collectedAmount(o);
+                      if (collected === null) return null;
+                      const partial =
+                        (o as { courier_status?: string | null }).courier_status ===
+                          "partial_delivered" || o.status === "partial_delivered";
+                      return (
+                        <span
+                          title={
+                            partial
+                              ? "Partial delivery — amount the courier collected"
+                              : "Amount the courier collected"
+                          }
+                          className={cn(
+                            "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-bold tabular-nums ring-1",
+                            partial
+                              ? "bg-orange-50 text-orange-800 ring-orange-200"
+                              : "bg-emerald-50 text-emerald-800 ring-emerald-200",
+                          )}
+                        >
+                          <Banknote className="size-3" />
+                          {partial ? "Partial collected" : "Collected"} {adminPrice(collected)}
+                        </span>
+                      );
+                    })()}
+
+
 
                   </div>
                   <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
