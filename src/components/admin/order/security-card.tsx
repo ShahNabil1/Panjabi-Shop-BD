@@ -369,15 +369,17 @@ export function FulfillmentCard({
 
         <div
           className={cn(
-            "rounded-xl border p-3",
+            "relative overflow-hidden rounded-xl border p-3",
             isPathao
               ? "border-[#E32227]/30 bg-gradient-to-br from-[#E32227]/[0.06] via-white to-white"
               : "border-border/70 bg-background/60",
           )}
         >
-          <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+          <CourierWatermark partner={partner} />
+          <p className="relative text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
             Physical shipment
           </p>
+
           <div className="mt-2 flex flex-wrap items-center gap-2">
             <span className="inline-flex rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-semibold text-indigo-800 ring-1 ring-indigo-200">
               {status === "pending" ? "Pending" : status.toUpperCase()}
