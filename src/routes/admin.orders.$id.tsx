@@ -53,11 +53,14 @@ const updatableStatuses = ["no_response", "good_no_response", "hold", "cancelled
 type PendingStatus = (typeof updatableStatuses)[number];
 
 export const Route = createFileRoute("/admin/orders/$id")({
-  validateSearch: (search: Record<string, unknown>): { takeover?: number } =>
-    search["takeover"] ? { takeover: 1 } : {},
+  validateSearch: (search: Record<string, unknown>): { takeover?: number; from?: "list" } => ({
+    ...(search["takeover"] ? { takeover: 1 as const } : {}),
+    ...(search["from"] === "list" ? { from: "list" as const } : {}),
+  }),
 
   component: AdminOrderDetail,
 });
+
 
 type OrderItemRow = {
   id: string;
@@ -71,7 +74,10 @@ type OrderItemRow = {
 
 function AdminOrderDetail() {
   const { id } = useParams({ from: "/admin/orders/$id" });
-  const { takeover } = useSearch({ from: "/admin/orders/$id" });
+  const { takeover, from } = useSearch({ from: "/admin/orders/$id" });
+  /** Return to whichever board the user came from. */
+  const backTo = from === "list" ? "/admin/orders/list" : "/admin/orders";
+
   const navigate = useNavigate();
   const qc = useQueryClient();
   const { user } = useAuth();
@@ -170,7 +176,7 @@ function AdminOrderDetail() {
       <Panel className="space-y-3 text-center">
         <p className="text-sm font-bold">Order not found</p>
         <Button asChild variant="outline">
-          <Link to="/admin/orders">Back to orders</Link>
+          <Link to={backTo}>Back to orders</Link>
         </Button>
       </Panel>
     );
@@ -240,7 +246,7 @@ function AdminOrderDetail() {
     <div className="space-y-5">
       <div className="flex items-center justify-between gap-3">
         <Button asChild variant="outline" size="sm" className="rounded-xl">
-          <Link to="/admin/orders">
+          <Link to={backTo}>
             <ArrowLeft className="size-4" />
             Back to orders
           </Link>
@@ -573,7 +579,7 @@ function AdminOrderDetail() {
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="gap-2 sm:gap-2">
-            <Button variant="outline" onClick={() => void navigate({ to: "/admin/orders" })}>
+            <Button variant="outline" onClick={() => void navigate({ to: backTo })}>
               <ArrowLeft className="size-4" />
               Back to orders
             </Button>
@@ -599,7 +605,7 @@ function AdminOrderDetail() {
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="gap-2 sm:gap-2">
-            <Button variant="outline" onClick={() => void navigate({ to: "/admin/orders" })}>
+            <Button variant="outline" onClick={() => void navigate({ to: backTo })}>
               <ArrowLeft className="size-4" />
               Back to orders
             </Button>
