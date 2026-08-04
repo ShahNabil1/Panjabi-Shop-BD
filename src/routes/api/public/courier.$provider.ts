@@ -29,21 +29,17 @@ export const Route = createFileRoute("/api/public/courier/$provider")({
 
         const {
           PATHAO_INTEGRATION_SECRET,
-          partnerWebhookSecret,
+          verifyWebhookSecret,
           processCourierWebhook,
         } = await import("@/lib/courier-webhook.server");
-        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+        const { createPublicServerClient } = await import("@/lib/supabase-public");
+        const db = createPublicServerClient();
 
         const pathaoHeaders = { "X-Pathao-Merchant-Webhook-Integration-Secret": PATHAO_INTEGRATION_SECRET };
         const respond = (body: unknown, status: number) =>
           provider === "pathao"
             ? Response.json(body, { status: status === 200 ? 202 : status, headers: pathaoHeaders })
             : Response.json(body, { status });
-
-        const expected = await partnerWebhookSecret(supabaseAdmin, provider);
-        if (!expected) {
-          return respond({ status: 403, message: "Provider not configured" }, 403);
-        }
 
         const url = new URL(request.url);
         const supplied =
@@ -52,7 +48,12 @@ export const Route = createFileRoute("/api/public/courier/$provider")({
           request.headers.get("x-webhook-secret") ??
           url.searchParams.get("secret") ??
           "";
-        if (!timingSafeEqual(supplied, expected)) {
+
+        const check = await verifyWebhookSecret(db, provider, supplied);
+        if (check === "unconfigured") {
+          return respond({ status: 403, message: "Provider not configured" }, 403);
+        }
+        if (check !== "ok") {
           return respond({ status: 401, message: "Invalid webhook secret" }, 401);
         }
 
