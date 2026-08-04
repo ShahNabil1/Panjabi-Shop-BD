@@ -183,8 +183,8 @@ function PartnerCard({
     try {
       const res = await adminTestCourierWebhook({ data: { provider } });
       setPing({ ok: res.ok, status: res.status, body: res.body });
-      if (res.ok) toast.success("Webhook receiver accepted the signed test event");
-      else toast.error("Webhook test failed — see details below");
+      if (res.ok) toast.success("Our webhook endpoint responded correctly (courier-side setup still needed)");
+      else toast.error("Webhook endpoint check failed — see details below");
     } catch (error) {
       const message = (error as Error).message;
       setPing({ ok: false, status: 0, body: message });
