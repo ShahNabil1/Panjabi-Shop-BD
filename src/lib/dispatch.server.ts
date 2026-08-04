@@ -420,3 +420,35 @@ export async function dispatchOrder(
     return { ...base, ok: false, provider, consignmentId: null, message };
   }
 }
+
+/**
+ * Order-status progression guard — mirrors `courier_webhook_apply` in the DB.
+ * Returns the order status to apply, or null to leave it untouched:
+ *  - manual financial states (paid/unpaid/lost_damaged) are never overwritten
+ *  - a late/out-of-order courier event can never move an order backwards
+ */
+const ORDER_RANK: Record<string, number> = {
+  incomplete: 0,
+  pending: 1,
+  no_response: 1,
+  good_no_response: 1,
+  hold: 1,
+  confirmed: 2,
+  processing: 2,
+  rts: 3,
+  shipped: 4,
+  partial_delivered: 5,
+  delivered: 5,
+  awaiting_return: 5,
+  returned: 6,
+  cancelled: 6,
+  lost_damaged: 6,
+};
+
+export function nextOrderStatus(current: string | null, candidate: string | null): string | null {
+  if (!candidate) return null;
+  if (current && ["paid", "unpaid", "lost_damaged"].includes(current)) return null;
+  const cur = ORDER_RANK[current ?? ""] ?? 0;
+  const next = ORDER_RANK[candidate] ?? 0;
+  return next < cur ? null : candidate;
+}
