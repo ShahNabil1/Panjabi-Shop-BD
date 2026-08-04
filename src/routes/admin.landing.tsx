@@ -152,6 +152,7 @@ function LandingPagesAdmin() {
               hint="URL: /lp/your-slug"
             />
             <ImageField
+              cropPreset="landing"
               label="OG Image (social preview)"
               folder="landing"
               value={draft.og_image_url}

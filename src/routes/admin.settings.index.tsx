@@ -121,6 +121,7 @@ function SettingsAdmin() {
                 </div>
               </div>
               <ImageField
+              cropPreset="og"
                 label="Banner image"
                 folder="hero"
                 value={slide.url || null}
