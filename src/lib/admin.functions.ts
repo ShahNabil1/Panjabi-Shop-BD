@@ -122,7 +122,7 @@ export const adminGetOrder = createServerFn({ method: "POST" })
     const { data: order, error } = await db
       .from("orders")
       .select(
-        "*, order_items(*), order_activity(id, kind, message, meta, created_at), order_consignments(provider, collected_amount, delivery_fee, total_cost, status, return_consignment_id)",
+        "*, order_items(*), order_activity(id, kind, message, meta, created_at), order_consignments(provider, collected_amount, delivery_fee, total_cost, status, return_consignment_id, payment_invoice_id, paid_at)",
       )
       .eq("id", data.id)
       .maybeSingle();
