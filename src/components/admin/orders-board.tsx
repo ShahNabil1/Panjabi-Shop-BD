@@ -234,7 +234,7 @@ export function OrdersBoard({
           />
         </div>
         <div className="flex flex-wrap gap-1.5">
-          {statuses.map((s) => (
+          {tabs.map((s) => (
             <button
               key={s}
               onClick={() => setStatus(s)}
@@ -242,13 +242,18 @@ export function OrdersBoard({
                 "rounded-full px-3 py-1.5 text-xs font-semibold transition-all duration-200 hover:-translate-y-0.5",
                 status === s
                   ? "ig-gradient text-primary-foreground shadow-sm"
-                  : "bg-muted text-muted-foreground hover:bg-muted/70",
+                  : (paymentFilters as readonly string[]).includes(s)
+                    ? s === "paid"
+                      ? "bg-emerald-100 text-emerald-900 hover:bg-emerald-200"
+                      : "bg-rose-100 text-rose-900 hover:bg-rose-200"
+                    : "bg-muted text-muted-foreground hover:bg-muted/70",
               )}
             >
-              {statusLabels[s]}
+              {statusLabels[s] ?? s}
             </button>
           ))}
         </div>
+
       </div>
 
       {bulkEnabled && total > 0 ? (
