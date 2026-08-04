@@ -86,7 +86,9 @@ const sections: Array<{ title: string; items: NavItem[] }> = [
     title: "Settings",
     items: [
       { to: "/admin/settings", label: "Site Settings", icon: Settings, exact: true },
+      { to: "/admin/settings/delivery", label: "Delivery Settings", icon: Truck },
       { to: "/admin/settings/sms-templates", label: "SMS Templates", icon: MessageSquareText },
+
     ],
   },
 ];
