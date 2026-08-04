@@ -554,7 +554,7 @@ function CouponDialog({
                   className={cn(inputClass, "font-mono uppercase tracking-wider")}
                   value={d.code}
                   onChange={(e) =>
-                    update("code", e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 24))
+                    update("code", maskCouponCode(e.target.value))
                   }
                   onKeyDown={(e) => {
                     if (e.key.length === 1 && !/[A-Za-z0-9]/.test(e.key)) e.preventDefault();
