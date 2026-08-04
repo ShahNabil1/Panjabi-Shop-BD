@@ -343,6 +343,7 @@ export function OrdersBoard({
                       <Link
                         to="/admin/orders/$id"
                         params={{ id: o.id }}
+                        search={bucket === "list" ? { from: "list" as const } : {}}
                         className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-border bg-background px-3 py-1.5 text-xs font-semibold text-foreground transition-colors hover:border-primary/40 hover:bg-accent active:scale-95"
                       >
                         <Eye className="size-3.5" />
@@ -452,7 +453,10 @@ export function OrdersBoard({
                   void navigate({
                     to: "/admin/orders/$id",
                     params: { id },
-                    search: { takeover: 1 },
+                    search: {
+                      takeover: 1 as const,
+                      ...(bucket === "list" ? { from: "list" as const } : {}),
+                    },
                   });
               }}
             >
