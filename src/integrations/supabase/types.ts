@@ -588,6 +588,7 @@ export type Database = {
           raw: Json
           status: string
           status_message: string | null
+          total_cost: number | null
           tracking_code: string | null
           updated_at: string
         }
@@ -603,6 +604,7 @@ export type Database = {
           raw?: Json
           status?: string
           status_message?: string | null
+          total_cost?: number | null
           tracking_code?: string | null
           updated_at?: string
         }
@@ -618,6 +620,7 @@ export type Database = {
           raw?: Json
           status?: string
           status_message?: string | null
+          total_cost?: number | null
           tracking_code?: string | null
           updated_at?: string
         }

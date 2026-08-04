@@ -156,6 +156,9 @@ export const adminRefreshCourierStatus = createServerFn({ method: "POST" })
     try {
       const partner = await loadPartner(db, provider);
       let raw = "unknown";
+      let liveFee: number | null = null;
+      const { pathaoFeeFromInfo } = await import("./dispatch.server");
+
 
       if (provider === "steadfast") {
         const { steadfastStatusByCid } = await import("./steadfast.server");
@@ -178,6 +181,7 @@ export const adminRefreshCourierStatus = createServerFn({ method: "POST" })
         const info = await pathaoOrderInfo(creds, token, order.courier_consignment_id);
         const d = (info["data"] ?? {}) as Record<string, unknown>;
         raw = (d["order_status"] as string) ?? "unknown";
+        liveFee = pathaoFeeFromInfo(d);
       } else {
         return { ok: false, message: "Live status sync is not available for this courier" };
       }
@@ -205,9 +209,14 @@ export const adminRefreshCourierStatus = createServerFn({ method: "POST" })
         .eq("id", data.orderId);
       await db
         .from("order_consignments")
-        .update({ status, status_message: raw })
+        .update({
+          status,
+          status_message: raw,
+          ...(liveFee !== null ? { total_cost: liveFee } : {}),
+        })
         .eq("order_id", data.orderId)
         .eq("provider", provider);
+
 
       const who = await actorName(db, context.userId);
       await logActivity(
@@ -353,6 +362,12 @@ export const adminPathaoDeliveryCost = createServerFn({ method: "GET" })
       const invoiceId = d["invoice_id"];
       const total =
         deliveryFee + codFee + additional + compensation - discount - promoDiscount;
+
+      await db
+        .from("order_consignments")
+        .update({ total_cost: total })
+        .eq("order_id", data.orderId)
+        .eq("provider", "pathao");
 
       return {
         ok: true,

@@ -453,3 +453,26 @@ export function nextOrderStatus(current: string | null, candidate: string | null
   const next = ORDER_RANK[candidate] ?? 0;
   return next < cur ? null : candidate;
 }
+
+/**
+ * Total courier cost from a Pathao order-info payload:
+ * delivery fee + COD fee + extra charges − discounts.
+ */
+export function pathaoFeeFromInfo(d: Record<string, unknown>): number | null {
+  const num = (...keys: string[]) => {
+    for (const k of keys) {
+      const v = d[k];
+      if (v != null && v !== "" && !Number.isNaN(Number(v))) return Number(v);
+    }
+    return 0;
+  };
+  if (d["delivery_fee"] == null) return null;
+  return (
+    num("delivery_fee") +
+    num("cod_fee", "collection_fee") +
+    num("additional_charge") +
+    num("compensation_cost", "compensation") -
+    num("discount") -
+    num("promo_discount")
+  );
+}
