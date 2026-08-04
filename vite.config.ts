@@ -7,6 +7,12 @@
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
 export default defineConfig({
+  nitro: {
+    // nodejs_compat is enabled by the hosting runtime as of 2026-08-04.
+    // Explicitly emitting the now-redundant flag makes the worker fail before
+    // our SSR handler can start, so keep deploy config generation but omit it.
+    cloudflare: { nodeCompat: false, deployConfig: true },
+  },
   tanstackStart: {
     // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
     // nitro/vite builds from this
