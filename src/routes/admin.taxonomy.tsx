@@ -166,6 +166,7 @@ function TaxonomyPage() {
               onChange={(v) => setCat({ ...cat, meta_title: v || null })}
             />
             <ImageField
+              cropPreset="card"
               label="Category image"
               folder="categories"
               value={cat.image_url}

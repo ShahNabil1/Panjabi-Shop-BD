@@ -175,6 +175,7 @@ function PromotionsPage() {
               onChange={(v) => setDraft({ ...draft, subtitle_bn: v || null, subtitle_en: v || null })}
             />
             <ImageField
+              cropPreset="landing"
               label="Banner Image"
               folder="promotions"
               value={draft.banner_url}
