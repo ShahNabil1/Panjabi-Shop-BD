@@ -7,6 +7,7 @@ import type { BlockKind } from "@/lib/admin-schema";
 import { adminAddOrderNote, adminSetBlocked } from "@/lib/order-admin.functions";
 import {
   adminOrderWebhookEvents,
+  adminPathaoDeliveryCost,
   adminRefreshCourierStatus,
   adminSendOrderToCourier,
 } from "@/lib/dispatch.functions";
