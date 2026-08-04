@@ -215,6 +215,8 @@ export function FulfillmentCard({
   trackingCode,
   sentAt,
   customerPhone,
+  collectedAmount,
+  orderTotal,
 }: {
   orderId: string;
   status: string;
@@ -226,6 +228,8 @@ export function FulfillmentCard({
   trackingCode: string | null;
   sentAt: string | null;
   customerPhone?: string | null;
+  collectedAmount?: number | null;
+  orderTotal?: number | null;
 }) {
   const qc = useQueryClient();
   const [historyOpen, setHistoryOpen] = useState(false);
