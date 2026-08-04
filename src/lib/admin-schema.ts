@@ -2,6 +2,7 @@ import { z } from "zod";
 
 export const orderStatuses = [
   "pending",
+  "rts",
   "confirmed",
   "processing",
   "incomplete",
@@ -28,6 +29,7 @@ export const webOrderStatuses = [
 /** Statuses shown on the Order List screen (confirmed fulfilment pipeline). */
 export const listOrderStatuses = [
   "pending",
+  "rts",
   "confirmed",
   "shipped",
   "delivered",
@@ -58,6 +60,8 @@ export const orderStatusSchema = z.object({
   reason: z.string().trim().max(500).optional(),
   /** When true the automatic confirmation SMS is skipped. */
   skipSms: z.boolean().optional(),
+  /** Courier chosen at confirmation time (Steadfast / Pathao / Carrybee). */
+  deliveryPartner: z.string().trim().max(40).optional(),
 });
 
 export const orderListSchema = z.object({

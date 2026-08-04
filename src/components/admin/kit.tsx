@@ -227,6 +227,7 @@ const statusStyles: Record<string, string> = {
   no_response: "bg-zinc-100 text-zinc-800 ring-zinc-200",
   good_no_response: "bg-teal-100 text-teal-900 ring-teal-200",
   hold: "bg-fuchsia-100 text-fuchsia-900 ring-fuchsia-200",
+  rts: "bg-sky-100 text-sky-900 ring-sky-200",
   shipped: "bg-violet-100 text-violet-900 ring-violet-200",
   delivered: "bg-emerald-100 text-emerald-900 ring-emerald-200",
   cancelled: "bg-rose-100 text-rose-900 ring-rose-200",
@@ -235,6 +236,7 @@ const statusStyles: Record<string, string> = {
 
 export const statusLabels: Record<string, string> = {
   pending: "Pending",
+  rts: "RTS",
   confirmed: "Confirmed",
   processing: "Processing",
   incomplete: "Incomplete",

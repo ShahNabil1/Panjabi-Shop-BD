@@ -1,14 +1,22 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { Search, Clock, Globe, Eye, ShieldAlert, UserRound } from "lucide-react";
+import { Search, Clock, Globe, Eye, ShieldAlert, UserRound, Truck, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 import { adminListOrders } from "@/lib/admin.functions";
 import type { OrderBucket, OrderStatus } from "@/lib/admin-schema";
 import { EmptyState, Panel, StatusPill, statusLabels } from "@/components/admin/kit";
 import { BrandLoader } from "@/components/admin/brand-loader";
 import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
 import { courierCachedRatios } from "@/lib/courier.functions";
+import { adminProcessRtsChunk, adminStartRtsJob } from "@/lib/dispatch.functions";
+import {
+  courierStatusLabels,
+  courierStatusTone,
+  type CourierStatus,
+} from "@/lib/delivery-shared";
 import { CourierStatusBar, ratioTone } from "@/components/admin/courier-status";
 import { cn } from "@/lib/utils";
 import { Pagination } from "@/components/admin/pagination";
@@ -23,6 +31,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+
 
 
 function adminPrice(value: number | string | null | undefined) {
@@ -95,6 +104,58 @@ export function OrdersBoard({
   const presence = useOrderPresence(rows.map((o) => o.id));
   const [takeover, setTakeover] = useState<{ id: string; name: string } | null>(null);
 
+  const qc = useQueryClient();
+  const bulkEnabled = bucket === "list" && status === "pending";
+  const [selected, setSelected] = useState<string[]>([]);
+  const [rtsOpen, setRtsOpen] = useState(false);
+  const [rtsRunning, setRtsRunning] = useState(false);
+  const [rtsProgress, setRtsProgress] = useState({ done: 0, total: 0, failed: 0 });
+
+  useEffect(() => {
+    setSelected([]);
+  }, [status, bucket, search, current]);
+
+  const toggleOne = (id: string) =>
+    setSelected((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
+
+  const allOnPage = rows.every((o) => selected.includes(o.id)) && rows.length > 0;
+  const toggleAll = () =>
+    setSelected((prev) =>
+      allOnPage ? prev.filter((id) => !rows.some((o) => o.id === id)) : [
+        ...new Set([...prev, ...rows.map((o) => o.id)]),
+      ],
+    );
+
+  /** Sends the selected pending orders to their courier in small chunks. */
+  const runRts = async () => {
+    setRtsRunning(true);
+    setRtsProgress({ done: 0, total: selected.length, failed: 0 });
+    try {
+      const job = await adminStartRtsJob({ data: { orderIds: selected } });
+      let done = 0;
+      let failed = 0;
+      for (const chunk of job.chunks) {
+        const res = await adminProcessRtsChunk({
+          data: { jobId: job.jobId, orderIds: chunk },
+        });
+        done += chunk.length;
+        failed += res.results.filter((r) => !r.ok).length;
+        for (const r of res.results) {
+          if (!r.ok) toast.error(`${r.orderNumber}: ${r.message}`);
+        }
+        setRtsProgress({ done, total: job.total, failed });
+      }
+      toast.success(`${done - failed} order(s) sent to courier${failed ? `, ${failed} failed` : ""}`);
+      setSelected([]);
+      setRtsOpen(false);
+      await qc.invalidateQueries({ queryKey: ["admin", "orders"] });
+    } catch (error) {
+      toast.error((error as Error).message);
+    } finally {
+      setRtsRunning(false);
+    }
+  };
+
   const phones = [...new Set(rows.map((o) => o.customer_phone))];
   const { data: ratios } = useQuery({
     queryKey: ["admin", "courier", "ratios", phones.join(",")],
@@ -139,6 +200,25 @@ export function OrdersBoard({
         </div>
       </div>
 
+      {bulkEnabled && total > 0 ? (
+        <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-border/70 bg-card px-4 py-3">
+          <label className="flex items-center gap-2 text-xs font-semibold text-muted-foreground">
+            <Checkbox checked={allOnPage} onCheckedChange={toggleAll} />
+            Select all on this page
+          </label>
+          <span className="text-xs text-muted-foreground">{selected.length} selected</span>
+          <Button
+            size="sm"
+            disabled={selected.length === 0}
+            onClick={() => setRtsOpen(true)}
+            className="ml-auto bg-sky-600 text-white hover:bg-sky-700 active:scale-95"
+          >
+            <Truck className="size-4" />
+            Send To RTS
+          </Button>
+        </div>
+      ) : null}
+
       <Panel className="p-0">
         {isLoading ? (
           <BrandLoader size="md" className="py-8" />
@@ -154,6 +234,14 @@ export function OrdersBoard({
                 key={o.id}
                 className="flex flex-wrap items-center justify-between gap-3 px-4 py-3.5 transition-colors duration-200 hover:bg-muted/40"
               >
+                {bulkEnabled ? (
+                  <Checkbox
+                    checked={selected.includes(o.id)}
+                    onCheckedChange={() => toggleOne(o.id)}
+                    aria-label={`Select ${o.order_number}`}
+                  />
+                ) : null}
+
                 <div className="min-w-0 flex-1 space-y-1.5">
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="text-[15px] font-bold text-foreground">{o.customer_name}</span>
@@ -169,6 +257,23 @@ export function OrdersBoard({
                         )}
                       >
                         {ratios[o.customer_phone]}%
+                      </span>
+                    ) : null}
+                    {(o as { courier_status?: string | null }).courier_status ? (
+                      <span
+                        className={cn(
+                          "rounded-full px-2 py-0.5 text-xs font-bold ring-1",
+                          courierStatusTone(
+                            (o as { courier_status?: string }).courier_status as CourierStatus,
+                          ),
+                        )}
+                      >
+                        {(o as { delivery_partner?: string | null }).delivery_partner
+                          ? `${(o as { delivery_partner?: string }).delivery_partner} · `
+                          : ""}
+                        {courierStatusLabels[
+                          (o as { courier_status?: string }).courier_status as CourierStatus
+                        ] ?? (o as { courier_status?: string }).courier_status}
                       </span>
                     ) : null}
                   </div>
@@ -233,6 +338,50 @@ export function OrdersBoard({
           onPageSizeChange={setPageSize}
         />
       ) : null}
+
+      <Dialog open={rtsOpen} onOpenChange={(open) => !rtsRunning && setRtsOpen(open)}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-base">
+              <Truck className="size-4 text-sky-600" />
+              Send {selected.length} order(s) to RTS?
+            </DialogTitle>
+            <DialogDescription>
+              Each order is booked with the delivery partner saved on it. Orders are processed in
+              small batches, so large selections stay safe. Failed orders stay in Pending.
+            </DialogDescription>
+          </DialogHeader>
+          {rtsRunning ? (
+            <div className="space-y-2">
+              <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
+                <div
+                  className="h-full rounded-full bg-sky-600 transition-all"
+                  style={{
+                    width: `${rtsProgress.total ? (rtsProgress.done / rtsProgress.total) * 100 : 0}%`,
+                  }}
+                />
+              </div>
+              <p className="text-xs text-muted-foreground">
+                {rtsProgress.done}/{rtsProgress.total} processed
+                {rtsProgress.failed ? ` · ${rtsProgress.failed} failed` : ""}
+              </p>
+            </div>
+          ) : null}
+          <DialogFooter className="gap-2 sm:gap-2">
+            <Button variant="outline" disabled={rtsRunning} onClick={() => setRtsOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              disabled={rtsRunning}
+              onClick={() => void runRts()}
+              className="bg-sky-600 text-white hover:bg-sky-700 active:scale-95"
+            >
+              {rtsRunning ? <Loader2 className="size-4 animate-spin" /> : <Truck className="size-4" />}
+              Confirm & Send
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={!!takeover} onOpenChange={(open) => !open && setTakeover(null)}>
         <DialogContent className="sm:max-w-md">

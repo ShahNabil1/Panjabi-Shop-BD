@@ -5,6 +5,8 @@ import { ArrowLeft, CheckCircle2, FileText, MessageSquare, ShieldAlert, UserRoun
 import { useEffect, useRef, useState } from "react";
 
 import { adminUpdateOrderStatus } from "@/lib/admin.functions";
+import { adminListDeliveryPartners } from "@/lib/delivery.functions";
+import { providerLabels } from "@/lib/delivery-shared";
 import {
   adminClaimOrder,
   adminHeartbeatOrder,
@@ -124,19 +126,32 @@ function AdminOrderDetail() {
     queryFn: () => adminListSmsTemplates(),
   });
 
+  const partners = useQuery({
+    queryKey: ["admin", "delivery-partners"],
+    queryFn: () => adminListDeliveryPartners(),
+  });
+  const activePartners = (partners.data ?? []).filter((p) => p.enabled);
+  const [courier, setCourier] = useState("");
+
   const [pending, setPending] = useState<PendingStatus | "">("");
   const [reason, setReason] = useState("");
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [silent, setSilent] = useState(false);
 
   const update = useMutation({
-    mutationFn: (input: { status: OrderStatus; reason?: string; skipSms?: boolean }) =>
+    mutationFn: (input: {
+      status: OrderStatus;
+      reason?: string;
+      skipSms?: boolean;
+      deliveryPartner?: string;
+    }) =>
       adminUpdateOrderStatus({
         data: {
           id,
           status: input.status,
           ...(input.reason ? { reason: input.reason } : {}),
           ...(input.skipSms ? { skipSms: true } : {}),
+          ...(input.deliveryPartner ? { deliveryPartner: input.deliveryPartner } : {}),
         },
       }),
     onSuccess: async () => {
@@ -183,6 +198,10 @@ function AdminOrderDetail() {
     advance_amount?: number | string | null;
     advance_method?: string | null;
     fulfillment_status: string;
+    courier_status?: string | null;
+    courier_consignment_id?: string | null;
+    courier_tracking_code?: string | null;
+    courier_sent_at?: string | null;
     auto_sms_status: string;
     source: string;
     order_items: OrderItemRow[];
@@ -381,6 +400,30 @@ function AdminOrderDetail() {
                   </DialogDescription>
                 </DialogHeader>
 
+                <div className="space-y-1.5">
+                  <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground">
+                    Delivery partner
+                  </p>
+                  {activePartners.length === 0 ? (
+                    <p className="rounded-lg bg-amber-50 px-3 py-2 text-xs font-medium text-amber-800">
+                      No delivery partner saved yet. Add one in Settings → Delivery Settings.
+                    </p>
+                  ) : (
+                    <Select value={courier} onValueChange={setCourier}>
+                      <SelectTrigger className="h-10 rounded-xl border-border bg-background text-sm font-semibold">
+                        <SelectValue placeholder="Select where this order will be shipped" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {activePartners.map((p) => (
+                          <SelectItem key={p.provider} value={providerLabels[p.provider]}>
+                            {providerLabels[p.provider]}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                </div>
+
                 {autoSmsEnabled ? (
                   <div className="rounded-xl border border-border bg-muted/40 p-3">
                     <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground">
@@ -410,10 +453,10 @@ function AdminOrderDetail() {
                   <Button
                     variant="outline"
                     loading={update.isPending && silent}
-                    disabled={update.isPending}
+                    disabled={update.isPending || !courier}
                     onClick={() => {
                       setSilent(true);
-                      update.mutate({ status: "pending", skipSms: true });
+                      update.mutate({ status: "pending", skipSms: true, deliveryPartner: courier });
                     }}
                   >
                     <CheckCircle2 className="size-4" />
@@ -422,10 +465,10 @@ function AdminOrderDetail() {
                   {autoSmsEnabled ? (
                     <Button
                       loading={update.isPending && !silent}
-                      disabled={update.isPending}
+                      disabled={update.isPending || !courier}
                       onClick={() => {
                         setSilent(false);
-                        update.mutate({ status: "pending" });
+                        update.mutate({ status: "pending", deliveryPartner: courier });
                       }}
                       className="bg-[hsl(143,85%,32%)] text-white hover:bg-[hsl(143,85%,27%)] focus-visible:ring-[hsl(143,85%,32%)]"
                     >
@@ -470,7 +513,17 @@ function AdminOrderDetail() {
         }))}
       />
 
-      <FulfillmentCard status={order.fulfillment_status} source={order.source} />
+      <FulfillmentCard
+        orderId={order.id}
+        status={order.fulfillment_status}
+        source={order.source}
+        orderStatus={order.status}
+        partner={order.delivery_partner}
+        courierStatus={order.courier_status ?? null}
+        consignmentId={order.courier_consignment_id ?? null}
+        trackingCode={order.courier_tracking_code ?? null}
+        sentAt={order.courier_sent_at ?? null}
+      />
 
       <SecurityCard
         orderId={order.id}
