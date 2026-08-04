@@ -16,10 +16,11 @@ export const Route = createFileRoute("/admin/products/")({
 
 function AdminProductsPage() {
   const qc = useQueryClient();
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ["admin", "products"],
     queryFn: () => adminListProducts(),
   });
+
 
   const remove = useMutation({
     mutationFn: (id: string) => adminDeleteProduct({ data: { id } }),
@@ -47,7 +48,20 @@ function AdminProductsPage() {
       <Panel className="p-0">
         {isLoading ? (
           <BrandLoader size="md" className="py-8" />
+        ) : isError ? (
+          <div className="space-y-3 p-6 text-center">
+            <p className="text-sm font-semibold text-destructive">
+              Could not load products
+            </p>
+            <p className="text-xs text-muted-foreground">
+              {(error as Error)?.message || "Server request failed."}
+            </p>
+            <Button size="sm" variant="outline" onClick={() => refetch()}>
+              Try again
+            </Button>
+          </div>
         ) : (data?.length ?? 0) === 0 ? (
+
           <div className="p-4">
             <EmptyState title="No products yet" hint="Click the New product button above to get started." />
           </div>
