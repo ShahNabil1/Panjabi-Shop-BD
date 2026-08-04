@@ -1,0 +1,350 @@
+import { createFileRoute } from "@tanstack/react-router";
+import { useMemo, useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import {
+  CheckCircle2,
+  Copy,
+  Link2,
+  Loader2,
+  Plug,
+  Plus,
+  Save,
+  Trash2,
+  TriangleAlert,
+  Truck,
+} from "lucide-react";
+
+import {
+  adminListDeliveryPartners,
+  adminRemoveDeliveryPartner,
+  adminSaveDeliveryPartner,
+  adminSetDeliveryPartnerEnabled,
+  adminTestDeliveryPartner,
+  type DeliveryPartnerRow,
+} from "@/lib/delivery.functions";
+import {
+  DELIVERY_PROVIDERS,
+  SECRET_MASK,
+  providerFields,
+  providerLabels,
+  type DeliveryProvider,
+} from "@/lib/delivery-shared";
+import { AdminHeading, Panel } from "@/components/admin/kit";
+import { BrandLoader } from "@/components/admin/brand-loader";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
+import { cn } from "@/lib/utils";
+
+export const Route = createFileRoute("/admin/settings/delivery")({
+  component: DeliverySettings,
+  head: () => ({
+    meta: [
+      { title: "Delivery Settings · Upoharkabbo Admin" },
+      { name: "description", content: "Connect Steadfast, Pathao and Carrybee courier accounts." },
+    ],
+  }),
+});
+
+function webhookUrl(provider: DeliveryProvider) {
+  const origin = typeof window === "undefined" ? "" : window.location.origin;
+  return `${origin}/api/public/courier/${provider}`;
+}
+
+function DeliverySettings() {
+  const qc = useQueryClient();
+  const { data, isLoading } = useQuery({
+    queryKey: ["admin", "delivery-partners"],
+    queryFn: () => adminListDeliveryPartners(),
+  });
+  const partners = useMemo<DeliveryPartnerRow[]>(() => data ?? [], [data]);
+
+  const [adding, setAdding] = useState<DeliveryProvider | "">("");
+  const available = DELIVERY_PROVIDERS.filter((p) => !partners.some((x) => x.provider === p));
+
+  const draftProviders = useMemo(() => {
+    const list = partners.map((p) => p.provider);
+    if (adding && !list.includes(adding)) list.push(adding);
+    return list;
+  }, [partners, adding]);
+
+  return (
+    <div className="space-y-6">
+      <AdminHeading
+        title="Delivery Settings"
+        description="Connect courier accounts, verify credentials live and copy the webhook URL."
+      />
+
+      <Panel className="flex flex-wrap items-end gap-3">
+        <div className="space-y-1.5">
+          <label className="text-xs font-semibold text-muted-foreground">Add delivery partner</label>
+          <select
+            value={adding}
+            onChange={(e) => setAdding(e.target.value as DeliveryProvider | "")}
+            className="h-10 w-56 rounded-xl border border-border bg-background px-3 text-sm font-medium outline-none transition focus:border-primary/50"
+          >
+            <option value="">Select a partner…</option>
+            {available.map((p) => (
+              <option key={p} value={p}>
+                {providerLabels[p]}
+              </option>
+            ))}
+          </select>
+        </div>
+        <Button
+          type="button"
+          disabled={!adding}
+          onClick={() => toast.info(`Fill in ${providerLabels[adding as DeliveryProvider]} details below, then save.`)}
+          className="active:scale-95"
+        >
+          <Plus className="size-4" />
+          Add
+        </Button>
+        {available.length === 0 ? (
+          <p className="text-xs text-muted-foreground">All partners are already added.</p>
+        ) : null}
+      </Panel>
+
+      {isLoading ? (
+        <BrandLoader size="md" className="py-10" />
+      ) : draftProviders.length === 0 ? (
+        <Panel className="py-10 text-center text-sm text-muted-foreground">
+          No delivery partner added yet. Pick one above to get started.
+        </Panel>
+      ) : (
+        <div className="space-y-5">
+          {draftProviders.map((provider) => (
+            <PartnerCard
+              key={provider}
+              provider={provider}
+              row={partners.find((p) => p.provider === provider) ?? null}
+              onDone={() => {
+                setAdding("");
+                void qc.invalidateQueries({ queryKey: ["admin", "delivery-partners"] });
+              }}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function PartnerCard({
+  provider,
+  row,
+  onDone,
+}: {
+  provider: DeliveryProvider;
+  row: DeliveryPartnerRow | null;
+  onDone: () => void;
+}) {
+  const fields = providerFields[provider];
+  const [values, setValues] = useState<Record<string, string>>(() => {
+    const init: Record<string, string> = {};
+    for (const f of fields) init[f.key] = row?.credentials?.[f.key] ?? "";
+    return init;
+  });
+  const [enabled, setEnabled] = useState(row?.enabled ?? true);
+  const [testing, setTesting] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [removing, setRemoving] = useState(false);
+  const [result, setResult] = useState<{ ok: boolean; message: string } | null>(
+    row ? { ok: row.connection_ok, message: row.connection_message ?? "" } : null,
+  );
+
+  const url = webhookUrl(provider);
+
+  const test = async () => {
+    setTesting(true);
+    try {
+      const res = await adminTestDeliveryPartner({ data: { provider, credentials: values } });
+      setResult(res);
+      if (res.ok) toast.success(`${providerLabels[provider]}: ${res.message}`);
+      else toast.error(res.message);
+    } catch (error) {
+      const message = (error as Error).message;
+      setResult({ ok: false, message });
+      toast.error(message);
+    } finally {
+      setTesting(false);
+    }
+  };
+
+  const save = async () => {
+    setSaving(true);
+    try {
+      const res = await adminSaveDeliveryPartner({
+        data: { provider, enabled, credentials: values, config: {} },
+      });
+      setResult({ ok: true, message: res.message });
+      toast.success(`${providerLabels[provider]} saved`);
+      onDone();
+    } catch (error) {
+      toast.error((error as Error).message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const remove = async () => {
+    setRemoving(true);
+    try {
+      await adminRemoveDeliveryPartner({ data: { provider } });
+      toast.success(`${providerLabels[provider]} removed`);
+      onDone();
+    } catch (error) {
+      toast.error((error as Error).message);
+    } finally {
+      setRemoving(false);
+    }
+  };
+
+  return (
+    <Panel className="space-y-5">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <span className="grid size-10 place-items-center rounded-xl bg-primary/10 text-primary">
+            <Truck className="size-5" />
+          </span>
+          <div>
+            <h3 className="text-base font-bold text-foreground">{providerLabels[provider]}</h3>
+            <p className="text-xs text-muted-foreground">
+              {row?.last_checked_at
+                ? `Last checked ${new Date(row.last_checked_at).toLocaleString("en-US", { timeZone: "Asia/Dhaka" })}`
+                : "Not verified yet"}
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center gap-3">
+          {result ? (
+            <span
+              className={cn(
+                "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-bold ring-1",
+                result.ok
+                  ? "bg-emerald-50 text-emerald-700 ring-emerald-200"
+                  : "bg-rose-50 text-rose-700 ring-rose-200",
+              )}
+            >
+              {result.ok ? <CheckCircle2 className="size-3.5" /> : <TriangleAlert className="size-3.5" />}
+              {result.ok ? "Connected" : "Not connected"}
+            </span>
+          ) : null}
+          <label className="flex items-center gap-2 text-xs font-semibold text-muted-foreground">
+            Active
+            <Switch
+              checked={enabled}
+              onCheckedChange={async (next) => {
+                setEnabled(next);
+                if (row) {
+                  try {
+                    await adminSetDeliveryPartnerEnabled({ data: { provider, enabled: next } });
+                    toast.success(next ? "Partner activated" : "Partner deactivated");
+                  } catch (error) {
+                    toast.error((error as Error).message);
+                  }
+                }
+              }}
+            />
+          </label>
+        </div>
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        {fields.map((f) => (
+          <div key={f.key} className="space-y-1.5">
+            <label className="text-xs font-semibold text-muted-foreground">
+              {f.label}
+              {f.optional ? <span className="ml-1 font-normal">(optional)</span> : null}
+            </label>
+            <Input
+              type={f.secret ? "password" : "text"}
+              value={values[f.key] ?? ""}
+              placeholder={f.placeholder ?? ""}
+              autoComplete="off"
+              onFocus={() => {
+                if (values[f.key] === SECRET_MASK) setValues((v) => ({ ...v, [f.key]: "" }));
+              }}
+              onChange={(e) => setValues((v) => ({ ...v, [f.key]: e.target.value }))}
+              className="rounded-xl"
+            />
+            {f.hint ? <p className="text-[11px] text-muted-foreground">{f.hint}</p> : null}
+          </div>
+        ))}
+      </div>
+
+      <div className="space-y-1.5">
+        <label className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground">
+          <Link2 className="size-3.5" />
+          Webhook URL — paste this into the {providerLabels[provider]} panel
+        </label>
+        <div className="flex gap-2">
+          <Input readOnly value={url} className="rounded-xl font-mono text-xs" />
+          <Button
+            type="button"
+            variant="outline"
+            className="shrink-0 active:scale-95"
+            onClick={() => {
+              void navigator.clipboard.writeText(url);
+              toast.success("Webhook URL copied");
+            }}
+          >
+            <Copy className="size-4" />
+            Copy
+          </Button>
+        </div>
+      </div>
+
+      {result && !result.ok && result.message ? (
+        <p className="rounded-xl bg-rose-50 px-3 py-2 text-xs font-medium text-rose-700">
+          {result.message}
+        </p>
+      ) : null}
+      {result?.ok && result.message ? (
+        <p className="rounded-xl bg-emerald-50 px-3 py-2 text-xs font-medium text-emerald-700">
+          {result.message}
+        </p>
+      ) : null}
+
+      {row?.stores?.length ? (
+        <p className="text-xs text-muted-foreground">
+          Stores: {row.stores.map((s) => `${s.store_name} (#${s.store_id})`).join(", ")}
+        </p>
+      ) : null}
+
+      <div className="flex flex-wrap items-center gap-2">
+        <Button type="button" variant="outline" onClick={test} disabled={testing} className="active:scale-95">
+          {testing ? <Loader2 className="size-4 animate-spin" /> : <Plug className="size-4" />}
+          Test connection
+        </Button>
+        <Button
+          type="button"
+          onClick={save}
+          disabled={saving || !result?.ok}
+          className="bg-emerald-600 text-white hover:bg-emerald-700 active:scale-95"
+        >
+          {saving ? <Loader2 className="size-4 animate-spin" /> : <Save className="size-4" />}
+          Save partner
+        </Button>
+        {!result?.ok ? (
+          <span className="text-xs text-muted-foreground">
+            Run a successful connection test before saving.
+          </span>
+        ) : null}
+        {row ? (
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={remove}
+            disabled={removing}
+            className="ml-auto text-rose-600 hover:bg-rose-50 hover:text-rose-700 active:scale-95"
+          >
+            {removing ? <Loader2 className="size-4 animate-spin" /> : <Trash2 className="size-4" />}
+            Remove
+          </Button>
+        ) : null}
+      </div>
+    </Panel>
+  );
+}

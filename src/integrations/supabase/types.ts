@@ -238,6 +238,96 @@ export type Database = {
         }
         Relationships: []
       }
+      courier_bulk_job_items: {
+        Row: {
+          consignment_id: string | null
+          created_at: string
+          id: string
+          job_id: string
+          message: string | null
+          order_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          consignment_id?: string | null
+          created_at?: string
+          id?: string
+          job_id: string
+          message?: string | null
+          order_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          consignment_id?: string | null
+          created_at?: string
+          id?: string
+          job_id?: string
+          message?: string | null
+          order_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "courier_bulk_job_items_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "courier_bulk_jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "courier_bulk_job_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      courier_bulk_jobs: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          failed: number
+          id: string
+          processed: number
+          provider: string
+          results: Json
+          status: string
+          succeeded: number
+          total: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          failed?: number
+          id?: string
+          processed?: number
+          provider: string
+          results?: Json
+          status?: string
+          succeeded?: number
+          total?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          failed?: number
+          id?: string
+          processed?: number
+          provider?: string
+          results?: Json
+          status?: string
+          succeeded?: number
+          total?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       courier_checks: {
         Row: {
           cancelled_parcel: number
@@ -274,6 +364,84 @@ export type Database = {
           success_ratio?: number
           total_parcel?: number
           updated_at?: string
+        }
+        Relationships: []
+      }
+      courier_webhook_events: {
+        Row: {
+          consignment_id: string | null
+          created_at: string
+          error: string | null
+          event: string | null
+          id: string
+          merchant_order_id: string | null
+          payload: Json
+          processed: boolean
+          provider: string
+        }
+        Insert: {
+          consignment_id?: string | null
+          created_at?: string
+          error?: string | null
+          event?: string | null
+          id?: string
+          merchant_order_id?: string | null
+          payload?: Json
+          processed?: boolean
+          provider: string
+        }
+        Update: {
+          consignment_id?: string | null
+          created_at?: string
+          error?: string | null
+          event?: string | null
+          id?: string
+          merchant_order_id?: string | null
+          payload?: Json
+          processed?: boolean
+          provider?: string
+        }
+        Relationships: []
+      }
+      delivery_partners: {
+        Row: {
+          config: Json
+          connection_message: string | null
+          connection_ok: boolean
+          created_at: string
+          credentials: Json
+          enabled: boolean
+          id: string
+          last_checked_at: string | null
+          provider: string
+          updated_at: string
+          webhook_secret: string | null
+        }
+        Insert: {
+          config?: Json
+          connection_message?: string | null
+          connection_ok?: boolean
+          created_at?: string
+          credentials?: Json
+          enabled?: boolean
+          id?: string
+          last_checked_at?: string | null
+          provider: string
+          updated_at?: string
+          webhook_secret?: string | null
+        }
+        Update: {
+          config?: Json
+          connection_message?: string | null
+          connection_ok?: boolean
+          created_at?: string
+          credentials?: Json
+          enabled?: boolean
+          id?: string
+          last_checked_at?: string | null
+          provider?: string
+          updated_at?: string
+          webhook_secret?: string | null
         }
         Relationships: []
       }
@@ -400,6 +568,62 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "order_activity_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      order_consignments: {
+        Row: {
+          cod_amount: number | null
+          consignment_id: string | null
+          created_at: string
+          delivery_fee: number | null
+          id: string
+          merchant_order_id: string | null
+          order_id: string
+          provider: string
+          raw: Json
+          status: string
+          status_message: string | null
+          tracking_code: string | null
+          updated_at: string
+        }
+        Insert: {
+          cod_amount?: number | null
+          consignment_id?: string | null
+          created_at?: string
+          delivery_fee?: number | null
+          id?: string
+          merchant_order_id?: string | null
+          order_id: string
+          provider: string
+          raw?: Json
+          status?: string
+          status_message?: string | null
+          tracking_code?: string | null
+          updated_at?: string
+        }
+        Update: {
+          cod_amount?: number | null
+          consignment_id?: string | null
+          created_at?: string
+          delivery_fee?: number | null
+          id?: string
+          merchant_order_id?: string | null
+          order_id?: string
+          provider?: string
+          raw?: Json
+          status?: string
+          status_message?: string | null
+          tracking_code?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_consignments_order_id_fkey"
             columns: ["order_id"]
             isOneToOne: false
             referencedRelation: "orders"
