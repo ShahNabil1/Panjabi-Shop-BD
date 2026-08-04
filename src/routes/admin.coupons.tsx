@@ -25,11 +25,15 @@ import {
   adminRestoreCoupon,
   adminSaveCoupon,
   adminToggleCoupon,
+} from "@/lib/coupons.functions";
+import {
   COUPON_CODE_RE,
+  maskCouponCode,
   type CouponAppliesTo,
   type CouponDiscountType,
   type CouponRow,
-} from "@/lib/coupons.functions";
+} from "@/lib/coupons.shared";
+
 import { adminListProducts, adminTaxonomy } from "@/lib/admin.functions";
 import { AdminHeading, EmptyState, Panel } from "@/components/admin/kit";
 import { Button } from "@/components/ui/button";
