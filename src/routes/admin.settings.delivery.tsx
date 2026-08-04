@@ -168,14 +168,15 @@ function PartnerCard({
   const [savedSnapshot, setSavedSnapshot] = useState<string | null>(() =>
     row ? JSON.stringify(Object.fromEntries(fields.map((f) => [f.key, row.credentials?.[f.key] ?? ""]))) : null,
   );
-  const isDirty =
-    savedSnapshot === null ||
-    JSON.stringify(values) !== savedSnapshot ||
-    noteTemplate !== savedTemplate;
   const [enabled, setEnabled] = useState(row?.enabled ?? true);
   const [noteTemplate, setNoteTemplate] = useState(row?.note_template ?? "");
   const [savedTemplate, setSavedTemplate] = useState(row?.note_template ?? "");
   const [makingDefault, setMakingDefault] = useState(false);
+  const isDirty =
+    savedSnapshot === null ||
+    JSON.stringify(values) !== savedSnapshot ||
+    noteTemplate !== savedTemplate;
+
   const [removeOpen, setRemoveOpen] = useState(false);
   const [testing, setTesting] = useState(false);
   const [saving, setSaving] = useState(false);
