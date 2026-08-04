@@ -814,6 +814,7 @@ export type Database = {
           note: string | null
           order_number: string
           payment_method: string
+          scheduled_for: string | null
           source: string
           status: Database["public"]["Enums"]["order_status"]
           subtotal: number
@@ -853,6 +854,7 @@ export type Database = {
           note?: string | null
           order_number?: string
           payment_method?: string
+          scheduled_for?: string | null
           source?: string
           status?: Database["public"]["Enums"]["order_status"]
           subtotal?: number
@@ -892,6 +894,7 @@ export type Database = {
           note?: string | null
           order_number?: string
           payment_method?: string
+          scheduled_for?: string | null
           source?: string
           status?: Database["public"]["Enums"]["order_status"]
           subtotal?: number
@@ -1489,6 +1492,7 @@ export type Database = {
         Args: { _order_number: string; _phone: string }
         Returns: Json
       }
+      promote_scheduled_orders: { Args: never; Returns: Json }
       validate_coupon: {
         Args: {
           _code: string
