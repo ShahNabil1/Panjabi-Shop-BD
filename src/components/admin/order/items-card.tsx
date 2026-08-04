@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Check, Lock, Package, Plus, Save, Search, Trash2, Truck } from "lucide-react";
@@ -29,11 +29,14 @@ export function DeliveryNoteCard({
   orderId,
   initial,
   partner,
+  template = "",
   locked = false,
 }: {
   orderId: string;
   initial: string;
   partner: string | null;
+  /** Note template of the currently selected courier. */
+  template?: string;
   locked?: boolean;
 }) {
   const qc = useQueryClient();
@@ -41,14 +44,27 @@ export function DeliveryNoteCard({
   const [note, setNote] = useState(initial);
 
   const save = useMutation({
-    mutationFn: () =>
-      adminSaveDeliveryNote({ data: { id: orderId, deliveryNote: enabled ? note : "" } }),
+    mutationFn: (value?: string) =>
+      adminSaveDeliveryNote({
+        data: { id: orderId, deliveryNote: enabled ? (value ?? note) : "" },
+      }),
     onSuccess: async () => {
       toast.success("Delivery note saved");
       await qc.invalidateQueries({ queryKey: ["admin"] });
     },
     onError: (e: Error) => toast.error(e.message),
   });
+
+  // Selecting a courier fills the note with that courier's template automatically.
+  const lastTemplate = useRef(template);
+  useEffect(() => {
+    if (locked) return;
+    if (template === lastTemplate.current) return;
+    lastTemplate.current = template;
+    if (!template) return;
+    setEnabled(true);
+    setNote(template);
+  }, [template, locked]);
 
   return (
     <Panel className="space-y-3">
@@ -57,7 +73,18 @@ export function DeliveryNoteCard({
           <Checkbox
             checked={enabled}
             disabled={locked}
-            onCheckedChange={(v) => setEnabled(Boolean(v))}
+            onCheckedChange={(v) => {
+              const on = Boolean(v);
+              setEnabled(on);
+              if (!on) {
+                setNote("");
+                adminSaveDeliveryNote({ data: { id: orderId, deliveryNote: "" } })
+                  .then(() => qc.invalidateQueries({ queryKey: ["admin"] }))
+                  .catch((e: Error) => toast.error(e.message));
+              } else if (template) {
+                setNote(template);
+              }
+            }}
           />
           <Truck className="size-4 text-primary" />
           Add delivery note
@@ -88,7 +115,7 @@ export function DeliveryNoteCard({
           {locked ? null : (
             <div className="flex items-center justify-between">
               <span className="text-xs text-muted-foreground">{note.length}/500 characters</span>
-              <Button size="sm" loading={save.isPending} onClick={() => save.mutate()}>
+              <Button size="sm" loading={save.isPending} onClick={() => save.mutate(undefined)}>
                 <Save className="size-3.5" />
                 Save note
               </Button>
@@ -211,7 +238,7 @@ export function ItemsCard({
               variant={isDirty ? "default" : "secondary"}
               loading={save.isPending}
               disabled={!isDirty}
-              onClick={() => save.mutate()}
+              onClick={() => save.mutate(undefined)}
             >
               {isDirty ? <Save className="size-3.5" /> : <Check className="size-3.5" />}
               {save.isPending ? "Saving…" : isDirty ? "Save" : "Saved"}

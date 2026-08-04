@@ -144,6 +144,19 @@ function AdminOrderDetail() {
   });
   const activePartners = (partners.data ?? []).filter((p) => p.enabled);
   const [courier, setCourier] = useState("");
+  const defaultPartnerApplied = useRef(false);
+
+  // Pre-select the courier marked as default in Settings → Delivery.
+  useEffect(() => {
+    if (defaultPartnerApplied.current || courier || activePartners.length === 0) return;
+    const fallback = activePartners.find((p) => p.is_default);
+    if (!fallback) return;
+    defaultPartnerApplied.current = true;
+    setCourier(providerLabels[fallback.provider]);
+  }, [activePartners, courier]);
+
+  const courierTemplate =
+    activePartners.find((p) => providerLabels[p.provider] === courier)?.note_template ?? "";
 
   const [pending, setPending] = useState<PendingStatus | "">("");
   const [reason, setReason] = useState("");
@@ -519,7 +532,8 @@ function AdminOrderDetail() {
       <DeliveryNoteCard
         orderId={order.id}
         initial={order.delivery_note ?? ""}
-        partner={order.delivery_partner}
+        partner={courier || order.delivery_partner}
+        template={courierTemplate}
         locked={dispatchLocked}
       />
 
