@@ -346,6 +346,8 @@ export function ItemsCard({
           <Input
             type="number"
             min={0}
+            readOnly={locked}
+            disabled={locked}
             className="h-9 rounded-lg"
             value={discount}
             onChange={(e) => setDiscount(Math.max(0, Number(e.target.value)))}
@@ -359,13 +361,16 @@ export function ItemsCard({
             <Input
               type="number"
               min={0}
+              readOnly={locked}
+              disabled={locked}
               className="h-9 rounded-lg"
               value={advance}
               onChange={(e) => setAdvance(Math.max(0, Number(e.target.value)))}
             />
             {advance > 0 ? (
               <select
-                className="h-9 rounded-lg border border-border/80 bg-background px-2 text-sm"
+                disabled={locked}
+                className="h-9 rounded-lg border border-border/80 bg-background px-2 text-sm disabled:opacity-70"
                 value={advanceMethod}
                 onChange={(e) => setAdvanceMethod(e.target.value)}
               >
