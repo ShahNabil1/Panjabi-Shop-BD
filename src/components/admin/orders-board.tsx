@@ -305,12 +305,20 @@ export function OrdersBoard({
                       const fee = courierFee(o);
                       if (fee === null) return null;
                       return (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-0.5 text-xs font-bold tabular-nums text-amber-900 ring-1 ring-amber-200">
+                        <span
+                          title={
+                            fee.full
+                              ? "Total courier cost (delivery + COD fee & charges)"
+                              : "Base delivery fee — refresh courier status for the full billed cost"
+                          }
+                          className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-0.5 text-xs font-bold tabular-nums text-amber-900 ring-1 ring-amber-200"
+                        >
                           <Truck className="size-3" />
-                          Delivery {adminPrice(fee)}
+                          {fee.full ? "Courier cost" : "Delivery"} {adminPrice(fee.amount)}
                         </span>
                       );
                     })()}
+
                   </div>
                   <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
                     <span className="inline-flex items-center gap-1.5">
