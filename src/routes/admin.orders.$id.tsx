@@ -74,7 +74,10 @@ type OrderItemRow = {
 
 function AdminOrderDetail() {
   const { id } = useParams({ from: "/admin/orders/$id" });
-  const { takeover } = useSearch({ from: "/admin/orders/$id" });
+  const { takeover, from } = useSearch({ from: "/admin/orders/$id" });
+  /** Return to whichever board the user came from. */
+  const backTo = from === "list" ? "/admin/orders/list" : "/admin/orders";
+
   const navigate = useNavigate();
   const qc = useQueryClient();
   const { user } = useAuth();
