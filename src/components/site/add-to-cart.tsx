@@ -101,8 +101,8 @@ export function AddToCartBar({
       <button
         type="button"
         onClick={() => {
-          addItem();
-          openCart("checkout");
+          addItem(false);
+          void navigate({ to: "/checkout" });
         }}
         className="min-w-36 flex-1 rounded-sm bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
       >
