@@ -378,19 +378,8 @@ export function FulfillmentCard({
             <span className="inline-flex rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-semibold text-indigo-800 ring-1 ring-indigo-200">
               {status === "pending" ? "Pending" : status.toUpperCase()}
             </span>
-            {partner ? (
-              isPathao ? (
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-[#E32227] px-2.5 py-0.5 text-xs font-bold uppercase tracking-wide text-white shadow-sm">
-                  <Truck className="size-3.5" />
-                  Pathao
-                </span>
-              ) : (
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-2.5 py-0.5 text-xs font-semibold">
-                  <Truck className="size-3.5" />
-                  {partner}
-                </span>
-              )
-            ) : null}
+            {partner ? <CourierBadge partner={partner} /> : null}
+
             {courierStatus ? (
               <span
                 className={cn(
