@@ -105,49 +105,64 @@ export const courierToOrderStatus: Record<CourierStatus, string | null> = {
 
 /** Maps a raw provider status string to our normalised status. */
 export function normaliseCourierStatus(provider: DeliveryProvider, raw: string): CourierStatus {
-  const s = raw.toLowerCase().replace(/[\s-]+/g, "_");
+  const s = raw.toLowerCase().replace(/[\s.\-]+/g, "_");
   if (provider === "pathao") {
+    // Strip the `order_` prefix so events ("order.picked") and human labels
+    // ("Picked") resolve to the same key.
+    const key = s.replace(/^order_/, "");
     const map: Record<string, CourierStatus> = {
-      "order.created": "pending",
-      "order.updated": "pending",
-      "order.pickup_requested": "pending",
-      "order.assigned_for_pickup": "pending",
-      "order.pickup_failed": "hold",
-      "order.pickup_cancelled": "cancelled",
-      "order.picked": "picked",
-      // Pathao's human label for a picked parcel is literally "Pickup".
-      "order.pickup": "picked",
-
-      "order.at_the_sorting_hub": "in_transit",
-      "order.in_transit": "in_transit",
-      "order.received_at_last_mile_hub": "in_transit",
-      "order.assigned_for_delivery": "in_transit",
-      "order.exchange": "in_transit",
-      "order.delivered": "delivered",
-      "order.partial_delivery": "partial_delivered",
-      "order.delivery_failed": "hold",
-      "order.on_hold": "hold",
-      // Return ID creation is distinct from the parcel's later return journey.
-      "order.return_id_created": "return_id_created",
-      "order.return": "return_in_transit",
-      "order.returned": "return_in_transit",
-      "order.return_in_transit": "return_in_transit",
-      "order.pickup_failed_and_return": "return_in_transit",
-      "order.delivery_failed_and_return": "return_in_transit",
-      "order.returned_to_merchant": "returned",
-      "order.return_completed": "returned",
-      "order.paid_return": "returned",
-      "order.lost": "lost",
-      "order.damaged": "lost",
-      "order.lost_or_damaged": "lost",
+      // → RTS
+      created: "pending",
+      updated: "pending",
+      pickup_requested: "pending",
+      assigned_for_pickup: "pending",
+      // → Shipped
+      picked: "picked",
+      pickup: "picked",
+      at_the_sorting_hub: "in_transit",
+      in_transit: "in_transit",
+      received_at_last_mile_hub: "in_transit",
+      assigned_for_delivery: "in_transit",
+      // → Courier Hold
+      pickup_failed: "hold",
+      delivery_failed: "hold",
+      on_hold: "hold",
+      hold: "hold",
+      // → Cancelled
+      pickup_cancelled: "cancelled",
+      cancelled: "cancelled",
+      // → Delivered
+      delivered: "delivered",
+      // → Partial Delivered
+      partial_delivery: "partial_delivered",
+      partial_delivered: "partial_delivered",
+      paid_return: "partial_delivered",
+      // → Awaiting Return
+      returned: "return_in_transit",
+      return: "return_in_transit",
+      return_id_created: "return_id_created",
+      return_in_transit: "return_in_transit",
+      pickup_failed_and_return: "return_in_transit",
+      delivery_failed_and_return: "return_in_transit",
+      // → Returned
+      returned_to_merchant: "returned",
+      return_completed: "returned",
+      // → Exchange
+      exchanged: "exchange",
+      exchange: "exchange",
+      // Money settlement only — no parcel movement.
+      paid: "paid_invoice",
+      payment_invoice: "paid_invoice",
+      lost: "lost",
+      damaged: "lost",
+      lost_or_damaged: "lost",
     };
-    // Pathao sends either `order.picked` (event) or `Picked` (order_status).
-    const key = s.startsWith("order.") ? s : `order.${s}`;
-    return map[key] ?? genericStatus(s.replace(/^order\./, ""));
+    return map[key] ?? "unknown";
   }
 
   return genericStatus(s);
 }
+
 
 function genericStatus(s: string): CourierStatus {
   const map: Record<string, CourierStatus> = {
