@@ -47,9 +47,10 @@ export const Route = createFileRoute("/admin/settings/delivery")({
   }),
 });
 
+const BRAND_WEBHOOK_ORIGIN = "https://upoharkabbo.com";
+
 function webhookUrl(provider: DeliveryProvider) {
-  const origin = typeof window === "undefined" ? "" : window.location.origin;
-  return `${origin}/api/public/courier/${provider}`;
+  return `${BRAND_WEBHOOK_ORIGIN}/api/public/courier/${provider}`;
 }
 
 function DeliverySettings() {
