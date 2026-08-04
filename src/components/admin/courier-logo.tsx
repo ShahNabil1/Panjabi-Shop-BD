@@ -110,14 +110,18 @@ export function CourierWatermark({
   if (!key) return null;
   const c = COURIERS[key];
   return (
-    <img
-      src={c.src}
-      alt=""
+    <span
       aria-hidden
       className={cn(
-        "pointer-events-none absolute -right-4 -bottom-4 w-32 select-none object-contain opacity-[0.07] mix-blend-multiply",
+        "pointer-events-none absolute inset-0 grid select-none place-items-center",
         className,
       )}
-    />
+    >
+      <img
+        src={c.src}
+        alt=""
+        className="w-[65%] max-w-[420px] object-contain opacity-[0.06] mix-blend-multiply"
+      />
+    </span>
   );
 }
