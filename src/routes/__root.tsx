@@ -23,6 +23,7 @@ import { CartDrawer } from "@/components/site/cart-drawer";
 import { AuthProvider } from "../lib/auth-context";
 import { Toaster } from "../components/ui/sonner";
 import { SITE_URL } from "../lib/site";
+import { useDigitNormalizer } from "../lib/use-digit-normalizer";
 
 function str(value: unknown, fallback: string) {
   return typeof value === "string" && value.trim() ? value : fallback;
