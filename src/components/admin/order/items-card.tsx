@@ -29,10 +29,12 @@ export function DeliveryNoteCard({
   orderId,
   initial,
   partner,
+  locked = false,
 }: {
   orderId: string;
   initial: string;
   partner: string | null;
+  locked?: boolean;
 }) {
   const qc = useQueryClient();
   const [enabled, setEnabled] = useState(Boolean(initial));
