@@ -61,21 +61,9 @@ export function CartDrawer() {
         )}
       >
         <header className="flex items-center gap-3 border-b border-border px-4 py-3">
-          {checkout ? (
-            <button
-              type="button"
-              onClick={() => setStep("cart")}
-              className="grid h-9 w-9 shrink-0 place-items-center rounded-sm border border-border transition-colors hover:border-primary hover:text-primary"
-              aria-label={tr(lang, "cart")}
-            >
-              <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M15 5l-7 7 7 7" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </button>
-          ) : null}
           <h2 className="min-w-0 flex-1 truncate text-base font-bold">
-            {checkout ? tr(lang, "checkout") : tr(lang, "cart")}
-            {!checkout && items.length ? (
+            {tr(lang, "cart")}
+            {items.length ? (
               <span className="ml-1.5 text-sm font-normal text-muted-foreground">
                 ({formatNumber(lang, items.length)})
               </span>
