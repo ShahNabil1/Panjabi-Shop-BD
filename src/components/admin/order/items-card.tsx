@@ -54,13 +54,24 @@ export function DeliveryNoteCard({
     <Panel className="space-y-3">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <label className="flex cursor-pointer items-center gap-2.5 text-sm font-bold">
-          <Checkbox checked={enabled} onCheckedChange={(v) => setEnabled(Boolean(v))} />
+          <Checkbox
+            checked={enabled}
+            disabled={locked}
+            onCheckedChange={(v) => setEnabled(Boolean(v))}
+          />
           <Truck className="size-4 text-primary" />
           Add delivery note
         </label>
-        <span className="text-xs text-muted-foreground">
-          for {partner ?? "courier"} · optional
-        </span>
+        {locked ? (
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-2.5 py-1 text-[11px] font-semibold text-muted-foreground ring-1 ring-border">
+            <Lock className="size-3" />
+            Locked — sent to courier
+          </span>
+        ) : (
+          <span className="text-xs text-muted-foreground">
+            for {partner ?? "courier"} · optional
+          </span>
+        )}
       </div>
 
       {enabled ? (
@@ -68,18 +79,21 @@ export function DeliveryNoteCard({
           <Textarea
             rows={3}
             maxLength={500}
+            readOnly={locked}
             className="rounded-xl"
             placeholder="Optional — e.g. Deliver by 3 PM, call before arrival, leave with security…"
             value={note}
             onChange={(e) => setNote(e.target.value)}
           />
-          <div className="flex items-center justify-between">
-            <span className="text-xs text-muted-foreground">{note.length}/500 characters</span>
-            <Button size="sm" loading={save.isPending} onClick={() => save.mutate()}>
-              <Save className="size-3.5" />
-              Save note
-            </Button>
-          </div>
+          {locked ? null : (
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-muted-foreground">{note.length}/500 characters</span>
+              <Button size="sm" loading={save.isPending} onClick={() => save.mutate()}>
+                <Save className="size-3.5" />
+                Save note
+              </Button>
+            </div>
+          )}
         </div>
       ) : null}
     </Panel>
