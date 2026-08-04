@@ -225,7 +225,6 @@ export async function dispatchOrder(
         client_secret: partner.credentials["client_secret"]!,
         username: partner.credentials["username"]!,
         password: partner.credentials["password"]!,
-        ...(partner.credentials["base_url"] ? { base_url: partner.credentials["base_url"] } : {}),
       };
       const { pathaoToken, pathaoStores, pathaoCities, pathaoZones, pathaoCreateOrder } =
         await import("./pathao.server");

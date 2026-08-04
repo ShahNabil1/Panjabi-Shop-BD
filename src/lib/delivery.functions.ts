@@ -85,7 +85,6 @@ async function runCheck(provider: DeliveryProvider, creds: Record<string, string
         client_secret: creds["client_secret"]!,
         username: creds["username"]!,
         password: creds["password"]!,
-        ...(creds["base_url"] ? { base_url: creds["base_url"] } : {}),
       });
       return { ok: res.ok, message: res.message, extra: { stores: res.stores } };
     }

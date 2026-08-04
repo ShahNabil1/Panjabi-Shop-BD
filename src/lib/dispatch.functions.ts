@@ -173,7 +173,6 @@ export const adminRefreshCourierStatus = createServerFn({ method: "POST" })
           client_secret: partner.credentials["client_secret"]!,
           username: partner.credentials["username"]!,
           password: partner.credentials["password"]!,
-          ...(partner.credentials["base_url"] ? { base_url: partner.credentials["base_url"] } : {}),
         };
         const token = await pathaoToken(creds);
         const info = await pathaoOrderInfo(creds, token, order.courier_consignment_id);
