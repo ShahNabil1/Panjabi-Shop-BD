@@ -600,18 +600,23 @@ function CreateOrderPage() {
                 <select
                   className={input}
                   value={deliveryPartner}
-                  onChange={(e) =>
-                    setDeliveryPartner(e.target.value as (typeof deliveryPartners)[number] | "")
-                  }
+                  onChange={(e) => setDeliveryPartner(e.target.value)}
+                  disabled={activePartners.isLoading}
                 >
                   <option value="">Not selected</option>
-                  {deliveryPartners.map((p) => (
-                    <option key={p} value={p}>
-                      {p}
+                  {(activePartners.data ?? []).map((p) => (
+                    <option key={p} value={providerLabels[p]}>
+                      {providerLabels[p]}
                     </option>
                   ))}
                 </select>
+                {!activePartners.isLoading && (activePartners.data ?? []).length === 0 ? (
+                  <span className="mt-1 block text-xs font-semibold text-muted-foreground">
+                    No delivery partner is enabled yet — add one in Settings → Delivery.
+                  </span>
+                ) : null}
               </label>
+
             </div>
 
             <Button
