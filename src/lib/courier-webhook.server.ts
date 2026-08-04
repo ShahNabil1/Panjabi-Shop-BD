@@ -43,7 +43,9 @@ export function parseCourierPayload(provider: DeliveryProvider, payload: Payload
 }
 
 /** Order status applied automatically once a courier reaches a terminal state. */
-function orderStatusFor(courierStatus: string): string | null {
+type OrderStatusValue = "delivered" | "returned" | "cancelled";
+
+function orderStatusFor(courierStatus: string): OrderStatusValue | null {
   switch (courierStatus) {
     case "delivered":
     case "partial_delivered":
