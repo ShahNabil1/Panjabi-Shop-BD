@@ -259,6 +259,12 @@ export function OrdersBoard({
                         {ratios[o.customer_phone]}%
                       </span>
                     ) : null}
+                    {(o as { delivery_partner?: string | null }).delivery_partner ? (
+                      <CourierBadge
+                        partner={(o as { delivery_partner?: string }).delivery_partner}
+                        className="py-1"
+                      />
+                    ) : null}
                     {(o as { courier_status?: string | null }).courier_status ? (
                       <span
                         className={cn(
@@ -268,14 +274,21 @@ export function OrdersBoard({
                           ),
                         )}
                       >
-                        {(o as { delivery_partner?: string | null }).delivery_partner
-                          ? `${(o as { delivery_partner?: string }).delivery_partner} · `
-                          : ""}
                         {courierStatusLabels[
                           (o as { courier_status?: string }).courier_status as CourierStatus
                         ] ?? (o as { courier_status?: string }).courier_status}
                       </span>
                     ) : null}
+                    {(() => {
+                      const fee = courierFee(o);
+                      if (fee === null) return null;
+                      return (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-0.5 text-xs font-bold tabular-nums text-amber-900 ring-1 ring-amber-200">
+                          <Truck className="size-3" />
+                          Delivery {adminPrice(fee)}
+                        </span>
+                      );
+                    })()}
                   </div>
                   <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
                     <span className="inline-flex items-center gap-1.5">
