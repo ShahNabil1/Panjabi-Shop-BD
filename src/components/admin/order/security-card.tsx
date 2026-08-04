@@ -218,6 +218,8 @@ export function FulfillmentCard({
   customerPhone,
   collectedAmount,
   orderTotal,
+  paidAt,
+  paymentInvoiceId,
 }: {
   orderId: string;
   status: string;
@@ -232,6 +234,8 @@ export function FulfillmentCard({
   customerPhone?: string | null;
   collectedAmount?: number | null;
   orderTotal?: number | null;
+  paidAt?: string | null;
+  paymentInvoiceId?: string | null;
 }) {
   const qc = useQueryClient();
   const [historyOpen, setHistoryOpen] = useState(false);
