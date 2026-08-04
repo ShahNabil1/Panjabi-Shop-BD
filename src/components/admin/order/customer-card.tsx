@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { MapPin, Pencil, Phone, Save, X } from "lucide-react";
+import { Lock, MapPin, Pencil, Phone, Save, X } from "lucide-react";
 
 import { BD_DIVISIONS } from "@/lib/bd-geo";
 import { adminUpdateOrderCustomer } from "@/lib/order-admin.functions";
@@ -36,7 +36,13 @@ function Value({ label, children }: { label: string; children: React.ReactNode }
   );
 }
 
-export function CustomerCard({ order }: { order: OrderCustomer }) {
+export function CustomerCard({
+  order,
+  locked = false,
+}: {
+  order: OrderCustomer;
+  locked?: boolean;
+}) {
   const qc = useQueryClient();
   const [editing, setEditing] = useState(false);
   const baseline = {
@@ -73,7 +79,12 @@ export function CustomerCard({ order }: { order: OrderCustomer }) {
           <MapPin className="size-4 text-primary" />
           Customer &amp; Delivery
         </h2>
-        {editing ? (
+        {locked ? (
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-2.5 py-1 text-[11px] font-semibold text-muted-foreground ring-1 ring-border">
+            <Lock className="size-3" />
+            Locked — sent to courier
+          </span>
+        ) : editing ? (
           <div className="flex items-center gap-2">
             <Button
               size="sm"
@@ -104,7 +115,7 @@ export function CustomerCard({ order }: { order: OrderCustomer }) {
         )}
       </div>
 
-      {editing ? (
+      {editing && !locked ? (
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-1.5">
             <Label className={labelClass}>Name *</Label>

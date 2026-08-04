@@ -224,6 +224,8 @@ function AdminOrderDetail() {
 
   const isWeb = (webOrderStatuses as readonly string[]).includes(order.status);
   const isDanger = pending === "hold" || pending === "cancelled";
+  /** Once dispatched to a courier the shipment data is frozen. */
+  const dispatchLocked = ["rts", "shipped", "delivered", "returned"].includes(order.status);
 
   return (
     <div className="space-y-5">
@@ -490,18 +492,20 @@ function AdminOrderDetail() {
       {/* Fraud checker directly under the order title */}
       <CourierReport phone={order.customer_phone} />
 
-      <CustomerCard order={order} />
+      <CustomerCard order={order} locked={dispatchLocked} />
 
       <DeliveryNoteCard
         orderId={order.id}
         initial={order.delivery_note ?? ""}
         partner={order.delivery_partner}
+        locked={dispatchLocked}
       />
 
       <SmsCard orderId={order.id} phone={order.customer_phone} />
 
       <ItemsCard
         orderId={order.id}
+        locked={dispatchLocked}
         deliveryCharge={Number(order.delivery_charge ?? 0)}
         discount={Number(order.discount ?? 0)}
         advanceAmount={Number(order.advance_amount ?? 0)}

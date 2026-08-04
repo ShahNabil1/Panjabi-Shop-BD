@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Check, Package, Plus, Save, Search, Trash2, Truck } from "lucide-react";
+import { Check, Lock, Package, Plus, Save, Search, Trash2, Truck } from "lucide-react";
 
 import { advanceMethods } from "@/lib/admin-schema";
 import { adminSearchProducts } from "@/lib/admin.functions";
@@ -29,10 +29,12 @@ export function DeliveryNoteCard({
   orderId,
   initial,
   partner,
+  locked = false,
 }: {
   orderId: string;
   initial: string;
   partner: string | null;
+  locked?: boolean;
 }) {
   const qc = useQueryClient();
   const [enabled, setEnabled] = useState(Boolean(initial));
@@ -52,13 +54,24 @@ export function DeliveryNoteCard({
     <Panel className="space-y-3">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <label className="flex cursor-pointer items-center gap-2.5 text-sm font-bold">
-          <Checkbox checked={enabled} onCheckedChange={(v) => setEnabled(Boolean(v))} />
+          <Checkbox
+            checked={enabled}
+            disabled={locked}
+            onCheckedChange={(v) => setEnabled(Boolean(v))}
+          />
           <Truck className="size-4 text-primary" />
           Add delivery note
         </label>
-        <span className="text-xs text-muted-foreground">
-          for {partner ?? "courier"} · optional
-        </span>
+        {locked ? (
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-2.5 py-1 text-[11px] font-semibold text-muted-foreground ring-1 ring-border">
+            <Lock className="size-3" />
+            Locked — sent to courier
+          </span>
+        ) : (
+          <span className="text-xs text-muted-foreground">
+            for {partner ?? "courier"} · optional
+          </span>
+        )}
       </div>
 
       {enabled ? (
@@ -66,18 +79,21 @@ export function DeliveryNoteCard({
           <Textarea
             rows={3}
             maxLength={500}
+            readOnly={locked}
             className="rounded-xl"
             placeholder="Optional — e.g. Deliver by 3 PM, call before arrival, leave with security…"
             value={note}
             onChange={(e) => setNote(e.target.value)}
           />
-          <div className="flex items-center justify-between">
-            <span className="text-xs text-muted-foreground">{note.length}/500 characters</span>
-            <Button size="sm" loading={save.isPending} onClick={() => save.mutate()}>
-              <Save className="size-3.5" />
-              Save note
-            </Button>
-          </div>
+          {locked ? null : (
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-muted-foreground">{note.length}/500 characters</span>
+              <Button size="sm" loading={save.isPending} onClick={() => save.mutate()}>
+                <Save className="size-3.5" />
+                Save note
+              </Button>
+            </div>
+          )}
         </div>
       ) : null}
     </Panel>
@@ -92,6 +108,7 @@ export function ItemsCard({
   discount: initialDiscount,
   advanceAmount: initialAdvance,
   advanceMethod: initialAdvanceMethod,
+  locked = false,
 }: {
   orderId: string;
   initialItems: EditableItem[];
@@ -99,6 +116,7 @@ export function ItemsCard({
   discount: number;
   advanceAmount?: number;
   advanceMethod?: string | null;
+  locked?: boolean;
 }) {
   const qc = useQueryClient();
   const [items, setItems] = useState<EditableItem[]>(initialItems);
@@ -177,26 +195,32 @@ export function ItemsCard({
           <Package className="size-4 text-primary" />
           Items
         </h2>
-        <div className="flex items-center gap-2">
-          <Button size="sm" variant="outline" onClick={() => setAdding((v) => !v)}>
-            <Plus className="size-3.5" />
-            Add Product
-          </Button>
-          <Button
-            size="sm"
-            variant={isDirty ? "default" : "secondary"}
-            loading={save.isPending}
-            disabled={!isDirty}
-            onClick={() => save.mutate()}
-          >
-            {isDirty ? <Save className="size-3.5" /> : <Check className="size-3.5" />}
-            {save.isPending ? "Saving…" : isDirty ? "Save" : "Saved"}
-          </Button>
-
-        </div>
+        {locked ? (
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-2.5 py-1 text-[11px] font-semibold text-muted-foreground ring-1 ring-border">
+            <Lock className="size-3" />
+            Locked — sent to courier
+          </span>
+        ) : (
+          <div className="flex items-center gap-2">
+            <Button size="sm" variant="outline" onClick={() => setAdding((v) => !v)}>
+              <Plus className="size-3.5" />
+              Add Product
+            </Button>
+            <Button
+              size="sm"
+              variant={isDirty ? "default" : "secondary"}
+              loading={save.isPending}
+              disabled={!isDirty}
+              onClick={() => save.mutate()}
+            >
+              {isDirty ? <Save className="size-3.5" /> : <Check className="size-3.5" />}
+              {save.isPending ? "Saving…" : isDirty ? "Save" : "Saved"}
+            </Button>
+          </div>
+        )}
       </div>
 
-      {adding ? (
+      {adding && !locked ? (
         <div className="space-y-2 rounded-xl border border-border/70 bg-background/60 p-3">
           <div className="relative">
             <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
@@ -282,6 +306,8 @@ export function ItemsCard({
             <Input
               type="number"
               min={1}
+              readOnly={locked}
+              disabled={locked}
               className="h-9 w-20 rounded-lg text-center"
               value={item.quantity}
               onChange={(e) => patch(index, { quantity: Math.max(1, Number(e.target.value)) })}
@@ -289,6 +315,8 @@ export function ItemsCard({
             <Input
               type="number"
               min={0}
+              readOnly={locked}
+              disabled={locked}
               className="h-9 w-28 rounded-lg text-center"
               value={item.unitPrice}
               onChange={(e) => patch(index, { unitPrice: Math.max(0, Number(e.target.value)) })}
@@ -296,14 +324,16 @@ export function ItemsCard({
             <span className="w-24 text-right text-sm font-bold tabular-nums">
               {money(item.unitPrice * item.quantity)}
             </span>
-            <button
-              type="button"
-              aria-label="Remove item"
-              className="text-muted-foreground transition-colors hover:text-destructive"
-              onClick={() => setItems(items.filter((_, i) => i !== index))}
-            >
-              <Trash2 className="size-4" />
-            </button>
+            {locked ? null : (
+              <button
+                type="button"
+                aria-label="Remove item"
+                className="text-muted-foreground transition-colors hover:text-destructive"
+                onClick={() => setItems(items.filter((_, i) => i !== index))}
+              >
+                <Trash2 className="size-4" />
+              </button>
+            )}
           </li>
         ))}
       </ul>
@@ -316,6 +346,8 @@ export function ItemsCard({
           <Input
             type="number"
             min={0}
+            readOnly={locked}
+            disabled={locked}
             className="h-9 rounded-lg"
             value={discount}
             onChange={(e) => setDiscount(Math.max(0, Number(e.target.value)))}
@@ -329,13 +361,16 @@ export function ItemsCard({
             <Input
               type="number"
               min={0}
+              readOnly={locked}
+              disabled={locked}
               className="h-9 rounded-lg"
               value={advance}
               onChange={(e) => setAdvance(Math.max(0, Number(e.target.value)))}
             />
             {advance > 0 ? (
               <select
-                className="h-9 rounded-lg border border-border/80 bg-background px-2 text-sm"
+                disabled={locked}
+                className="h-9 rounded-lg border border-border/80 bg-background px-2 text-sm disabled:opacity-70"
                 value={advanceMethod}
                 onChange={(e) => setAdvanceMethod(e.target.value)}
               >
