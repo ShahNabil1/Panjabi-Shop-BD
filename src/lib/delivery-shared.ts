@@ -48,12 +48,14 @@ export type CourierStatus =
   | "in_transit"
   | "delivered"
   | "partial_delivered"
+  | "exchange"
   | "hold"
   | "return_id_created"
   | "return_in_transit"
   | "returned"
   | "cancelled"
   | "lost"
+  | "paid_invoice"
   | "unknown";
 
 export const courierStatusLabels: Record<CourierStatus, string> = {
@@ -63,12 +65,14 @@ export const courierStatusLabels: Record<CourierStatus, string> = {
   in_transit: "In transit",
   delivered: "Delivered",
   partial_delivered: "Partial delivered",
+  exchange: "Exchange",
   hold: "On hold",
   return_id_created: "Return ID Created",
   return_in_transit: "Return in transit",
-  returned: "Returned",
+  returned: "Returned to merchant",
   cancelled: "Cancelled",
   lost: "Lost / damaged",
+  paid_invoice: "Payment invoice",
   unknown: "Unknown",
 };
 
@@ -78,22 +82,26 @@ export const courierStatusLabels: Record<CourierStatus, string> = {
  * whatever status it already has. Mirrors `courier_webhook_apply` in the DB.
  */
 export const courierToOrderStatus: Record<CourierStatus, string | null> = {
-  pending: null,
-  // Steadfast puts every freshly-created consignment in `in_review`, so it is
-  // a normal RTS state — never a hold.
-  in_review: null,
+  // Pathao's created / updated / pickup-requested / assigned-for-pickup phase.
+  pending: "rts",
+  // Steadfast puts every freshly-created consignment in `in_review`.
+  in_review: "rts",
   unknown: null,
+  // Pathao payment invoices settle money, not parcels — order status untouched.
+  paid_invoice: null,
   hold: "courier_hold",
   picked: "shipped",
   in_transit: "shipped",
   delivered: "delivered",
   partial_delivered: "partial_delivered",
+  exchange: "exchange",
   return_id_created: "awaiting_return",
   return_in_transit: "awaiting_return",
   returned: "returned",
   cancelled: "cancelled",
   lost: "lost_damaged",
 };
+
 
 /** Maps a raw provider status string to our normalised status. */
 export function normaliseCourierStatus(provider: DeliveryProvider, raw: string): CourierStatus {
