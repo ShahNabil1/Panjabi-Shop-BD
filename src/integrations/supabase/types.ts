@@ -769,6 +769,11 @@ export type Database = {
           alt_phone: string | null
           auto_sms_status: string
           city: string
+          courier_consignment_id: string | null
+          courier_provider: string | null
+          courier_sent_at: string | null
+          courier_status: string | null
+          courier_tracking_code: string | null
           created_at: string
           customer_email: string | null
           customer_ip: string | null
@@ -803,6 +808,11 @@ export type Database = {
           alt_phone?: string | null
           auto_sms_status?: string
           city: string
+          courier_consignment_id?: string | null
+          courier_provider?: string | null
+          courier_sent_at?: string | null
+          courier_status?: string | null
+          courier_tracking_code?: string | null
           created_at?: string
           customer_email?: string | null
           customer_ip?: string | null
@@ -837,6 +847,11 @@ export type Database = {
           alt_phone?: string | null
           auto_sms_status?: string
           city?: string
+          courier_consignment_id?: string | null
+          courier_provider?: string | null
+          courier_sent_at?: string | null
+          courier_status?: string | null
+          courier_tracking_code?: string | null
           created_at?: string
           customer_email?: string | null
           customer_ip?: string | null
@@ -1423,6 +1438,7 @@ export type Database = {
       coupon_target_type: "product" | "category"
       order_status:
         | "pending"
+        | "rts"
         | "confirmed"
         | "processing"
         | "shipped"
@@ -1567,6 +1583,7 @@ export const Constants = {
       coupon_target_type: ["product", "category"],
       order_status: [
         "pending",
+        "rts",
         "confirmed",
         "processing",
         "shipped",
