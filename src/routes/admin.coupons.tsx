@@ -759,7 +759,7 @@ function CouponDialog({
           ) : null}
         </div>
 
-        <div className="sticky bottom-0 z-10 flex items-center justify-end gap-2 border-t border-border bg-background/95 px-5 py-3 backdrop-blur">
+        <div className="flex shrink-0 items-center justify-end gap-2 border-t border-border bg-background px-5 py-3">
           <Button type="button" variant="outline" onClick={onClose} className="active:scale-95">
             Cancel
           </Button>
