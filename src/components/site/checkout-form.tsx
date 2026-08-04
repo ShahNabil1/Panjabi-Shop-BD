@@ -431,6 +431,70 @@ export function CheckoutForm({
           ))}
         </ul>
 
+        <div className="mt-4 border-t border-border pt-3">
+          <span className="mb-1.5 block text-sm font-semibold">
+            {lang === "bn" ? "কুপন কোড" : "Coupon code"}
+          </span>
+          <div className="flex gap-2">
+            <input
+              className={cn(inputClass, "font-en uppercase tracking-widest")}
+              value={couponCode}
+              onChange={(e) => setCouponCode(maskCouponCode(e.target.value))}
+              onKeyDown={(e) => {
+                if (e.key.length === 1 && !/[A-Za-z0-9]/.test(e.key)) e.preventDefault();
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  void applyCoupon();
+                }
+              }}
+              placeholder={lang === "bn" ? "কোড লিখুন" : "Enter code"}
+              inputMode="text"
+              autoCapitalize="characters"
+              autoComplete="off"
+              maxLength={24}
+              disabled={Boolean(appliedCode)}
+            />
+            {appliedCode ? (
+              <button
+                type="button"
+                onClick={() => {
+                  setCoupon(null);
+                  setCouponCode("");
+                  setCouponError(null);
+                }}
+                className="shrink-0 rounded-sm border border-border px-4 text-sm font-bold transition-colors hover:border-destructive hover:text-destructive active:scale-95"
+              >
+                {lang === "bn" ? "বাতিল" : "Remove"}
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => void applyCoupon()}
+                disabled={couponPending || !couponCode}
+                className="shrink-0 rounded-sm bg-foreground px-4 text-sm font-bold text-background transition-transform active:scale-95 disabled:opacity-50"
+              >
+                {couponPending
+                  ? lang === "bn"
+                    ? "যাচাই..."
+                    : "Checking…"
+                  : lang === "bn"
+                    ? "প্রয়োগ"
+                    : "Apply"}
+              </button>
+            )}
+          </div>
+          {couponError ? (
+            <p className="mt-1.5 text-xs font-semibold text-destructive">{couponError}</p>
+          ) : null}
+          {appliedCode ? (
+            <p className="mt-1.5 text-xs font-semibold text-emerald-600">
+              {lang === "bn"
+                ? `কুপন ${appliedCode} প্রয়োগ হয়েছে`
+                : `Coupon ${appliedCode} applied`}
+            </p>
+          ) : null}
+        </div>
+
         <dl className="mt-4 grid gap-1.5 border-t border-border pt-3 text-sm">
           <div className="flex justify-between">
             <dt className="text-muted-foreground">{tr(lang, "subtotal")}</dt>
@@ -442,11 +506,21 @@ export function CheckoutForm({
               {delivery === 0 ? tr(lang, "free") : formatPrice(lang, delivery)}
             </dd>
           </div>
+          {discount > 0 ? (
+            <div className="flex justify-between text-emerald-600">
+              <dt className="font-semibold">
+                {lang === "bn" ? "কুপন ছাড়" : "Coupon discount"}
+                {appliedCode ? <span className="font-en"> ({appliedCode})</span> : null}
+              </dt>
+              <dd className="font-bold tabular-nums">− {formatPrice(lang, discount)}</dd>
+            </div>
+          ) : null}
           <div className="flex justify-between border-t border-border pt-2 text-base">
             <dt className="font-bold">{tr(lang, "total")}</dt>
             <dd className="font-bold tabular-nums text-primary">{formatPrice(lang, total)}</dd>
           </div>
         </dl>
+
       </div>
 
       {failed ? (
