@@ -273,7 +273,10 @@ function AdminOrderDetail() {
                 <SelectValue placeholder="Update Status" />
               </SelectTrigger>
               <SelectContent>
-                {updatableStatuses.map((s) => (
+                {(order.status === "rts"
+                  ? (["cancelled"] as const satisfies readonly PendingStatus[])
+                  : updatableStatuses
+                ).map((s) => (
                   <SelectItem key={s} value={s} disabled={s === order.status}>
                     {statusLabels[s]}
                   </SelectItem>
