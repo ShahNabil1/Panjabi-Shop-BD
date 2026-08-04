@@ -1492,6 +1492,11 @@ export type Database = {
         | "no_response"
         | "good_no_response"
         | "hold"
+        | "partial_delivered"
+        | "awaiting_return"
+        | "unpaid"
+        | "paid"
+        | "lost_damaged"
       promotion_type: "offer" | "featured" | "flash" | "new_arrival"
     }
     CompositeTypes: {
@@ -1637,6 +1642,11 @@ export const Constants = {
         "no_response",
         "good_no_response",
         "hold",
+        "partial_delivered",
+        "awaiting_return",
+        "unpaid",
+        "paid",
+        "lost_damaged",
       ],
       promotion_type: ["offer", "featured", "flash", "new_arrival"],
     },

@@ -10,9 +10,14 @@ export const orderStatuses = [
   "good_no_response",
   "hold",
   "shipped",
+  "partial_delivered",
   "delivered",
   "cancelled",
+  "awaiting_return",
   "returned",
+  "unpaid",
+  "paid",
+  "lost_damaged",
 ] as const;
 export type OrderStatus = (typeof orderStatuses)[number];
 
@@ -30,11 +35,15 @@ export const webOrderStatuses = [
 export const listOrderStatuses = [
   "pending",
   "rts",
-  "confirmed",
   "shipped",
+  "partial_delivered",
   "delivered",
   "cancelled",
+  "awaiting_return",
   "returned",
+  "unpaid",
+  "paid",
+  "lost_damaged",
 ] as const;
 
 export const orderBuckets = ["web", "list"] as const;

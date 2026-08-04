@@ -229,9 +229,14 @@ const statusStyles: Record<string, string> = {
   hold: "bg-fuchsia-100 text-fuchsia-900 ring-fuchsia-200",
   rts: "bg-sky-100 text-sky-900 ring-sky-200",
   shipped: "bg-violet-100 text-violet-900 ring-violet-200",
+  partial_delivered: "bg-lime-100 text-lime-900 ring-lime-200",
   delivered: "bg-emerald-100 text-emerald-900 ring-emerald-200",
   cancelled: "bg-rose-100 text-rose-900 ring-rose-200",
+  awaiting_return: "bg-amber-100 text-amber-900 ring-amber-200",
   returned: "bg-stone-200 text-stone-800 ring-stone-300",
+  unpaid: "bg-red-100 text-red-900 ring-red-200",
+  paid: "bg-green-100 text-green-900 ring-green-200",
+  lost_damaged: "bg-neutral-800 text-neutral-100 ring-neutral-700",
 };
 
 export const statusLabels: Record<string, string> = {
@@ -244,9 +249,14 @@ export const statusLabels: Record<string, string> = {
   good_no_response: "Good But No Response",
   hold: "Hold",
   shipped: "Shipped",
+  partial_delivered: "Partial Delivered",
   delivered: "Delivered",
   cancelled: "Cancelled",
+  awaiting_return: "Awaiting Return",
   returned: "Returned",
+  unpaid: "Unpaid",
+  paid: "Paid",
+  lost_damaged: "Lost/Damaged",
 };
 
 
