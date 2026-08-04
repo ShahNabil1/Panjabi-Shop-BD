@@ -144,7 +144,61 @@ export function CheckoutForm({
   );
   const delivery =
     rates.freeAll || (rates.freeAbove > 0 && subtotal >= rates.freeAbove) ? 0 : rates[area];
-  const total = subtotal + delivery;
+
+  // ---- Coupon (validated on the server, re-checked again when ordering) ----
+  const checkCoupon = useServerFn(validateCoupon);
+  const [couponCode, setCouponCode] = useState("");
+  const [coupon, setCoupon] = useState<CouponValidation | null>(null);
+  const [couponError, setCouponError] = useState<string | null>(null);
+  const [couponPending, setCouponPending] = useState(false);
+
+  const productIds = useMemo(() => [...new Set(items.map((i) => i.productId))], [items]);
+  const appliedCode = coupon?.ok ? coupon.code : null;
+
+  // Any cart change invalidates a previously applied coupon amount.
+  useEffect(() => {
+    setCoupon(null);
+    setCouponError(null);
+  }, [subtotal, productIds.join(",")]);
+
+  const applyCoupon = async () => {
+    const code = maskCouponCode(couponCode);
+    setCouponCode(code);
+    if (!COUPON_CODE_RE.test(code)) {
+      setCoupon(null);
+      setCouponError(
+        lang === "bn" ? "সঠিক কুপন কোড লিখুন" : "Enter a valid coupon code",
+      );
+      return;
+    }
+    setCouponPending(true);
+    setCouponError(null);
+    try {
+      const result = await checkCoupon({
+        data: {
+          code,
+          subtotal,
+          productIds,
+          phone: /^01[3-9]\d{8}$/.test(phone.trim()) ? phone.trim() : null,
+        },
+      });
+      if (result.ok) {
+        setCoupon(result);
+      } else {
+        setCoupon(null);
+        setCouponError(couponReasonMessage(result.reason, result.minSpend));
+      }
+    } catch {
+      setCoupon(null);
+      setCouponError(lang === "bn" ? "কুপন যাচাই করা যায়নি" : "Could not verify the coupon");
+    } finally {
+      setCouponPending(false);
+    }
+  };
+
+  const discount = coupon?.ok ? Math.min(Math.round(coupon.discount), subtotal) : 0;
+  const total = Math.max(0, subtotal + delivery - discount);
+
 
   const validate = () => {
     const next: Record<string, string> = {};
