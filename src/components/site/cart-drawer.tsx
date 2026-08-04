@@ -232,13 +232,13 @@ export function CartDrawer() {
                 </span>
               </div>
               <p className="mt-1 text-xs text-muted-foreground">{tr(lang, "codNote")}</p>
-              <button
-                type="button"
-                onClick={() => setStep("checkout")}
-                className="mt-3 w-full rounded-sm bg-primary px-5 py-3 text-sm font-bold text-primary-foreground transition-colors hover:bg-primary/90"
+              <Link
+                to="/checkout"
+                onClick={closeCart}
+                className="mt-3 block w-full rounded-sm bg-primary px-5 py-3 text-center text-sm font-bold text-primary-foreground transition-colors hover:bg-primary/90"
               >
                 {tr(lang, "checkout")}
-              </button>
+              </Link>
               <button
                 type="button"
                 onClick={closeCart}
