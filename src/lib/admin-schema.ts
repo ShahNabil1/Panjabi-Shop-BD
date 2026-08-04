@@ -90,6 +90,8 @@ export const orderStatusSchema = z.object({
 
 export const orderListSchema = z.object({
   status: z.enum(orderStatuses).optional(),
+  /** Payment view: paid = courier payout invoice received, unpaid = not yet. */
+  payment: z.enum(paymentFilters).optional(),
   bucket: z.enum(orderBuckets).optional(),
   search: z.string().trim().max(120).optional(),
 });
