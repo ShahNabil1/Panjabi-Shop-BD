@@ -734,7 +734,12 @@ export const adminCreateOrder = createServerFn({ method: "POST" })
         delivery_partner: data.deliveryPartner,
         delivery_note: data.deliveryNote || null,
         payment_method: data.advanceAmount > 0 ? "partial_advance" : "cod",
-        status: "pending",
+        status: data.preOrder
+          ? "pre_order"
+          : data.scheduledFor
+            ? "scheduled_order"
+            : "pending",
+        scheduled_for: !data.preOrder && data.scheduledFor ? data.scheduledFor : null,
         source: data.source,
       })
       .select("id, order_number")
