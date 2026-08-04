@@ -150,7 +150,7 @@ export const adminCreateOrderSchema = z.object({
   advanceAmount: z.number().min(0).default(0),
   advanceMethod: z.enum(advanceMethods).nullable().default(null),
   source: z.enum(orderSources).default("Direct"),
-  deliveryPartner: z.enum(deliveryPartners).nullable().default(null),
+  deliveryPartner: z.string().trim().min(2).max(40).nullable().default(null),
   items: z.array(adminOrderItemSchema).min(1).max(30),
 });
 

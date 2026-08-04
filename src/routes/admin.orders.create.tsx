@@ -11,9 +11,10 @@ import {
 } from "@/lib/admin.functions";
 import {
   advanceMethods,
-  deliveryPartners,
   orderSources,
 } from "@/lib/admin-schema";
+import { adminActiveDeliveryPartners } from "@/lib/delivery.functions";
+import { providerLabels } from "@/lib/delivery-shared";
 import { BD_DIVISIONS } from "@/lib/bd-geo";
 import { AdminHeading, Panel } from "@/components/admin/kit";
 import { BrandLoader } from "@/components/admin/brand-loader";
@@ -68,8 +69,13 @@ function CreateOrderPage() {
   const [advanceMethod, setAdvanceMethod] =
     useState<(typeof advanceMethods)[number]>("bKash");
   const [source, setSource] = useState<(typeof orderSources)[number]>("Facebook");
-  const [deliveryPartner, setDeliveryPartner] =
-    useState<(typeof deliveryPartners)[number] | "">("");
+  const [deliveryPartner, setDeliveryPartner] = useState<string>("");
+
+  const activePartners = useQuery({
+    queryKey: ["admin", "active-delivery-partners"],
+    queryFn: () => adminActiveDeliveryPartners(),
+    staleTime: 60_000,
+  });
 
   const phoneValid = /^01[3-9]\d{8}$/.test(phone.trim());
 
@@ -594,18 +600,23 @@ function CreateOrderPage() {
                 <select
                   className={input}
                   value={deliveryPartner}
-                  onChange={(e) =>
-                    setDeliveryPartner(e.target.value as (typeof deliveryPartners)[number] | "")
-                  }
+                  onChange={(e) => setDeliveryPartner(e.target.value)}
+                  disabled={activePartners.isLoading}
                 >
                   <option value="">Not selected</option>
-                  {deliveryPartners.map((p) => (
-                    <option key={p} value={p}>
-                      {p}
+                  {(activePartners.data ?? []).map((p) => (
+                    <option key={p} value={providerLabels[p]}>
+                      {providerLabels[p]}
                     </option>
                   ))}
                 </select>
+                {!activePartners.isLoading && (activePartners.data ?? []).length === 0 ? (
+                  <span className="mt-1 block text-xs font-semibold text-muted-foreground">
+                    No delivery partner is enabled yet — add one in Settings → Delivery.
+                  </span>
+                ) : null}
               </label>
+
             </div>
 
             <Button
