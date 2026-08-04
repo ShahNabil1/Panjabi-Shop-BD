@@ -19,6 +19,8 @@ import {
   Settings,
   ShoppingCart,
   ListOrdered,
+  Ticket,
+
   X,
 } from "lucide-react";
 
