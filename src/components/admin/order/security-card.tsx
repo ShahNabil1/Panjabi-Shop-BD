@@ -218,6 +218,8 @@ export function FulfillmentCard({
   customerPhone,
   collectedAmount,
   orderTotal,
+  paidAt,
+  paymentInvoiceId,
 }: {
   orderId: string;
   status: string;
@@ -232,6 +234,8 @@ export function FulfillmentCard({
   customerPhone?: string | null;
   collectedAmount?: number | null;
   orderTotal?: number | null;
+  paidAt?: string | null;
+  paymentInvoiceId?: string | null;
 }) {
   const qc = useQueryClient();
   const [historyOpen, setHistoryOpen] = useState(false);
@@ -540,7 +544,27 @@ export function FulfillmentCard({
                 })()
               ) : null}
 
+              {paidAt ? (
+                <div className="rounded-lg border border-green-200 bg-green-50/70 px-3 py-2.5">
+                  <div className="flex items-center gap-1.5">
+                    <Banknote className="size-4 text-green-700" />
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-green-800">
+                      Courier payout received
+                    </p>
+                  </div>
+                  {paymentInvoiceId ? (
+                    <p className="mt-1 font-mono text-sm font-bold text-green-900">
+                      Invoice {paymentInvoiceId}
+                    </p>
+                  ) : null}
+                  <p className="mt-0.5 text-xs text-muted-foreground">
+                    {new Date(paidAt).toLocaleString("en-US", { timeZone: "Asia/Dhaka" })}
+                  </p>
+                </div>
+              ) : null}
+
               {isPathao ? <PathaoCostOfDelivery orderId={orderId} /> : null}
+
 
 
               <dl className="grid gap-1 text-xs text-muted-foreground">

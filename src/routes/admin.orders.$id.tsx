@@ -567,6 +567,20 @@ function AdminOrderDetail() {
           return rows?.map((r) => r.return_consignment_id).find((x) => !!x) ?? null;
         })()}
         orderTotal={order.total != null ? Number(order.total) : null}
+        paidAt={(() => {
+          const rows = (
+            order as unknown as { order_consignments?: Array<{ paid_at?: string | null }> }
+          ).order_consignments;
+          return rows?.map((r) => r.paid_at).find((x) => !!x) ?? null;
+        })()}
+        paymentInvoiceId={(() => {
+          const rows = (
+            order as unknown as {
+              order_consignments?: Array<{ payment_invoice_id?: string | null }>;
+            }
+          ).order_consignments;
+          return rows?.map((r) => r.payment_invoice_id).find((x) => !!x) ?? null;
+        })()}
       />
 
       <SecurityCard

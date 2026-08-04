@@ -20,6 +20,7 @@ import {
   adminEditOrderSchema,
   webOrderStatuses,
   listOrderStatuses,
+  payableStatuses,
 } from "./admin-schema";
 
 
@@ -88,11 +89,12 @@ export const adminListOrders = createServerFn({ method: "POST" })
     let q = db
       .from("orders")
       .select(
-        "id, order_number, customer_name, customer_phone, city, total, status, source, customer_ip, created_at, delivery_partner, courier_status, courier_consignment_id, order_consignments(provider, delivery_fee, cod_amount, total_cost, collected_amount, status)",
+        "id, order_number, customer_name, customer_phone, city, total, status, source, customer_ip, created_at, delivery_partner, courier_status, courier_consignment_id, order_consignments(provider, delivery_fee, cod_amount, total_cost, collected_amount, status, payment_invoice_id, paid_at)",
       )
       .order("created_at", { ascending: false })
       .limit(200);
-    if (data.status) q = q.eq("status", data.status);
+    if (data.payment) q = q.in("status", [...payableStatuses]);
+    else if (data.status) q = q.eq("status", data.status);
     else if (data.bucket)
       q = q.in("status", [...(data.bucket === "web" ? webOrderStatuses : listOrderStatuses)]);
     if (data.search) {
@@ -101,7 +103,15 @@ export const adminListOrders = createServerFn({ method: "POST" })
         `order_number.ilike.%${s}%,customer_name.ilike.%${s}%,customer_phone.ilike.%${s}%`,
       );
     }
-    return unwrap(await q);
+    const rows = unwrap(await q);
+    if (!data.payment) return rows;
+    /** Paid = at least one consignment carries a courier payout invoice. */
+    const isPaid = (o: unknown) =>
+      ((o as { order_consignments?: Array<{ paid_at?: string | null }> }).order_consignments ?? [])
+        .some((c) => Boolean(c.paid_at));
+    return (rows as unknown[]).filter((o) =>
+      data.payment === "paid" ? isPaid(o) : !isPaid(o),
+    ) as typeof rows;
   });
 
 export const adminGetOrder = createServerFn({ method: "POST" })
@@ -112,7 +122,7 @@ export const adminGetOrder = createServerFn({ method: "POST" })
     const { data: order, error } = await db
       .from("orders")
       .select(
-        "*, order_items(*), order_activity(id, kind, message, meta, created_at), order_consignments(provider, collected_amount, delivery_fee, total_cost, status, return_consignment_id)",
+        "*, order_items(*), order_activity(id, kind, message, meta, created_at), order_consignments(provider, collected_amount, delivery_fee, total_cost, status, return_consignment_id, payment_invoice_id, paid_at)",
       )
       .eq("id", data.id)
       .maybeSingle();

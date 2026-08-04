@@ -5,7 +5,7 @@ import { Search, Clock, Globe, Eye, ShieldAlert, UserRound, Truck, Loader2, Bank
 import { toast } from "sonner";
 
 import { adminListOrders } from "@/lib/admin.functions";
-import type { OrderBucket, OrderStatus } from "@/lib/admin-schema";
+import { paymentFilters, type OrderBucket, type OrderStatus, type PaymentFilter } from "@/lib/admin-schema";
 import { EmptyState, Panel, StatusPill, statusLabels } from "@/components/admin/kit";
 import { BrandLoader } from "@/components/admin/brand-loader";
 import { Input } from "@/components/ui/input";
@@ -72,6 +72,20 @@ function collectedAmount(order: unknown): number | null {
   return v === null || v === undefined ? null : Number(v);
 }
 
+/** Courier payout (an `order.paid` invoice webhook) for this order, if received. */
+function courierPayout(order: unknown): { invoice: string | null } | null {
+  const rows = (
+    order as {
+      order_consignments?: Array<{
+        paid_at?: string | null;
+        payment_invoice_id?: string | null;
+      }>;
+    }
+  ).order_consignments;
+  const row = rows?.find((r) => Boolean(r.paid_at));
+  return row ? { invoice: row.payment_invoice_id ?? null } : null;
+}
+
 
 function formatBdDateTime(value: string) {
   return new Date(value).toLocaleString("en-US", {
@@ -95,7 +109,15 @@ export function OrdersBoard({
   statuses: readonly OrderStatus[];
   emptyTitle?: string;
 }) {
-  const [status, setStatus] = useState<string>(statuses[0]!);
+  /**
+   * Order List also exposes two payment views. They are not order statuses:
+   * they slice delivered / partial-delivered parcels by whether Pathao has
+   * already paid the money out (an `order.paid` invoice webhook arrived).
+   */
+  const tabs: readonly string[] =
+    bucket === "list" ? [...statuses, ...paymentFilters] : statuses;
+  const [status, setStatus] = useState<string>(tabs[0]!);
+  const isPaymentView = (paymentFilters as readonly string[]).includes(status);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const PAGE_SIZE_KEY = "admin.orders.pageSize";
@@ -121,7 +143,11 @@ export function OrdersBoard({
       adminListOrders({
         data: {
           bucket,
-          ...(status ? { status: status as OrderStatus } : {}),
+          ...(isPaymentView
+            ? { payment: status as PaymentFilter }
+            : status
+              ? { status: status as OrderStatus }
+              : {}),
           ...(search ? { search } : {}),
         },
       }),
@@ -222,7 +248,7 @@ export function OrdersBoard({
           />
         </div>
         <div className="flex flex-wrap gap-1.5">
-          {statuses.map((s) => (
+          {tabs.map((s) => (
             <button
               key={s}
               onClick={() => setStatus(s)}
@@ -230,13 +256,18 @@ export function OrdersBoard({
                 "rounded-full px-3 py-1.5 text-xs font-semibold transition-all duration-200 hover:-translate-y-0.5",
                 status === s
                   ? "ig-gradient text-primary-foreground shadow-sm"
-                  : "bg-muted text-muted-foreground hover:bg-muted/70",
+                  : (paymentFilters as readonly string[]).includes(s)
+                    ? s === "paid"
+                      ? "bg-emerald-100 text-emerald-900 hover:bg-emerald-200"
+                      : "bg-rose-100 text-rose-900 hover:bg-rose-200"
+                    : "bg-muted text-muted-foreground hover:bg-muted/70",
               )}
             >
-              {statusLabels[s]}
+              {statusLabels[s] ?? s}
             </button>
           ))}
         </div>
+
       </div>
 
       {bulkEnabled && total > 0 ? (
@@ -361,9 +392,21 @@ export function OrdersBoard({
                       );
                     })()}
 
-
-
+                    {(() => {
+                      const payout = courierPayout(o);
+                      if (!payout) return null;
+                      return (
+                        <span
+                          title={`Courier payout received${payout.invoice ? ` · Invoice ${payout.invoice}` : ""}`}
+                          className="inline-flex items-center gap-1 rounded-full bg-green-50 px-2 py-0.5 text-xs font-bold text-green-800 ring-1 ring-green-200"
+                        >
+                          <Banknote className="size-3" />
+                          Paid{payout.invoice ? ` · ${payout.invoice}` : ""}
+                        </span>
+                      );
+                    })()}
                   </div>
+
                   <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
                     <span className="inline-flex items-center gap-1.5">
                       <Clock className="size-3.5" />
