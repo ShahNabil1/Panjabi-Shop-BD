@@ -1497,6 +1497,7 @@ export type Database = {
         | "unpaid"
         | "paid"
         | "lost_damaged"
+        | "courier_hold"
       promotion_type: "offer" | "featured" | "flash" | "new_arrival"
     }
     CompositeTypes: {
@@ -1647,6 +1648,7 @@ export const Constants = {
         "unpaid",
         "paid",
         "lost_damaged",
+        "courier_hold",
       ],
       promotion_type: ["offer", "featured", "flash", "new_arrival"],
     },
