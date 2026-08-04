@@ -194,6 +194,17 @@ export const placeOrder = createServerFn({ method: "POST" })
 
     if (itemsError) throw new Error("ORDER_ITEMS_FAILED");
 
+    if (couponId) {
+      const { recordCouponRedemption } = await import("./coupons.server");
+      await recordCouponRedemption({
+        db: supabaseAdmin,
+        couponId,
+        orderId: order.id,
+        phone: data.customerPhone,
+        amount: discount,
+      });
+    }
+
     // A completed order clears any abandoned checkout captured for this phone.
     await supabaseAdmin
       .from("orders")
@@ -201,8 +212,9 @@ export const placeOrder = createServerFn({ method: "POST" })
       .eq("customer_phone", data.customerPhone)
       .eq("status", "incomplete");
 
-    return { orderNumber: order.order_number, subtotal, deliveryCharge, discount: 0, total };
+    return { orderNumber: order.order_number, subtotal, deliveryCharge, discount, total };
   });
+
 
 /** Order receipt lookup — requires both the order number and the phone used. */
 /** Public delivery-charge configuration, used to preview totals at checkout. */
