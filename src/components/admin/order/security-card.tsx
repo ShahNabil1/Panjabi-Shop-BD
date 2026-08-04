@@ -87,6 +87,7 @@ export function FulfillmentCard({
   consignmentId,
   trackingCode,
   sentAt,
+  customerPhone,
 }: {
   orderId: string;
   status: string;
@@ -97,8 +98,10 @@ export function FulfillmentCard({
   consignmentId: string | null;
   trackingCode: string | null;
   sentAt: string | null;
+  customerPhone?: string | null;
 }) {
   const qc = useQueryClient();
+  const [historyOpen, setHistoryOpen] = useState(false);
   const send = useMutation({
     mutationFn: () => adminSendOrderToCourier({ data: { orderId } }),
     onSuccess: async (res) => {
@@ -119,18 +122,111 @@ export function FulfillmentCard({
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const events = useQuery({
+    queryKey: ["admin", "courier-webhook-events", orderId],
+    queryFn: () => adminOrderWebhookEvents({ data: { orderId } }),
+    enabled: historyOpen,
+  });
+
   const normalised = (courierStatus ?? "unknown") as CourierStatus;
   const isPathao = (partner ?? "").toLowerCase() === "pathao";
   const consignmentUrl = consignmentId
     ? `https://merchant.pathao.com/courier/orders/${consignmentId}`
     : null;
+  const publicTrackingUrl =
+    isPathao && consignmentId
+      ? `https://merchant.pathao.com/tracking?consignment_id=${encodeURIComponent(consignmentId)}${
+          customerPhone ? `&phone=${encodeURIComponent(customerPhone)}` : ""
+        }`
+      : null;
 
   return (
     <div className="grid gap-4 lg:grid-cols-2">
       <Panel className="space-y-3">
-        <h2 className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
-          Fulfillment
-        </h2>
+        <div className="flex items-start justify-between gap-2">
+          <h2 className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+            Fulfillment
+          </h2>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                type="button"
+                aria-label="Webhook event history"
+                onClick={() => setHistoryOpen(true)}
+                className="grid size-8 place-items-center rounded-full border border-border/70 text-muted-foreground transition hover:bg-muted hover:text-foreground active:scale-90"
+              >
+                <History className="size-4" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent>Webhook event history</TooltipContent>
+          </Tooltip>
+        </div>
+
+        <Dialog open={historyOpen} onOpenChange={setHistoryOpen}>
+          <DialogContent className="flex max-h-[85vh] max-w-2xl flex-col overflow-hidden">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <History className="size-4" />
+                Webhook event history
+              </DialogTitle>
+              <DialogDescription>
+                Every courier webhook received for this order, newest first.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="-mx-1 flex-1 overflow-y-auto px-1">
+              {events.isLoading ? (
+                <p className="py-6 text-center text-sm text-muted-foreground">Loading…</p>
+              ) : (events.data ?? []).length === 0 ? (
+                <p className="py-6 text-center text-sm text-muted-foreground">
+                  No webhook events received for this order yet.
+                </p>
+              ) : (
+                <ol className="relative space-y-3 border-l border-border/70 pl-4">
+                  {(events.data ?? []).map((ev) => (
+                    <li key={ev.id} className="relative">
+                      <span className="absolute -left-[21px] top-2 size-2.5 rounded-full bg-primary ring-4 ring-background" />
+                      <div className="rounded-xl border border-border/70 bg-background/60 p-3">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="rounded-full bg-muted px-2 py-0.5 text-[11px] font-semibold uppercase">
+                            {ev.provider}
+                          </span>
+                          <span className="font-mono text-xs font-semibold text-foreground">
+                            {ev.event ?? "event"}
+                          </span>
+                          {ev.status ? (
+                            <span
+                              className={cn(
+                                "rounded-full px-2 py-0.5 text-[11px] font-semibold ring-1",
+                                courierStatusTone(ev.status as CourierStatus),
+                              )}
+                            >
+                              {courierStatusLabels[ev.status as CourierStatus] ?? ev.status}
+                            </span>
+                          ) : null}
+                          <span className="ml-auto text-[11px] text-muted-foreground">
+                            {dt(ev.createdAt)}
+                          </span>
+                        </div>
+                        {ev.message ? (
+                          <p className="mt-1.5 text-sm text-foreground">{ev.message}</p>
+                        ) : null}
+                        <details className="mt-2">
+                          <summary className="cursor-pointer text-[11px] font-semibold text-muted-foreground">
+                            Raw payload
+                          </summary>
+                          <pre className="mt-1 max-h-56 overflow-auto rounded-lg bg-muted p-2 text-[11px] leading-relaxed">
+                            {ev.payloadJson}
+                          </pre>
+                        </details>
+                      </div>
+                    </li>
+                  ))}
+                </ol>
+              )}
+            </div>
+          </DialogContent>
+        </Dialog>
+
 
         <div
           className={cn(
