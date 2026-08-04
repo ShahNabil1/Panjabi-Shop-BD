@@ -226,7 +226,7 @@ function CreateOrderPage() {
           preOrder,
           scheduledFor:
             !preOrder && scheduleOn && scheduledFor
-              ? new Date(scheduledFor).toISOString()
+              ? new Date(`${scheduledFor}T00:00:00`).toISOString()
               : null,
           items: lines.map((l) => ({
             productId: l.productId,
