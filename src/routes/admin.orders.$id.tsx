@@ -462,7 +462,7 @@ function AdminOrderDetail() {
                 onClick={() =>
                   update.mutate({
                     status: "scheduled_order",
-                    scheduledFor: new Date(scheduleAt).toISOString(),
+                    scheduledFor: new Date(`${scheduleAt}T00:00:00`).toISOString(),
                   })
                 }
               >
