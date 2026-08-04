@@ -5,8 +5,9 @@ import type { Database } from "@/integrations/supabase/types";
 export type Db = SupabaseClient<Database>;
 
 /**
- * Verifies the caller holds the `admin` role using their own RLS-scoped client,
- * then returns the service-role client for privileged writes.
+ * Verifies the caller holds the `admin` role and returns their own
+ * RLS-scoped client. Admin policies on every table grant full access, so no
+ * service-role key is required anywhere.
  * Never call this before `requireSupabaseAuth` has run.
  */
 export async function requireAdmin(supabase: Db, userId: string): Promise<Db> {
@@ -16,8 +17,7 @@ export async function requireAdmin(supabase: Db, userId: string): Promise<Db> {
   });
   if (error) throw new Error("Role check failed");
   if (!data) throw new Error("Forbidden");
-  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  return supabaseAdmin as unknown as Db;
+  return supabase;
 }
 
 export function slugify(input: string): string {

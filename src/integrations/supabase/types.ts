@@ -1413,6 +1413,45 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      checkout_incomplete_state: { Args: { _phone: string }; Returns: Json }
+      checkout_place_order: {
+        Args: {
+          _coupon_id?: string
+          _discount?: number
+          _items: Json
+          _order: Json
+        }
+        Returns: Json
+      }
+      checkout_save_incomplete: {
+        Args: {
+          _activity_kind: string
+          _activity_message: string
+          _activity_meta: Json
+          _existing_id: string
+          _items: Json
+          _order: Json
+          _replace_items: boolean
+        }
+        Returns: Json
+      }
+      courier_webhook_apply: {
+        Args: {
+          _consignment_id: string
+          _event: string
+          _merchant_order_id: string
+          _message: string
+          _payload: Json
+          _provider: string
+          _raw_status: string
+          _status: string
+        }
+        Returns: Json
+      }
+      courier_webhook_check_secret: {
+        Args: { _provider: string; _supplied: string }
+        Returns: string
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -1421,6 +1460,10 @@ export type Database = {
         Returns: boolean
       }
       next_order_number: { Args: never; Returns: string }
+      order_receipt: {
+        Args: { _order_number: string; _phone: string }
+        Returns: Json
+      }
       validate_coupon: {
         Args: {
           _code: string
