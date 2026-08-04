@@ -6,6 +6,14 @@ import { useCart, type CartItem } from "@/lib/cart-context";
 import { useLang } from "@/lib/language-context";
 import { formatNumber, formatPrice, pick, tr } from "@/lib/i18n";
 import { captureIncompleteOrder, placeOrder } from "@/lib/order.functions";
+import { validateCoupon } from "@/lib/coupons.functions";
+import {
+  COUPON_CODE_RE,
+  couponReasonMessage,
+  maskCouponCode,
+  type CouponValidation,
+} from "@/lib/coupons.shared";
+
 import { BD_DIVISIONS } from "@/lib/bd-geo";
 import { ProductThumb } from "@/components/site/product-card";
 import { QuantityStepper } from "@/components/site/add-to-cart";
