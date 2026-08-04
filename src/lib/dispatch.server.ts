@@ -6,6 +6,7 @@
 
 import type { Db } from "./admin.server";
 import { normaliseCourierStatus, type DeliveryProvider } from "./delivery-shared";
+import { BD_DIVISIONS } from "./bd-geo";
 
 export type DispatchResult = {
   ok: boolean;
@@ -120,6 +121,82 @@ const norm = (s: string) =>
     .toLowerCase()
     .replace(/\b(sadar|district|zila|upazila|thana|city)\b/g, "")
     .replace(/[^a-z0-9]/g, "");
+
+const bnTrim = (s: string) => (s ?? "").replace(/\s+/g, " ").trim();
+
+/** Bangla -> English name maps built from the local BD administrative dataset. */
+const DISTRICT_EN = new Map<string, string>();
+const UPAZILA_EN = new Map<string, string>();
+for (const div of BD_DIVISIONS) {
+  for (const d of div.districts) {
+    DISTRICT_EN.set(bnTrim(d.bn), d.en);
+    for (const u of d.upazilas) UPAZILA_EN.set(bnTrim(u.bn), u.en);
+  }
+}
+
+/** Spelling variants Pathao/Steadfast use for the same place. */
+const NAME_ALIASES: Record<string, string[]> = {
+  bogra: ["Bogura"],
+  bogura: ["Bogra"],
+  comilla: ["Cumilla"],
+  cumilla: ["Comilla"],
+  barisal: ["Barishal"],
+  barishal: ["Barisal"],
+  jessore: ["Jashore"],
+  jashore: ["Jessore"],
+  chittagong: ["Chattogram", "Chattagram"],
+  chattogram: ["Chittagong", "Chattagram"],
+  chattagram: ["Chattogram", "Chittagong"],
+  coxsbazar: ["Cox's Bazar", "Coxs Bazar", "Cox Bazar"],
+  netrokona: ["Netrakona"],
+  netrakona: ["Netrokona"],
+  maulvibazar: ["Moulvibazar"],
+  moulvibazar: ["Maulvibazar"],
+  brahmanbaria: ["B. Baria", "Brahmanbaria"],
+  chapainawabganj: ["Chapai Nawabganj", "Nawabganj"],
+  munshiganj: ["Munshigonj"],
+  gaibandha: ["Gaibandah"],
+  narsingdi: ["Narshingdi"],
+};
+
+/** All name spellings worth trying for a stored (usually Bangla) place name. */
+function nameCandidates(raw: string | null | undefined, map: Map<string, string>): string[] {
+  const out: string[] = [];
+  const push = (v: string) => {
+    const t = bnTrim(v);
+    if (t && !out.includes(t)) out.push(t);
+  };
+  const base = bnTrim(raw ?? "");
+  if (!base) return out;
+  push(base);
+  const en = map.get(base);
+  if (en) push(en);
+  const noSadar = bnTrim(base.replace(/সদর$/u, ""));
+  if (noSadar !== base) {
+    push(noSadar);
+    const en2 = map.get(noSadar);
+    if (en2) push(en2);
+  }
+  for (const c of [...out]) {
+    const alias = NAME_ALIASES[norm(c)];
+    if (alias) alias.forEach(push);
+  }
+  return out;
+}
+
+/** Tries every spelling variant against the courier's list. */
+function pickPlace<T extends Record<string, unknown>>(
+  rows: T[],
+  nameKey: string,
+  raw: string | null | undefined,
+  map: Map<string, string>,
+): T | null {
+  for (const candidate of nameCandidates(raw, map)) {
+    const hit = pickByName(rows, nameKey, candidate);
+    if (hit) return hit;
+  }
+  return null;
+}
 
 function pickByName<T extends Record<string, unknown>>(
   rows: T[],
@@ -237,15 +314,26 @@ export async function dispatchOrder(
       const cityBody = await pathaoCities(creds, token);
       const cityList = (((cityBody["data"] ?? {}) as Record<string, unknown>)["data"] ??
         []) as Array<Record<string, unknown>>;
-      const city = pickByName(cityList, "city_name", order.district ?? order.city ?? "");
-      if (!city) throw new Error(`Pathao city not found for "${order.district ?? order.city}"`);
+      const city =
+        pickPlace(cityList, "city_name", order.district, DISTRICT_EN) ??
+        pickPlace(cityList, "city_name", order.city, DISTRICT_EN);
+      if (!city)
+        throw new Error(
+          `Pathao city not found for "${order.district ?? order.city}" — check the district name on this order`,
+        );
       const cityId = Number(city["city_id"]);
 
       const zoneBody = await pathaoZones(creds, token, cityId);
       const zoneList = (((zoneBody["data"] ?? {}) as Record<string, unknown>)["data"] ??
         []) as Array<Record<string, unknown>>;
-      const zone = pickByName(zoneList, "zone_name", order.upazila ?? "");
-      if (!zone) throw new Error(`Pathao zone not found for "${order.upazila}"`);
+      const zone =
+        pickPlace(zoneList, "zone_name", order.upazila, UPAZILA_EN) ??
+        pickPlace(zoneList, "zone_name", order.city, UPAZILA_EN) ??
+        pickByName(zoneList, "zone_name", `${String(city["city_name"] ?? "")} Sadar`);
+      if (!zone)
+        throw new Error(
+          `Pathao zone not found for "${order.upazila ?? order.city}" under ${String(city["city_name"] ?? "")}`,
+        );
 
       const res = await pathaoCreateOrder(creds, token, {
         store_id: storeId,
