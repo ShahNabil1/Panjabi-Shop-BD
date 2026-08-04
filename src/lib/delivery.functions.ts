@@ -232,3 +232,61 @@ export const adminActiveDeliveryPartners = createServerFn({ method: "GET" })
       .eq("enabled", true);
     return (data ?? []).map((r) => r.provider as DeliveryProvider);
   });
+
+/**
+ * Fires a signed test event at our own public webhook receiver and returns the
+ * raw receiver response, so admins can verify the endpoint + secret end-to-end.
+ */
+export const adminTestCourierWebhook = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => z.object({ provider: providerSchema }).parse(input))
+  .handler(async ({ data, context }) => {
+    const db = await requireAdmin(context.supabase, context.userId);
+    const { data: row } = await db
+      .from("delivery_partners")
+      .select("webhook_secret")
+      .eq("provider", data.provider)
+      .maybeSingle();
+    const secret = (row as { webhook_secret?: string | null } | null)?.webhook_secret;
+    if (!secret) {
+      return {
+        ok: false,
+        status: 0,
+        url: "",
+        body: "Save this partner first — no webhook secret has been generated yet.",
+      };
+    }
+
+    const { getRequestHeader } = await import("@tanstack/react-start/server");
+    const host = getRequestHeader("host") ?? "";
+    const proto = host.startsWith("localhost") || host.startsWith("127.") ? "http" : "https";
+    const url = `${proto}://${host}/api/public/courier/${data.provider}`;
+
+    const headerName =
+      data.provider === "pathao"
+        ? "X-PATHAO-Signature"
+        : data.provider === "steadfast"
+          ? "Steadfast-Secret-Key"
+          : "X-Webhook-Secret";
+
+    // No status field on purpose: the event is logged without touching any order.
+    const payload = {
+      event: "webhook.test",
+      notification_type: "webhook_test",
+      consignment_id: `TEST-${Date.now()}`,
+      merchant_order_id: "WEBHOOK-TEST",
+      source: "upoharkabbo-admin",
+    };
+
+    try {
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", [headerName]: secret },
+        body: JSON.stringify(payload),
+      });
+      const body = await res.text();
+      return { ok: res.ok, status: res.status, url, body: body.slice(0, 1000) };
+    } catch (error) {
+      return { ok: false, status: 0, url, body: (error as Error).message };
+    }
+  });

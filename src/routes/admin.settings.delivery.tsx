@@ -9,6 +9,7 @@ import {
   Loader2,
   Plug,
   Plus,
+  Radio,
   Save,
   Trash2,
   TriangleAlert,
@@ -20,6 +21,7 @@ import {
   adminRemoveDeliveryPartner,
   adminSaveDeliveryPartner,
   adminSetDeliveryPartnerEnabled,
+  adminTestCourierWebhook,
   adminTestDeliveryPartner,
   type DeliveryPartnerRow,
 } from "@/lib/delivery.functions";
@@ -154,8 +156,29 @@ function PartnerCard({
   const [result, setResult] = useState<{ ok: boolean; message: string } | null>(
     row ? { ok: row.connection_ok, message: row.connection_message ?? "" } : null,
   );
+  const [pinging, setPinging] = useState(false);
+  const [ping, setPing] = useState<{ ok: boolean; status: number; body: string } | null>(null);
 
   const url = webhookUrl(provider);
+
+  const pingWebhook = async () => {
+    setPinging(true);
+    setPing(null);
+    try {
+      const res = await adminTestCourierWebhook({ data: { provider } });
+      setPing({ ok: res.ok, status: res.status, body: res.body });
+      if (res.ok) toast.success("Webhook receiver accepted the signed test event");
+      else toast.error("Webhook test failed — see details below");
+    } catch (error) {
+      const message = (error as Error).message;
+      setPing({ ok: false, status: 0, body: message });
+      toast.error(message);
+    } finally {
+      setPinging(false);
+    }
+  };
+
+
 
   const test = async () => {
     setTesting(true);
@@ -294,8 +317,40 @@ function PartnerCard({
             <Copy className="size-4" />
             Copy
           </Button>
+          <Button
+            type="button"
+            variant="outline"
+            disabled={pinging || !row?.webhook_secret}
+            className="shrink-0 active:scale-95"
+            onClick={() => void pingWebhook()}
+          >
+            {pinging ? (
+              <Loader2 className="size-4 animate-spin" />
+            ) : (
+              <Radio className="size-4" />
+            )}
+            Test webhook
+          </Button>
         </div>
+        {ping ? (
+          <div
+            className={cn(
+              "space-y-1 rounded-xl px-3 py-2 text-xs",
+              ping.ok
+                ? "bg-emerald-50 text-emerald-700"
+                : "bg-rose-50 text-rose-700",
+            )}
+          >
+            <p className="font-semibold">
+              Receiver responded {ping.status || "—"} {ping.ok ? "· signature accepted" : "· failed"}
+            </p>
+            <pre className="whitespace-pre-wrap break-all font-mono text-[11px] opacity-90">
+              {ping.body}
+            </pre>
+          </div>
+        ) : null}
       </div>
+
 
       {row?.webhook_secret ? (
         <div className="space-y-1.5">
