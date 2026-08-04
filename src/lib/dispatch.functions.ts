@@ -137,13 +137,14 @@ export const adminRefreshCourierStatus = createServerFn({ method: "POST" })
 
     const { data: row } = await db
       .from("orders")
-      .select("delivery_partner, courier_consignment_id, order_number")
+      .select("delivery_partner, courier_consignment_id, order_number, courier_status")
       .eq("id", data.orderId)
       .maybeSingle();
     const order = row as {
       delivery_partner: string | null;
       courier_consignment_id: string | null;
       order_number: string;
+      courier_status: string | null;
     } | null;
     if (!order) return { ok: false, message: "Order not found" };
 
@@ -186,7 +187,28 @@ export const adminRefreshCourierStatus = createServerFn({ method: "POST" })
         return { ok: false, message: "Live status sync is not available for this courier" };
       }
 
-      const status = normaliseCourierStatus(provider, raw);
+      const refreshedStatus = normaliseCourierStatus(provider, raw);
+      // Pathao's order-info endpoint can remain `Pending` even after a newer
+      // webhook has created a return ID. Never let that stale response erase
+      // a meaningful webhook state on refresh.
+      const preservedStatuses = new Set([
+        "picked",
+        "in_transit",
+        "delivered",
+        "partial_delivered",
+        "hold",
+        "return_id_created",
+        "return_in_transit",
+        "returned",
+        "cancelled",
+        "lost",
+      ]);
+      const status =
+        (refreshedStatus === "pending" || refreshedStatus === "unknown") &&
+        order.courier_status &&
+        preservedStatuses.has(order.courier_status)
+          ? (order.courier_status as typeof refreshedStatus)
+          : refreshedStatus;
       const { courierToOrderStatus } = await import("./delivery-shared");
       const { nextOrderStatus } = await import("./dispatch.server");
 
