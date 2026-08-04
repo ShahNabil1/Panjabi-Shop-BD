@@ -36,8 +36,15 @@ export function parseCourierPayload(provider: DeliveryProvider, payload: Payload
       event: str(payload["event"]),
       consignmentId: str(payload["consignment_id"]),
       merchantOrderId: str(payload["merchant_order_id"]),
-      rawStatus: str(payload["order_status"]) ?? str(payload["event"]) ?? "",
+      // `order_status` is the human label ("Pickup" for a picked parcel), so the
+      // canonical machine values come first: slug, then the event name.
+      rawStatus:
+        str(payload["order_status_slug"]) ??
+        str(payload["event"]) ??
+        str(payload["order_status"]) ??
+        "",
       message: str(payload["reason"]) ?? str(payload["order_status"]),
+
     };
   }
   // Steadfast + Carrybee share a flat delivery-status shape.
