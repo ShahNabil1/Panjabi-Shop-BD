@@ -36,7 +36,13 @@ function Value({ label, children }: { label: string; children: React.ReactNode }
   );
 }
 
-export function CustomerCard({ order }: { order: OrderCustomer }) {
+export function CustomerCard({
+  order,
+  locked = false,
+}: {
+  order: OrderCustomer;
+  locked?: boolean;
+}) {
   const qc = useQueryClient();
   const [editing, setEditing] = useState(false);
   const baseline = {
