@@ -17,7 +17,7 @@ import {
   type CourierStatus,
 } from "@/lib/delivery-shared";
 import { Panel } from "@/components/admin/kit";
-import { CourierBadge, CourierMark } from "@/components/admin/courier-logo";
+import { CourierBadge, CourierMark, CourierWatermark } from "@/components/admin/courier-logo";
 
 import { Button } from "@/components/ui/button";
 import {
