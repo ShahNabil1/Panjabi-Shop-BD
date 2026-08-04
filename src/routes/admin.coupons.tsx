@@ -545,7 +545,7 @@ function CouponDialog({
           </button>
         </div>
 
-        <div className="space-y-5 p-5">
+        <div className="min-h-0 flex-1 space-y-5 overflow-y-auto overscroll-contain p-5">
           <Section title="Basics" icon={BadgePercent}>
             <div className="grid gap-3 md:grid-cols-2">
               <FormField label="Code" required hint="Customers type this — e.g. WELCOME10">
