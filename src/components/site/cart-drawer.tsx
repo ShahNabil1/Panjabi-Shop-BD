@@ -4,32 +4,16 @@ import { useEffect, useState } from "react";
 import { useCart } from "@/lib/cart-context";
 import { useLang } from "@/lib/language-context";
 import { formatNumber, formatPrice, pick, tr } from "@/lib/i18n";
-import { getDeliveryRates } from "@/lib/order.functions";
 import { ProductThumb } from "@/components/site/product-card";
 import { QuantityStepper } from "@/components/site/add-to-cart";
-import { CheckoutForm, type DeliveryRates } from "@/components/site/checkout-form";
 import { cn } from "@/lib/utils";
 
 export function CartDrawer() {
   const { lang } = useLang();
-  const { items, subtotal, setQuantity, remove, open, step, setStep, closeCart } = useCart();
+  const { items, subtotal, setQuantity, remove, open, closeCart } = useCart();
   const [mounted, setMounted] = useState(false);
-  const [rates, setRates] = useState<DeliveryRates | null>(null);
 
   useEffect(() => setMounted(true), []);
-
-  useEffect(() => {
-    if (!open || rates) return;
-    let active = true;
-    void getDeliveryRates()
-      .then((r) => {
-        if (active) setRates(r as DeliveryRates);
-      })
-      .catch(() => undefined);
-    return () => {
-      active = false;
-    };
-  }, [open, rates]);
 
   useEffect(() => {
     if (typeof document === "undefined") return;
@@ -50,7 +34,6 @@ export function CartDrawer() {
 
   if (!mounted) return null;
 
-  const checkout = step === "checkout";
 
   return (
     <div
