@@ -185,7 +185,7 @@ export const placeOrder = createServerFn({ method: "POST" })
         quantity: l.quantity,
         line_total: l.lineTotal,
       })),
-      _coupon_id: couponId ?? undefined,
+      ...(couponId ? { _coupon_id: couponId } : {}),
       _discount: discount,
     });
 
