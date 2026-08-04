@@ -160,7 +160,12 @@ function PartnerCard({
     for (const f of fields) init[f.key] = row?.credentials?.[f.key] ?? "";
     return init;
   });
+  const [savedSnapshot, setSavedSnapshot] = useState<string | null>(() =>
+    row ? JSON.stringify(Object.fromEntries(fields.map((f) => [f.key, row.credentials?.[f.key] ?? ""]))) : null,
+  );
+  const isDirty = savedSnapshot === null || JSON.stringify(values) !== savedSnapshot;
   const [enabled, setEnabled] = useState(row?.enabled ?? true);
+  const [removeOpen, setRemoveOpen] = useState(false);
   const [testing, setTesting] = useState(false);
   const [saving, setSaving] = useState(false);
   const [removing, setRemoving] = useState(false);
