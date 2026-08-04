@@ -64,7 +64,7 @@ export const Route = createFileRoute("/api/public/courier/$provider")({
           return respond({ status: 400, message: "Invalid JSON body" }, 400);
         }
 
-        const result = await processCourierWebhook(supabaseAdmin, provider, payload);
+        const result = await processCourierWebhook(db, provider, payload);
         // Always 200/202 once authenticated so couriers stop retrying.
         return respond({ status: 200, message: result.message }, 200);
       },
