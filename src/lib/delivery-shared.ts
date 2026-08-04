@@ -49,6 +49,7 @@ export type CourierStatus =
   | "delivered"
   | "partial_delivered"
   | "hold"
+  | "return_id_created"
   | "return_in_transit"
   | "returned"
   | "cancelled"
@@ -63,6 +64,7 @@ export const courierStatusLabels: Record<CourierStatus, string> = {
   delivered: "Delivered",
   partial_delivered: "Partial delivered",
   hold: "On hold",
+  return_id_created: "Return ID Created",
   return_in_transit: "Return in transit",
   returned: "Returned",
   cancelled: "Cancelled",
@@ -86,6 +88,7 @@ export const courierToOrderStatus: Record<CourierStatus, string | null> = {
   in_transit: "shipped",
   delivered: "delivered",
   partial_delivered: "partial_delivered",
+  return_id_created: "awaiting_return",
   return_in_transit: "awaiting_return",
   returned: "returned",
   cancelled: "cancelled",
@@ -116,8 +119,8 @@ export function normaliseCourierStatus(provider: DeliveryProvider, raw: string):
       "order.partial_delivery": "partial_delivered",
       "order.delivery_failed": "hold",
       "order.on_hold": "hold",
-      // Return journey: in transit back to the merchant, then finally handed over.
-      "order.return_id_created": "return_in_transit",
+      // Return ID creation is distinct from the parcel's later return journey.
+      "order.return_id_created": "return_id_created",
       "order.return": "return_in_transit",
       "order.returned": "return_in_transit",
       "order.return_in_transit": "return_in_transit",
@@ -162,6 +165,7 @@ function genericStatus(s: string): CourierStatus {
     return_in_transit: "return_in_transit",
     returning: "return_in_transit",
     return_requested: "return_in_transit",
+    return_id_created: "return_id_created",
     returned: "returned",
     return: "returned",
     returned_to_merchant: "returned",
@@ -184,6 +188,7 @@ export function courierStatusTone(status: CourierStatus): string {
     case "in_transit":
     case "picked":
       return "bg-sky-50 text-sky-700 ring-sky-200";
+    case "return_id_created":
     case "return_in_transit":
       return "bg-orange-50 text-orange-700 ring-orange-200";
     case "returned":
