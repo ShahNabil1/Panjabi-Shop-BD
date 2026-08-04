@@ -21,6 +21,7 @@ import { BrandLoader } from "@/components/admin/brand-loader";
 import { CourierReport } from "@/components/admin/courier-report";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { normalizePhoneInput } from "@/lib/phone";
 
 export const Route = createFileRoute("/admin/orders/create")({
   component: CreateOrderPage,
@@ -247,10 +248,10 @@ function CreateOrderPage() {
                   <input
                     className={input}
                     value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
+                    onChange={(e) => setPhone(normalizePhoneInput(e.target.value))}
                     inputMode="numeric"
                     placeholder="01XXXXXXXXX"
-                    maxLength={14}
+                    maxLength={11}
                   />
                   {lookup.data ? (
                     <Button type="button" size="sm" onClick={applyFill} className="shrink-0">

@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { normalizePhoneInput } from "@/lib/phone";
 
 export type OrderCustomer = {
   id: string;
@@ -130,7 +131,9 @@ export function CustomerCard({
             <Input
               className="rounded-xl"
               value={form.customerPhone}
-              onChange={(e) => setForm({ ...form, customerPhone: e.target.value })}
+              onChange={(e) => setForm({ ...form, customerPhone: normalizePhoneInput(e.target.value) })}
+              inputMode="numeric"
+              maxLength={11}
             />
           </div>
           <div className="space-y-1.5">
@@ -139,7 +142,9 @@ export function CustomerCard({
               className="rounded-xl"
               placeholder="Optional"
               value={form.altPhone}
-              onChange={(e) => setForm({ ...form, altPhone: e.target.value })}
+              onChange={(e) => setForm({ ...form, altPhone: normalizePhoneInput(e.target.value) })}
+              inputMode="numeric"
+              maxLength={11}
             />
           </div>
           <div className="space-y-1.5">
