@@ -88,15 +88,35 @@ export function CourierBadge({
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-full py-0.5 pl-0.5 pr-2.5 text-xs font-bold uppercase tracking-wide shadow-sm ring-1",
+        "inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-bold uppercase tracking-wide shadow-sm ring-1",
         c.chip,
         className,
       )}
     >
-      <span className="grid size-5 place-items-center overflow-hidden rounded-full bg-white">
-        <img src={c.src} alt={`${c.label} logo`} className="size-full object-contain" />
-      </span>
       {c.label}
     </span>
+  );
+}
+
+export function CourierWatermark({
+  partner,
+  className,
+}: {
+  partner?: string | null;
+  className?: string;
+}) {
+  const key = courierKey(partner);
+  if (!key) return null;
+  const c = COURIERS[key];
+  return (
+    <img
+      src={c.src}
+      alt=""
+      aria-hidden
+      className={cn(
+        "pointer-events-none absolute -right-4 -bottom-4 w-32 select-none object-contain opacity-[0.07] mix-blend-multiply",
+        className,
+      )}
+    />
   );
 }
