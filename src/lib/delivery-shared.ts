@@ -178,9 +178,13 @@ export function courierStatusTone(status: CourierStatus): string {
     case "in_transit":
     case "picked":
       return "bg-sky-50 text-sky-700 ring-sky-200";
+    case "return_in_transit":
+      return "bg-orange-50 text-orange-700 ring-orange-200";
     case "returned":
     case "cancelled":
       return "bg-rose-50 text-rose-700 ring-rose-200";
+    case "lost":
+      return "bg-neutral-900 text-white ring-neutral-700";
     case "hold":
       return "bg-orange-50 text-orange-700 ring-orange-200";
     default:
