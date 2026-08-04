@@ -318,41 +318,28 @@ export function FulfillmentCard({
                     </span>
                   )}
                   <CopyButton value={consignmentId} accent={isPathao} />
-                  {publicTrackingUrl ? (
-                    <>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <a
-                            href={publicTrackingUrl}
-                            target="_blank"
-                            rel="noreferrer"
-                            aria-label="Open public tracking page"
-                            className="grid size-7 shrink-0 place-items-center rounded-md border border-[#E32227]/30 text-[#E32227] transition hover:bg-[#E32227]/10 active:scale-90"
-                          >
-                            <ExternalLink className="size-3.5" />
-                          </a>
-                        </TooltipTrigger>
-                        <TooltipContent>Open public tracking link</TooltipContent>
-                      </Tooltip>
-                      <CopyButton value={publicTrackingUrl} accent={isPathao} />
-                    </>
-                  ) : null}
                 </div>
                 {publicTrackingUrl ? (
-                  <p className="mt-1.5 truncate text-[11px] text-muted-foreground">
-                    Public tracking:{" "}
+                  <div className="mt-2.5 flex flex-wrap items-center gap-2">
                     <a
                       href={publicTrackingUrl}
                       target="_blank"
                       rel="noreferrer"
-                      className="text-[#E32227] underline underline-offset-2"
+                      className="inline-flex items-center gap-1.5 rounded-md border border-[#E32227]/30 bg-[#E32227]/5 px-2.5 py-1.5 text-xs font-semibold text-[#E32227] transition hover:bg-[#E32227]/10 active:scale-95"
                     >
-                      {publicTrackingUrl}
+                      <ExternalLink className="size-3.5" />
+                      Open tracking link
                     </a>
-                  </p>
+                    <CopyTextButton
+                      value={publicTrackingUrl}
+                      label="Copy tracking link"
+                      accent={isPathao}
+                    />
+                  </div>
                 ) : null}
               </div>
 
+              {isPathao ? <PathaoCostOfDelivery orderId={orderId} /> : null}
 
               <dl className="grid gap-1 text-xs text-muted-foreground">
                 {trackingCode ? (
@@ -370,17 +357,6 @@ export function FulfillmentCard({
                   </div>
                 ) : null}
               </dl>
-
-              <Button
-                size="sm"
-                variant="outline"
-                loading={refresh.isPending}
-                onClick={() => refresh.mutate()}
-                className="active:scale-95"
-              >
-                <RefreshCw className="size-4" />
-                Refresh courier status
-              </Button>
             </div>
           ) : orderStatus === "pending" ? (
             <div className="mt-3 space-y-2">
