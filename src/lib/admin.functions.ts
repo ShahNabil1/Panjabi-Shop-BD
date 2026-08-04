@@ -584,7 +584,24 @@ export const adminRunCleanup = createServerFn({ method: "POST" })
         { onConflict: "key" },
       );
 
-    return result as Record<string, unknown>;
+    const r = result as {
+      success?: boolean;
+      cutoff?: string;
+      retention_days?: number;
+      deleted_activity?: number;
+      deleted_webhooks?: number;
+      deleted_notes?: number;
+      truncated_consignments?: number;
+    };
+    return {
+      success: r.success ?? true,
+      cutoff: r.cutoff ?? now,
+      retentionDays: r.retention_days ?? data.days,
+      deletedActivity: r.deleted_activity ?? 0,
+      deletedWebhooks: r.deleted_webhooks ?? 0,
+      deletedNotes: r.deleted_notes ?? 0,
+      truncatedConsignments: r.truncated_consignments ?? 0,
+    };
   });
 
 export const adminListSettings = createServerFn({ method: "GET" })
