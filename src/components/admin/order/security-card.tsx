@@ -212,6 +212,7 @@ export function FulfillmentCard({
   partner,
   courierStatus,
   consignmentId,
+  returnConsignmentId,
   trackingCode,
   sentAt,
   customerPhone,
@@ -225,6 +226,7 @@ export function FulfillmentCard({
   partner: string | null;
   courierStatus: string | null;
   consignmentId: string | null;
+  returnConsignmentId?: string | null;
   trackingCode: string | null;
   sentAt: string | null;
   customerPhone?: string | null;
@@ -452,6 +454,41 @@ export function FulfillmentCard({
                   </div>
                 ) : null}
               </div>
+
+              {returnConsignmentId ? (
+                <div
+                  className={cn(
+                    "rounded-lg border px-3 py-2.5",
+                    isPathao
+                      ? "border-orange-300/60 bg-orange-50/70"
+                      : "border-border/70 bg-background",
+                  )}
+                >
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-orange-700">
+                    Return ID
+                  </p>
+                  <div className="mt-1 flex items-center gap-2">
+                    {isPathao ? (
+                      <a
+                        href={`https://merchant.pathao.com/courier/orders/${returnConsignmentId}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        title="Open return in Pathao merchant panel"
+                        className="truncate font-mono text-lg font-extrabold tracking-tight text-black underline-offset-4 transition hover:text-[#E32227] hover:underline"
+                      >
+                        {returnConsignmentId}
+                      </a>
+                    ) : (
+                      <span className="truncate font-mono text-lg font-extrabold tracking-tight text-foreground">
+                        {returnConsignmentId}
+                      </span>
+                    )}
+                    <CopyButton value={returnConsignmentId} accent={isPathao} />
+                  </div>
+                </div>
+              ) : null}
+
+
 
               {collectedAmount != null ? (
                 (() => {

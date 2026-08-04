@@ -587,6 +587,7 @@ export type Database = {
           order_id: string
           provider: string
           raw: Json
+          return_consignment_id: string | null
           status: string
           status_message: string | null
           total_cost: number | null
@@ -604,6 +605,7 @@ export type Database = {
           order_id: string
           provider: string
           raw?: Json
+          return_consignment_id?: string | null
           status?: string
           status_message?: string | null
           total_cost?: number | null
@@ -621,6 +623,7 @@ export type Database = {
           order_id?: string
           provider?: string
           raw?: Json
+          return_consignment_id?: string | null
           status?: string
           status_message?: string | null
           total_cost?: number | null

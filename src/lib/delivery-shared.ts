@@ -117,6 +117,7 @@ export function normaliseCourierStatus(provider: DeliveryProvider, raw: string):
       "order.delivery_failed": "hold",
       "order.on_hold": "hold",
       // Return journey: in transit back to the merchant, then finally handed over.
+      "order.return_id_created": "return_in_transit",
       "order.return": "return_in_transit",
       "order.returned": "return_in_transit",
       "order.return_in_transit": "return_in_transit",
