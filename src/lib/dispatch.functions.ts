@@ -183,7 +183,26 @@ export const adminRefreshCourierStatus = createServerFn({ method: "POST" })
       }
 
       const status = normaliseCourierStatus(provider, raw);
-      await db.from("orders").update({ courier_status: status }).eq("id", data.orderId);
+      const { courierToOrderStatus } = await import("./delivery-shared");
+      const { nextOrderStatus } = await import("./dispatch.server");
+
+      const { data: cur } = await db
+        .from("orders")
+        .select("status")
+        .eq("id", data.orderId)
+        .maybeSingle();
+      const mapped = nextOrderStatus(
+        (cur as { status?: string } | null)?.status ?? null,
+        courierToOrderStatus[status],
+      );
+
+      await db
+        .from("orders")
+        .update({
+          courier_status: status,
+          ...(mapped ? { status: mapped as never } : {}),
+        })
+        .eq("id", data.orderId);
       await db
         .from("order_consignments")
         .update({ status, status_message: raw })
@@ -196,7 +215,7 @@ export const adminRefreshCourierStatus = createServerFn({ method: "POST" })
         data.orderId,
         "courier",
         `${who} refreshed ${provider} status → ${raw}`,
-        { actor: who, meta: { provider, status, raw_status: raw } },
+        { actor: who, meta: { provider, status, raw_status: raw, order_status: mapped } },
       );
       return { ok: true, message: courierStatusLabels[status] ?? raw };
     } catch (error) {
