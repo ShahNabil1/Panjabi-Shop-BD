@@ -124,3 +124,83 @@ export const adminSendOrderToCourier = createServerFn({ method: "POST" })
       message: res.message,
     };
   });
+
+/** Pulls the latest status straight from the courier API for one order. */
+export const adminRefreshCourierStatus = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => z.object({ orderId: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }): Promise<{ ok: boolean; message: string }> => {
+    const db = await requireAdmin(context.supabase, context.userId);
+    const { actorName, logActivity } = await import("./admin.server");
+    const { loadPartner, providerKey } = await import("./dispatch.server");
+    const { normaliseCourierStatus, courierStatusLabels } = await import("./delivery-shared");
+
+    const { data: row } = await db
+      .from("orders")
+      .select("delivery_partner, courier_consignment_id, order_number")
+      .eq("id", data.orderId)
+      .maybeSingle();
+    const order = row as {
+      delivery_partner: string | null;
+      courier_consignment_id: string | null;
+      order_number: string;
+    } | null;
+    if (!order) return { ok: false, message: "Order not found" };
+
+    const provider = providerKey(order.delivery_partner);
+    if (!provider) return { ok: false, message: "No delivery partner on this order" };
+    if (!order.courier_consignment_id) {
+      return { ok: false, message: "This order has not been sent to the courier yet" };
+    }
+
+    try {
+      const partner = await loadPartner(db, provider);
+      let raw = "unknown";
+
+      if (provider === "steadfast") {
+        const { steadfastStatusByCid } = await import("./steadfast.server");
+        raw = await steadfastStatusByCid(
+          {
+            api_key: partner.credentials["api_key"]!,
+            secret_key: partner.credentials["secret_key"]!,
+          },
+          order.courier_consignment_id,
+        );
+      } else if (provider === "pathao") {
+        const { pathaoToken, pathaoOrderInfo } = await import("./pathao.server");
+        const creds = {
+          client_id: partner.credentials["client_id"]!,
+          client_secret: partner.credentials["client_secret"]!,
+          username: partner.credentials["username"]!,
+          password: partner.credentials["password"]!,
+          ...(partner.credentials["base_url"] ? { base_url: partner.credentials["base_url"] } : {}),
+        };
+        const token = await pathaoToken(creds);
+        const info = await pathaoOrderInfo(creds, token, order.courier_consignment_id);
+        const d = (info["data"] ?? {}) as Record<string, unknown>;
+        raw = (d["order_status"] as string) ?? "unknown";
+      } else {
+        return { ok: false, message: "Live status sync is not available for this courier" };
+      }
+
+      const status = normaliseCourierStatus(provider, raw);
+      await db.from("orders").update({ courier_status: status }).eq("id", data.orderId);
+      await db
+        .from("order_consignments")
+        .update({ status, status_message: raw })
+        .eq("order_id", data.orderId)
+        .eq("provider", provider);
+
+      const who = await actorName(db, context.userId);
+      await logActivity(
+        db,
+        data.orderId,
+        "courier",
+        `${who} refreshed ${provider} status → ${raw}`,
+        { actor: who, meta: { provider, status, raw_status: raw } },
+      );
+      return { ok: true, message: courierStatusLabels[status] ?? raw };
+    } catch (error) {
+      return { ok: false, message: (error as Error).message };
+    }
+  });

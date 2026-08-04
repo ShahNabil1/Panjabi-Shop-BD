@@ -296,6 +296,34 @@ function PartnerCard({
         </div>
       </div>
 
+      {row?.webhook_secret ? (
+        <div className="space-y-1.5">
+          <label className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground">
+            <Link2 className="size-3.5" />
+            Webhook secret — set this as the secret/signature in {providerLabels[provider]}
+          </label>
+          <div className="flex gap-2">
+            <Input
+              readOnly
+              value={row.webhook_secret}
+              className="rounded-xl font-mono text-xs"
+            />
+            <Button
+              type="button"
+              variant="outline"
+              className="shrink-0 active:scale-95"
+              onClick={() => {
+                void navigator.clipboard.writeText(row.webhook_secret ?? "");
+                toast.success("Webhook secret copied");
+              }}
+            >
+              <Copy className="size-4" />
+              Copy
+            </Button>
+          </div>
+        </div>
+      ) : null}
+
       {result && !result.ok && result.message ? (
         <p className="rounded-xl bg-rose-50 px-3 py-2 text-xs font-medium text-rose-700">
           {result.message}

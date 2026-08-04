@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Fingerprint, Globe, NotebookPen, Phone, Shield, ShieldCheck, ShieldX, Truck } from "lucide-react";
+import { Fingerprint, Globe, NotebookPen, Phone, Shield, ShieldCheck, ShieldX, Truck, RefreshCw } from "lucide-react";
 
 import type { BlockKind } from "@/lib/admin-schema";
 import { adminAddOrderNote, adminSetBlocked } from "@/lib/order-admin.functions";
-import { adminSendOrderToCourier } from "@/lib/dispatch.functions";
+import { adminRefreshCourierStatus, adminSendOrderToCourier } from "@/lib/dispatch.functions";
 import {
   courierStatusLabels,
   courierStatusTone,
@@ -68,6 +68,16 @@ export function FulfillmentCard({
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const refresh = useMutation({
+    mutationFn: () => adminRefreshCourierStatus({ data: { orderId } }),
+    onSuccess: async (res) => {
+      if (res.ok) toast.success(`Courier status: ${res.message}`);
+      else toast.error(res.message);
+      await qc.invalidateQueries({ queryKey: ["admin"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
   const normalised = (courierStatus ?? "unknown") as CourierStatus;
 
   return (
@@ -123,6 +133,18 @@ export function FulfillmentCard({
                   </dd>
                 </div>
               ) : null}
+              <div className="pt-1">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  loading={refresh.isPending}
+                  onClick={() => refresh.mutate()}
+                  className="active:scale-95"
+                >
+                  <RefreshCw className="size-4" />
+                  Refresh courier status
+                </Button>
+              </div>
             </dl>
           ) : orderStatus === "pending" ? (
             <div className="mt-3 space-y-2">

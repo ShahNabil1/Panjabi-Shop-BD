@@ -44,6 +44,7 @@ import { Route as AdminSettingsDeliveryRouteImport } from './routes/admin.settin
 import { Route as AdminSettingsSmsTemplatesRouteImport } from './routes/admin.settings.sms-templates'
 import { Route as CCategoryIndexRouteImport } from './routes/c.$category.index'
 import { Route as CCategorySubcategoryRouteImport } from './routes/c.$category.$subcategory'
+import { Route as ApiPublicCourierProviderRouteImport } from './routes/api/public/courier.$provider'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -221,6 +222,12 @@ const CCategorySubcategoryRoute = CCategorySubcategoryRouteImport.update({
   path: '/c/$category/$subcategory',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicCourierProviderRoute =
+  ApiPublicCourierProviderRouteImport.update({
+    id: '/api/public/courier/$provider',
+    path: '/api/public/courier/$provider',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -258,6 +265,7 @@ export interface FileRoutesByFullPath {
   '/admin/products/': typeof AdminProductsIndexRoute
   '/admin/settings/': typeof AdminSettingsIndexRoute
   '/c/$category/': typeof CCategoryIndexRoute
+  '/api/public/courier/$provider': typeof ApiPublicCourierProviderRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -294,6 +302,7 @@ export interface FileRoutesByTo {
   '/admin/products': typeof AdminProductsIndexRoute
   '/admin/settings': typeof AdminSettingsIndexRoute
   '/c/$category': typeof CCategoryIndexRoute
+  '/api/public/courier/$provider': typeof ApiPublicCourierProviderRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -332,6 +341,7 @@ export interface FileRoutesById {
   '/admin/products/': typeof AdminProductsIndexRoute
   '/admin/settings/': typeof AdminSettingsIndexRoute
   '/c/$category/': typeof CCategoryIndexRoute
+  '/api/public/courier/$provider': typeof ApiPublicCourierProviderRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -371,6 +381,7 @@ export interface FileRouteTypes {
     | '/admin/products/'
     | '/admin/settings/'
     | '/c/$category/'
+    | '/api/public/courier/$provider'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -407,6 +418,7 @@ export interface FileRouteTypes {
     | '/admin/products'
     | '/admin/settings'
     | '/c/$category'
+    | '/api/public/courier/$provider'
   id:
     | '__root__'
     | '/'
@@ -444,6 +456,7 @@ export interface FileRouteTypes {
     | '/admin/products/'
     | '/admin/settings/'
     | '/c/$category/'
+    | '/api/public/courier/$provider'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -467,6 +480,7 @@ export interface RootRouteChildren {
   OffersIndexRoute: typeof OffersIndexRoute
   CCategorySubcategoryRoute: typeof CCategorySubcategoryRoute
   CCategoryIndexRoute: typeof CCategoryIndexRoute
+  ApiPublicCourierProviderRoute: typeof ApiPublicCourierProviderRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -716,6 +730,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CCategorySubcategoryRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/courier/$provider': {
+      id: '/api/public/courier/$provider'
+      path: '/api/public/courier/$provider'
+      fullPath: '/api/public/courier/$provider'
+      preLoaderRoute: typeof ApiPublicCourierProviderRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -778,6 +799,7 @@ const rootRouteChildren: RootRouteChildren = {
   OffersIndexRoute: OffersIndexRoute,
   CCategorySubcategoryRoute: CCategorySubcategoryRoute,
   CCategoryIndexRoute: CCategoryIndexRoute,
+  ApiPublicCourierProviderRoute: ApiPublicCourierProviderRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
