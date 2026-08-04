@@ -15,7 +15,7 @@ import {
   TextField,
   ToggleField,
 } from "@/components/admin/kit";
-import { ImageField, ImageUploadButton } from "@/components/admin/image-upload";
+import { ImageUploadButton } from "@/components/admin/image-upload";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -644,12 +644,6 @@ function ProductEditor() {
             value={draft.meta_title ?? ""}
             onChange={(v) => set("meta_title", v || null)}
             hint="Keep within 60 characters"
-          />
-          <ImageField
-            label="OG image (social preview)"
-            folder="products"
-            value={draft.og_image_url}
-            onChange={(v) => set("og_image_url", v)}
           />
           <AreaField
             label="Meta description"
