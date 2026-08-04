@@ -100,3 +100,26 @@ export function CourierBadge({
     </span>
   );
 }
+
+export function CourierWatermark({
+  partner,
+  className,
+}: {
+  partner?: string | null;
+  className?: string;
+}) {
+  const key = courierKey(partner);
+  if (!key) return null;
+  const c = COURIERS[key];
+  return (
+    <img
+      src={c.src}
+      alt=""
+      aria-hidden
+      className={cn(
+        "pointer-events-none absolute -right-4 -bottom-4 w-32 select-none object-contain opacity-[0.07] mix-blend-multiply",
+        className,
+      )}
+    />
+  );
+}
