@@ -67,12 +67,12 @@ export function AddToCartBar({
   const [qty, setQty] = useState(1);
   const soldOut = stock <= 0;
 
-  const addItem = () => {
+  const addItem = (openDrawer = true) => {
     add({ ...item, quantity: qty });
     toast.success(tr(lang, "added"), {
       description: pick(lang, item.nameBn, item.nameEn),
     });
-    openCart("cart");
+    if (openDrawer) openCart("cart");
   };
 
   if (soldOut) {
