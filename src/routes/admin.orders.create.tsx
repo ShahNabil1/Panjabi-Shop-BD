@@ -222,6 +222,11 @@ function CreateOrderPage() {
           source,
           deliveryPartner: deliveryPartner === "" ? null : deliveryPartner,
           deliveryNote: deliveryNoteOn ? deliveryNote.trim() : "",
+          preOrder,
+          scheduledFor:
+            !preOrder && scheduleOn && scheduledFor
+              ? new Date(scheduledFor).toISOString()
+              : null,
           items: lines.map((l) => ({
             productId: l.productId,
             variantId: l.variantId,
