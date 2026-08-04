@@ -390,6 +390,7 @@ export const captureIncompleteOrder = createServerFn({ method: "POST" })
     }
 
     const { error } = await db.rpc("checkout_save_incomplete", {
+      _existing_id: null as unknown as string,
       _order: orderPayload,
       _items: lines,
       _replace_items: true,
