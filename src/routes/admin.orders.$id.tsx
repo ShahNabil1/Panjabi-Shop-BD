@@ -523,6 +523,7 @@ function AdminOrderDetail() {
         consignmentId={order.courier_consignment_id ?? null}
         trackingCode={order.courier_tracking_code ?? null}
         sentAt={order.courier_sent_at ?? null}
+        customerPhone={order.customer_phone ?? null}
       />
 
       <SecurityCard
