@@ -132,7 +132,25 @@ export const placeOrder = createServerFn({ method: "POST" })
       rates.freeAll || (rates.freeAbove > 0 && subtotal >= rates.freeAbove)
         ? 0
         : rates[deliveryArea];
-    const total = subtotal + deliveryCharge;
+
+    // Coupons are re-validated server-side; the client's number is never trusted.
+    let discount = 0;
+    let couponId: string | null = null;
+    if (data.couponCode) {
+      const { evaluateCoupon } = await import("./coupons.server");
+      const result = await evaluateCoupon({
+        code: data.couponCode,
+        subtotal,
+        productIds: [...new Set(lines.map((l) => l.product.id))],
+        phone: data.customerPhone,
+        db: supabaseAdmin,
+      });
+      if (!result.ok) throw new Error(`COUPON_${(result.reason ?? "error").toUpperCase()}`);
+      discount = Math.min(Math.max(0, Math.round(result.discount)), subtotal);
+      couponId = result.couponId;
+    }
+
+    const total = Math.max(0, subtotal + deliveryCharge - discount);
 
     const { data: order, error: orderError } = await supabaseAdmin
       .from("orders")
@@ -147,7 +165,7 @@ export const placeOrder = createServerFn({ method: "POST" })
         note: data.note || null,
         subtotal,
         delivery_charge: deliveryCharge,
-        discount: 0,
+        discount,
         total,
         payment_method: "cod",
         status: "processing",
@@ -158,6 +176,7 @@ export const placeOrder = createServerFn({ method: "POST" })
       .single();
 
     if (orderError || !order) throw new Error("ORDER_FAILED");
+
 
     const { error: itemsError } = await supabaseAdmin.from("order_items").insert(
       lines.map((l) => ({
