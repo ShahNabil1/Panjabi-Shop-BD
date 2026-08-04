@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { Search, Clock, Globe, Eye, ShieldAlert, UserRound, Truck, Loader2 } from "lucide-react";
+import { Search, Clock, Globe, Eye, ShieldAlert, UserRound, Truck, Loader2, Banknote } from "lucide-react";
 import { toast } from "sonner";
 
 import { adminListOrders } from "@/lib/admin.functions";
