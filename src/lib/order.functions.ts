@@ -79,19 +79,20 @@ export const placeOrder = createServerFn({ method: "POST" })
       ...new Set(data.items.map((i) => i.variantId).filter((v): v is string => Boolean(v))),
     ];
 
-    const [productsRes, variantsRes, settingsRes] = await Promise.all([
-      supabaseAdmin
+    const [productsRes, settingsRes] = await Promise.all([
+      db
         .from("products")
         .select("id, slug, name_bn, name_en, price, stock, sku, is_active")
         .in("id", productIds),
-      variantIds.length
-        ? supabaseAdmin
-            .from("product_variants")
-            .select("id, product_id, value_bn, value_en, group_name_bn, price_delta, stock, sku, is_active")
-            .in("id", variantIds)
-        : Promise.resolve({ data: [], error: null }),
-      supabaseAdmin.from("site_settings").select("value").eq("key", "delivery").maybeSingle(),
+      db.from("site_settings").select("value").eq("key", "delivery").maybeSingle(),
     ]);
+
+    const variantsRes = variantIds.length
+      ? await db
+          .from("product_variants")
+          .select("id, product_id, value_bn, value_en, group_name_bn, price_delta, stock, sku, is_active")
+          .in("id", variantIds)
+      : { data: [], error: null };
 
     if (productsRes.error) throw new Error("Could not load products");
     const products = productsRes.data ?? [];
