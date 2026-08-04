@@ -176,7 +176,7 @@ function AdminOrderDetail() {
       <Panel className="space-y-3 text-center">
         <p className="text-sm font-bold">Order not found</p>
         <Button asChild variant="outline">
-          <Link to="/admin/orders">Back to orders</Link>
+          <Link to={backTo}>Back to orders</Link>
         </Button>
       </Panel>
     );
@@ -246,7 +246,7 @@ function AdminOrderDetail() {
     <div className="space-y-5">
       <div className="flex items-center justify-between gap-3">
         <Button asChild variant="outline" size="sm" className="rounded-xl">
-          <Link to="/admin/orders">
+          <Link to={backTo}>
             <ArrowLeft className="size-4" />
             Back to orders
           </Link>
@@ -579,7 +579,7 @@ function AdminOrderDetail() {
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="gap-2 sm:gap-2">
-            <Button variant="outline" onClick={() => void navigate({ to: "/admin/orders" })}>
+            <Button variant="outline" onClick={() => void navigate({ to: backTo })}>
               <ArrowLeft className="size-4" />
               Back to orders
             </Button>
@@ -605,7 +605,7 @@ function AdminOrderDetail() {
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="gap-2 sm:gap-2">
-            <Button variant="outline" onClick={() => void navigate({ to: "/admin/orders" })}>
+            <Button variant="outline" onClick={() => void navigate({ to: backTo })}>
               <ArrowLeft className="size-4" />
               Back to orders
             </Button>
