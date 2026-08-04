@@ -429,7 +429,7 @@ export function OrdersBoard({
                     return (
                       <Link
                         to="/admin/orders/$id"
-                        params={{ id: o.id }}
+                        params={{ id: (o.order_number || o.id).toLowerCase() }}
                         search={bucket === "list" ? { from: "list" as const } : {}}
                         className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-border bg-background px-3 py-1.5 text-xs font-semibold text-foreground transition-colors hover:border-primary/40 hover:bg-accent active:scale-95"
                       >
