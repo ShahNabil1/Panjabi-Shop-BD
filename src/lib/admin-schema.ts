@@ -19,8 +19,6 @@ export const orderStatuses = [
   "cancelled",
   "awaiting_return",
   "returned",
-  "unpaid",
-  "paid",
   "lost_damaged",
 ] as const;
 export type OrderStatus = (typeof orderStatuses)[number];
@@ -49,10 +47,19 @@ export const listOrderStatuses = [
   "cancelled",
   "awaiting_return",
   "returned",
-  "unpaid",
-  "paid",
   "lost_damaged",
 ] as const;
+
+/**
+ * Payment views are NOT order statuses. They slice the money-earning parcels
+ * (delivered / partial delivered) by whether the courier has already paid us
+ * out — i.e. whether an `order.paid` invoice webhook has arrived.
+ */
+export const paymentFilters = ["paid", "unpaid"] as const;
+export type PaymentFilter = (typeof paymentFilters)[number];
+/** Order statuses whose money is collectable from the courier. */
+export const payableStatuses = ["delivered", "partial_delivered"] as const;
+
 
 export const orderBuckets = ["web", "list"] as const;
 export type OrderBucket = (typeof orderBuckets)[number];
