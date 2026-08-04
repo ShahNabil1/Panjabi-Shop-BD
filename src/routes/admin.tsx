@@ -5,6 +5,7 @@ import {
   BadgePercent,
   Boxes,
   ChevronLeft,
+  Database,
   ExternalLink,
   HelpCircle,
   LayoutDashboard,
