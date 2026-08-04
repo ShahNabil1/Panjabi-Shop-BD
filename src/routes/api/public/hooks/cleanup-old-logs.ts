@@ -37,12 +37,12 @@ export const Route = createFileRoute("/api/public/hooks/cleanup-old-logs")({
           .eq("key", "retention")
           .single();
 
-        const enabled = (setting?.value as Record<string, unknown> | undefined)?.enabled ?? true;
+        const enabled = (setting?.value as Record<string, unknown> | undefined)?.["enabled"] ?? true;
         if (!enabled) {
           return Response.json({ success: true, message: "Cleanup disabled" });
         }
 
-        const days = Number((setting?.value as Record<string, unknown> | undefined)?.days ?? 90);
+        const days = Number((setting?.value as Record<string, unknown> | undefined)?.["days"] ?? 90);
         const safeDays = Number.isFinite(days) && days > 0 ? Math.min(days, 730) : 90;
 
         const { data, error } = await supabase.rpc("cleanup_old_order_logs", {

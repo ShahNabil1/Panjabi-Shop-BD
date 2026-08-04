@@ -45,6 +45,7 @@ import { Route as AdminSettingsSmsTemplatesRouteImport } from './routes/admin.se
 import { Route as CCategoryIndexRouteImport } from './routes/c.$category.index'
 import { Route as CCategorySubcategoryRouteImport } from './routes/c.$category.$subcategory'
 import { Route as ApiPublicCourierProviderRouteImport } from './routes/api/public/courier.$provider'
+import { Route as ApiPublicHooksCleanupOldLogsRouteImport } from './routes/api/public/hooks/cleanup-old-logs'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -228,6 +229,12 @@ const ApiPublicCourierProviderRoute =
     path: '/api/public/courier/$provider',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksCleanupOldLogsRoute =
+  ApiPublicHooksCleanupOldLogsRouteImport.update({
+    id: '/api/public/hooks/cleanup-old-logs',
+    path: '/api/public/hooks/cleanup-old-logs',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -266,6 +273,7 @@ export interface FileRoutesByFullPath {
   '/admin/settings/': typeof AdminSettingsIndexRoute
   '/c/$category/': typeof CCategoryIndexRoute
   '/api/public/courier/$provider': typeof ApiPublicCourierProviderRoute
+  '/api/public/hooks/cleanup-old-logs': typeof ApiPublicHooksCleanupOldLogsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -303,6 +311,7 @@ export interface FileRoutesByTo {
   '/admin/settings': typeof AdminSettingsIndexRoute
   '/c/$category': typeof CCategoryIndexRoute
   '/api/public/courier/$provider': typeof ApiPublicCourierProviderRoute
+  '/api/public/hooks/cleanup-old-logs': typeof ApiPublicHooksCleanupOldLogsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -342,6 +351,7 @@ export interface FileRoutesById {
   '/admin/settings/': typeof AdminSettingsIndexRoute
   '/c/$category/': typeof CCategoryIndexRoute
   '/api/public/courier/$provider': typeof ApiPublicCourierProviderRoute
+  '/api/public/hooks/cleanup-old-logs': typeof ApiPublicHooksCleanupOldLogsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -382,6 +392,7 @@ export interface FileRouteTypes {
     | '/admin/settings/'
     | '/c/$category/'
     | '/api/public/courier/$provider'
+    | '/api/public/hooks/cleanup-old-logs'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -419,6 +430,7 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/c/$category'
     | '/api/public/courier/$provider'
+    | '/api/public/hooks/cleanup-old-logs'
   id:
     | '__root__'
     | '/'
@@ -457,6 +469,7 @@ export interface FileRouteTypes {
     | '/admin/settings/'
     | '/c/$category/'
     | '/api/public/courier/$provider'
+    | '/api/public/hooks/cleanup-old-logs'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -481,6 +494,7 @@ export interface RootRouteChildren {
   CCategorySubcategoryRoute: typeof CCategorySubcategoryRoute
   CCategoryIndexRoute: typeof CCategoryIndexRoute
   ApiPublicCourierProviderRoute: typeof ApiPublicCourierProviderRoute
+  ApiPublicHooksCleanupOldLogsRoute: typeof ApiPublicHooksCleanupOldLogsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -737,6 +751,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicCourierProviderRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/cleanup-old-logs': {
+      id: '/api/public/hooks/cleanup-old-logs'
+      path: '/api/public/hooks/cleanup-old-logs'
+      fullPath: '/api/public/hooks/cleanup-old-logs'
+      preLoaderRoute: typeof ApiPublicHooksCleanupOldLogsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -800,7 +821,18 @@ const rootRouteChildren: RootRouteChildren = {
   CCategorySubcategoryRoute: CCategorySubcategoryRoute,
   CCategoryIndexRoute: CCategoryIndexRoute,
   ApiPublicCourierProviderRoute: ApiPublicCourierProviderRoute,
+  ApiPublicHooksCleanupOldLogsRoute: ApiPublicHooksCleanupOldLogsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
