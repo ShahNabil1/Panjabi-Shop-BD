@@ -86,6 +86,11 @@ export const orderStatusSchema = z.object({
   skipSms: z.boolean().optional(),
   /** Courier chosen at confirmation time (Steadfast / Pathao / Carrybee). */
   deliveryPartner: z.string().trim().max(40).optional(),
+  /**
+   * ISO timestamp used with the `scheduled_order` status. A cron job flips the
+   * order to `processing` once this moment passes.
+   */
+  scheduledFor: z.string().trim().min(1).max(40).nullable().optional(),
 });
 
 export const orderListSchema = z.object({
@@ -152,6 +157,10 @@ export const adminCreateOrderSchema = z.object({
   source: z.enum(orderSources).default("Direct"),
   deliveryPartner: z.string().trim().min(2).max(40).nullable().default(null),
   deliveryNote: z.string().trim().max(500).optional().default(""),
+  /** Creates the order directly in the Pre-Order status. */
+  preOrder: z.boolean().default(false),
+  /** ISO timestamp — creates the order in the Scheduled Order status. */
+  scheduledFor: z.string().trim().min(1).max(40).nullable().default(null),
   items: z.array(adminOrderItemSchema).min(1).max(30),
 });
 

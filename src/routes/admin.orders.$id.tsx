@@ -49,8 +49,22 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-const updatableStatuses = ["no_response", "good_no_response", "hold", "cancelled"] as const;
+const updatableStatuses = [
+  "no_response",
+  "good_no_response",
+  "hold",
+  "pre_order",
+  "scheduled_order",
+  "cancelled",
+] as const;
 type PendingStatus = (typeof updatableStatuses)[number];
+
+/** `datetime-local` value for "one hour from now", used as the schedule default. */
+function defaultScheduleValue(): string {
+  const d = new Date(Date.now() + 60 * 60 * 1000);
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
 
 export const Route = createFileRoute("/admin/orders/$id")({
   validateSearch: (search: Record<string, unknown>): { takeover?: number; from?: "list" } => ({
@@ -160,6 +174,8 @@ function AdminOrderDetail() {
 
   const [pending, setPending] = useState<PendingStatus | "">("");
   const [reason, setReason] = useState("");
+  /** `datetime-local` value used when moving the order to Scheduled Order. */
+  const [scheduleAt, setScheduleAt] = useState(defaultScheduleValue);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [silent, setSilent] = useState(false);
 
@@ -169,6 +185,7 @@ function AdminOrderDetail() {
       reason?: string;
       skipSms?: boolean;
       deliveryPartner?: string;
+      scheduledFor?: string | null;
     }) =>
       adminUpdateOrderStatus({
         data: {
@@ -177,6 +194,7 @@ function AdminOrderDetail() {
           ...(input.reason ? { reason: input.reason } : {}),
           ...(input.skipSms ? { skipSms: true } : {}),
           ...(input.deliveryPartner ? { deliveryPartner: input.deliveryPartner } : {}),
+          ...(input.scheduledFor ? { scheduledFor: input.scheduledFor } : {}),
         },
       }),
     onSuccess: async () => {
@@ -223,6 +241,7 @@ function AdminOrderDetail() {
     advance_amount?: number | string | null;
     advance_method?: string | null;
     fulfillment_status: string;
+    scheduled_for?: string | null;
     courier_status?: string | null;
     courier_consignment_id?: string | null;
     courier_tracking_code?: string | null;
@@ -295,6 +314,20 @@ function AdminOrderDetail() {
                 hour12: true,
               })}
             </p>
+            {order.status === "scheduled_order" && order.scheduled_for ? (
+              <p className="mt-1 text-xs font-bold text-cyan-700">
+                Scheduled for{" "}
+                {new Date(order.scheduled_for).toLocaleString("en-US", {
+                  timeZone: "Asia/Dhaka",
+                  day: "numeric",
+                  month: "short",
+                  year: "numeric",
+                  hour: "numeric",
+                  minute: "2-digit",
+                  hour12: true,
+                })}
+              </p>
+            ) : null}
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
@@ -401,6 +434,39 @@ function AdminOrderDetail() {
                   {pending === "hold" ? "Confirm Hold" : "Confirm Cancel"}
                 </Button>
               </div>
+            </div>
+          </div>
+        ) : pending === "scheduled_order" ? (
+          <div className="ml-auto max-w-md space-y-2 rounded-xl border border-cyan-300 bg-cyan-50 p-3">
+            <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-cyan-800">
+              Schedule this order
+            </p>
+            <input
+              type="datetime-local"
+              className="w-full rounded-lg border border-border/70 bg-white/80 px-3 py-2 text-sm outline-none focus:border-primary"
+              value={scheduleAt}
+              onChange={(e) => setScheduleAt(e.target.value)}
+            />
+            <p className="text-xs text-muted-foreground">
+              The order stays in Scheduled Order and moves to Processing automatically at this time.
+            </p>
+            <div className="flex items-center justify-end gap-2">
+              <Button size="sm" variant="ghost" onClick={() => setPending("")}>
+                Back
+              </Button>
+              <Button
+                size="sm"
+                loading={update.isPending}
+                disabled={!scheduleAt}
+                onClick={() =>
+                  update.mutate({
+                    status: "scheduled_order",
+                    scheduledFor: new Date(scheduleAt).toISOString(),
+                  })
+                }
+              >
+                Schedule order
+              </Button>
             </div>
           </div>
         ) : pending ? (

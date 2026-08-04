@@ -73,6 +73,9 @@ function CreateOrderPage() {
   const [deliveryPartner, setDeliveryPartner] = useState<string>("");
   const [deliveryNoteOn, setDeliveryNoteOn] = useState(true);
   const [deliveryNote, setDeliveryNote] = useState("");
+  const [preOrder, setPreOrder] = useState(false);
+  const [scheduleOn, setScheduleOn] = useState(false);
+  const [scheduledFor, setScheduledFor] = useState("");
 
   const activePartners = useQuery({
     queryKey: ["admin", "active-delivery-partners"],
@@ -219,6 +222,11 @@ function CreateOrderPage() {
           source,
           deliveryPartner: deliveryPartner === "" ? null : deliveryPartner,
           deliveryNote: deliveryNoteOn ? deliveryNote.trim() : "",
+          preOrder,
+          scheduledFor:
+            !preOrder && scheduleOn && scheduledFor
+              ? new Date(scheduledFor).toISOString()
+              : null,
           items: lines.map((l) => ({
             productId: l.productId,
             variantId: l.variantId,
@@ -242,6 +250,7 @@ function CreateOrderPage() {
     district &&
     upazila &&
     lines.length > 0 &&
+    (preOrder || !scheduleOn || scheduledFor.length > 0) &&
     !create.isPending;
 
   return (
@@ -619,6 +628,67 @@ function CreateOrderPage() {
                   ))}
                 </select>
               </label>
+
+              {/* Pre-Order toggle — sends the order straight to the Pre-Order board. */}
+              <div className="rounded-xl border border-border bg-background px-3 py-2.5">
+                <label className="flex cursor-pointer items-center justify-between gap-3">
+                  <span>
+                    <span className="block text-sm font-semibold text-foreground">Pre-Order</span>
+                    <span className="block text-xs text-muted-foreground">
+                      Creates the order with the Pre-Order status.
+                    </span>
+                  </span>
+                  <input
+                    type="checkbox"
+                    role="switch"
+                    className="size-5 shrink-0 accent-primary"
+                    checked={preOrder}
+                    onChange={(e) => {
+                      setPreOrder(e.target.checked);
+                      if (e.target.checked) setScheduledFor("");
+                    }}
+                  />
+                </label>
+              </div>
+
+              {/* Schedule — order waits in Scheduled Order until this moment. */}
+              <div
+                className={cn(
+                  "rounded-xl border border-border bg-background px-3 py-2.5",
+                  preOrder && "opacity-60",
+                )}
+              >
+                <label className="flex cursor-pointer items-center justify-between gap-3">
+                  <span>
+                    <span className="block text-sm font-semibold text-foreground">
+                      Schedule order
+                    </span>
+                    <span className="block text-xs text-muted-foreground">
+                      Auto-moves to Processing on the chosen date &amp; time.
+                    </span>
+                  </span>
+                  <input
+                    type="checkbox"
+                    role="switch"
+                    className="size-5 shrink-0 accent-primary"
+                    disabled={preOrder}
+                    checked={scheduleOn}
+                    onChange={(e) => {
+                      setScheduleOn(e.target.checked);
+                      if (!e.target.checked) setScheduledFor("");
+                    }}
+                  />
+                </label>
+                {scheduleOn && !preOrder ? (
+                  <input
+                    type="datetime-local"
+                    className={cn(input, "mt-2.5")}
+                    value={scheduledFor}
+                    onChange={(e) => setScheduledFor(e.target.value)}
+                  />
+                ) : null}
+              </div>
+
               <label className="block">
                 <Label>Delivery partner</Label>
                 <select
@@ -684,7 +754,11 @@ function CreateOrderPage() {
               {create.isPending ? "Creating…" : "Create order"}
             </Button>
             <p className="mt-2 text-center text-xs text-muted-foreground">
-              New orders are created with the Pending status.
+              {preOrder
+                ? "This order will be created with the Pre-Order status."
+                : scheduleOn && scheduledFor
+                  ? "This order will stay in Scheduled Order and move to Processing automatically on the chosen date."
+                  : "New orders are created with the Pending status."}
             </p>
           </Panel>
         </div>

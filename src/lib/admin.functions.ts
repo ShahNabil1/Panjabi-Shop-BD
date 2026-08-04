@@ -148,6 +148,9 @@ export const adminUpdateOrderStatus = createServerFn({ method: "POST" })
       .from("orders")
       .update({
         status: data.status,
+        // A schedule only belongs to the scheduled_order status; any other
+        // status clears it so the cron job never resurrects the order.
+        scheduled_for: data.status === "scheduled_order" ? (data.scheduledFor ?? null) : null,
         ...(data.deliveryPartner ? { delivery_partner: data.deliveryPartner } : {}),
       })
       .eq("id", data.id);
@@ -731,7 +734,12 @@ export const adminCreateOrder = createServerFn({ method: "POST" })
         delivery_partner: data.deliveryPartner,
         delivery_note: data.deliveryNote || null,
         payment_method: data.advanceAmount > 0 ? "partial_advance" : "cod",
-        status: "pending",
+        status: data.preOrder
+          ? "pre_order"
+          : data.scheduledFor
+            ? "scheduled_order"
+            : "pending",
+        scheduled_for: !data.preOrder && data.scheduledFor ? data.scheduledFor : null,
         source: data.source,
       })
       .select("id, order_number")
