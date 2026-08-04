@@ -166,22 +166,6 @@ export function CartDrawer() {
               </div>
             </div>
           </div>
-        ) : checkout ? (
-          <div className="flex-1 overflow-y-auto px-4 py-4">
-            {rates ? (
-              <CheckoutForm
-                items={items}
-                rates={rates}
-                source="website"
-                compact
-                onSetQuantity={setQuantity}
-                onRemove={remove}
-                onPlaced={closeCart}
-              />
-            ) : (
-              <div className="h-64 animate-pulse rounded-sm bg-secondary" />
-            )}
-          </div>
         ) : (
           <>
             <ul className="flex-1 overflow-y-auto px-4 py-4">
