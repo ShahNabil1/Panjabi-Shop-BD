@@ -754,7 +754,11 @@ function CreateOrderPage() {
               {create.isPending ? "Creating…" : "Create order"}
             </Button>
             <p className="mt-2 text-center text-xs text-muted-foreground">
-              New orders are created with the Pending status.
+              {preOrder
+                ? "This order will be created with the Pre-Order status."
+                : scheduleOn && scheduledFor
+                  ? "This order will stay in Scheduled Order and move to Processing automatically on the chosen date."
+                  : "New orders are created with the Pending status."}
             </p>
           </Panel>
         </div>
