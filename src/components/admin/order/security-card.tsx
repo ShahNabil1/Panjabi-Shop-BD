@@ -1,10 +1,16 @@
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Fingerprint, Globe, NotebookPen, Phone, Shield, ShieldCheck, ShieldX } from "lucide-react";
+import { Fingerprint, Globe, NotebookPen, Phone, Shield, ShieldCheck, ShieldX, Truck } from "lucide-react";
 
 import type { BlockKind } from "@/lib/admin-schema";
 import { adminAddOrderNote, adminSetBlocked } from "@/lib/order-admin.functions";
+import { adminSendOrderToCourier } from "@/lib/dispatch.functions";
+import {
+  courierStatusLabels,
+  courierStatusTone,
+  type CourierStatus,
+} from "@/lib/delivery-shared";
 import { Panel } from "@/components/admin/kit";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -30,20 +36,113 @@ const dt = (value: string) =>
   });
 
 /** Fulfillment placeholder — courier booking becomes functional in a later phase. */
-export function FulfillmentCard({ status, source }: { status: string; source: string }) {
+export function FulfillmentCard({
+  orderId,
+  status,
+  source,
+  orderStatus,
+  partner,
+  courierStatus,
+  consignmentId,
+  trackingCode,
+  sentAt,
+}: {
+  orderId: string;
+  status: string;
+  source: string;
+  orderStatus: string;
+  partner: string | null;
+  courierStatus: string | null;
+  consignmentId: string | null;
+  trackingCode: string | null;
+  sentAt: string | null;
+}) {
+  const qc = useQueryClient();
+  const send = useMutation({
+    mutationFn: () => adminSendOrderToCourier({ data: { orderId } }),
+    onSuccess: async (res) => {
+      if (res.ok) toast.success(`Sent to courier · ${res.message}`);
+      else toast.error(res.message);
+      await qc.invalidateQueries({ queryKey: ["admin"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const normalised = (courierStatus ?? "unknown") as CourierStatus;
+
   return (
     <div className="grid gap-4 lg:grid-cols-2">
       <Panel className="space-y-3">
         <h2 className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
           Fulfillment
         </h2>
+
         <div className="rounded-xl border border-border/70 bg-background/60 p-3">
           <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
             Physical shipment
           </p>
-          <span className="mt-2 inline-flex rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-semibold text-indigo-800 ring-1 ring-indigo-200">
-            {status === "pending" ? "Pending" : status}
-          </span>
+          <div className="mt-2 flex flex-wrap items-center gap-2">
+            <span className="inline-flex rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-semibold text-indigo-800 ring-1 ring-indigo-200">
+              {status === "pending" ? "Pending" : status.toUpperCase()}
+            </span>
+            {partner ? (
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-2.5 py-0.5 text-xs font-semibold">
+                <Truck className="size-3.5" />
+                {partner}
+              </span>
+            ) : null}
+            {courierStatus ? (
+              <span
+                className={cn(
+                  "inline-flex rounded-full px-2.5 py-0.5 text-xs font-bold ring-1",
+                  courierStatusTone(normalised),
+                )}
+              >
+                {courierStatusLabels[normalised] ?? courierStatus}
+              </span>
+            ) : null}
+          </div>
+
+          {consignmentId ? (
+            <dl className="mt-3 grid gap-1 text-xs text-muted-foreground">
+              <div className="flex gap-2">
+                <dt className="font-semibold">Consignment</dt>
+                <dd className="font-mono text-foreground">{consignmentId}</dd>
+              </div>
+              {trackingCode ? (
+                <div className="flex gap-2">
+                  <dt className="font-semibold">Tracking</dt>
+                  <dd className="font-mono text-foreground">{trackingCode}</dd>
+                </div>
+              ) : null}
+              {sentAt ? (
+                <div className="flex gap-2">
+                  <dt className="font-semibold">Sent</dt>
+                  <dd>
+                    {new Date(sentAt).toLocaleString("en-US", { timeZone: "Asia/Dhaka" })}
+                  </dd>
+                </div>
+              ) : null}
+            </dl>
+          ) : orderStatus === "pending" ? (
+            <div className="mt-3 space-y-2">
+              <Button
+                size="sm"
+                loading={send.isPending}
+                disabled={!partner}
+                onClick={() => send.mutate()}
+                className="active:scale-95"
+              >
+                <Truck className="size-4" />
+                Send to {partner ?? "courier"}
+              </Button>
+              {!partner ? (
+                <p className="text-xs text-muted-foreground">
+                  Select a delivery partner on this order first.
+                </p>
+              ) : null}
+            </div>
+          ) : null}
         </div>
       </Panel>
 
