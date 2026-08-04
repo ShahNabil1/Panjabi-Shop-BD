@@ -4,32 +4,16 @@ import { useEffect, useState } from "react";
 import { useCart } from "@/lib/cart-context";
 import { useLang } from "@/lib/language-context";
 import { formatNumber, formatPrice, pick, tr } from "@/lib/i18n";
-import { getDeliveryRates } from "@/lib/order.functions";
 import { ProductThumb } from "@/components/site/product-card";
 import { QuantityStepper } from "@/components/site/add-to-cart";
-import { CheckoutForm, type DeliveryRates } from "@/components/site/checkout-form";
 import { cn } from "@/lib/utils";
 
 export function CartDrawer() {
   const { lang } = useLang();
-  const { items, subtotal, setQuantity, remove, open, step, setStep, closeCart } = useCart();
+  const { items, subtotal, setQuantity, remove, open, closeCart } = useCart();
   const [mounted, setMounted] = useState(false);
-  const [rates, setRates] = useState<DeliveryRates | null>(null);
 
   useEffect(() => setMounted(true), []);
-
-  useEffect(() => {
-    if (!open || rates) return;
-    let active = true;
-    void getDeliveryRates()
-      .then((r) => {
-        if (active) setRates(r as DeliveryRates);
-      })
-      .catch(() => undefined);
-    return () => {
-      active = false;
-    };
-  }, [open, rates]);
 
   useEffect(() => {
     if (typeof document === "undefined") return;
@@ -50,7 +34,6 @@ export function CartDrawer() {
 
   if (!mounted) return null;
 
-  const checkout = step === "checkout";
 
   return (
     <div
@@ -78,21 +61,9 @@ export function CartDrawer() {
         )}
       >
         <header className="flex items-center gap-3 border-b border-border px-4 py-3">
-          {checkout ? (
-            <button
-              type="button"
-              onClick={() => setStep("cart")}
-              className="grid h-9 w-9 shrink-0 place-items-center rounded-sm border border-border transition-colors hover:border-primary hover:text-primary"
-              aria-label={tr(lang, "cart")}
-            >
-              <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M15 5l-7 7 7 7" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </button>
-          ) : null}
           <h2 className="min-w-0 flex-1 truncate text-base font-bold">
-            {checkout ? tr(lang, "checkout") : tr(lang, "cart")}
-            {!checkout && items.length ? (
+            {tr(lang, "cart")}
+            {items.length ? (
               <span className="ml-1.5 text-sm font-normal text-muted-foreground">
                 ({formatNumber(lang, items.length)})
               </span>
@@ -166,22 +137,6 @@ export function CartDrawer() {
               </div>
             </div>
           </div>
-        ) : checkout ? (
-          <div className="flex-1 overflow-y-auto px-4 py-4">
-            {rates ? (
-              <CheckoutForm
-                items={items}
-                rates={rates}
-                source="website"
-                compact
-                onSetQuantity={setQuantity}
-                onRemove={remove}
-                onPlaced={closeCart}
-              />
-            ) : (
-              <div className="h-64 animate-pulse rounded-sm bg-secondary" />
-            )}
-          </div>
         ) : (
           <>
             <ul className="flex-1 overflow-y-auto px-4 py-4">
@@ -248,13 +203,13 @@ export function CartDrawer() {
                 </span>
               </div>
               <p className="mt-1 text-xs text-muted-foreground">{tr(lang, "codNote")}</p>
-              <button
-                type="button"
-                onClick={() => setStep("checkout")}
-                className="mt-3 w-full rounded-sm bg-primary px-5 py-3 text-sm font-bold text-primary-foreground transition-colors hover:bg-primary/90"
+              <Link
+                to="/checkout"
+                onClick={closeCart}
+                className="mt-3 block w-full rounded-sm bg-primary px-5 py-3 text-center text-sm font-bold text-primary-foreground transition-colors hover:bg-primary/90"
               >
                 {tr(lang, "checkout")}
-              </button>
+              </Link>
               <button
                 type="button"
                 onClick={closeCart}

@@ -1,3 +1,4 @@
+import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -62,15 +63,16 @@ export function AddToCartBar({
 }) {
   const { lang } = useLang();
   const { add, openCart } = useCart();
+  const navigate = useNavigate();
   const [qty, setQty] = useState(1);
   const soldOut = stock <= 0;
 
-  const addItem = () => {
+  const addItem = (openDrawer = true) => {
     add({ ...item, quantity: qty });
     toast.success(tr(lang, "added"), {
       description: pick(lang, item.nameBn, item.nameEn),
     });
-    openCart("cart");
+    if (openDrawer) openCart("cart");
   };
 
   if (soldOut) {
@@ -91,7 +93,7 @@ export function AddToCartBar({
       <QuantityStepper value={qty} onChange={setQty} max={stock} />
       <button
         type="button"
-        onClick={addItem}
+        onClick={() => addItem()}
         className="min-w-36 flex-1 rounded-sm border border-primary px-5 py-3 text-sm font-semibold text-primary transition-colors hover:bg-primary/5"
       >
         {tr(lang, "addToCart")}
@@ -99,8 +101,8 @@ export function AddToCartBar({
       <button
         type="button"
         onClick={() => {
-          addItem();
-          openCart("checkout");
+          addItem(false);
+          void navigate({ to: "/checkout" });
         }}
         className="min-w-36 flex-1 rounded-sm bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
       >
