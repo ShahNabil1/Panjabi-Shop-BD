@@ -546,6 +546,18 @@ function AdminOrderDetail() {
         trackingCode={order.courier_tracking_code ?? null}
         sentAt={order.courier_sent_at ?? null}
         customerPhone={order.customer_phone ?? null}
+        collectedAmount={(() => {
+          const rows = (
+            order as unknown as {
+              order_consignments?: Array<{ collected_amount?: number | string | null }>;
+            }
+          ).order_consignments;
+          const v = rows
+            ?.map((r) => r.collected_amount)
+            .find((x) => x !== null && x !== undefined);
+          return v === null || v === undefined ? null : Number(v);
+        })()}
+        orderTotal={order.total != null ? Number(order.total) : null}
       />
 
       <SecurityCard

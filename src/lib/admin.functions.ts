@@ -88,7 +88,7 @@ export const adminListOrders = createServerFn({ method: "POST" })
     let q = db
       .from("orders")
       .select(
-        "id, order_number, customer_name, customer_phone, city, total, status, source, customer_ip, created_at, delivery_partner, courier_status, courier_consignment_id, order_consignments(provider, delivery_fee, cod_amount, total_cost, status)",
+        "id, order_number, customer_name, customer_phone, city, total, status, source, customer_ip, created_at, delivery_partner, courier_status, courier_consignment_id, order_consignments(provider, delivery_fee, cod_amount, total_cost, collected_amount, status)",
       )
       .order("created_at", { ascending: false })
       .limit(200);
@@ -111,7 +111,9 @@ export const adminGetOrder = createServerFn({ method: "POST" })
     const db = await requireAdmin(context.supabase, context.userId);
     const { data: order, error } = await db
       .from("orders")
-      .select("*, order_items(*), order_activity(id, kind, message, meta, created_at)")
+      .select(
+        "*, order_items(*), order_activity(id, kind, message, meta, created_at), order_consignments(provider, collected_amount, delivery_fee, total_cost, status)",
+      )
       .eq("id", data.id)
       .maybeSingle();
     if (error) throw new Error(error.message);

@@ -578,6 +578,7 @@ export type Database = {
       order_consignments: {
         Row: {
           cod_amount: number | null
+          collected_amount: number | null
           consignment_id: string | null
           created_at: string
           delivery_fee: number | null
@@ -594,6 +595,7 @@ export type Database = {
         }
         Insert: {
           cod_amount?: number | null
+          collected_amount?: number | null
           consignment_id?: string | null
           created_at?: string
           delivery_fee?: number | null
@@ -610,6 +612,7 @@ export type Database = {
         }
         Update: {
           cod_amount?: number | null
+          collected_amount?: number | null
           consignment_id?: string | null
           created_at?: string
           delivery_fee?: number | null

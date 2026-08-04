@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { Search, Clock, Globe, Eye, ShieldAlert, UserRound, Truck, Loader2 } from "lucide-react";
+import { Search, Clock, Globe, Eye, ShieldAlert, UserRound, Truck, Loader2, Banknote } from "lucide-react";
 import { toast } from "sonner";
 
 import { adminListOrders } from "@/lib/admin.functions";
@@ -59,6 +59,17 @@ function courierFee(order: unknown): { amount: number; full: boolean } | null {
   if (totals !== null && totals !== undefined) return { amount: Number(totals), full: true };
   const fee = rows.map((r) => r.delivery_fee).find((v) => v !== null && v !== undefined);
   return fee === null || fee === undefined ? null : { amount: Number(fee), full: false };
+}
+
+/** Cash the rider actually handed back — reported by the courier on (partial) delivery. */
+function collectedAmount(order: unknown): number | null {
+  const rows = (
+    order as {
+      order_consignments?: Array<{ collected_amount?: number | string | null }>;
+    }
+  ).order_consignments;
+  const v = rows?.map((r) => r.collected_amount).find((x) => x !== null && x !== undefined);
+  return v === null || v === undefined ? null : Number(v);
 }
 
 
@@ -324,6 +335,33 @@ export function OrdersBoard({
                         </span>
                       );
                     })()}
+                    {(() => {
+                      const collected = collectedAmount(o);
+                      if (collected === null) return null;
+                      const partial =
+                        (o as { courier_status?: string | null }).courier_status ===
+                          "partial_delivered" || o.status === "partial_delivered";
+                      return (
+                        <span
+                          title={
+                            partial
+                              ? "Partial delivery — amount the courier collected"
+                              : "Amount the courier collected"
+                          }
+                          className={cn(
+                            "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-bold tabular-nums ring-1",
+                            partial
+                              ? "bg-orange-50 text-orange-800 ring-orange-200"
+                              : "bg-emerald-50 text-emerald-800 ring-emerald-200",
+                          )}
+                        >
+                          <Banknote className="size-3" />
+                          {partial ? "Partial collected" : "Collected"} {adminPrice(collected)}
+                        </span>
+                      );
+                    })()}
+
+
 
                   </div>
                   <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">

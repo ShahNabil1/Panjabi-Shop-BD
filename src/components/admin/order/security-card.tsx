@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Check, Copy, ExternalLink, Fingerprint, Globe, History, NotebookPen, Phone, Shield, ShieldCheck, ShieldX, Truck, RefreshCw } from "lucide-react";
+import { Banknote, Check, Copy, ExternalLink, Fingerprint, Globe, History, NotebookPen, Phone, Shield, ShieldCheck, ShieldX, Truck, RefreshCw } from "lucide-react";
 
 import type { BlockKind } from "@/lib/admin-schema";
 import { adminAddOrderNote, adminSetBlocked } from "@/lib/order-admin.functions";
@@ -215,6 +215,8 @@ export function FulfillmentCard({
   trackingCode,
   sentAt,
   customerPhone,
+  collectedAmount,
+  orderTotal,
 }: {
   orderId: string;
   status: string;
@@ -226,6 +228,8 @@ export function FulfillmentCard({
   trackingCode: string | null;
   sentAt: string | null;
   customerPhone?: string | null;
+  collectedAmount?: number | null;
+  orderTotal?: number | null;
 }) {
   const qc = useQueryClient();
   const [historyOpen, setHistoryOpen] = useState(false);
@@ -449,7 +453,58 @@ export function FulfillmentCard({
                 ) : null}
               </div>
 
+              {collectedAmount != null ? (
+                (() => {
+                  const isPartial =
+                    normalised === "partial_delivered" || orderStatus === "partial_delivered";
+                  const shortfall =
+                    orderTotal != null ? Math.max(0, orderTotal - collectedAmount) : null;
+                  return (
+                    <div
+                      className={cn(
+                        "rounded-lg border px-3 py-2.5",
+                        isPartial
+                          ? "border-orange-200 bg-orange-50/70"
+                          : "border-emerald-200 bg-emerald-50/70",
+                      )}
+                    >
+                      <div className="flex items-center gap-1.5">
+                        <Banknote
+                          className={cn(
+                            "size-4",
+                            isPartial ? "text-orange-700" : "text-emerald-700",
+                          )}
+                        />
+                        <p
+                          className={cn(
+                            "text-[10px] font-semibold uppercase tracking-[0.12em]",
+                            isPartial ? "text-orange-800" : "text-emerald-800",
+                          )}
+                        >
+                          {isPartial ? "Partial delivery — collected" : "Collected amount"}
+                        </p>
+                      </div>
+                      <p
+                        className={cn(
+                          "mt-1 text-xl font-extrabold tabular-nums",
+                          isPartial ? "text-orange-900" : "text-emerald-900",
+                        )}
+                      >
+                        {bdt(collectedAmount)}
+                      </p>
+                      {isPartial && orderTotal != null ? (
+                        <p className="mt-1 text-xs text-muted-foreground">
+                          Order value {bdt(orderTotal)}
+                          {shortfall ? ` · Not collected ${bdt(shortfall)}` : ""}
+                        </p>
+                      ) : null}
+                    </div>
+                  );
+                })()
+              ) : null}
+
               {isPathao ? <PathaoCostOfDelivery orderId={orderId} /> : null}
+
 
               <dl className="grid gap-1 text-xs text-muted-foreground">
                 {trackingCode ? (
