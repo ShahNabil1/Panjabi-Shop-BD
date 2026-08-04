@@ -306,6 +306,8 @@ export function ItemsCard({
             <Input
               type="number"
               min={1}
+              readOnly={locked}
+              disabled={locked}
               className="h-9 w-20 rounded-lg text-center"
               value={item.quantity}
               onChange={(e) => patch(index, { quantity: Math.max(1, Number(e.target.value)) })}
@@ -313,6 +315,8 @@ export function ItemsCard({
             <Input
               type="number"
               min={0}
+              readOnly={locked}
+              disabled={locked}
               className="h-9 w-28 rounded-lg text-center"
               value={item.unitPrice}
               onChange={(e) => patch(index, { unitPrice: Math.max(0, Number(e.target.value)) })}
@@ -320,14 +324,16 @@ export function ItemsCard({
             <span className="w-24 text-right text-sm font-bold tabular-nums">
               {money(item.unitPrice * item.quantity)}
             </span>
-            <button
-              type="button"
-              aria-label="Remove item"
-              className="text-muted-foreground transition-colors hover:text-destructive"
-              onClick={() => setItems(items.filter((_, i) => i !== index))}
-            >
-              <Trash2 className="size-4" />
-            </button>
+            {locked ? null : (
+              <button
+                type="button"
+                aria-label="Remove item"
+                className="text-muted-foreground transition-colors hover:text-destructive"
+                onClick={() => setItems(items.filter((_, i) => i !== index))}
+              >
+                <Trash2 className="size-4" />
+              </button>
+            )}
           </li>
         ))}
       </ul>
