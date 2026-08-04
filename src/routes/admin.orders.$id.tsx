@@ -224,6 +224,8 @@ function AdminOrderDetail() {
 
   const isWeb = (webOrderStatuses as readonly string[]).includes(order.status);
   const isDanger = pending === "hold" || pending === "cancelled";
+  /** Once dispatched to a courier the shipment data is frozen. */
+  const dispatchLocked = ["rts", "shipped", "delivered", "returned"].includes(order.status);
 
   return (
     <div className="space-y-5">
