@@ -265,6 +265,9 @@ export async function dispatchOrder(
     const partner = await loadPartner(db, provider);
     const items = await loadItems(db, orderId);
     const note = [order.delivery_note, order.note].filter(Boolean).join(" | ").slice(0, 250);
+    // Pathao: only our own delivery note goes out as special instruction —
+    // never the customer's checkout note.
+    const pathaoInstruction = (order.delivery_note ?? "").trim().slice(0, 250);
 
     let consignmentId: string | null = null;
     let trackingCode: string | null = null;
@@ -349,7 +352,7 @@ export async function dispatchOrder(
         item_weight: 0.5,
         amount_to_collect: codAmount(order),
         item_description: itemSummary(items),
-        ...(note ? { special_instruction: note } : {}),
+        ...(pathaoInstruction ? { special_instruction: pathaoInstruction } : {}),
       });
       consignmentId = res.consignmentId;
       rawStatus = res.status;
@@ -361,7 +364,10 @@ export async function dispatchOrder(
 
     const status = normaliseCourierStatus(provider, rawStatus);
 
-    await db.from("order_consignments").upsert(
+    // Partial unique index (provider, consignment_id) cannot back a PostgREST
+    // upsert, so replace the row for this order+provider explicitly.
+    await db.from("order_consignments").delete().eq("order_id", orderId).eq("provider", provider);
+    const { error: consignmentError } = await db.from("order_consignments").insert(
       {
         order_id: orderId,
         provider,
@@ -374,8 +380,8 @@ export async function dispatchOrder(
         cod_amount: codAmount(order),
         raw: JSON.parse(JSON.stringify(raw)) as never,
       },
-      { onConflict: "provider,consignment_id" },
     );
+    if (consignmentError) throw new Error(consignmentError.message);
 
     await db
       .from("orders")

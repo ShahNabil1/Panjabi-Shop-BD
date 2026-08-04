@@ -107,9 +107,13 @@ export function normaliseCourierStatus(provider: DeliveryProvider, raw: string):
       "order.paid-return": "returned",
       "order.exchange": "in_transit",
     };
-    return map[s] ?? map[`order.${s}`] ?? "unknown";
+    return map[s] ?? map[`order.${s}`] ?? genericStatus(s.replace(/^order\./, ""));
   }
 
+  return genericStatus(s);
+}
+
+function genericStatus(s: string): CourierStatus {
   const map: Record<string, CourierStatus> = {
     pending: "pending",
     in_review: "in_review",
