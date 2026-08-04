@@ -608,8 +608,11 @@ export const adminCreateOrder = createServerFn({ method: "POST" })
       .insert({
         customer_name: data.customerName,
         customer_phone: data.customerPhone,
-        address_line: `${data.addressLine}, ${data.upazila}, ${data.district}, ${data.division}`,
+        address_line: data.addressLine,
         city: data.district,
+        division: data.division,
+        district: data.district,
+        upazila: data.upazila,
         delivery_area: data.district === "ঢাকা" ? "inside_dhaka" : "outside_dhaka",
         note: data.note || null,
         subtotal,
