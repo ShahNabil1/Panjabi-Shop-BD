@@ -28,10 +28,17 @@ async function call(creds: SteadfastCreds, path: string, init?: RequestInit) {
     body = { raw: text };
   }
   if (!res.ok) {
-    const msg =
-      (body as { message?: string } | null)?.message ?? `Steadfast request failed (${res.status})`;
+    const detail =
+      (body as { message?: string } | null)?.message ??
+      (body as { raw?: string } | null)?.raw ??
+      "";
+    const clean = String(detail).replace(/<[^>]*>/g, "").trim().slice(0, 200);
+    const msg = clean
+      ? `Steadfast (${res.status}): ${clean}`
+      : `Steadfast request failed (${res.status})`;
     throw new Error(msg);
   }
+
   return (body ?? {}) as Record<string, unknown>;
 }
 
