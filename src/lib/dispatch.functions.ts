@@ -209,9 +209,14 @@ export const adminRefreshCourierStatus = createServerFn({ method: "POST" })
         .eq("id", data.orderId);
       await db
         .from("order_consignments")
-        .update({ status, status_message: raw })
+        .update({
+          status,
+          status_message: raw,
+          ...(liveFee !== null ? { total_cost: liveFee } : {}),
+        })
         .eq("order_id", data.orderId)
         .eq("provider", provider);
+
 
       const who = await actorName(db, context.userId);
       await logActivity(
