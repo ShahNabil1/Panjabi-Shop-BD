@@ -59,11 +59,11 @@ const updatableStatuses = [
 ] as const;
 type PendingStatus = (typeof updatableStatuses)[number];
 
-/** `datetime-local` value for "one hour from now", used as the schedule default. */
+/** `date` input value for tomorrow, used as the schedule default. */
 function defaultScheduleValue(): string {
-  const d = new Date(Date.now() + 60 * 60 * 1000);
+  const d = new Date(Date.now() + 24 * 60 * 60 * 1000);
   const pad = (n: number) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 }
 
 export const Route = createFileRoute("/admin/orders/$id")({
