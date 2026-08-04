@@ -422,28 +422,65 @@ function PartnerCard({
         <Button
           type="button"
           onClick={save}
-          disabled={saving || !result?.ok}
-          className="bg-emerald-600 text-white hover:bg-emerald-700 active:scale-95"
+          disabled={saving || !result?.ok || !isDirty}
+          className="bg-emerald-600 text-white hover:bg-emerald-700 active:scale-95 disabled:opacity-60"
         >
-          {saving ? <Loader2 className="size-4 animate-spin" /> : <Save className="size-4" />}
-          Save partner
+          {saving ? (
+            <Loader2 className="size-4 animate-spin" />
+          ) : !isDirty ? (
+            <CheckCircle2 className="size-4" />
+          ) : (
+            <Save className="size-4" />
+          )}
+          {!isDirty && !saving ? "Saved" : "Save partner"}
         </Button>
         {!result?.ok ? (
           <span className="text-xs text-muted-foreground">
             Run a successful connection test before saving.
           </span>
+        ) : !isDirty ? (
+          <span className="text-xs text-muted-foreground">No unsaved changes.</span>
         ) : null}
         {row ? (
-          <Button
-            type="button"
-            variant="ghost"
-            onClick={remove}
-            disabled={removing}
-            className="ml-auto text-rose-600 hover:bg-rose-50 hover:text-rose-700 active:scale-95"
-          >
-            {removing ? <Loader2 className="size-4 animate-spin" /> : <Trash2 className="size-4" />}
-            Remove
-          </Button>
+          <AlertDialog open={removeOpen} onOpenChange={setRemoveOpen}>
+            <AlertDialogTrigger asChild>
+              <Button
+                type="button"
+                variant="ghost"
+                disabled={removing}
+                className="ml-auto text-rose-600 hover:bg-rose-50 hover:text-rose-700 active:scale-95"
+              >
+                {removing ? <Loader2 className="size-4 animate-spin" /> : <Trash2 className="size-4" />}
+                Remove
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent className="rounded-2xl">
+              <AlertDialogHeader>
+                <AlertDialogTitle className="flex items-center gap-2 text-rose-600">
+                  <TriangleAlert className="size-5" />
+                  Remove {providerLabels[provider]}?
+                </AlertDialogTitle>
+                <AlertDialogDescription>
+                  This deletes the saved credentials and webhook secret for {providerLabels[provider]}.
+                  Existing consignments stay intact, but new orders can no longer be dispatched to this
+                  courier until you reconnect it.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel className="rounded-xl">Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  className="rounded-xl bg-rose-600 text-white hover:bg-rose-700 active:scale-95"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setRemoveOpen(false);
+                    void remove();
+                  }}
+                >
+                  Yes, remove partner
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         ) : null}
       </div>
     </Panel>
