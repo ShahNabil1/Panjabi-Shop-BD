@@ -73,6 +73,9 @@ function CreateOrderPage() {
   const [deliveryPartner, setDeliveryPartner] = useState<string>("");
   const [deliveryNoteOn, setDeliveryNoteOn] = useState(true);
   const [deliveryNote, setDeliveryNote] = useState("");
+  const [preOrder, setPreOrder] = useState(false);
+  const [scheduleOn, setScheduleOn] = useState(false);
+  const [scheduledFor, setScheduledFor] = useState("");
 
   const activePartners = useQuery({
     queryKey: ["admin", "active-delivery-partners"],
