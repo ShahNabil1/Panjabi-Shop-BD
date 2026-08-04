@@ -212,6 +212,7 @@ export function FulfillmentCard({
   partner,
   courierStatus,
   consignmentId,
+  returnConsignmentId,
   trackingCode,
   sentAt,
   customerPhone,
@@ -225,6 +226,7 @@ export function FulfillmentCard({
   partner: string | null;
   courierStatus: string | null;
   consignmentId: string | null;
+  returnConsignmentId?: string | null;
   trackingCode: string | null;
   sentAt: string | null;
   customerPhone?: string | null;
