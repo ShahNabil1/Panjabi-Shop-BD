@@ -72,6 +72,20 @@ function collectedAmount(order: unknown): number | null {
   return v === null || v === undefined ? null : Number(v);
 }
 
+/** Courier payout (an `order.paid` invoice webhook) for this order, if received. */
+function courierPayout(order: unknown): { invoice: string | null } | null {
+  const rows = (
+    order as {
+      order_consignments?: Array<{
+        paid_at?: string | null;
+        payment_invoice_id?: string | null;
+      }>;
+    }
+  ).order_consignments;
+  const row = rows?.find((r) => Boolean(r.paid_at));
+  return row ? { invoice: row.payment_invoice_id ?? null } : null;
+}
+
 
 function formatBdDateTime(value: string) {
   return new Date(value).toLocaleString("en-US", {
