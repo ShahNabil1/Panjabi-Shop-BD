@@ -160,7 +160,9 @@ function PathaoCostOfDelivery({ orderId }: { orderId: string }) {
   return (
     <div className="rounded-lg border border-[#E32227]/25 bg-white px-3 py-3">
       <div className="flex items-center gap-2">
+        <CourierMark partner="pathao" className="size-6" />
         <p className="text-sm font-bold text-foreground">Cost of Delivery</p>
+
         <span
           className={cn(
             "rounded-full px-2 py-0.5 text-[10px] font-semibold ring-1",
