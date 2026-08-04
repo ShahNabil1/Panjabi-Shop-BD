@@ -41,6 +41,7 @@ import { Route as AdminProductsIndexRouteImport } from './routes/admin.products.
 import { Route as AdminProductsIdRouteImport } from './routes/admin.products.$id'
 import { Route as AdminSettingsIndexRouteImport } from './routes/admin.settings.index'
 import { Route as AdminSettingsDeliveryRouteImport } from './routes/admin.settings.delivery'
+import { Route as AdminSettingsRetentionRouteImport } from './routes/admin.settings.retention'
 import { Route as AdminSettingsSmsTemplatesRouteImport } from './routes/admin.settings.sms-templates'
 import { Route as CCategoryIndexRouteImport } from './routes/c.$category.index'
 import { Route as CCategorySubcategoryRouteImport } from './routes/c.$category.$subcategory'
@@ -207,6 +208,11 @@ const AdminSettingsDeliveryRoute = AdminSettingsDeliveryRouteImport.update({
   path: '/settings/delivery',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminSettingsRetentionRoute = AdminSettingsRetentionRouteImport.update({
+  id: '/settings/retention',
+  path: '/settings/retention',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminSettingsSmsTemplatesRoute =
   AdminSettingsSmsTemplatesRouteImport.update({
     id: '/settings/sms-templates',
@@ -266,6 +272,7 @@ export interface FileRoutesByFullPath {
   '/admin/orders/list': typeof AdminOrdersListRoute
   '/admin/products/$id': typeof AdminProductsIdRoute
   '/admin/settings/delivery': typeof AdminSettingsDeliveryRoute
+  '/admin/settings/retention': typeof AdminSettingsRetentionRoute
   '/admin/settings/sms-templates': typeof AdminSettingsSmsTemplatesRoute
   '/c/$category/$subcategory': typeof CCategorySubcategoryRoute
   '/admin/orders/': typeof AdminOrdersIndexRoute
@@ -304,6 +311,7 @@ export interface FileRoutesByTo {
   '/admin/orders/list': typeof AdminOrdersListRoute
   '/admin/products/$id': typeof AdminProductsIdRoute
   '/admin/settings/delivery': typeof AdminSettingsDeliveryRoute
+  '/admin/settings/retention': typeof AdminSettingsRetentionRoute
   '/admin/settings/sms-templates': typeof AdminSettingsSmsTemplatesRoute
   '/c/$category/$subcategory': typeof CCategorySubcategoryRoute
   '/admin/orders': typeof AdminOrdersIndexRoute
@@ -344,6 +352,7 @@ export interface FileRoutesById {
   '/admin/orders/list': typeof AdminOrdersListRoute
   '/admin/products/$id': typeof AdminProductsIdRoute
   '/admin/settings/delivery': typeof AdminSettingsDeliveryRoute
+  '/admin/settings/retention': typeof AdminSettingsRetentionRoute
   '/admin/settings/sms-templates': typeof AdminSettingsSmsTemplatesRoute
   '/c/$category/$subcategory': typeof CCategorySubcategoryRoute
   '/admin/orders/': typeof AdminOrdersIndexRoute
@@ -385,6 +394,7 @@ export interface FileRouteTypes {
     | '/admin/orders/list'
     | '/admin/products/$id'
     | '/admin/settings/delivery'
+    | '/admin/settings/retention'
     | '/admin/settings/sms-templates'
     | '/c/$category/$subcategory'
     | '/admin/orders/'
@@ -423,6 +433,7 @@ export interface FileRouteTypes {
     | '/admin/orders/list'
     | '/admin/products/$id'
     | '/admin/settings/delivery'
+    | '/admin/settings/retention'
     | '/admin/settings/sms-templates'
     | '/c/$category/$subcategory'
     | '/admin/orders'
@@ -462,6 +473,7 @@ export interface FileRouteTypes {
     | '/admin/orders/list'
     | '/admin/products/$id'
     | '/admin/settings/delivery'
+    | '/admin/settings/retention'
     | '/admin/settings/sms-templates'
     | '/c/$category/$subcategory'
     | '/admin/orders/'
@@ -723,6 +735,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminSettingsDeliveryRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/settings/retention': {
+      id: '/admin/settings/retention'
+      path: '/settings/retention'
+      fullPath: '/admin/settings/retention'
+      preLoaderRoute: typeof AdminSettingsRetentionRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/settings/sms-templates': {
       id: '/admin/settings/sms-templates'
       path: '/settings/sms-templates'
@@ -773,6 +792,7 @@ interface AdminRouteChildren {
   AdminOrdersListRoute: typeof AdminOrdersListRoute
   AdminProductsIdRoute: typeof AdminProductsIdRoute
   AdminSettingsDeliveryRoute: typeof AdminSettingsDeliveryRoute
+  AdminSettingsRetentionRoute: typeof AdminSettingsRetentionRoute
   AdminSettingsSmsTemplatesRoute: typeof AdminSettingsSmsTemplatesRoute
   AdminOrdersIndexRoute: typeof AdminOrdersIndexRoute
   AdminProductsIndexRoute: typeof AdminProductsIndexRoute
@@ -791,6 +811,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminOrdersListRoute: AdminOrdersListRoute,
   AdminProductsIdRoute: AdminProductsIdRoute,
   AdminSettingsDeliveryRoute: AdminSettingsDeliveryRoute,
+  AdminSettingsRetentionRoute: AdminSettingsRetentionRoute,
   AdminSettingsSmsTemplatesRoute: AdminSettingsSmsTemplatesRoute,
   AdminOrdersIndexRoute: AdminOrdersIndexRoute,
   AdminProductsIndexRoute: AdminProductsIndexRoute,
