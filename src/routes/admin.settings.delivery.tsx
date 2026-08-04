@@ -349,6 +349,10 @@ function PartnerCard({
             Test webhook
           </Button>
         </div>
+        <p className="text-[11px] text-muted-foreground">
+          "Test webhook" only checks that our public endpoint answers correctly. It does not verify
+          that {providerLabels[provider]} has accepted the integration on their panel.
+        </p>
         {ping ? (
           <div
             className={cn(
@@ -359,7 +363,10 @@ function PartnerCard({
             )}
           >
             <p className="font-semibold">
-              Receiver responded {ping.status || "—"} {ping.ok ? "· signature accepted" : "· failed"}
+              Endpoint responded {ping.status || "no response"}{" "}
+              {ping.ok
+                ? "· receiver reachable & response format valid"
+                : "· receiver check failed"}
             </p>
             <pre className="whitespace-pre-wrap break-all font-mono text-[11px] opacity-90">
               {ping.body}
