@@ -104,6 +104,9 @@ export function normaliseCourierStatus(provider: DeliveryProvider, raw: string):
       "order.pickup_failed": "hold",
       "order.pickup_cancelled": "cancelled",
       "order.picked": "picked",
+      // Pathao's human label for a picked parcel is literally "Pickup".
+      "order.pickup": "picked",
+
       "order.at_the_sorting_hub": "in_transit",
       "order.in_transit": "in_transit",
       "order.received_at_last_mile_hub": "in_transit",
