@@ -11,9 +11,10 @@ import {
 } from "@/lib/admin.functions";
 import {
   advanceMethods,
-  deliveryPartners,
   orderSources,
 } from "@/lib/admin-schema";
+import { adminActiveDeliveryPartners } from "@/lib/delivery.functions";
+import { providerLabels } from "@/lib/delivery-shared";
 import { BD_DIVISIONS } from "@/lib/bd-geo";
 import { AdminHeading, Panel } from "@/components/admin/kit";
 import { BrandLoader } from "@/components/admin/brand-loader";
