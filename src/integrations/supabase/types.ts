@@ -585,6 +585,8 @@ export type Database = {
           id: string
           merchant_order_id: string | null
           order_id: string
+          paid_at: string | null
+          payment_invoice_id: string | null
           provider: string
           raw: Json
           return_consignment_id: string | null
@@ -603,6 +605,8 @@ export type Database = {
           id?: string
           merchant_order_id?: string | null
           order_id: string
+          paid_at?: string | null
+          payment_invoice_id?: string | null
           provider: string
           raw?: Json
           return_consignment_id?: string | null
@@ -621,6 +625,8 @@ export type Database = {
           id?: string
           merchant_order_id?: string | null
           order_id?: string
+          paid_at?: string | null
+          payment_invoice_id?: string | null
           provider?: string
           raw?: Json
           return_consignment_id?: string | null
