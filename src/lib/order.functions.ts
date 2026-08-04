@@ -145,7 +145,7 @@ export const placeOrder = createServerFn({ method: "POST" })
         subtotal,
         productIds: [...new Set(lines.map((l) => l.product.id))],
         phone: data.customerPhone,
-        db: supabaseAdmin,
+        db,
       });
       if (!result.ok) throw new Error(`COUPON_${(result.reason ?? "error").toUpperCase()}`);
       discount = Math.min(Math.max(0, Math.round(result.discount)), subtotal);
@@ -154,9 +154,10 @@ export const placeOrder = createServerFn({ method: "POST" })
 
     const total = Math.max(0, subtotal + deliveryCharge - discount);
 
-    const { data: order, error: orderError } = await supabaseAdmin
-      .from("orders")
-      .insert({
+    // Guest checkout writes go through a security-definer routine so the
+    // anonymous key never needs table-level write access.
+    const { data: placed, error: orderError } = await db.rpc("checkout_place_order", {
+      _order: {
         customer_name: data.customerName,
         customer_phone: data.customerPhone,
         customer_email: null,
@@ -166,26 +167,15 @@ export const placeOrder = createServerFn({ method: "POST" })
         district: data.district,
         upazila: data.upazila,
         delivery_area: deliveryArea,
-
         note: data.note || null,
         subtotal,
         delivery_charge: deliveryCharge,
         discount,
         total,
-        payment_method: "cod",
-        status: "processing",
         source: data.source,
         customer_ip: clientIp,
-      })
-      .select("id, order_number")
-      .single();
-
-    if (orderError || !order) throw new Error("ORDER_FAILED");
-
-
-    const { error: itemsError } = await supabaseAdmin.from("order_items").insert(
-      lines.map((l) => ({
-        order_id: order.id,
+      },
+      _items: lines.map((l) => ({
         product_id: l.product.id,
         product_name: l.product.name_bn,
         product_slug: l.product.slug,
@@ -195,27 +185,12 @@ export const placeOrder = createServerFn({ method: "POST" })
         quantity: l.quantity,
         line_total: l.lineTotal,
       })),
-    );
+      _coupon_id: couponId,
+      _discount: discount,
+    });
 
-    if (itemsError) throw new Error("ORDER_ITEMS_FAILED");
-
-    if (couponId) {
-      const { recordCouponRedemption } = await import("./coupons.server");
-      await recordCouponRedemption({
-        db: supabaseAdmin,
-        couponId,
-        orderId: order.id,
-        phone: data.customerPhone,
-        amount: discount,
-      });
-    }
-
-    // A completed order clears any abandoned checkout captured for this phone.
-    await supabaseAdmin
-      .from("orders")
-      .delete()
-      .eq("customer_phone", data.customerPhone)
-      .eq("status", "incomplete");
+    const order = placed as { id?: string; order_number?: string } | null;
+    if (orderError || !order?.order_number) throw new Error("ORDER_FAILED");
 
     return { orderNumber: order.order_number, subtotal, deliveryCharge, discount, total };
   });
