@@ -236,6 +236,7 @@ function AdminOrderDetail() {
     "shipped",
     "courier_hold",
     "partial_delivered",
+    "exchange",
     "delivered",
     "awaiting_return",
     "returned",

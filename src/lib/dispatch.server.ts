@@ -441,6 +441,7 @@ const ORDER_RANK: Record<string, number> = {
   partial_delivered: 5,
   delivered: 5,
   awaiting_return: 5,
+  exchange: 5,
   returned: 6,
   cancelled: 6,
   lost_damaged: 6,
