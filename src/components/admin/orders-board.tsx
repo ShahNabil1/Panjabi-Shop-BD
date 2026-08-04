@@ -5,7 +5,7 @@ import { Search, Clock, Globe, Eye, ShieldAlert, UserRound, Truck, Loader2, Bank
 import { toast } from "sonner";
 
 import { adminListOrders } from "@/lib/admin.functions";
-import type { OrderBucket, OrderStatus } from "@/lib/admin-schema";
+import { paymentFilters, type OrderBucket, type OrderStatus, type PaymentFilter } from "@/lib/admin-schema";
 import { EmptyState, Panel, StatusPill, statusLabels } from "@/components/admin/kit";
 import { BrandLoader } from "@/components/admin/brand-loader";
 import { Input } from "@/components/ui/input";
