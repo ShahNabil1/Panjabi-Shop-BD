@@ -414,6 +414,26 @@ function CouponDialog({
   const [d, setD] = useState<Draft>(draft);
   const [error, setError] = useState<string | null>(null);
 
+  useEffect(() => {
+    const body = document.body;
+    const prevOverflow = body.style.overflow;
+    const prevPad = body.style.paddingRight;
+    const gap = window.innerWidth - document.documentElement.clientWidth;
+    body.style.overflow = "hidden";
+    if (gap > 0) body.style.paddingRight = `${gap}px`;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => {
+      body.style.overflow = prevOverflow;
+      body.style.paddingRight = prevPad;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [onClose]);
+
+
+
   const products = useQuery({
     queryKey: ["admin", "products"],
     queryFn: () => adminListProducts(),
