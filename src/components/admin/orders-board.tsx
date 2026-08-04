@@ -190,9 +190,14 @@ export function OrdersBoard({
 
   return (
     <div className="space-y-5">
-      <div className="flex justify-end">
-        <CourierStatusBar />
-      </div>
+      {bucket === "list" ? (
+        <CourierApiStatusBar />
+      ) : (
+        <div className="flex justify-end">
+          <CourierStatusBar />
+        </div>
+      )}
+
 
       <div className="admin-rise flex flex-wrap items-center gap-3 rounded-2xl border border-border/70 bg-card p-3">
         <div className="relative max-w-xs flex-1 min-w-[200px]">
