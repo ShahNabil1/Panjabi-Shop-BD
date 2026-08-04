@@ -37,17 +37,29 @@ import {
 
 function adminPrice(value: number | string | null | undefined) {
   const n = Number(value ?? 0);
-  return `৳ ${n.toLocaleString("en-US")}`;
+  return `৳ ${n.toLocaleString("en-US", { maximumFractionDigits: 2 })}`;
 }
 
-/** Latest delivery fee returned by the courier for this order, if any. */
-function courierFee(order: unknown): number | null {
-  const rows = (order as { order_consignments?: Array<{ delivery_fee: number | string | null }> })
-    .order_consignments;
+/**
+ * Courier cost for this order: the full billed total (delivery + COD fee etc.)
+ * when the courier has reported it, otherwise the base delivery fee.
+ */
+function courierFee(order: unknown): { amount: number; full: boolean } | null {
+  const rows = (
+    order as {
+      order_consignments?: Array<{
+        delivery_fee: number | string | null;
+        total_cost?: number | string | null;
+      }>;
+    }
+  ).order_consignments;
   if (!rows?.length) return null;
+  const totals = rows.map((r) => r.total_cost).find((v) => v !== null && v !== undefined);
+  if (totals !== null && totals !== undefined) return { amount: Number(totals), full: true };
   const fee = rows.map((r) => r.delivery_fee).find((v) => v !== null && v !== undefined);
-  return fee === null || fee === undefined ? null : Number(fee);
+  return fee === null || fee === undefined ? null : { amount: Number(fee), full: false };
 }
+
 
 function formatBdDateTime(value: string) {
   return new Date(value).toLocaleString("en-US", {
