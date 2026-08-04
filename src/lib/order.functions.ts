@@ -287,23 +287,22 @@ function captureSignature(input: {
 export const captureIncompleteOrder = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => incompleteOrderSchema.parse(input))
   .handler(async ({ data }) => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { createPublicServerClient } = await import("./supabase-public");
+    const db = createPublicServerClient();
 
     const productIds = [...new Set(data.items.map((i) => i.productId))];
     const variantIds = [...new Set(data.items.map((i) => i.variantId).filter(Boolean))] as string[];
 
-    const [productsRes, variantsRes] = await Promise.all([
-      supabaseAdmin
-        .from("products")
-        .select("id, slug, name_bn, price, sku")
-        .in("id", productIds),
-      variantIds.length
-        ? supabaseAdmin
-            .from("product_variants")
-            .select("id, product_id, value_bn, group_name_bn, price_delta, sku")
-            .in("id", variantIds)
-        : Promise.resolve({ data: [], error: null }),
-    ]);
+    const productsRes = await db
+      .from("products")
+      .select("id, slug, name_bn, price, sku")
+      .in("id", productIds);
+    const variantsRes = variantIds.length
+      ? await db
+          .from("product_variants")
+          .select("id, product_id, value_bn, group_name_bn, price_delta, sku")
+          .in("id", variantIds)
+      : { data: [], error: null };
 
     const products = productsRes.data ?? [];
     const variants = variantsRes.data ?? [];
@@ -335,107 +334,70 @@ export const captureIncompleteOrder = createServerFn({ method: "POST" })
       .join(", ");
     const name = data.customerName || "Unknown";
 
+    const { data: stateRaw } = await db.rpc("checkout_incomplete_state", {
+      _phone: data.customerPhone,
+    });
+    const state = stateRaw as {
+      has_recent_order: boolean;
+      existing: {
+        id: string;
+        customer_name: string | null;
+        address_line: string | null;
+        items: Array<{ product_name: string; variant_label: string | null; quantity: number }>;
+      } | null;
+    } | null;
+
     // Never capture when the same number already placed a real order in the last day.
-    const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-    const { data: recent } = await supabaseAdmin
-      .from("orders")
-      .select("id")
-      .eq("customer_phone", data.customerPhone)
-      .neq("status", "incomplete")
-      .gte("created_at", since)
-      .limit(1);
-    if (recent && recent.length) return { ok: false as const };
+    if (state?.has_recent_order) return { ok: false as const };
 
-    const { data: existing } = await supabaseAdmin
-      .from("orders")
-      .select("id, customer_name, address_line, order_items(product_name, variant_label, quantity)")
-      .eq("customer_phone", data.customerPhone)
-      .eq("status", "incomplete")
-      .order("created_at", { ascending: false })
-      .limit(1)
-      .maybeSingle();
-
+    const existing = state?.existing ?? null;
     const nextSignature = captureSignature({ name, address: addressLine, items: lines });
+
+    const orderPayload = {
+      customer_name: name,
+      customer_phone: data.customerPhone,
+      address_line: data.addressLine || addressLine || "—",
+      city: data.district || "—",
+      division: data.division || null,
+      district: data.district || null,
+      upazila: data.upazila || null,
+      note: data.note || null,
+      subtotal,
+      source: data.source,
+    };
 
     if (existing) {
       const prevSignature = captureSignature({
         name: existing.customer_name ?? "",
         address: existing.address_line ?? "",
-        items: (existing.order_items ?? []) as Array<{
-          product_name: string;
-          variant_label: string | null;
-          quantity: number;
-        }>,
+        items: existing.items ?? [],
       });
+      const changed = prevSignature !== nextSignature;
 
-      if (prevSignature !== nextSignature) {
-        await supabaseAdmin
-          .from("orders")
-          .update({
-            customer_name: name,
-            address_line: data.addressLine || addressLine,
-            city: data.district || "—",
-            division: data.division || null,
-            district: data.district || null,
-            upazila: data.upazila || null,
-            note: data.note || null,
-            subtotal,
-            total: subtotal,
-            source: data.source,
-          })
-          .eq("id", existing.id);
-        await supabaseAdmin.from("order_items").delete().eq("order_id", existing.id);
-        await supabaseAdmin
-          .from("order_items")
-          .insert(lines.map((l) => ({ ...l, order_id: existing.id })));
-      }
-
-      await supabaseAdmin.from("order_activity").insert({
-        order_id: existing.id,
-        kind: prevSignature === nextSignature ? "revisit" : "update",
-        message:
-          prevSignature === nextSignature
-            ? "Customer returned and left checkout again with the same details"
-            : "Customer returned with updated checkout details",
-        meta: { source: data.source, subtotal },
+      await db.rpc("checkout_save_incomplete", {
+        _existing_id: existing.id,
+        _order: orderPayload,
+        _items: lines,
+        _replace_items: changed,
+        _activity_kind: changed ? "update" : "revisit",
+        _activity_message: changed
+          ? "Customer returned with updated checkout details"
+          : "Customer returned and left checkout again with the same details",
+        _activity_meta: { source: data.source, subtotal },
       });
 
       return { ok: true as const, deduplicated: true };
     }
 
-    const { data: order } = await supabaseAdmin
-      .from("orders")
-      .insert({
-        customer_name: name,
-        customer_phone: data.customerPhone,
-        address_line: data.addressLine || addressLine || "—",
-        city: data.district || "—",
-        division: data.division || null,
-        district: data.district || null,
-        upazila: data.upazila || null,
-        note: data.note || null,
-        subtotal,
-        delivery_charge: 0,
-        discount: 0,
-        total: subtotal,
-        payment_method: "cod",
-        status: "incomplete",
-        source: data.source,
-      })
-      .select("id")
-      .single();
-
-    if (!order) return { ok: false as const };
-
-    await supabaseAdmin
-      .from("order_items")
-      .insert(lines.map((l) => ({ ...l, order_id: order.id })));
-    await supabaseAdmin.from("order_activity").insert({
-      order_id: order.id,
-      kind: "capture",
-      message: "Abandoned checkout captured from the website",
-      meta: { source: data.source, subtotal },
+    const { error } = await db.rpc("checkout_save_incomplete", {
+      _order: orderPayload,
+      _items: lines,
+      _replace_items: true,
+      _activity_kind: "capture",
+      _activity_message: "Abandoned checkout captured from the website",
+      _activity_meta: { source: data.source, subtotal },
     });
+    if (error) return { ok: false as const };
 
     return { ok: true as const, deduplicated: false };
   });
