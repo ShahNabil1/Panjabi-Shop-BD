@@ -174,6 +174,8 @@ function AdminOrderDetail() {
 
   const [pending, setPending] = useState<PendingStatus | "">("");
   const [reason, setReason] = useState("");
+  /** `datetime-local` value used when moving the order to Scheduled Order. */
+  const [scheduleAt, setScheduleAt] = useState(defaultScheduleValue);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [silent, setSilent] = useState(false);
 
