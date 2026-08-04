@@ -349,7 +349,7 @@ function CreateOrderPage() {
             </label>
           </Panel>
 
-          {phoneValid ? <CourierReport phone={phone.trim()} /> : null}
+
 
           <Panel>
             <h2 className="text-sm font-bold">Items</h2>
