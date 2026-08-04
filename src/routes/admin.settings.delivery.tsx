@@ -11,6 +11,7 @@ import {
   Plus,
   Radio,
   Save,
+  Star,
   Trash2,
   TriangleAlert,
   Truck,
@@ -20,6 +21,7 @@ import {
   adminListDeliveryPartners,
   adminRemoveDeliveryPartner,
   adminSaveDeliveryPartner,
+  adminSetDefaultDeliveryPartner,
   adminSetDeliveryPartnerEnabled,
   adminTestCourierWebhook,
   adminTestDeliveryPartner,
@@ -39,6 +41,7 @@ import { BrandLoader } from "@/components/admin/brand-loader";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -165,8 +168,14 @@ function PartnerCard({
   const [savedSnapshot, setSavedSnapshot] = useState<string | null>(() =>
     row ? JSON.stringify(Object.fromEntries(fields.map((f) => [f.key, row.credentials?.[f.key] ?? ""]))) : null,
   );
-  const isDirty = savedSnapshot === null || JSON.stringify(values) !== savedSnapshot;
+  const isDirty =
+    savedSnapshot === null ||
+    JSON.stringify(values) !== savedSnapshot ||
+    noteTemplate !== savedTemplate;
   const [enabled, setEnabled] = useState(row?.enabled ?? true);
+  const [noteTemplate, setNoteTemplate] = useState(row?.note_template ?? "");
+  const [savedTemplate, setSavedTemplate] = useState(row?.note_template ?? "");
+  const [makingDefault, setMakingDefault] = useState(false);
   const [removeOpen, setRemoveOpen] = useState(false);
   const [testing, setTesting] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -218,10 +227,11 @@ function PartnerCard({
     setSaving(true);
     try {
       const res = await adminSaveDeliveryPartner({
-        data: { provider, enabled, credentials: values, config: {} },
+        data: { provider, enabled, credentials: values, noteTemplate, config: {} },
       });
       setResult({ ok: true, message: res.message });
       setSavedSnapshot(JSON.stringify(values));
+      setSavedTemplate(noteTemplate);
       toast.success(`${providerLabels[provider]} saved`);
       onDone();
     } catch (error) {
@@ -279,6 +289,37 @@ function PartnerCard({
               {result.ok ? "Connected" : "Not connected"}
             </span>
           ) : null}
+          {row ? (
+            row.is_default ? (
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-2.5 py-1 text-xs font-bold text-amber-700 ring-1 ring-amber-200">
+                <Star className="size-3.5 fill-amber-500 text-amber-500" />
+                Default
+              </span>
+            ) : (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                disabled={makingDefault}
+                className="active:scale-95"
+                onClick={async () => {
+                  setMakingDefault(true);
+                  try {
+                    await adminSetDefaultDeliveryPartner({ data: { provider } });
+                    toast.success(`${providerLabels[provider]} is now the default courier`);
+                    onDone();
+                  } catch (error) {
+                    toast.error((error as Error).message);
+                  } finally {
+                    setMakingDefault(false);
+                  }
+                }}
+              >
+                {makingDefault ? <Loader2 className="size-4 animate-spin" /> : <Star className="size-4" />}
+                Make default
+              </Button>
+            )
+          ) : null}
           <label className="flex items-center gap-2 text-xs font-semibold text-muted-foreground">
             Active
             <Switch
@@ -320,6 +361,25 @@ function PartnerCard({
             {f.hint ? <p className="text-[11px] text-muted-foreground">{f.hint}</p> : null}
           </div>
         ))}
+      </div>
+
+      <div className="space-y-1.5">
+        <label className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground">
+          <Truck className="size-3.5" />
+          Delivery note template — auto-filled when {providerLabels[provider]} is selected
+        </label>
+        <Textarea
+          rows={3}
+          maxLength={500}
+          className="rounded-xl"
+          placeholder="e.g. Please call before delivery. Fragile item — handle with care."
+          value={noteTemplate}
+          onChange={(e) => setNoteTemplate(e.target.value)}
+        />
+        <p className="text-[11px] text-muted-foreground">
+          {noteTemplate.length}/500 · Applied automatically to the order's delivery note when this
+          courier is chosen. Turning the delivery-note checkbox off clears it again.
+        </p>
       </div>
 
       <div className="space-y-1.5">
