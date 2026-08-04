@@ -61,6 +61,17 @@ function courierFee(order: unknown): { amount: number; full: boolean } | null {
   return fee === null || fee === undefined ? null : { amount: Number(fee), full: false };
 }
 
+/** Cash the rider actually handed back — reported by the courier on (partial) delivery. */
+function collectedAmount(order: unknown): number | null {
+  const rows = (
+    order as {
+      order_consignments?: Array<{ collected_amount?: number | string | null }>;
+    }
+  ).order_consignments;
+  const v = rows?.map((r) => r.collected_amount).find((x) => x !== null && x !== undefined);
+  return v === null || v === undefined ? null : Number(v);
+}
+
 
 function formatBdDateTime(value: string) {
   return new Date(value).toLocaleString("en-US", {
