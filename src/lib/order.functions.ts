@@ -158,8 +158,11 @@ export const placeOrder = createServerFn({ method: "POST" })
         customer_name: data.customerName,
         customer_phone: data.customerPhone,
         customer_email: null,
-        address_line: `${data.addressLine}, ${data.upazila}, ${data.district}, ${data.division}`,
+        address_line: data.addressLine,
         city: data.district,
+        division: data.division,
+        district: data.district,
+        upazila: data.upazila,
         delivery_area: deliveryArea,
 
         note: data.note || null,
@@ -378,8 +381,11 @@ export const captureIncompleteOrder = createServerFn({ method: "POST" })
           .from("orders")
           .update({
             customer_name: name,
-            address_line: addressLine,
+            address_line: data.addressLine || addressLine,
             city: data.district || "—",
+            division: data.division || null,
+            district: data.district || null,
+            upazila: data.upazila || null,
             note: data.note || null,
             subtotal,
             total: subtotal,
@@ -410,8 +416,11 @@ export const captureIncompleteOrder = createServerFn({ method: "POST" })
       .insert({
         customer_name: name,
         customer_phone: data.customerPhone,
-        address_line: addressLine || "—",
+        address_line: data.addressLine || addressLine || "—",
         city: data.district || "—",
+        division: data.division || null,
+        district: data.district || null,
+        upazila: data.upazila || null,
         note: data.note || null,
         subtotal,
         delivery_charge: 0,
