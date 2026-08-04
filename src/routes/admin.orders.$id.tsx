@@ -73,7 +73,7 @@ type OrderItemRow = {
 };
 
 function AdminOrderDetail() {
-  const { id } = useParams({ from: "/admin/orders/$id" });
+  const { id: slug } = useParams({ from: "/admin/orders/$id" });
   const { takeover, from } = useSearch({ from: "/admin/orders/$id" });
   /** Return to whichever board the user came from. */
   const backTo = from === "list" ? "/admin/orders/list" : "/admin/orders";
@@ -82,14 +82,23 @@ function AdminOrderDetail() {
   const qc = useQueryClient();
   const { user } = useAuth();
 
+  const { data, isLoading } = useQuery({
+    queryKey: ["admin", "order-workspace", slug],
+    queryFn: () => adminOrderWorkspace({ data: { id: slug } }),
+  });
+
+  /** Real UUID of the order — resolved from the pretty slug in the URL. */
+  const id = ((data?.order as { id?: string } | undefined)?.id ?? "") as string;
+
   // ---- Live presence: claim the order, heartbeat, release, react to takeovers ----
-  const presence = useOrderPresence([id]);
-  const held = presence[id];
+  const presence = useOrderPresence(id ? [id] : []);
+  const held = id ? presence[id] : undefined;
   const [blockedBy, setBlockedBy] = useState<string | null>(null);
   const [evictedBy, setEvictedBy] = useState<string | null>(null);
   const ownsRef = useRef(false);
 
   const claim = async (force: boolean) => {
+    if (!id) return;
     const res = await adminClaimOrder({ data: { id, ...(force ? { force: true } : {}) } });
     if (res.ok) {
       ownsRef.current = true;
@@ -101,6 +110,7 @@ function AdminOrderDetail() {
   };
 
   useEffect(() => {
+    if (!id) return;
     void claim(takeover === 1);
     const beat = setInterval(() => {
       if (ownsRef.current) void adminHeartbeatOrder({ data: { id } });
@@ -122,10 +132,6 @@ function AdminOrderDetail() {
     }
   }, [held, user]);
 
-  const { data, isLoading } = useQuery({
-    queryKey: ["admin", "order-workspace", id],
-    queryFn: () => adminOrderWorkspace({ data: { id } }),
-  });
 
   const smsTemplates = useQuery({
     queryKey: ["admin", "sms-templates"],

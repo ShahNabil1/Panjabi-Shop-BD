@@ -2,6 +2,8 @@ import { createServerFn } from "@tanstack/react-start";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { requireAdmin, actorName, logActivity, diffFields } from "./admin.server";
+import { z } from "zod";
+
 import {
   blockSchema,
   idSchema,
@@ -13,20 +15,27 @@ import {
   smsSendSchema,
 } from "./admin-schema";
 
+const orderRefSchema = z.object({ id: z.string().min(1) });
+
 /** Full order workspace payload: order, items, activity, notes, SMS log, block state. */
 export const adminOrderWorkspace = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => idSchema.parse(input))
+  .inputValidator((input: unknown) => orderRefSchema.parse(input))
   .handler(async ({ data, context }) => {
     const db = await requireAdmin(context.supabase, context.userId);
 
-    const { data: order, error } = await db
+    // The URL may carry either the UUID or the human order number (e.g. "uk-02").
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(data.id);
+    const query = db
       .from("orders")
-      .select("*, order_items(*), order_activity(id, kind, message, meta, created_at)")
-      .eq("id", data.id)
-      .maybeSingle();
+      .select("*, order_items(*), order_activity(id, kind, message, meta, created_at)");
+    const { data: order, error } = await (isUuid
+      ? query.eq("id", data.id)
+      : query.ilike("order_number", data.id)
+    ).maybeSingle();
     if (error) throw new Error(error.message);
     if (!order) return null;
+    const orderId = (order as { id: string }).id;
 
     const o = order as unknown as Record<string, unknown>;
 
@@ -36,7 +45,7 @@ export const adminOrderWorkspace = createServerFn({ method: "POST" })
     const { data: recentViews } = await db
       .from("order_activity")
       .select("id, meta, created_at")
-      .eq("order_id", data.id)
+      .eq("order_id", orderId)
       .eq("kind", "view")
       .order("created_at", { ascending: false })
       .limit(1);
@@ -48,7 +57,7 @@ export const adminOrderWorkspace = createServerFn({ method: "POST" })
     const shouldLog =
       !last || lastActor !== who || Date.now() - lastAt >= 30 * 60 * 1000;
     if (shouldLog) {
-      await logActivity(db, data.id, "view", `${who} viewed this order`, { actor: who });
+      await logActivity(db, orderId, "view", `${who} viewed this order`, { actor: who });
     }
 
 
@@ -56,12 +65,12 @@ export const adminOrderWorkspace = createServerFn({ method: "POST" })
       db
         .from("order_notes")
         .select("*")
-        .eq("order_id", data.id)
+        .eq("order_id", orderId)
         .order("created_at", { ascending: false }),
       db
         .from("sms_logs")
         .select("*")
-        .eq("order_id", data.id)
+        .eq("order_id", orderId)
         .order("created_at", { ascending: false }),
       db
         .from("blocked_identifiers")
@@ -75,7 +84,7 @@ export const adminOrderWorkspace = createServerFn({ method: "POST" })
       db
         .from("order_activity")
         .select("id, kind, message, meta, created_at")
-        .eq("order_id", data.id)
+        .eq("order_id", orderId)
         .order("created_at", { ascending: false })
         .limit(200),
     ]);

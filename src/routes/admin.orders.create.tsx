@@ -199,7 +199,7 @@ function CreateOrderPage() {
       }),
     onSuccess: (res) => {
       toast.success(`Order ${res.orderNumber} created`);
-      void navigate({ to: "/admin/orders/$id", params: { id: res.id } });
+      void navigate({ to: "/admin/orders/$id", params: { id: (res.orderNumber || res.id).toLowerCase() } });
     },
     onError: (e: Error) => toast.error(e.message),
   });
