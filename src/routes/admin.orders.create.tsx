@@ -68,8 +68,13 @@ function CreateOrderPage() {
   const [advanceMethod, setAdvanceMethod] =
     useState<(typeof advanceMethods)[number]>("bKash");
   const [source, setSource] = useState<(typeof orderSources)[number]>("Facebook");
-  const [deliveryPartner, setDeliveryPartner] =
-    useState<(typeof deliveryPartners)[number] | "">("");
+  const [deliveryPartner, setDeliveryPartner] = useState<string>("");
+
+  const activePartners = useQuery({
+    queryKey: ["admin", "active-delivery-partners"],
+    queryFn: () => adminActiveDeliveryPartners(),
+    staleTime: 60_000,
+  });
 
   const phoneValid = /^01[3-9]\d{8}$/.test(phone.trim());
 
