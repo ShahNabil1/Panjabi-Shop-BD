@@ -102,6 +102,102 @@ function CopyButton({ value, accent }: { value: string; accent?: boolean }) {
   );
 }
 
+function CopyTextButton({
+  value,
+  label,
+  accent,
+}: {
+  value: string;
+  label: string;
+  accent?: boolean;
+}) {
+  const [copied, setCopied] = useState(false);
+  return (
+    <button
+      type="button"
+      onClick={() => {
+        void navigator.clipboard.writeText(value).then(() => {
+          setCopied(true);
+          setTimeout(() => setCopied(false), 1600);
+        });
+      }}
+      className={cn(
+        "inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-xs font-semibold transition active:scale-95",
+        copied
+          ? "border-emerald-300 bg-emerald-50 text-emerald-700"
+          : accent
+            ? "border-[#E32227]/30 text-[#E32227] hover:bg-[#E32227]/10"
+            : "border-border text-muted-foreground hover:bg-muted",
+      )}
+    >
+      {copied ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}
+      {copied ? "Copied" : label}
+    </button>
+  );
+}
+
+const bdt = (n: number) =>
+  `৳${Number(n).toLocaleString("en-US", { maximumFractionDigits: 2 })}`;
+
+function PathaoCostOfDelivery({ orderId }: { orderId: string }) {
+  const cost = useQuery({
+    queryKey: ["admin", "pathao-cost", orderId],
+    queryFn: () => adminPathaoDeliveryCost({ data: { orderId } }),
+  });
+
+  if (cost.isLoading) {
+    return (
+      <div className="rounded-lg border border-[#E32227]/25 bg-white px-3 py-2.5 text-xs text-muted-foreground">
+        Loading cost of delivery…
+      </div>
+    );
+  }
+  if (!cost.data?.ok) return null;
+
+  return (
+    <div className="rounded-lg border border-[#E32227]/25 bg-white px-3 py-3">
+      <div className="flex items-center gap-2">
+        <p className="text-sm font-bold text-foreground">Cost of Delivery</p>
+        <span
+          className={cn(
+            "rounded-full px-2 py-0.5 text-[10px] font-semibold ring-1",
+            cost.data.paid
+              ? "bg-emerald-50 text-emerald-700 ring-emerald-200"
+              : "bg-indigo-50 text-indigo-700 ring-indigo-200",
+          )}
+        >
+          {cost.data.paid ? "Paid" : "Unpaid"}
+        </span>
+      </div>
+      <dl className="mt-2 space-y-1.5">
+        {cost.data.lines.map((line) => (
+          <div key={line.label} className="flex items-center justify-between gap-3 text-xs">
+            <dt className="text-muted-foreground">{line.label}</dt>
+            <dd
+              className={cn(
+                "font-semibold tabular-nums",
+                line.negative && line.amount > 0
+                  ? "text-[#E32227]"
+                  : line.negative
+                    ? "text-[#E32227]"
+                    : "text-foreground",
+              )}
+            >
+              {line.negative ? "- " : ""}
+              {bdt(line.amount)}
+            </dd>
+          </div>
+        ))}
+      </dl>
+      <div className="mt-2.5 flex items-center justify-between border-t border-dashed border-border pt-2.5">
+        <p className="text-sm font-bold text-foreground">Total Cost</p>
+        <p className="text-sm font-bold tabular-nums text-foreground">{bdt(cost.data.total)}</p>
+      </div>
+    </div>
+  );
+}
+
+
 /** Fulfillment placeholder — courier booking becomes functional in a later phase. */
 export function FulfillmentCard({
   orderId,
