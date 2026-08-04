@@ -32,13 +32,6 @@ export const providerFields: Record<DeliveryProvider, CredentialField[]> = {
     { key: "client_secret", label: "Client Secret", placeholder: "Pathao client secret", secret: true },
     { key: "username", label: "Merchant Email", placeholder: "merchant@example.com" },
     { key: "password", label: "Merchant Password", placeholder: "••••••••", secret: true },
-    {
-      key: "base_url",
-      label: "Base URL",
-      placeholder: "https://api-hermes.pathao.com",
-      optional: true,
-      hint: "Sandbox: https://courier-api-sandbox.pathao.com",
-    },
   ],
   carrybee: [
     { key: "base_url", label: "Base URL", placeholder: "https://api.carrybee.com" },
