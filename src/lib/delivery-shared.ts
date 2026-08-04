@@ -77,9 +77,11 @@ export const courierStatusLabels: Record<CourierStatus, string> = {
  */
 export const courierToOrderStatus: Record<CourierStatus, string | null> = {
   pending: null,
+  // Steadfast puts every freshly-created consignment in `in_review`, so it is
+  // a normal RTS state — never a hold.
   in_review: null,
-  hold: null,
   unknown: null,
+  hold: "courier_hold",
   picked: "shipped",
   in_transit: "shipped",
   delivered: "delivered",
