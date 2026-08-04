@@ -794,7 +794,8 @@ function CouponDialog({
           </Button>
         </div>
       </form>
-    </div>
+    </div>,
+    document.body,
   );
 }
 
