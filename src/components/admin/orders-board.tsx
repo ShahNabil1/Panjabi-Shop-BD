@@ -262,7 +262,7 @@ export function OrdersBoard({
                     ) : null}
                     {(o as { delivery_partner?: string | null }).delivery_partner ? (
                       <CourierBadge
-                        partner={(o as { delivery_partner?: string }).delivery_partner}
+                        partner={(o as { delivery_partner?: string | null }).delivery_partner ?? null}
                         className="py-1"
                       />
                     ) : null}
