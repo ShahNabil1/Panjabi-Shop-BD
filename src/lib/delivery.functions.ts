@@ -256,10 +256,11 @@ export const adminTestCourierWebhook = createServerFn({ method: "POST" })
       };
     }
 
-    const { getRequestHeader } = await import("@tanstack/react-start/server");
-    const host = getRequestHeader("host") ?? "";
-    const proto = host.startsWith("localhost") || host.startsWith("127.") ? "http" : "https";
-    const url = `${proto}://${host}/api/public/courier/${data.provider}`;
+    const { PATHAO_INTEGRATION_SECRET } = await import("@/lib/courier-webhook.server");
+
+    // Always probe the real, branded public endpoint that couriers actually call —
+    // never a local self-request, so the result can't be falsely optimistic.
+    const url = `https://upoharkabbo.com/api/public/courier/${data.provider}`;
 
     const headerName =
       data.provider === "pathao"
@@ -268,14 +269,17 @@ export const adminTestCourierWebhook = createServerFn({ method: "POST" })
           ? "Steadfast-Secret-Key"
           : "X-Webhook-Secret";
 
-    // No status field on purpose: the event is logged without touching any order.
-    const payload = {
-      event: "webhook.test",
-      notification_type: "webhook_test",
-      consignment_id: `TEST-${Date.now()}`,
-      merchant_order_id: "WEBHOOK-TEST",
-      source: "upoharkabbo-admin",
-    };
+    // Pathao's own integration probe: exact body, and it demands 202 + echoed header.
+    const payload =
+      data.provider === "pathao"
+        ? { event: "webhook_integration" }
+        : {
+            event: "webhook.test",
+            notification_type: "webhook_test",
+            consignment_id: `TEST-${Date.now()}`,
+            merchant_order_id: "WEBHOOK-TEST",
+            source: "upoharkabbo-admin",
+          };
 
     try {
       const res = await fetch(url, {
@@ -284,7 +288,25 @@ export const adminTestCourierWebhook = createServerFn({ method: "POST" })
         body: JSON.stringify(payload),
       });
       const body = await res.text();
-      return { ok: res.ok, status: res.status, url, body: body.slice(0, 1000) };
+
+      let ok = res.ok;
+      let note = "";
+      if (data.provider === "pathao") {
+        const echoed = res.headers.get("x-pathao-merchant-webhook-integration-secret") ?? "";
+        const statusOk = res.status === 202;
+        const headerOk = echoed === PATHAO_INTEGRATION_SECRET;
+        ok = statusOk && headerOk;
+        if (!statusOk) note = `Pathao requires HTTP 202 — endpoint returned ${res.status}. `;
+        else if (!headerOk)
+          note = "Missing/incorrect X-Pathao-Merchant-Webhook-Integration-Secret response header. ";
+      }
+
+      return {
+        ok,
+        status: res.status,
+        url,
+        body: `${note}${body.slice(0, 900)}`,
+      };
     } catch (error) {
       return { ok: false, status: 0, url, body: (error as Error).message };
     }
