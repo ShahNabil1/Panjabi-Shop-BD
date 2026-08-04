@@ -208,23 +208,38 @@ export const getDeliveryRates = createServerFn({ method: "GET" }).handler(async 
 export const getOrderSummary = createServerFn({ method: "GET" })
   .inputValidator((input: unknown) => orderLookupSchema.parse(input))
   .handler(async ({ data }): Promise<OrderSummary | null> => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { createPublicServerClient } = await import("./supabase-public");
+    const db = createPublicServerClient();
 
-    const { data: order } = await supabaseAdmin
-      .from("orders")
-      .select(
-        "id, order_number, status, created_at, customer_name, customer_phone, address_line, city, delivery_area, subtotal, delivery_charge, discount, total",
-      )
-      .eq("order_number", data.orderNumber)
-      .eq("customer_phone", data.phone)
-      .maybeSingle();
+    const { data: raw } = await db.rpc("order_receipt", {
+      _order_number: data.orderNumber,
+      _phone: data.phone,
+    });
+
+    const order = raw as {
+      order_number: string;
+      status: string;
+      created_at: string;
+      customer_name: string;
+      customer_phone: string;
+      address_line: string;
+      city: string;
+      delivery_area: string | null;
+      subtotal: number;
+      delivery_charge: number;
+      discount: number;
+      total: number;
+      items: Array<{
+        product_name: string;
+        product_slug: string | null;
+        variant_label: string | null;
+        unit_price: number;
+        quantity: number;
+        line_total: number;
+      }>;
+    } | null;
 
     if (!order) return null;
-
-    const { data: items } = await supabaseAdmin
-      .from("order_items")
-      .select("product_name, product_slug, variant_label, unit_price, quantity, line_total")
-      .eq("order_id", order.id);
 
     return {
       orderNumber: order.order_number,
@@ -239,7 +254,7 @@ export const getOrderSummary = createServerFn({ method: "GET" })
       deliveryCharge: Number(order.delivery_charge),
       discount: Number(order.discount),
       total: Number(order.total),
-      items: (items ?? []).map((i) => ({
+      items: (order.items ?? []).map((i) => ({
         name: i.product_name,
         slug: i.product_slug,
         variantLabel: i.variant_label,
