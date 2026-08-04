@@ -93,6 +93,7 @@ export function CourierBadge({
         className,
       )}
     >
+      <img src={c.src} alt="" aria-hidden className="size-4 rounded-full object-contain" />
       {c.label}
     </span>
   );
