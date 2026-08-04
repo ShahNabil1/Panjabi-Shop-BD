@@ -86,6 +86,11 @@ export const orderStatusSchema = z.object({
   skipSms: z.boolean().optional(),
   /** Courier chosen at confirmation time (Steadfast / Pathao / Carrybee). */
   deliveryPartner: z.string().trim().max(40).optional(),
+  /**
+   * ISO timestamp used with the `scheduled_order` status. A cron job flips the
+   * order to `processing` once this moment passes.
+   */
+  scheduledFor: z.string().trim().min(1).max(40).nullable().optional(),
 });
 
 export const orderListSchema = z.object({
