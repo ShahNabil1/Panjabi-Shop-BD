@@ -20,6 +20,7 @@ import { AdminHeading, Panel } from "@/components/admin/kit";
 import { BrandLoader } from "@/components/admin/brand-loader";
 import { CourierReport } from "@/components/admin/courier-report";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import { normalizePhoneInput } from "@/lib/phone";
 
