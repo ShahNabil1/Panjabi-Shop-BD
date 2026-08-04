@@ -219,6 +219,7 @@ function PartnerCard({
         data: { provider, enabled, credentials: values, config: {} },
       });
       setResult({ ok: true, message: res.message });
+      setSavedSnapshot(JSON.stringify(values));
       toast.success(`${providerLabels[provider]} saved`);
       onDone();
     } catch (error) {
