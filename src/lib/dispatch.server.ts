@@ -437,6 +437,7 @@ const ORDER_RANK: Record<string, number> = {
   processing: 2,
   rts: 3,
   shipped: 4,
+  courier_hold: 4,
   partial_delivered: 5,
   delivered: 5,
   awaiting_return: 5,

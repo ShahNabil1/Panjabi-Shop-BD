@@ -228,6 +228,7 @@ function AdminOrderDetail() {
   const dispatchLocked = [
     "rts",
     "shipped",
+    "courier_hold",
     "partial_delivered",
     "delivered",
     "awaiting_return",
