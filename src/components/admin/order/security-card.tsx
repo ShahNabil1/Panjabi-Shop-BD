@@ -203,8 +203,8 @@ export function FulfillmentCard({
                           <span className="rounded-full bg-muted px-2 py-0.5 text-[11px] font-semibold uppercase">
                             {ev.provider}
                           </span>
-                          <span className="font-mono text-xs font-semibold text-foreground">
-                            {ev.event ?? "event"}
+                          <span className="text-xs font-semibold text-foreground">
+                            {humaniseEvent(ev.event)}
                           </span>
                           {ev.status ? (
                             <span
@@ -220,17 +220,11 @@ export function FulfillmentCard({
                             {dt(ev.createdAt)}
                           </span>
                         </div>
-                        {ev.message ? (
-                          <p className="mt-1.5 text-sm text-foreground">{ev.message}</p>
+                        {ev.message && humaniseEvent(ev.message) !== humaniseEvent(ev.event) ? (
+                          <p className="mt-1.5 text-sm text-foreground">
+                            {humaniseEvent(ev.message)}
+                          </p>
                         ) : null}
-                        <details className="mt-2">
-                          <summary className="cursor-pointer text-[11px] font-semibold text-muted-foreground">
-                            Raw payload
-                          </summary>
-                          <pre className="mt-1 max-h-56 overflow-auto rounded-lg bg-muted p-2 text-[11px] leading-relaxed">
-                            {ev.payloadJson}
-                          </pre>
-                        </details>
                       </div>
                     </li>
                   ))}
