@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 import { toast } from "sonner";
 import {
   BadgePercent,
@@ -535,8 +536,12 @@ function CouponDialog({
     product_images?: Array<{ url: string; sort_order: number }> | null;
   }>;
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-hidden overscroll-contain bg-black/60 p-3 backdrop-blur-sm sm:items-center">
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  if (!mounted) return null;
+
+  return createPortal(
+    <div className="fixed inset-0 z-[100] flex items-start justify-center overflow-hidden overscroll-contain bg-black/60 p-3 backdrop-blur-sm sm:items-center">
       <form
         onSubmit={onSubmit}
         role="dialog"
@@ -789,7 +794,8 @@ function CouponDialog({
           </Button>
         </div>
       </form>
-    </div>
+    </div>,
+    document.body,
   );
 }
 
