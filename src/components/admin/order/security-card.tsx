@@ -269,19 +269,37 @@ export function FulfillmentCard({
           <h2 className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
             Fulfillment
           </h2>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <button
-                type="button"
-                aria-label="Webhook event history"
-                onClick={() => setHistoryOpen(true)}
-                className="grid size-8 place-items-center rounded-full border border-border/70 text-muted-foreground transition hover:bg-muted hover:text-foreground active:scale-90"
-              >
-                <History className="size-4" />
-              </button>
-            </TooltipTrigger>
-            <TooltipContent>Webhook event history</TooltipContent>
-          </Tooltip>
+          <div className="flex items-center gap-1.5">
+            {consignmentId ? (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    type="button"
+                    aria-label="Refresh courier status"
+                    disabled={refresh.isPending}
+                    onClick={() => refresh.mutate()}
+                    className="grid size-8 place-items-center rounded-full border border-border/70 text-muted-foreground transition hover:bg-muted hover:text-foreground active:scale-90 disabled:opacity-60"
+                  >
+                    <RefreshCw className={cn("size-4", refresh.isPending && "animate-spin")} />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>Refresh courier status</TooltipContent>
+              </Tooltip>
+            ) : null}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  type="button"
+                  aria-label="Webhook event history"
+                  onClick={() => setHistoryOpen(true)}
+                  className="grid size-8 place-items-center rounded-full border border-border/70 text-muted-foreground transition hover:bg-muted hover:text-foreground active:scale-90"
+                >
+                  <History className="size-4" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>Webhook event history</TooltipContent>
+            </Tooltip>
+          </div>
         </div>
 
         <Dialog open={historyOpen} onOpenChange={setHistoryOpen}>
