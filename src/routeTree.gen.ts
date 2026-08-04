@@ -22,6 +22,7 @@ import { Route as FaqRouteImport } from './routes/faq'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AdminCouponsRouteImport } from './routes/admin.coupons'
 import { Route as AdminFaqsRouteImport } from './routes/admin.faqs'
 import { Route as AdminLandingRouteImport } from './routes/admin.landing'
 import { Route as AdminPromotionsRouteImport } from './routes/admin.promotions'
@@ -106,6 +107,11 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
 const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminCouponsRoute = AdminCouponsRouteImport.update({
+  id: '/coupons',
+  path: '/coupons',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminFaqsRoute = AdminFaqsRouteImport.update({
@@ -223,6 +229,7 @@ export interface FileRoutesByFullPath {
   '/faq': typeof FaqRoute
   '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/admin/coupons': typeof AdminCouponsRoute
   '/admin/faqs': typeof AdminFaqsRoute
   '/admin/landing': typeof AdminLandingRoute
   '/admin/promotions': typeof AdminPromotionsRoute
@@ -257,6 +264,7 @@ export interface FileRoutesByTo {
   '/faq': typeof FaqRoute
   '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/admin/coupons': typeof AdminCouponsRoute
   '/admin/faqs': typeof AdminFaqsRoute
   '/admin/landing': typeof AdminLandingRoute
   '/admin/promotions': typeof AdminPromotionsRoute
@@ -293,6 +301,7 @@ export interface FileRoutesById {
   '/faq': typeof FaqRoute
   '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/admin/coupons': typeof AdminCouponsRoute
   '/admin/faqs': typeof AdminFaqsRoute
   '/admin/landing': typeof AdminLandingRoute
   '/admin/promotions': typeof AdminPromotionsRoute
@@ -330,6 +339,7 @@ export interface FileRouteTypes {
     | '/faq'
     | '/search'
     | '/sitemap.xml'
+    | '/admin/coupons'
     | '/admin/faqs'
     | '/admin/landing'
     | '/admin/promotions'
@@ -364,6 +374,7 @@ export interface FileRouteTypes {
     | '/faq'
     | '/search'
     | '/sitemap.xml'
+    | '/admin/coupons'
     | '/admin/faqs'
     | '/admin/landing'
     | '/admin/promotions'
@@ -399,6 +410,7 @@ export interface FileRouteTypes {
     | '/faq'
     | '/search'
     | '/sitemap.xml'
+    | '/admin/coupons'
     | '/admin/faqs'
     | '/admin/landing'
     | '/admin/promotions'
@@ -536,6 +548,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/admin/'
       preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/coupons': {
+      id: '/admin/coupons'
+      path: '/coupons'
+      fullPath: '/admin/coupons'
+      preLoaderRoute: typeof AdminCouponsRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/faqs': {
@@ -682,6 +701,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AdminRouteChildren {
+  AdminCouponsRoute: typeof AdminCouponsRoute
   AdminFaqsRoute: typeof AdminFaqsRoute
   AdminLandingRoute: typeof AdminLandingRoute
   AdminPromotionsRoute: typeof AdminPromotionsRoute
@@ -698,6 +718,7 @@ interface AdminRouteChildren {
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminCouponsRoute: AdminCouponsRoute,
   AdminFaqsRoute: AdminFaqsRoute,
   AdminLandingRoute: AdminLandingRoute,
   AdminPromotionsRoute: AdminPromotionsRoute,
