@@ -313,6 +313,20 @@ function AdminOrderDetail() {
                 hour12: true,
               })}
             </p>
+            {order.status === "scheduled_order" && order.scheduled_for ? (
+              <p className="mt-1 text-xs font-bold text-cyan-700">
+                Scheduled for{" "}
+                {new Date(order.scheduled_for).toLocaleString("en-US", {
+                  timeZone: "Asia/Dhaka",
+                  day: "numeric",
+                  month: "short",
+                  year: "numeric",
+                  hour: "numeric",
+                  minute: "2-digit",
+                  hour12: true,
+                })}
+              </p>
+            ) : null}
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
