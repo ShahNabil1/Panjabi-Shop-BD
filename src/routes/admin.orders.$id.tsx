@@ -183,6 +183,7 @@ function AdminOrderDetail() {
       reason?: string;
       skipSms?: boolean;
       deliveryPartner?: string;
+      scheduledFor?: string | null;
     }) =>
       adminUpdateOrderStatus({
         data: {
@@ -191,6 +192,7 @@ function AdminOrderDetail() {
           ...(input.reason ? { reason: input.reason } : {}),
           ...(input.skipSms ? { skipSms: true } : {}),
           ...(input.deliveryPartner ? { deliveryPartner: input.deliveryPartner } : {}),
+          ...(input.scheduledFor ? { scheduledFor: input.scheduledFor } : {}),
         },
       }),
     onSuccess: async () => {
