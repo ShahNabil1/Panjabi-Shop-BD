@@ -57,7 +57,8 @@ function deliveryRates(
 export const placeOrder = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => placeOrderSchema.parse(input))
   .handler(async ({ data }): Promise<PlacedOrder> => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { createPublicServerClient } = await import("./supabase-public");
+    const db = createPublicServerClient();
 
     const { getRequestIP, getRequestHeader } = await import("@tanstack/react-start/server");
     let clientIp: string | null = null;
