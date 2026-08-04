@@ -196,6 +196,8 @@ export const adminRefreshCourierStatus = createServerFn({ method: "POST" })
         "in_transit",
         "delivered",
         "partial_delivered",
+        "exchange",
+
         "hold",
         "return_id_created",
         "return_in_transit",

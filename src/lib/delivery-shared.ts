@@ -48,12 +48,14 @@ export type CourierStatus =
   | "in_transit"
   | "delivered"
   | "partial_delivered"
+  | "exchange"
   | "hold"
   | "return_id_created"
   | "return_in_transit"
   | "returned"
   | "cancelled"
   | "lost"
+  | "paid_invoice"
   | "unknown";
 
 export const courierStatusLabels: Record<CourierStatus, string> = {
@@ -63,12 +65,14 @@ export const courierStatusLabels: Record<CourierStatus, string> = {
   in_transit: "In transit",
   delivered: "Delivered",
   partial_delivered: "Partial delivered",
+  exchange: "Exchange",
   hold: "On hold",
   return_id_created: "Return ID Created",
   return_in_transit: "Return in transit",
-  returned: "Returned",
+  returned: "Returned to merchant",
   cancelled: "Cancelled",
   lost: "Lost / damaged",
+  paid_invoice: "Payment invoice",
   unknown: "Unknown",
 };
 
@@ -78,16 +82,19 @@ export const courierStatusLabels: Record<CourierStatus, string> = {
  * whatever status it already has. Mirrors `courier_webhook_apply` in the DB.
  */
 export const courierToOrderStatus: Record<CourierStatus, string | null> = {
-  pending: null,
-  // Steadfast puts every freshly-created consignment in `in_review`, so it is
-  // a normal RTS state — never a hold.
-  in_review: null,
+  // Pathao's created / updated / pickup-requested / assigned-for-pickup phase.
+  pending: "rts",
+  // Steadfast puts every freshly-created consignment in `in_review`.
+  in_review: "rts",
   unknown: null,
+  // Pathao payment invoices settle money, not parcels — order status untouched.
+  paid_invoice: null,
   hold: "courier_hold",
   picked: "shipped",
   in_transit: "shipped",
   delivered: "delivered",
   partial_delivered: "partial_delivered",
+  exchange: "exchange",
   return_id_created: "awaiting_return",
   return_in_transit: "awaiting_return",
   returned: "returned",
@@ -95,51 +102,67 @@ export const courierToOrderStatus: Record<CourierStatus, string | null> = {
   lost: "lost_damaged",
 };
 
+
 /** Maps a raw provider status string to our normalised status. */
 export function normaliseCourierStatus(provider: DeliveryProvider, raw: string): CourierStatus {
-  const s = raw.toLowerCase().replace(/[\s-]+/g, "_");
+  const s = raw.toLowerCase().replace(/[\s.\-]+/g, "_");
   if (provider === "pathao") {
+    // Strip the `order_` prefix so events ("order.picked") and human labels
+    // ("Picked") resolve to the same key.
+    const key = s.replace(/^order_/, "");
     const map: Record<string, CourierStatus> = {
-      "order.created": "pending",
-      "order.updated": "pending",
-      "order.pickup_requested": "pending",
-      "order.assigned_for_pickup": "pending",
-      "order.pickup_failed": "hold",
-      "order.pickup_cancelled": "cancelled",
-      "order.picked": "picked",
-      // Pathao's human label for a picked parcel is literally "Pickup".
-      "order.pickup": "picked",
-
-      "order.at_the_sorting_hub": "in_transit",
-      "order.in_transit": "in_transit",
-      "order.received_at_last_mile_hub": "in_transit",
-      "order.assigned_for_delivery": "in_transit",
-      "order.exchange": "in_transit",
-      "order.delivered": "delivered",
-      "order.partial_delivery": "partial_delivered",
-      "order.delivery_failed": "hold",
-      "order.on_hold": "hold",
-      // Return ID creation is distinct from the parcel's later return journey.
-      "order.return_id_created": "return_id_created",
-      "order.return": "return_in_transit",
-      "order.returned": "return_in_transit",
-      "order.return_in_transit": "return_in_transit",
-      "order.pickup_failed_and_return": "return_in_transit",
-      "order.delivery_failed_and_return": "return_in_transit",
-      "order.returned_to_merchant": "returned",
-      "order.return_completed": "returned",
-      "order.paid_return": "returned",
-      "order.lost": "lost",
-      "order.damaged": "lost",
-      "order.lost_or_damaged": "lost",
+      // → RTS
+      created: "pending",
+      updated: "pending",
+      pickup_requested: "pending",
+      assigned_for_pickup: "pending",
+      // → Shipped
+      picked: "picked",
+      pickup: "picked",
+      at_the_sorting_hub: "in_transit",
+      in_transit: "in_transit",
+      received_at_last_mile_hub: "in_transit",
+      assigned_for_delivery: "in_transit",
+      // → Courier Hold
+      pickup_failed: "hold",
+      delivery_failed: "hold",
+      on_hold: "hold",
+      hold: "hold",
+      // → Cancelled
+      pickup_cancelled: "cancelled",
+      cancelled: "cancelled",
+      // → Delivered
+      delivered: "delivered",
+      // → Partial Delivered
+      partial_delivery: "partial_delivered",
+      partial_delivered: "partial_delivered",
+      paid_return: "partial_delivered",
+      // → Awaiting Return
+      returned: "return_in_transit",
+      return: "return_in_transit",
+      return_id_created: "return_id_created",
+      return_in_transit: "return_in_transit",
+      pickup_failed_and_return: "return_in_transit",
+      delivery_failed_and_return: "return_in_transit",
+      // → Returned
+      returned_to_merchant: "returned",
+      return_completed: "returned",
+      // → Exchange
+      exchanged: "exchange",
+      exchange: "exchange",
+      // Money settlement only — no parcel movement.
+      paid: "paid_invoice",
+      payment_invoice: "paid_invoice",
+      lost: "lost",
+      damaged: "lost",
+      lost_or_damaged: "lost",
     };
-    // Pathao sends either `order.picked` (event) or `Picked` (order_status).
-    const key = s.startsWith("order.") ? s : `order.${s}`;
-    return map[key] ?? genericStatus(s.replace(/^order\./, ""));
+    return map[key] ?? "unknown";
   }
 
   return genericStatus(s);
 }
+
 
 function genericStatus(s: string): CourierStatus {
   const map: Record<string, CourierStatus> = {
@@ -185,6 +208,9 @@ export function courierStatusTone(status: CourierStatus): string {
       return "bg-emerald-50 text-emerald-700 ring-emerald-200";
     case "partial_delivered":
       return "bg-amber-50 text-amber-700 ring-amber-200";
+    case "exchange":
+      return "bg-violet-50 text-violet-700 ring-violet-200";
+
     case "in_transit":
     case "picked":
       return "bg-sky-50 text-sky-700 ring-sky-200";

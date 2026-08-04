@@ -1509,6 +1509,7 @@ export type Database = {
         | "courier_hold"
         | "pre_order"
         | "scheduled_order"
+        | "exchange"
       promotion_type: "offer" | "featured" | "flash" | "new_arrival"
     }
     CompositeTypes: {
@@ -1662,6 +1663,7 @@ export const Constants = {
         "courier_hold",
         "pre_order",
         "scheduled_order",
+        "exchange",
       ],
       promotion_type: ["offer", "featured", "flash", "new_arrival"],
     },
