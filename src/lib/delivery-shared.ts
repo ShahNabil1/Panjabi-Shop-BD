@@ -208,6 +208,9 @@ export function courierStatusTone(status: CourierStatus): string {
       return "bg-emerald-50 text-emerald-700 ring-emerald-200";
     case "partial_delivered":
       return "bg-amber-50 text-amber-700 ring-amber-200";
+    case "exchange":
+      return "bg-violet-50 text-violet-700 ring-violet-200";
+
     case "in_transit":
     case "picked":
       return "bg-sky-50 text-sky-700 ring-sky-200";
