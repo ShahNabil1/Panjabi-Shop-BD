@@ -9,6 +9,8 @@ export const orderStatuses = [
   "no_response",
   "good_no_response",
   "hold",
+  "pre_order",
+  "scheduled_order",
   "courier_hold",
   "shipped",
   "partial_delivered",
@@ -29,6 +31,8 @@ export const webOrderStatuses = [
   "no_response",
   "good_no_response",
   "hold",
+  "pre_order",
+  "scheduled_order",
   "cancelled",
 ] as const;
 
