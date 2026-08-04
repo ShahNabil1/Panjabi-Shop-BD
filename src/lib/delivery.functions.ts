@@ -311,3 +311,42 @@ export const adminTestCourierWebhook = createServerFn({ method: "POST" })
       return { ok: false, status: 0, url, body: (error as Error).message };
     }
   });
+
+export type CourierConnectionState = {
+  provider: DeliveryProvider;
+  enabled: boolean;
+  configured: boolean;
+  ok: boolean;
+  message: string;
+  checkedAt: string;
+};
+
+/** Live API connection check for every courier — used by the Order List status bar. */
+export const adminCourierConnections = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<CourierConnectionState[]> => {
+    const db = await requireAdmin(context.supabase, context.userId);
+    const { data } = await db.from("delivery_partners").select("provider, enabled, credentials");
+    const rows = data ?? [];
+
+    return Promise.all(
+      DELIVERY_PROVIDERS.map(async (provider) => {
+        const row = rows.find((r) => r.provider === provider);
+        const creds = (row?.credentials ?? {}) as Record<string, string>;
+        const configured = missingFields(provider, creds).length === 0;
+        const checkedAt = new Date().toISOString();
+        if (!row) {
+          return { provider, enabled: false, configured: false, ok: false, message: "Not added", checkedAt };
+        }
+        if (!configured) {
+          return { provider, enabled: row.enabled, configured, ok: false, message: "Credentials missing", checkedAt };
+        }
+        const res = await runCheck(provider, creds);
+        void db
+          .from("delivery_partners")
+          .update({ connection_ok: res.ok, connection_message: res.message, last_checked_at: checkedAt })
+          .eq("provider", provider);
+        return { provider, enabled: row.enabled, configured, ok: res.ok, message: res.message, checkedAt };
+      }),
+    );
+  });
