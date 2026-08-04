@@ -269,3 +269,86 @@ export const adminOrderWebhookEvents = createServerFn({ method: "GET" })
       };
     });
   });
+
+export type PathaoDeliveryCost = {
+  ok: boolean;
+  message?: string;
+  paid: boolean;
+  lines: { label: string; amount: number; negative?: boolean }[];
+  total: number;
+};
+
+/** Pathao "Cost of Delivery" breakdown for a single order. */
+export const adminPathaoDeliveryCost = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => z.object({ orderId: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }): Promise<PathaoDeliveryCost> => {
+    const db = await requireAdmin(context.supabase, context.userId);
+    const { loadPartner, providerKey } = await import("./dispatch.server");
+
+    const empty: PathaoDeliveryCost = { ok: false, paid: false, lines: [], total: 0 };
+
+    const { data: row } = await db
+      .from("orders")
+      .select("delivery_partner, courier_consignment_id")
+      .eq("id", data.orderId)
+      .maybeSingle();
+    const order = row as {
+      delivery_partner: string | null;
+      courier_consignment_id: string | null;
+    } | null;
+    if (!order) return { ...empty, message: "Order not found" };
+    if (providerKey(order.delivery_partner) !== "pathao") {
+      return { ...empty, message: "Only available for Pathao" };
+    }
+    if (!order.courier_consignment_id) {
+      return { ...empty, message: "Not sent to Pathao yet" };
+    }
+
+    try {
+      const partner = await loadPartner(db, "pathao");
+      const { pathaoToken, pathaoOrderInfo } = await import("./pathao.server");
+      const creds = {
+        client_id: partner.credentials["client_id"]!,
+        client_secret: partner.credentials["client_secret"]!,
+        username: partner.credentials["username"]!,
+        password: partner.credentials["password"]!,
+      };
+      const token = await pathaoToken(creds);
+      const info = await pathaoOrderInfo(creds, token, order.courier_consignment_id);
+      const d = (info["data"] ?? {}) as Record<string, unknown>;
+      const num = (...keys: string[]) => {
+        for (const k of keys) {
+          const v = d[k];
+          if (v != null && v !== "" && !Number.isNaN(Number(v))) return Number(v);
+        }
+        return 0;
+      };
+
+      const deliveryFee = num("delivery_fee");
+      const codFee = num("cod_fee", "collection_fee");
+      const discount = num("discount");
+      const promoDiscount = num("promo_discount");
+      const additional = num("additional_charge");
+      const compensation = num("compensation_cost", "compensation");
+      const invoiceId = d["invoice_id"];
+      const total =
+        deliveryFee + codFee + additional + compensation - discount - promoDiscount;
+
+      return {
+        ok: true,
+        paid: Boolean(invoiceId),
+        total,
+        lines: [
+          { label: "Delivery Fee", amount: deliveryFee },
+          { label: "COD Fee", amount: codFee },
+          { label: "Discount", amount: discount, negative: true },
+          { label: "Promo Discount", amount: promoDiscount, negative: true },
+          { label: "Additional Charge", amount: additional },
+          { label: "Compensation Cost", amount: compensation },
+        ],
+      };
+    } catch (error) {
+      return { ...empty, message: (error as Error).message };
+    }
+  });

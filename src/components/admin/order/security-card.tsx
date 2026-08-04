@@ -7,6 +7,7 @@ import type { BlockKind } from "@/lib/admin-schema";
 import { adminAddOrderNote, adminSetBlocked } from "@/lib/order-admin.functions";
 import {
   adminOrderWebhookEvents,
+  adminPathaoDeliveryCost,
   adminRefreshCourierStatus,
   adminSendOrderToCourier,
 } from "@/lib/dispatch.functions";
@@ -102,6 +103,102 @@ function CopyButton({ value, accent }: { value: string; accent?: boolean }) {
   );
 }
 
+function CopyTextButton({
+  value,
+  label,
+  accent,
+}: {
+  value: string;
+  label: string;
+  accent?: boolean;
+}) {
+  const [copied, setCopied] = useState(false);
+  return (
+    <button
+      type="button"
+      onClick={() => {
+        void navigator.clipboard.writeText(value).then(() => {
+          setCopied(true);
+          setTimeout(() => setCopied(false), 1600);
+        });
+      }}
+      className={cn(
+        "inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-xs font-semibold transition active:scale-95",
+        copied
+          ? "border-emerald-300 bg-emerald-50 text-emerald-700"
+          : accent
+            ? "border-[#E32227]/30 text-[#E32227] hover:bg-[#E32227]/10"
+            : "border-border text-muted-foreground hover:bg-muted",
+      )}
+    >
+      {copied ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}
+      {copied ? "Copied" : label}
+    </button>
+  );
+}
+
+const bdt = (n: number) =>
+  `৳${Number(n).toLocaleString("en-US", { maximumFractionDigits: 2 })}`;
+
+function PathaoCostOfDelivery({ orderId }: { orderId: string }) {
+  const cost = useQuery({
+    queryKey: ["admin", "pathao-cost", orderId],
+    queryFn: () => adminPathaoDeliveryCost({ data: { orderId } }),
+  });
+
+  if (cost.isLoading) {
+    return (
+      <div className="rounded-lg border border-[#E32227]/25 bg-white px-3 py-2.5 text-xs text-muted-foreground">
+        Loading cost of delivery…
+      </div>
+    );
+  }
+  if (!cost.data?.ok) return null;
+
+  return (
+    <div className="rounded-lg border border-[#E32227]/25 bg-white px-3 py-3">
+      <div className="flex items-center gap-2">
+        <p className="text-sm font-bold text-foreground">Cost of Delivery</p>
+        <span
+          className={cn(
+            "rounded-full px-2 py-0.5 text-[10px] font-semibold ring-1",
+            cost.data.paid
+              ? "bg-emerald-50 text-emerald-700 ring-emerald-200"
+              : "bg-indigo-50 text-indigo-700 ring-indigo-200",
+          )}
+        >
+          {cost.data.paid ? "Paid" : "Unpaid"}
+        </span>
+      </div>
+      <dl className="mt-2 space-y-1.5">
+        {cost.data.lines.map((line) => (
+          <div key={line.label} className="flex items-center justify-between gap-3 text-xs">
+            <dt className="text-muted-foreground">{line.label}</dt>
+            <dd
+              className={cn(
+                "font-semibold tabular-nums",
+                line.negative && line.amount > 0
+                  ? "text-[#E32227]"
+                  : line.negative
+                    ? "text-[#E32227]"
+                    : "text-foreground",
+              )}
+            >
+              {line.negative ? "- " : ""}
+              {bdt(line.amount)}
+            </dd>
+          </div>
+        ))}
+      </dl>
+      <div className="mt-2.5 flex items-center justify-between border-t border-dashed border-border pt-2.5">
+        <p className="text-sm font-bold text-foreground">Total Cost</p>
+        <p className="text-sm font-bold tabular-nums text-foreground">{bdt(cost.data.total)}</p>
+      </div>
+    </div>
+  );
+}
+
+
 /** Fulfillment placeholder — courier booking becomes functional in a later phase. */
 export function FulfillmentCard({
   orderId,
@@ -173,19 +270,37 @@ export function FulfillmentCard({
           <h2 className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
             Fulfillment
           </h2>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <button
-                type="button"
-                aria-label="Webhook event history"
-                onClick={() => setHistoryOpen(true)}
-                className="grid size-8 place-items-center rounded-full border border-border/70 text-muted-foreground transition hover:bg-muted hover:text-foreground active:scale-90"
-              >
-                <History className="size-4" />
-              </button>
-            </TooltipTrigger>
-            <TooltipContent>Webhook event history</TooltipContent>
-          </Tooltip>
+          <div className="flex items-center gap-1.5">
+            {consignmentId ? (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    type="button"
+                    aria-label="Refresh courier status"
+                    disabled={refresh.isPending}
+                    onClick={() => refresh.mutate()}
+                    className="grid size-8 place-items-center rounded-full border border-border/70 text-muted-foreground transition hover:bg-muted hover:text-foreground active:scale-90 disabled:opacity-60"
+                  >
+                    <RefreshCw className={cn("size-4", refresh.isPending && "animate-spin")} />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>Refresh courier status</TooltipContent>
+              </Tooltip>
+            ) : null}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  type="button"
+                  aria-label="Webhook event history"
+                  onClick={() => setHistoryOpen(true)}
+                  className="grid size-8 place-items-center rounded-full border border-border/70 text-muted-foreground transition hover:bg-muted hover:text-foreground active:scale-90"
+                >
+                  <History className="size-4" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>Webhook event history</TooltipContent>
+            </Tooltip>
+          </div>
         </div>
 
         <Dialog open={historyOpen} onOpenChange={setHistoryOpen}>
@@ -318,41 +433,28 @@ export function FulfillmentCard({
                     </span>
                   )}
                   <CopyButton value={consignmentId} accent={isPathao} />
-                  {publicTrackingUrl ? (
-                    <>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <a
-                            href={publicTrackingUrl}
-                            target="_blank"
-                            rel="noreferrer"
-                            aria-label="Open public tracking page"
-                            className="grid size-7 shrink-0 place-items-center rounded-md border border-[#E32227]/30 text-[#E32227] transition hover:bg-[#E32227]/10 active:scale-90"
-                          >
-                            <ExternalLink className="size-3.5" />
-                          </a>
-                        </TooltipTrigger>
-                        <TooltipContent>Open public tracking link</TooltipContent>
-                      </Tooltip>
-                      <CopyButton value={publicTrackingUrl} accent={isPathao} />
-                    </>
-                  ) : null}
                 </div>
                 {publicTrackingUrl ? (
-                  <p className="mt-1.5 truncate text-[11px] text-muted-foreground">
-                    Public tracking:{" "}
+                  <div className="mt-2.5 flex flex-wrap items-center gap-2">
                     <a
                       href={publicTrackingUrl}
                       target="_blank"
                       rel="noreferrer"
-                      className="text-[#E32227] underline underline-offset-2"
+                      className="inline-flex items-center gap-1.5 rounded-md border border-[#E32227]/30 bg-[#E32227]/5 px-2.5 py-1.5 text-xs font-semibold text-[#E32227] transition hover:bg-[#E32227]/10 active:scale-95"
                     >
-                      {publicTrackingUrl}
+                      <ExternalLink className="size-3.5" />
+                      Open tracking link
                     </a>
-                  </p>
+                    <CopyTextButton
+                      value={publicTrackingUrl}
+                      label="Copy tracking link"
+                      accent={isPathao}
+                    />
+                  </div>
                 ) : null}
               </div>
 
+              {isPathao ? <PathaoCostOfDelivery orderId={orderId} /> : null}
 
               <dl className="grid gap-1 text-xs text-muted-foreground">
                 {trackingCode ? (
@@ -370,17 +472,6 @@ export function FulfillmentCard({
                   </div>
                 ) : null}
               </dl>
-
-              <Button
-                size="sm"
-                variant="outline"
-                loading={refresh.isPending}
-                onClick={() => refresh.mutate()}
-                className="active:scale-95"
-              >
-                <RefreshCw className="size-4" />
-                Refresh courier status
-              </Button>
             </div>
           ) : orderStatus === "pending" ? (
             <div className="mt-3 space-y-2">
