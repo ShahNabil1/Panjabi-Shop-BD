@@ -378,9 +378,21 @@ export function OrdersBoard({
                       );
                     })()}
 
+                    {(() => {
+                      const payout = courierPayout(o);
+                      if (!payout) return null;
+                      return (
+                        <span
+                          title={`Courier payout received${payout.invoice ? ` · Invoice ${payout.invoice}` : ""}`}
+                          className="inline-flex items-center gap-1 rounded-full bg-green-50 px-2 py-0.5 text-xs font-bold text-green-800 ring-1 ring-green-200"
+                        >
+                          <Banknote className="size-3" />
+                          Paid{payout.invoice ? ` · ${payout.invoice}` : ""}
+                        </span>
+                      );
+                    })()}
 
 
-                  </div>
                   <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
                     <span className="inline-flex items-center gap-1.5">
                       <Clock className="size-3.5" />
