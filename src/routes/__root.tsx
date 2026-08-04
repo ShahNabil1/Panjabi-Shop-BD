@@ -180,6 +180,8 @@ function Chrome({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const { lang } = Route.useLoaderData();
+  // Bangla/Arabic-Indic digits typed in any field become English digits.
+  useDigitNormalizer();
 
   return (
     <QueryClientProvider client={queryClient}>
