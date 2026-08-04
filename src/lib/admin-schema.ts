@@ -2,6 +2,7 @@ import { z } from "zod";
 
 export const orderStatuses = [
   "pending",
+  "rts",
   "confirmed",
   "processing",
   "incomplete",
@@ -28,6 +29,7 @@ export const webOrderStatuses = [
 /** Statuses shown on the Order List screen (confirmed fulfilment pipeline). */
 export const listOrderStatuses = [
   "pending",
+  "rts",
   "confirmed",
   "shipped",
   "delivered",
