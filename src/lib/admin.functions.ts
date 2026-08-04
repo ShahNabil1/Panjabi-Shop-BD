@@ -131,8 +131,19 @@ export const adminUpdateOrderStatus = createServerFn({ method: "POST" })
       .eq("id", data.id)
       .maybeSingle();
     const before = (prev as { status?: string } | null)?.status ?? "—";
-    const { error } = await db.from("orders").update({ status: data.status }).eq("id", data.id);
+    const { error } = await db
+      .from("orders")
+      .update({
+        status: data.status,
+        ...(data.deliveryPartner ? { delivery_partner: data.deliveryPartner } : {}),
+      })
+      .eq("id", data.id);
     if (error) throw new Error(error.message);
+    if (data.deliveryPartner) {
+      await logActivity(db, data.id, "courier", `${who} selected ${data.deliveryPartner} as delivery partner`, {
+        actor: who,
+      });
+    }
     await logActivity(
       db,
       data.id,
