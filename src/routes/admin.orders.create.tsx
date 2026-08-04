@@ -545,6 +545,51 @@ function CreateOrderPage() {
         </div>
 
         <div className="space-y-5">
+          <div className="grid min-w-0 grid-cols-2 gap-2">
+            <label className="grid min-w-0 cursor-pointer grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 shadow-sm">
+              <span className="truncate text-xs font-semibold text-foreground">Pre-Order</span>
+              <Switch
+                checked={preOrder}
+                className="shrink-0"
+                onCheckedChange={(v) => {
+                  setPreOrder(v);
+                  if (v) {
+                    setScheduleOn(false);
+                    setScheduledFor("");
+                  }
+                }}
+              />
+            </label>
+
+            <label
+              className={cn(
+                "grid min-w-0 cursor-pointer grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 shadow-sm",
+                preOrder && "pointer-events-none opacity-50",
+              )}
+            >
+              <span className="truncate text-xs font-semibold text-foreground">Schedule</span>
+              <Switch
+                checked={scheduleOn}
+                disabled={preOrder}
+                className="shrink-0"
+                onCheckedChange={(v) => {
+                  setScheduleOn(v);
+                  if (!v) setScheduledFor("");
+                }}
+              />
+            </label>
+
+            {scheduleOn && !preOrder ? (
+              <input
+                type="date"
+                min={new Date().toISOString().slice(0, 10)}
+                className={cn(input, "col-span-2")}
+                value={scheduledFor}
+                onChange={(e) => setScheduledFor(e.target.value)}
+              />
+            ) : null}
+          </div>
+
           <Panel>
             <h2 className="text-sm font-bold">Payment</h2>
             <div className="mt-3 grid gap-3">
@@ -615,52 +660,6 @@ function CreateOrderPage() {
           <Panel>
             <h2 className="text-sm font-bold">Order meta</h2>
             <div className="mt-3 grid min-w-0 gap-3 overflow-hidden">
-              <div className="grid min-w-0 grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] overflow-hidden rounded-lg border border-border bg-background">
-                {/* Pre-Order — creates the order directly in the Pre-Order board. */}
-                <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-1.5 border-r border-border px-2 py-2.5">
-                  <p className="min-w-0 whitespace-nowrap text-xs font-semibold text-foreground">Pre-Order</p>
-                  <Switch
-                    checked={preOrder}
-                    className="shrink-0"
-                    onCheckedChange={(v) => {
-                      setPreOrder(v);
-                      if (v) {
-                        setScheduleOn(false);
-                        setScheduledFor("");
-                      }
-                    }}
-                  />
-                </div>
-
-                {/* Schedule — waits in Scheduled Order until the chosen date. */}
-                <div
-                  className={cn(
-                    "grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-1.5 px-2 py-2.5",
-                    preOrder && "pointer-events-none opacity-50",
-                  )}
-                >
-                  <p className="min-w-0 whitespace-nowrap text-xs font-semibold text-foreground">Schedule order</p>
-                  <Switch
-                    checked={scheduleOn}
-                    disabled={preOrder}
-                    className="shrink-0"
-                    onCheckedChange={(v) => {
-                      setScheduleOn(v);
-                      if (!v) setScheduledFor("");
-                    }}
-                  />
-                </div>
-              </div>
-              {scheduleOn && !preOrder ? (
-                <input
-                  type="date"
-                  min={new Date().toISOString().slice(0, 10)}
-                  className={input}
-                  value={scheduledFor}
-                  onChange={(e) => setScheduledFor(e.target.value)}
-                />
-              ) : null}
-
               <label className="block">
                 <Label>Order source</Label>
                 <select
