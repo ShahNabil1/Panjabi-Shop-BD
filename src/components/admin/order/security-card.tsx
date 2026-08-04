@@ -24,7 +24,20 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  Tooltip as TooltipRoot,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+
+function Tooltip({ children, ...props }: React.ComponentProps<typeof TooltipRoot>) {
+  return (
+    <TooltipProvider delayDuration={200}>
+      <TooltipRoot {...props}>{children}</TooltipRoot>
+    </TooltipProvider>
+  );
+}
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
