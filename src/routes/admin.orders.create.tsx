@@ -614,13 +614,11 @@ function CreateOrderPage() {
 
           <Panel>
             <h2 className="text-sm font-bold">Order meta</h2>
-            <div className="mt-3 grid gap-3">
-              {/* Pre-Order — creates the order directly in the Pre-Order board. */}
-              <div className="rounded-xl border border-border bg-background p-3">
-                <div className="flex min-w-0 items-center justify-between gap-3">
-                  <div className="min-w-0">
-                    <p className="whitespace-nowrap text-sm font-semibold text-foreground">Pre-Order</p>
-                  </div>
+            <div className="mt-3 grid min-w-0 gap-3 overflow-hidden">
+              <div className="grid min-w-0 grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] overflow-hidden rounded-lg border border-border bg-background">
+                {/* Pre-Order — creates the order directly in the Pre-Order board. */}
+                <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-1.5 border-r border-border px-2 py-2.5">
+                  <p className="min-w-0 whitespace-nowrap text-xs font-semibold text-foreground">Pre-Order</p>
                   <Switch
                     checked={preOrder}
                     className="shrink-0"
@@ -633,19 +631,15 @@ function CreateOrderPage() {
                     }}
                   />
                 </div>
-              </div>
 
-              {/* Schedule — waits in Scheduled Order until the chosen date. */}
-              <div
-                className={cn(
-                  "rounded-xl border border-border bg-background p-3",
-                  preOrder && "pointer-events-none opacity-50",
-                )}
-              >
-                <div className="flex min-w-0 items-center justify-between gap-3">
-                  <div className="min-w-0">
-                    <p className="whitespace-nowrap text-sm font-semibold text-foreground">Schedule order</p>
-                  </div>
+                {/* Schedule — waits in Scheduled Order until the chosen date. */}
+                <div
+                  className={cn(
+                    "grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-1.5 px-2 py-2.5",
+                    preOrder && "pointer-events-none opacity-50",
+                  )}
+                >
+                  <p className="min-w-0 whitespace-nowrap text-xs font-semibold text-foreground">Schedule order</p>
                   <Switch
                     checked={scheduleOn}
                     disabled={preOrder}
@@ -656,16 +650,16 @@ function CreateOrderPage() {
                     }}
                   />
                 </div>
-                {scheduleOn && !preOrder ? (
-                  <input
-                    type="date"
-                    min={new Date().toISOString().slice(0, 10)}
-                    className={cn(input, "mt-3")}
-                    value={scheduledFor}
-                    onChange={(e) => setScheduledFor(e.target.value)}
-                  />
-                ) : null}
               </div>
+              {scheduleOn && !preOrder ? (
+                <input
+                  type="date"
+                  min={new Date().toISOString().slice(0, 10)}
+                  className={input}
+                  value={scheduledFor}
+                  onChange={(e) => setScheduledFor(e.target.value)}
+                />
+              ) : null}
 
               <label className="block">
                 <Label>Order source</Label>
