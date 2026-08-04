@@ -1,11 +1,15 @@
 import { useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Check, Copy, Fingerprint, Globe, NotebookPen, Phone, Shield, ShieldCheck, ShieldX, Truck, RefreshCw } from "lucide-react";
+import { Check, Copy, ExternalLink, Fingerprint, Globe, History, NotebookPen, Phone, Shield, ShieldCheck, ShieldX, Truck, RefreshCw } from "lucide-react";
 
 import type { BlockKind } from "@/lib/admin-schema";
 import { adminAddOrderNote, adminSetBlocked } from "@/lib/order-admin.functions";
-import { adminRefreshCourierStatus, adminSendOrderToCourier } from "@/lib/dispatch.functions";
+import {
+  adminOrderWebhookEvents,
+  adminRefreshCourierStatus,
+  adminSendOrderToCourier,
+} from "@/lib/dispatch.functions";
 import {
   courierStatusLabels,
   courierStatusTone,
@@ -13,9 +17,18 @@ import {
 } from "@/lib/delivery-shared";
 import { Panel } from "@/components/admin/kit";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
+
 
 export type NoteRow = {
   id: string;
