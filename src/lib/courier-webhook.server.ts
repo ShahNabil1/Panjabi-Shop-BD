@@ -13,7 +13,11 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 
 import type { Database } from "@/integrations/supabase/types";
 
-import { normaliseCourierStatus, type DeliveryProvider } from "./delivery-shared";
+import {
+  courierStatusLabels,
+  normaliseCourierStatus,
+  type DeliveryProvider,
+} from "./delivery-shared";
 
 /** Fixed value Pathao expects echoed back on every webhook response. */
 export const PATHAO_INTEGRATION_SECRET = "f3992ecc-59da-4cbe-a049-a13da2018d51";
@@ -85,7 +89,7 @@ export async function processCourierWebhook(
     _payload: payload as never,
     _status: status,
     _raw_status: parsed.rawStatus,
-    _message: parsed.message ?? "",
+    _message: parsed.message ?? (status ? courierStatusLabels[status] : ""),
   });
 
   if (error) return { processed: false, message: error.message };
