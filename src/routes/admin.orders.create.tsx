@@ -619,6 +619,67 @@ function CreateOrderPage() {
                   ))}
                 </select>
               </label>
+
+              {/* Pre-Order toggle — sends the order straight to the Pre-Order board. */}
+              <div className="rounded-xl border border-border bg-background px-3 py-2.5">
+                <label className="flex cursor-pointer items-center justify-between gap-3">
+                  <span>
+                    <span className="block text-sm font-semibold text-foreground">Pre-Order</span>
+                    <span className="block text-xs text-muted-foreground">
+                      Creates the order with the Pre-Order status.
+                    </span>
+                  </span>
+                  <input
+                    type="checkbox"
+                    role="switch"
+                    className="size-5 shrink-0 accent-primary"
+                    checked={preOrder}
+                    onChange={(e) => {
+                      setPreOrder(e.target.checked);
+                      if (e.target.checked) setScheduledFor("");
+                    }}
+                  />
+                </label>
+              </div>
+
+              {/* Schedule — order waits in Scheduled Order until this moment. */}
+              <div
+                className={cn(
+                  "rounded-xl border border-border bg-background px-3 py-2.5",
+                  preOrder && "opacity-60",
+                )}
+              >
+                <label className="flex cursor-pointer items-center justify-between gap-3">
+                  <span>
+                    <span className="block text-sm font-semibold text-foreground">
+                      Schedule order
+                    </span>
+                    <span className="block text-xs text-muted-foreground">
+                      Auto-moves to Processing on the chosen date &amp; time.
+                    </span>
+                  </span>
+                  <input
+                    type="checkbox"
+                    role="switch"
+                    className="size-5 shrink-0 accent-primary"
+                    disabled={preOrder}
+                    checked={scheduleOn}
+                    onChange={(e) => {
+                      setScheduleOn(e.target.checked);
+                      if (!e.target.checked) setScheduledFor("");
+                    }}
+                  />
+                </label>
+                {scheduleOn && !preOrder ? (
+                  <input
+                    type="datetime-local"
+                    className={cn(input, "mt-2.5")}
+                    value={scheduledFor}
+                    onChange={(e) => setScheduledFor(e.target.value)}
+                  />
+                ) : null}
+              </div>
+
               <label className="block">
                 <Label>Delivery partner</Label>
                 <select
