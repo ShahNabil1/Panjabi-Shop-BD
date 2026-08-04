@@ -442,13 +442,14 @@ function AdminOrderDetail() {
               Schedule this order
             </p>
             <input
-              type="datetime-local"
+              type="date"
+              min={new Date().toISOString().slice(0, 10)}
               className="w-full rounded-lg border border-border/70 bg-white/80 px-3 py-2 text-sm outline-none focus:border-primary"
               value={scheduleAt}
               onChange={(e) => setScheduleAt(e.target.value)}
             />
             <p className="text-xs text-muted-foreground">
-              The order stays in Scheduled Order and moves to Processing automatically at this time.
+              The order stays in Scheduled Order and moves to Processing automatically on this date.
             </p>
             <div className="flex items-center justify-end gap-2">
               <Button size="sm" variant="ghost" onClick={() => setPending("")}>
