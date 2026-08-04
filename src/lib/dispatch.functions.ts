@@ -218,14 +218,6 @@ export const adminRefreshCourierStatus = createServerFn({ method: "POST" })
         .eq("provider", provider);
 
 
-      const who = await actorName(db, context.userId);
-      await logActivity(
-        db,
-        data.orderId,
-        "courier",
-        `${who} refreshed ${provider} status → ${raw}`,
-        { actor: who, meta: { provider, status, raw_status: raw, order_status: mapped } },
-      );
       return { ok: true, message: courierStatusLabels[status] ?? raw };
     } catch (error) {
       return { ok: false, message: (error as Error).message };
