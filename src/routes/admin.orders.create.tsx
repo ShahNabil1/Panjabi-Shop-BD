@@ -620,9 +620,6 @@ function CreateOrderPage() {
                 <div className="flex min-w-0 items-start justify-between gap-3">
                   <div className="min-w-0">
                     <p className="text-sm font-semibold text-foreground">Pre-Order</p>
-                    <p className="mt-0.5 text-xs text-muted-foreground">
-                      Creates the order with the Pre-Order status.
-                    </p>
                   </div>
                   <Switch
                     checked={preOrder}
@@ -647,9 +644,6 @@ function CreateOrderPage() {
                 <div className="flex min-w-0 items-start justify-between gap-3">
                   <div className="min-w-0">
                     <p className="text-sm font-semibold text-foreground">Schedule order</p>
-                    <p className="mt-0.5 text-xs text-muted-foreground">
-                      Auto-moves to Processing on the chosen date.
-                    </p>
                   </div>
                   <Switch
                     checked={scheduleOn}
