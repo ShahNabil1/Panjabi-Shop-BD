@@ -6,6 +6,14 @@ import { useCart, type CartItem } from "@/lib/cart-context";
 import { useLang } from "@/lib/language-context";
 import { formatNumber, formatPrice, pick, tr } from "@/lib/i18n";
 import { captureIncompleteOrder, placeOrder } from "@/lib/order.functions";
+import { validateCoupon } from "@/lib/coupons.functions";
+import {
+  COUPON_CODE_RE,
+  couponReasonMessage,
+  maskCouponCode,
+  type CouponValidation,
+} from "@/lib/coupons.shared";
+
 import { BD_DIVISIONS } from "@/lib/bd-geo";
 import { ProductThumb } from "@/components/site/product-card";
 import { QuantityStepper } from "@/components/site/add-to-cart";
@@ -144,7 +152,61 @@ export function CheckoutForm({
   );
   const delivery =
     rates.freeAll || (rates.freeAbove > 0 && subtotal >= rates.freeAbove) ? 0 : rates[area];
-  const total = subtotal + delivery;
+
+  // ---- Coupon (validated on the server, re-checked again when ordering) ----
+  const checkCoupon = useServerFn(validateCoupon);
+  const [couponCode, setCouponCode] = useState("");
+  const [coupon, setCoupon] = useState<CouponValidation | null>(null);
+  const [couponError, setCouponError] = useState<string | null>(null);
+  const [couponPending, setCouponPending] = useState(false);
+
+  const productIds = useMemo(() => [...new Set(items.map((i) => i.productId))], [items]);
+  const appliedCode = coupon?.ok ? coupon.code : null;
+
+  // Any cart change invalidates a previously applied coupon amount.
+  useEffect(() => {
+    setCoupon(null);
+    setCouponError(null);
+  }, [subtotal, productIds.join(",")]);
+
+  const applyCoupon = async () => {
+    const code = maskCouponCode(couponCode);
+    setCouponCode(code);
+    if (!COUPON_CODE_RE.test(code)) {
+      setCoupon(null);
+      setCouponError(
+        lang === "bn" ? "সঠিক কুপন কোড লিখুন" : "Enter a valid coupon code",
+      );
+      return;
+    }
+    setCouponPending(true);
+    setCouponError(null);
+    try {
+      const result = await checkCoupon({
+        data: {
+          code,
+          subtotal,
+          productIds,
+          phone: /^01[3-9]\d{8}$/.test(phone.trim()) ? phone.trim() : null,
+        },
+      });
+      if (result.ok) {
+        setCoupon(result);
+      } else {
+        setCoupon(null);
+        setCouponError(couponReasonMessage(result.reason, result.minSpend));
+      }
+    } catch {
+      setCoupon(null);
+      setCouponError(lang === "bn" ? "কুপন যাচাই করা যায়নি" : "Could not verify the coupon");
+    } finally {
+      setCouponPending(false);
+    }
+  };
+
+  const discount = coupon?.ok ? Math.min(Math.round(coupon.discount), subtotal) : 0;
+  const total = Math.max(0, subtotal + delivery - discount);
+
 
   const validate = () => {
     const next: Record<string, string> = {};
@@ -176,7 +238,9 @@ export function CheckoutForm({
           district,
           upazila,
           note: note.trim(),
+          couponCode: appliedCode ?? "",
           source,
+
           items: items.map((i) => ({
             productId: i.productId,
             variantId: i.variantId,
@@ -369,6 +433,70 @@ export function CheckoutForm({
           ))}
         </ul>
 
+        <div className="mt-4 border-t border-border pt-3">
+          <span className="mb-1.5 block text-sm font-semibold">
+            {lang === "bn" ? "কুপন কোড" : "Coupon code"}
+          </span>
+          <div className="flex gap-2">
+            <input
+              className={cn(inputClass, "font-en uppercase tracking-widest")}
+              value={couponCode}
+              onChange={(e) => setCouponCode(maskCouponCode(e.target.value))}
+              onKeyDown={(e) => {
+                if (e.key.length === 1 && !/[A-Za-z0-9]/.test(e.key)) e.preventDefault();
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  void applyCoupon();
+                }
+              }}
+              placeholder={lang === "bn" ? "কোড লিখুন" : "Enter code"}
+              inputMode="text"
+              autoCapitalize="characters"
+              autoComplete="off"
+              maxLength={24}
+              disabled={Boolean(appliedCode)}
+            />
+            {appliedCode ? (
+              <button
+                type="button"
+                onClick={() => {
+                  setCoupon(null);
+                  setCouponCode("");
+                  setCouponError(null);
+                }}
+                className="shrink-0 rounded-sm border border-border px-4 text-sm font-bold transition-colors hover:border-destructive hover:text-destructive active:scale-95"
+              >
+                {lang === "bn" ? "বাতিল" : "Remove"}
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => void applyCoupon()}
+                disabled={couponPending || !couponCode}
+                className="shrink-0 rounded-sm bg-foreground px-4 text-sm font-bold text-background transition-transform active:scale-95 disabled:opacity-50"
+              >
+                {couponPending
+                  ? lang === "bn"
+                    ? "যাচাই..."
+                    : "Checking…"
+                  : lang === "bn"
+                    ? "প্রয়োগ"
+                    : "Apply"}
+              </button>
+            )}
+          </div>
+          {couponError ? (
+            <p className="mt-1.5 text-xs font-semibold text-destructive">{couponError}</p>
+          ) : null}
+          {appliedCode ? (
+            <p className="mt-1.5 text-xs font-semibold text-emerald-600">
+              {lang === "bn"
+                ? `কুপন ${appliedCode} প্রয়োগ হয়েছে`
+                : `Coupon ${appliedCode} applied`}
+            </p>
+          ) : null}
+        </div>
+
         <dl className="mt-4 grid gap-1.5 border-t border-border pt-3 text-sm">
           <div className="flex justify-between">
             <dt className="text-muted-foreground">{tr(lang, "subtotal")}</dt>
@@ -380,11 +508,21 @@ export function CheckoutForm({
               {delivery === 0 ? tr(lang, "free") : formatPrice(lang, delivery)}
             </dd>
           </div>
+          {discount > 0 ? (
+            <div className="flex justify-between text-emerald-600">
+              <dt className="font-semibold">
+                {lang === "bn" ? "কুপন ছাড়" : "Coupon discount"}
+                {appliedCode ? <span className="font-en"> ({appliedCode})</span> : null}
+              </dt>
+              <dd className="font-bold tabular-nums">− {formatPrice(lang, discount)}</dd>
+            </div>
+          ) : null}
           <div className="flex justify-between border-t border-border pt-2 text-base">
             <dt className="font-bold">{tr(lang, "total")}</dt>
             <dd className="font-bold tabular-nums text-primary">{formatPrice(lang, total)}</dd>
           </div>
         </dl>
+
       </div>
 
       {failed ? (

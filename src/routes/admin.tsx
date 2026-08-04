@@ -19,6 +19,8 @@ import {
   Settings,
   ShoppingCart,
   ListOrdered,
+  Ticket,
+
   X,
 } from "lucide-react";
 
@@ -66,8 +68,12 @@ const sections: Array<{ title: string; items: NavItem[] }> = [
   },
   {
     title: "Sales",
-    items: [{ to: "/admin/promotions", label: "Promotions", icon: BadgePercent }],
+    items: [
+      { to: "/admin/promotions", label: "Promotions", icon: BadgePercent },
+      { to: "/admin/coupons", label: "Coupons", icon: Ticket },
+    ],
   },
+
 
   {
     title: "Content",

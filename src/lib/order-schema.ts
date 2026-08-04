@@ -20,9 +20,11 @@ export const placeOrderSchema = z.object({
   district: z.string().trim().min(2).max(60),
   upazila: z.string().trim().min(2).max(80),
   note: z.string().trim().max(500).optional().or(z.literal("")),
+  couponCode: z.string().trim().max(40).optional().or(z.literal("")),
   source: z.enum(["website", "landing"]).default("website"),
   items: z.array(orderLineSchema).min(1).max(30),
 });
+
 
 export type PlaceOrderInput = z.infer<typeof placeOrderSchema>;
 
