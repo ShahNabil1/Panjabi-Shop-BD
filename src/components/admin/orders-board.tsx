@@ -40,6 +40,15 @@ function adminPrice(value: number | string | null | undefined) {
   return `৳ ${n.toLocaleString("en-US")}`;
 }
 
+/** Latest delivery fee returned by the courier for this order, if any. */
+function courierFee(order: unknown): number | null {
+  const rows = (order as { order_consignments?: Array<{ delivery_fee: number | string | null }> })
+    .order_consignments;
+  if (!rows?.length) return null;
+  const fee = rows.map((r) => r.delivery_fee).find((v) => v !== null && v !== undefined);
+  return fee === null || fee === undefined ? null : Number(fee);
+}
+
 function formatBdDateTime(value: string) {
   return new Date(value).toLocaleString("en-US", {
     timeZone: "Asia/Dhaka",
