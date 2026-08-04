@@ -17,6 +17,7 @@ import {
 
   Rocket,
   Settings,
+  Truck,
   ShoppingCart,
   ListOrdered,
   Ticket,
