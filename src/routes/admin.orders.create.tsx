@@ -617,12 +617,13 @@ function CreateOrderPage() {
             <div className="mt-3 grid gap-3">
               {/* Pre-Order — creates the order directly in the Pre-Order board. */}
               <div className="rounded-xl border border-border bg-background p-3">
-                <div className="flex min-w-0 items-start justify-between gap-3">
+                <div className="flex min-w-0 items-center justify-between gap-3">
                   <div className="min-w-0">
-                    <p className="text-sm font-semibold text-foreground">Pre-Order</p>
+                    <p className="whitespace-nowrap text-sm font-semibold text-foreground">Pre-Order</p>
                   </div>
                   <Switch
                     checked={preOrder}
+                    className="shrink-0"
                     onCheckedChange={(v) => {
                       setPreOrder(v);
                       if (v) {
@@ -641,13 +642,14 @@ function CreateOrderPage() {
                   preOrder && "pointer-events-none opacity-50",
                 )}
               >
-                <div className="flex min-w-0 items-start justify-between gap-3">
+                <div className="flex min-w-0 items-center justify-between gap-3">
                   <div className="min-w-0">
-                    <p className="text-sm font-semibold text-foreground">Schedule order</p>
+                    <p className="whitespace-nowrap text-sm font-semibold text-foreground">Schedule order</p>
                   </div>
                   <Switch
                     checked={scheduleOn}
                     disabled={preOrder}
+                    className="shrink-0"
                     onCheckedChange={(v) => {
                       setScheduleOn(v);
                       if (!v) setScheduledFor("");
