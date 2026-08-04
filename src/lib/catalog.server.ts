@@ -254,7 +254,7 @@ export async function fetchProduct(slug: string) {
       reviewCount: product.review_count,
       metaTitle: product.meta_title,
       metaDescription: product.meta_description,
-      ogImageUrl: product.og_image_url,
+      ogImageUrl: product.og_image_url ?? images[0]?.url ?? null,
     },
     images,
     variants,

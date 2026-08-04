@@ -645,12 +645,6 @@ function ProductEditor() {
             onChange={(v) => set("meta_title", v || null)}
             hint="Keep within 60 characters"
           />
-          <ImageField
-            label="OG image (social preview)"
-            folder="products"
-            value={draft.og_image_url}
-            onChange={(v) => set("og_image_url", v)}
-          />
           <AreaField
             label="Meta description"
             rows={3}
