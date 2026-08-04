@@ -16,10 +16,11 @@ export const Route = createFileRoute("/admin/products/")({
 
 function AdminProductsPage() {
   const qc = useQueryClient();
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ["admin", "products"],
     queryFn: () => adminListProducts(),
   });
+
 
   const remove = useMutation({
     mutationFn: (id: string) => adminDeleteProduct({ data: { id } }),
