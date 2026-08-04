@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import {
   BadgePercent,
@@ -414,6 +414,26 @@ function CouponDialog({
   const [d, setD] = useState<Draft>(draft);
   const [error, setError] = useState<string | null>(null);
 
+  useEffect(() => {
+    const body = document.body;
+    const prevOverflow = body.style.overflow;
+    const prevPad = body.style.paddingRight;
+    const gap = window.innerWidth - document.documentElement.clientWidth;
+    body.style.overflow = "hidden";
+    if (gap > 0) body.style.paddingRight = `${gap}px`;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => {
+      body.style.overflow = prevOverflow;
+      body.style.paddingRight = prevPad;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [onClose]);
+
+
+
   const products = useQuery({
     queryKey: ["admin", "products"],
     queryFn: () => adminListProducts(),
@@ -516,16 +536,15 @@ function CouponDialog({
   }>;
 
   return (
-    <div
-      className="fixed inset-0 z-50 grid place-items-center bg-black/60 p-3 backdrop-blur-sm"
-      onClick={onClose}
-    >
+    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-hidden overscroll-contain bg-black/60 p-3 backdrop-blur-sm sm:items-center">
       <form
         onSubmit={onSubmit}
-        onClick={(e) => e.stopPropagation()}
-        className="max-h-[92vh] w-full max-w-3xl overflow-y-auto rounded-2xl border border-border bg-background shadow-2xl"
+        role="dialog"
+        aria-modal="true"
+        className="flex max-h-[calc(100dvh-1.5rem)] w-full max-w-3xl flex-col overflow-hidden rounded-2xl border border-border bg-background shadow-2xl"
       >
-        <div className="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-border bg-background/95 px-5 py-3 backdrop-blur">
+        <div className="flex shrink-0 items-center justify-between gap-3 border-b border-border bg-background px-5 py-3">
+
           <div className="flex items-center gap-2">
             <div className="grid size-9 place-items-center rounded-xl bg-primary/10 text-primary">
               <Ticket className="size-5" />
@@ -546,7 +565,7 @@ function CouponDialog({
           </button>
         </div>
 
-        <div className="space-y-5 p-5">
+        <div className="min-h-0 flex-1 space-y-5 overflow-y-auto overscroll-contain p-5">
           <Section title="Basics" icon={BadgePercent}>
             <div className="grid gap-3 md:grid-cols-2">
               <FormField label="Code" required hint="Customers type this — e.g. WELCOME10">
@@ -760,7 +779,7 @@ function CouponDialog({
           ) : null}
         </div>
 
-        <div className="sticky bottom-0 z-10 flex items-center justify-end gap-2 border-t border-border bg-background/95 px-5 py-3 backdrop-blur">
+        <div className="flex shrink-0 items-center justify-end gap-2 border-t border-border bg-background px-5 py-3">
           <Button type="button" variant="outline" onClick={onClose} className="active:scale-95">
             Cancel
           </Button>
