@@ -156,8 +156,29 @@ function PartnerCard({
   const [result, setResult] = useState<{ ok: boolean; message: string } | null>(
     row ? { ok: row.connection_ok, message: row.connection_message ?? "" } : null,
   );
+  const [pinging, setPinging] = useState(false);
+  const [ping, setPing] = useState<{ ok: boolean; status: number; body: string } | null>(null);
 
   const url = webhookUrl(provider);
+
+  const pingWebhook = async () => {
+    setPinging(true);
+    setPing(null);
+    try {
+      const res = await adminTestCourierWebhook({ data: { provider } });
+      setPing({ ok: res.ok, status: res.status, body: res.body });
+      if (res.ok) toast.success("Webhook receiver accepted the signed test event");
+      else toast.error("Webhook test failed — see details below");
+    } catch (error) {
+      const message = (error as Error).message;
+      setPing({ ok: false, status: 0, body: message });
+      toast.error(message);
+    } finally {
+      setPinging(false);
+    }
+  };
+
+
 
   const test = async () => {
     setTesting(true);
