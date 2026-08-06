@@ -665,7 +665,7 @@ export function CheckoutForm({
                 className={cn(
                   "origin-left transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]",
                   couponOpen
-                    ? "mt-3 max-h-28 translate-x-0 scale-100 opacity-100"
+                    ? "max-h-28 translate-x-0 scale-100 opacity-100"
                     : "pointer-events-none max-h-0 -translate-x-8 scale-95 opacity-0",
                 )}
               >
