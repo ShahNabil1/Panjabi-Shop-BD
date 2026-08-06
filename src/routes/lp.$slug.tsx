@@ -10,7 +10,7 @@ import { ProductThumb } from "@/components/site/product-card";
 import { NotFoundView } from "@/components/site/not-found-view";
 import { FaqList } from "@/components/site/faq-list";
 import { CheckoutForm } from "@/components/site/checkout-form";
-import { QuantityStepper } from "@/components/site/add-to-cart";
+
 import { Prose } from "@/components/site/ui";
 import { SpecShowcase } from "@/components/site/spec-showcase";
 import type { CartItem } from "@/lib/cart-context";
@@ -251,35 +251,6 @@ function LandingPage() {
             </ul>
           ) : null}
 
-          {variants.length > 0 ? (
-            <div className="mt-6">
-              <p className="mb-2 text-sm font-semibold">
-                {pick(lang, variants[0]?.group_name_bn, variants[0]?.group_name_en)}
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {variants.map((v) => (
-                  <button
-                    key={v.id}
-                    type="button"
-                    onClick={() => setVariantId(v.id)}
-                    className={cn(
-                      "rounded-sm border px-3.5 py-2 text-sm transition-colors",
-                      v.id === variantId
-                        ? "border-primary bg-primary/10 text-primary"
-                        : "border-border bg-card hover:border-primary",
-                    )}
-                  >
-                    {pick(lang, v.value_bn, v.value_en)}
-                  </button>
-                ))}
-              </div>
-            </div>
-          ) : null}
-
-          <div className="mt-6 flex items-center gap-3">
-            <span className="text-sm font-semibold">{tr(lang, "quantity")}</span>
-            <QuantityStepper value={qty} onChange={setQty} max={stock} />
-          </div>
 
           <a
             href="#order"
