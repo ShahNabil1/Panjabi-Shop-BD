@@ -47,11 +47,16 @@ export function FaqList({ items, className }: { items: FaqItem[]; className?: st
                 <path d="m6 9 6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </button>
-            {expanded ? (
-              <p className="px-4 pb-4 text-sm leading-7 text-muted-foreground">
-                {pick(lang, item.answer_bn, item.answer_en)}
-              </p>
-            ) : null}
+            <div
+              className="grid transition-[grid-template-rows,opacity] duration-300 ease-out motion-reduce:transition-none"
+              style={{ gridTemplateRows: expanded ? "1fr" : "0fr", opacity: expanded ? 1 : 0 }}
+            >
+              <div className="overflow-hidden">
+                <p className="px-4 pb-4 text-sm leading-7 text-muted-foreground">
+                  {pick(lang, item.answer_bn, item.answer_en)}
+                </p>
+              </div>
+            </div>
           </div>
         );
       })}

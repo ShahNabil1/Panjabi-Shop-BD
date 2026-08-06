@@ -316,7 +316,7 @@ function LandingPage() {
       {landingFaqs.length > 0 ? (
         <section className="mx-auto mt-14 max-w-3xl">
           <div className="relative text-center">
-            <h2 className="lp-headline text-[28px] leading-[1.2] sm:text-[42px] sm:leading-[1.15]">
+            <h2 className="lp-headline text-balance text-[22px] leading-[1.25] sm:text-[42px] sm:leading-[1.15]">
               <span className="lp-slant text-gradient-lp inline-block">{tr(lang, "productFaq")}</span>
             </h2>
             <div aria-hidden className="mx-auto mt-3 flex items-center justify-center gap-2">
