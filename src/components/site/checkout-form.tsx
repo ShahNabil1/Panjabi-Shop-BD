@@ -364,54 +364,49 @@ export function CheckoutForm({
 
             <ul className="divide-y divide-border">
               {items.map((i) => (
-                <li
-                  key={i.key}
-                  className="grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-3 px-3 py-4 sm:px-4"
-                >
-                  <div className="flex min-w-0 items-center gap-3">
-                    <div className="h-14 w-14 shrink-0 overflow-hidden rounded-md bg-secondary">
-                      <ProductThumb
-                        src={i.image}
-                        alt={pick(lang, i.nameBn, i.nameEn)}
-                        label={i.nameEn}
-                      />
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-sm font-bold leading-snug">{pick(lang, i.nameBn, i.nameEn)}</p>
-                      {i.variantLabelBn ? (
-                        <p className="text-xs text-muted-foreground">
-                          {pick(lang, i.variantLabelBn, i.variantLabelEn)}
-                        </p>
-                      ) : null}
+                <li key={i.key} className="px-3 py-4 sm:px-4">
+                  {/* Product title always on top, full width */}
+                  <p className="text-[15px] font-bold leading-snug">
+                    {pick(lang, i.nameBn, i.nameEn)}
+                  </p>
+
+                  <div className="mt-2.5 flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                      <div className="h-14 w-14 shrink-0 overflow-hidden rounded-md bg-secondary">
+                        <ProductThumb
+                          src={i.image}
+                          alt={pick(lang, i.nameBn, i.nameEn)}
+                          label={i.nameEn}
+                        />
+                      </div>
                       {onRemove ? (
                         <button
                           type="button"
                           onClick={() => onRemove(i.key)}
-                          className="mt-1 text-xs font-semibold text-muted-foreground underline-offset-4 hover:text-destructive hover:underline"
+                          className="text-xs font-semibold text-muted-foreground underline-offset-4 hover:text-destructive hover:underline"
                         >
                           {tr(lang, "remove")}
                         </button>
                       ) : null}
                     </div>
-                  </div>
 
-                  <div className="justify-self-center">
-                    {onSetQuantity ? (
-                      <QuantityStepper
-                        value={i.quantity}
-                        max={i.stock}
-                        onChange={(next) => onSetQuantity(i.key, next)}
-                      />
-                    ) : (
-                      <span className="text-sm text-muted-foreground">
-                        × {formatNumber(lang, i.quantity)}
+                    <div className="flex items-center gap-4 sm:gap-5">
+                      {onSetQuantity ? (
+                        <QuantityStepper
+                          value={i.quantity}
+                          max={i.stock}
+                          onChange={(next) => onSetQuantity(i.key, next)}
+                        />
+                      ) : (
+                        <span className="text-sm text-muted-foreground">
+                          × {formatNumber(lang, i.quantity)}
+                        </span>
+                      )}
+                      <span className="text-sm font-bold tabular-nums">
+                        {formatPrice(lang, i.price * i.quantity)}
                       </span>
-                    )}
+                    </div>
                   </div>
-
-                  <span className="justify-self-end text-sm font-bold tabular-nums">
-                    {formatPrice(lang, i.price * i.quantity)}
-                  </span>
                 </li>
               ))}
             </ul>
