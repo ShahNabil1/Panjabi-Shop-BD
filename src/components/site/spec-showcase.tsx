@@ -13,39 +13,35 @@ type Props = {
   className?: string;
 };
 
-function Callout({ item, side }: { item: SpecItem; side: "left" | "right" }) {
+function Node({ item, side }: { item: SpecItem; side: "left" | "right" }) {
   return (
-    <div
-      className={cn(
-        "relative flex items-center gap-3",
-        side === "left" ? "sm:flex-row-reverse sm:text-right" : "sm:text-left",
-      )}
-    >
-      {/* connector */}
-      <span aria-hidden className="hidden shrink-0 items-center sm:flex">
-        <span className="h-2 w-2 rounded-full bg-primary" />
-        <span className="h-px w-6 bg-linear-to-r from-primary/70 to-primary/20 sm:w-8" />
-      </span>
-
+    <div className={cn("relative flex items-center", side === "left" ? "flex-row" : "flex-row-reverse")}>
       <div
         className={cn(
-          "flex-1 rounded-xl border border-primary/15 bg-white/70 px-4 py-3 shadow-[0_1px_0_0_rgba(0,0,0,0.02),0_12px_28px_-24px_rgba(0,0,0,0.45)] backdrop-blur-[2px]",
+          "min-w-0 flex-1 rounded-xl border border-primary/25 bg-white px-3 py-2.5 shadow-[0_10px_24px_-22px_rgba(0,0,0,0.5)]",
+          side === "left" ? "text-right" : "text-left",
         )}
       >
         {item.label ? (
-          <p className="font-display-bn text-[15px] leading-snug text-primary sm:text-[17px]">{item.label}</p>
+          <p className="font-display-bn text-[12px] leading-tight text-primary sm:text-[13px]">{item.label}</p>
         ) : null}
         {item.value ? (
           <p
             className={cn(
-              "lp-fat-bn text-[15px] leading-[1.65] text-foreground/85 sm:text-[16px]",
-              item.label ? "mt-1" : "",
+              "lp-fat-bn text-[13px] leading-[1.5] text-foreground sm:text-[15px]",
+              item.label ? "mt-0.5" : "",
             )}
           >
             {item.value}
           </p>
         ) : null}
       </div>
+
+      {/* connector arm into the central spine */}
+      <span aria-hidden className="flex shrink-0 items-center">
+        <span className="h-[1.5px] w-4 bg-primary/60 sm:w-8" />
+        <span className="h-2 w-2 shrink-0 rounded-full bg-primary" />
+      </span>
     </div>
   );
 }
@@ -60,51 +56,59 @@ export function SpecShowcase({ heading, items, imageUrl, imageAlt, className }: 
     <section className={cn("relative", className)}>
       <div
         aria-hidden
-        className="pointer-events-none absolute left-1/2 top-10 h-72 w-72 -translate-x-1/2 rounded-full bg-accent/[0.08] blur-3xl"
+        className="pointer-events-none absolute left-1/2 top-8 h-64 w-64 -translate-x-1/2 rounded-full bg-accent/[0.08] blur-3xl"
       />
 
       <div className="relative text-center">
         <h2 className="lp-headline text-[28px] leading-[1.2] sm:text-[42px] sm:leading-[1.15]">
           <span className="lp-slant text-gradient-lp inline-block">{heading}</span>
         </h2>
-        <div aria-hidden className="mx-auto mt-4 flex items-center justify-center gap-2">
+        <div aria-hidden className="mx-auto mt-3 flex items-center justify-center gap-2">
           <span className="h-px w-12 bg-linear-to-r from-transparent to-accent" />
           <span className="h-2 w-2 rotate-45 bg-linear-to-br from-primary to-accent" />
           <span className="h-px w-12 bg-linear-to-l from-transparent to-accent" />
         </div>
       </div>
 
-      <div className="relative mt-8 grid items-center gap-6 sm:grid-cols-[1fr_auto_1fr] sm:gap-4">
-        <div className="order-2 grid gap-4 sm:order-1">
-          {left.map((item, i) => (
-            <Callout key={`l-${i}`} item={item} side="left" />
-          ))}
-        </div>
-
-        {imageUrl ? (
-          <div className="order-1 mx-auto sm:order-2">
-            <div className="relative h-52 w-52 sm:h-72 sm:w-72">
-              <span
-                aria-hidden
-                className="absolute inset-0 rounded-full bg-linear-to-br from-primary/10 via-transparent to-accent/15"
-              />
-              <span aria-hidden className="absolute inset-2 rounded-full border border-primary/15" />
-              <img
-                src={imageUrl}
-                alt={imageAlt}
-                loading="lazy"
-                className="relative h-full w-full rounded-full object-cover p-3"
-              />
-            </div>
+      {/* product image in the middle, top of the diagram */}
+      {imageUrl ? (
+        <div className="relative mx-auto mt-6 w-fit">
+          <div className="relative h-44 w-44 sm:h-60 sm:w-60">
+            <span
+              aria-hidden
+              className="absolute inset-0 rounded-full bg-linear-to-br from-primary/10 via-transparent to-accent/15"
+            />
+            <span aria-hidden className="absolute inset-1.5 rounded-full border border-primary/15" />
+            <img
+              src={imageUrl}
+              alt={imageAlt}
+              loading="lazy"
+              className="relative h-full w-full rounded-full object-cover p-2.5"
+            />
           </div>
-        ) : (
-          <div className="order-1 hidden sm:order-2 sm:block sm:w-6" />
-        )}
+          {/* stem down to the spine */}
+          <span aria-hidden className="mx-auto block h-6 w-[1.5px] bg-primary/60" />
+        </div>
+      ) : null}
 
-        <div className="order-3 grid gap-4">
-          {right.map((item, i) => (
-            <Callout key={`r-${i}`} item={item} side="right" />
-          ))}
+      {/* connected diagram: central spine with left / right nodes */}
+      <div className="relative mt-0">
+        <span
+          aria-hidden
+          className="absolute left-1/2 top-2 bottom-2 w-[1.5px] -translate-x-1/2 bg-primary/60"
+        />
+
+        <div className="relative grid grid-cols-2 gap-x-0">
+          <div className="grid gap-3 pr-0">
+            {left.map((item, i) => (
+              <Node key={`l-${i}`} item={item} side="left" />
+            ))}
+          </div>
+          <div className="grid translate-y-6 gap-3">
+            {right.map((item, i) => (
+              <Node key={`r-${i}`} item={item} side="right" />
+            ))}
+          </div>
         </div>
       </div>
     </section>
