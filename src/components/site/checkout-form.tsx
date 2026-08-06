@@ -613,33 +613,52 @@ export function CheckoutForm({
           </ul>
 
           {/* Coupon */}
-          <div className="mt-4">
+          <div className="mt-5">
             <div className="relative overflow-hidden">
               <button
                 type="button"
                 onClick={() => setCouponOpen(true)}
                 className={cn(
-                  "inline-flex items-center gap-1.5 text-sm font-semibold text-primary underline-offset-4 transition-all duration-300 hover:underline",
-                  couponOpen && "pointer-events-none -translate-x-2 opacity-0",
+                  "group inline-flex items-center gap-2 rounded-full border border-dashed border-primary/40 bg-primary/5 px-3.5 py-1.5 text-[15px] font-black tracking-tight text-primary shadow-sm transition-all duration-300 ease-out hover:scale-[1.02] hover:border-primary/60 hover:bg-primary/10 hover:shadow-md active:scale-[0.98]",
+                  lang === "bn" && "font-display-bn",
+                  couponOpen && "pointer-events-none -translate-x-3 opacity-0",
                 )}
                 aria-hidden={couponOpen}
                 tabIndex={couponOpen ? -1 : 0}
               >
-                {lang === "bn" ? "কুপন আছে?" : "Have a coupon?"}
+                <svg
+                  viewBox="0 0 24 24"
+                  className="h-4 w-4 shrink-0 text-primary transition-transform duration-300 group-hover:rotate-12"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M2 9a3 3 0 0 1 0-6h20a3 3 0 0 1 0 6v6a3 3 0 0 1 0 6H2a3 3 0 0 1 0-6V9Z" />
+                  <path d="M12 3v18" />
+                  <path d="M7 3v6" />
+                  <path d="M17 3v6" />
+                </svg>
+                <span>{lang === "bn" ? "কুপন আছে?" : "Have a coupon?"}</span>
               </button>
 
               <div
                 className={cn(
-                  "transition-all duration-300 ease-out",
+                  "origin-left transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]",
                   couponOpen
-                    ? "mt-2 max-h-24 translate-x-0 opacity-100"
-                    : "pointer-events-none max-h-0 -translate-x-6 opacity-0",
+                    ? "mt-3 max-h-28 translate-x-0 scale-100 opacity-100"
+                    : "pointer-events-none max-h-0 -translate-x-8 scale-95 opacity-0",
                 )}
               >
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 overflow-hidden rounded-lg border border-primary/20 bg-background p-1 shadow-sm focus-within:border-primary/50 focus-within:ring-1 focus-within:ring-primary/20">
                   <input
                     ref={couponInputRef}
-                    className={cn(inputClass, "font-en uppercase tracking-widest")}
+                    className={cn(
+                      inputClass,
+                      "flex-1 border-0 bg-transparent px-3 py-2 text-[15px] font-en font-bold uppercase tracking-[0.15em] text-foreground shadow-none focus:ring-0",
+                    )}
                     value={couponCode}
                     onChange={(e) => {
                       setCouponCode(maskCouponCode(e.target.value));
@@ -670,21 +689,21 @@ export function CheckoutForm({
                         setCouponCode("");
                         setCouponError(null);
                       }}
-                      className="shrink-0 text-xs font-semibold text-muted-foreground underline-offset-4 transition-colors hover:text-destructive hover:underline"
+                      className="mr-1 shrink-0 rounded-md px-2 py-1 text-xs font-semibold text-muted-foreground underline-offset-4 transition-colors hover:bg-destructive/10 hover:text-destructive hover:underline"
                     >
                       {lang === "bn" ? "বাতিল" : "Remove"}
                     </button>
                   ) : couponPending ? (
-                    <span className="shrink-0 text-xs font-semibold text-muted-foreground">
+                    <span className="mr-2 shrink-0 text-xs font-semibold text-muted-foreground">
                       {lang === "bn" ? "যাচাই..." : "Checking…"}
                     </span>
                   ) : null}
                 </div>
                 {couponError ? (
-                  <p className="mt-1.5 text-xs font-semibold text-destructive">{couponError}</p>
+                  <p className="mt-2 text-xs font-semibold text-destructive animate-fade-in">{couponError}</p>
                 ) : null}
                 {appliedCode ? (
-                  <p className="mt-1.5 text-xs font-semibold text-emerald-600">
+                  <p className="mt-2 text-xs font-semibold text-emerald-600 animate-fade-in">
                     {lang === "bn"
                       ? `কুপন ${appliedCode} প্রয়োগ হয়েছে`
                       : `Coupon ${appliedCode} applied`}
