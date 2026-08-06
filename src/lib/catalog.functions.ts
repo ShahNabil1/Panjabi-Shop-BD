@@ -4,6 +4,7 @@ import {
   fetchCategoryPage,
   fetchFaqs,
   fetchHome,
+  fetchLandingPage,
   fetchLayoutData,
   fetchProduct,
   fetchPromotion,
@@ -49,7 +50,4 @@ export const getLayoutData = createServerFn({ method: "GET" }).handler(async () 
 
 export const getLandingPage = createServerFn({ method: "GET" })
   .inputValidator((data: { slug: string }) => ({ slug: String(data.slug) }))
-  .handler(async ({ data }) => {
-    const { fetchLandingPage } = await import("./catalog.server");
-    return fetchLandingPage(data.slug);
-  });
+  .handler(async ({ data }) => fetchLandingPage(data.slug));
