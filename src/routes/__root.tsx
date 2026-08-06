@@ -164,6 +164,7 @@ function Chrome({ children }: { children: ReactNode }) {
     pathname.startsWith("/admin") ||
     pathname.startsWith("/auth") ||
     pathname.startsWith("/invoice");
+  const hideFooter = pathname.startsWith("/lp");
 
   if (bare) {
     return <div className="min-h-screen">{children}</div>;
@@ -173,7 +174,7 @@ function Chrome({ children }: { children: ReactNode }) {
     <div className="flex min-h-screen flex-col">
       <SiteHeader />
       <main className="flex-1">{children}</main>
-      <SiteFooter />
+      {!hideFooter && <SiteFooter />}
     </div>
   );
 }
