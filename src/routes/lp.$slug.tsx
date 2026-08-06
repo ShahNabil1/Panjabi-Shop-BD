@@ -12,6 +12,7 @@ import { FaqList } from "@/components/site/faq-list";
 import { CheckoutForm } from "@/components/site/checkout-form";
 import { QuantityStepper } from "@/components/site/add-to-cart";
 import { Prose } from "@/components/site/ui";
+import { SpecShowcase } from "@/components/site/spec-showcase";
 import type { CartItem } from "@/lib/cart-context";
 import { cn } from "@/lib/utils";
 import logoMark from "@/assets/upoharkabbo-logo.png";
