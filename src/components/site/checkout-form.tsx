@@ -53,6 +53,14 @@ function Field({
   );
 }
 
+export type CheckoutVariant = {
+  id: string;
+  value_bn: string;
+  value_en: string;
+  group_name_bn: string;
+  group_name_en: string;
+};
+
 export function CheckoutForm({
   items,
   rates,
@@ -62,6 +70,9 @@ export function CheckoutForm({
   onSetQuantity,
   onRemove,
   allowAddMore,
+  variants,
+  variantId,
+  onVariantChange,
 }: {
   items: CartItem[];
   rates: DeliveryRates;
@@ -71,6 +82,9 @@ export function CheckoutForm({
   onSetQuantity?: (key: string, quantity: number) => void;
   onRemove?: (key: string) => void;
   allowAddMore?: boolean;
+  variants?: CheckoutVariant[];
+  variantId?: string | null;
+  onVariantChange?: (id: string) => void;
 }) {
   const { lang } = useLang();
   const navigate = useNavigate();
