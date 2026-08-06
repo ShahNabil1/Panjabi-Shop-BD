@@ -14,6 +14,7 @@ import { QuantityStepper } from "@/components/site/add-to-cart";
 import { Prose } from "@/components/site/ui";
 import type { CartItem } from "@/lib/cart-context";
 import { cn } from "@/lib/utils";
+import logoMark from "@/assets/upoharkabbo-logo.png";
 
 export const Route = createFileRoute("/lp/$slug")({
   loader: async ({ params }) => {
@@ -273,14 +274,14 @@ function LandingPage() {
 
       {description ? (
         <section className="mx-auto mt-12 max-w-3xl">
-          <h2 className="text-center text-lg font-bold">{tr(lang, "description")}</h2>
+          <h2 className="font-display-bn text-center text-xl leading-snug sm:text-2xl">{tr(lang, "description")}</h2>
           <Prose text={description} className="mt-3" />
         </section>
       ) : null}
 
       {product.specs.length > 0 ? (
         <section className="mx-auto mt-10 max-w-3xl">
-          <h2 className="text-center text-lg font-bold">{tr(lang, "specs")}</h2>
+          <h2 className="font-display-bn text-center text-xl leading-snug sm:text-2xl">{tr(lang, "specs")}</h2>
           <dl className="mt-3 divide-y divide-border rounded-sm border border-border bg-card">
             {product.specs.map((spec, i) => (
               <div key={i} className="grid grid-cols-[40%_60%] gap-3 px-4 py-2.5 text-sm">
@@ -294,13 +295,13 @@ function LandingPage() {
 
       {landingFaqs.length > 0 ? (
         <section className="mx-auto mt-10 max-w-3xl">
-          <h2 className="text-center text-lg font-bold">{tr(lang, "productFaq")}</h2>
+          <h2 className="font-display-bn text-center text-xl leading-snug sm:text-2xl">{tr(lang, "productFaq")}</h2>
           <FaqList items={landingFaqs} className="mt-3" />
         </section>
       ) : null}
 
       <section id="order" className="mt-12 scroll-mt-24">
-        <h2 className="text-center text-xl font-bold">{tr(lang, "deliveryInfo")}</h2>
+        <h2 className="font-display-bn text-center text-2xl leading-snug sm:text-3xl">{tr(lang, "deliveryInfo")}</h2>
         <p className="mt-1 text-center text-sm text-muted-foreground">{tr(lang, "codNote")}</p>
         <div className="mx-auto mt-5 max-w-2xl">
           {stock > 0 ? (
