@@ -237,7 +237,7 @@ function LandingPage() {
             href="#order"
             className="mt-6 block rounded-sm bg-primary px-6 py-3.5 text-center text-base font-bold text-primary-foreground transition-colors hover:bg-primary/90"
           >
-            {tr(lang, "orderNow2")}
+            {pick(lang, "এখনই অর্ডার করুন", "Order now")}
           </a>
 
           <p className="mt-3 text-center text-xs text-muted-foreground">{tr(lang, "codNote")}</p>
@@ -245,15 +245,15 @@ function LandingPage() {
       </div>
 
       {description ? (
-        <section className="mt-12 max-w-3xl">
-          <h2 className="text-lg font-bold">{tr(lang, "description")}</h2>
+        <section className="mx-auto mt-12 max-w-3xl">
+          <h2 className="text-center text-lg font-bold">{tr(lang, "description")}</h2>
           <Prose text={description} className="mt-3" />
         </section>
       ) : null}
 
       {product.specs.length > 0 ? (
-        <section className="mt-10 max-w-3xl">
-          <h2 className="text-lg font-bold">{tr(lang, "specs")}</h2>
+        <section className="mx-auto mt-10 max-w-3xl">
+          <h2 className="text-center text-lg font-bold">{tr(lang, "specs")}</h2>
           <dl className="mt-3 divide-y divide-border rounded-sm border border-border bg-card">
             {product.specs.map((spec, i) => (
               <div key={i} className="grid grid-cols-[40%_60%] gap-3 px-4 py-2.5 text-sm">
@@ -266,16 +266,16 @@ function LandingPage() {
       ) : null}
 
       {landingFaqs.length > 0 ? (
-        <section className="mt-10 max-w-3xl">
-          <h2 className="text-lg font-bold">{tr(lang, "productFaq")}</h2>
+        <section className="mx-auto mt-10 max-w-3xl">
+          <h2 className="text-center text-lg font-bold">{tr(lang, "productFaq")}</h2>
           <FaqList items={landingFaqs} className="mt-3" />
         </section>
       ) : null}
 
       <section id="order" className="mt-12 scroll-mt-24">
-        <h2 className="text-xl font-bold">{tr(lang, "deliveryInfo")}</h2>
-        <p className="mt-1 text-sm text-muted-foreground">{tr(lang, "codNote")}</p>
-        <div className="mt-5 max-w-2xl">
+        <h2 className="text-center text-xl font-bold">{tr(lang, "deliveryInfo")}</h2>
+        <p className="mt-1 text-center text-sm text-muted-foreground">{tr(lang, "codNote")}</p>
+        <div className="mx-auto mt-5 max-w-2xl">
           {stock > 0 ? (
             <CheckoutForm
               items={items}
@@ -292,15 +292,6 @@ function LandingPage() {
         </div>
       </section>
 
-      <p className="mt-10 text-center text-sm">
-        <Link
-          to="/p/$product"
-          params={{ product: product.slug }}
-          className="font-semibold text-primary underline-offset-4 hover:underline"
-        >
-          {pick(lang, "সম্পূর্ণ প্রোডাক্ট পেইজ দেখুন", "See the full product page")}
-        </Link>
-      </p>
     </div>
   );
 }
