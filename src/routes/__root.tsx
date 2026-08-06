@@ -17,6 +17,7 @@ import { LanguageProvider, useLang } from "../lib/language-context";
 import { tr } from "../lib/i18n";
 import { SiteHeader } from "../components/site/site-header";
 import { SiteFooter } from "../components/site/site-footer";
+import { LandingFooter } from "../components/site/landing-footer";
 import { NotFoundView } from "../components/site/not-found-view";
 import { CartProvider } from "../lib/cart-context";
 import { CartDrawer } from "@/components/site/cart-drawer";
