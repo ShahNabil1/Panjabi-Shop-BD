@@ -356,10 +356,12 @@ export function CheckoutForm({
           </div>
 
           <div className="mt-4 overflow-hidden rounded-xl border border-border">
-            <div className="grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-3 bg-secondary/60 px-3 py-2.5 text-xs font-bold uppercase tracking-wide text-muted-foreground sm:px-4">
+            <div className="flex items-center justify-between gap-3 bg-secondary/60 px-3 py-2.5 text-xs font-bold uppercase tracking-wide text-muted-foreground sm:px-4">
               <span>{pick(lang, "প্রোডাক্ট", "Product")}</span>
-              <span className="text-center">{pick(lang, "পরিমাণ", "Quantity")}</span>
-              <span className="text-right">{pick(lang, "দাম", "Price")}</span>
+              <div className="flex items-center gap-4 sm:gap-5">
+                <span className="text-center">{pick(lang, "পরিমাণ", "Quantity")}</span>
+                <span className="text-right">{pick(lang, "দাম", "Price")}</span>
+              </div>
             </div>
 
             <ul className="divide-y divide-border">
