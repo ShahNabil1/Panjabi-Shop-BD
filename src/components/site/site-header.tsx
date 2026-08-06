@@ -1,4 +1,4 @@
-import { Link, useLoaderData, useNavigate } from "@tanstack/react-router";
+import { Link, useLoaderData, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 
 import { useLang } from "@/lib/language-context";
@@ -135,6 +135,8 @@ export function SiteHeader() {
   const { lang } = useLang();
   const { categories, brand, tagline } = useSiteData();
   const [open, setOpen] = useState(false);
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const isLanding = pathname.startsWith("/lp/");
 
   useEffect(() => {
     if (typeof document === "undefined") return;
