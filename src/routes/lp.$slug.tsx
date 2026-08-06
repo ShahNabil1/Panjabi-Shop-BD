@@ -158,14 +158,14 @@ function LandingPage() {
   return (
     <div className="lp-canvas -mt-px min-h-screen">
       <div className="mx-auto max-w-4xl px-4 pb-16 pt-6 sm:px-6">
-      <header className="relative overflow-hidden rounded-3xl border border-white/70 bg-white/70 px-5 py-8 text-center shadow-[0_18px_50px_-24px_color-mix(in_oklab,var(--primary)_45%,transparent)] backdrop-blur-xl sm:px-10 sm:py-12">
+      <header className="relative px-5 py-8 text-center sm:px-10 sm:py-12">
         <div
           aria-hidden
-          className="pointer-events-none absolute -left-16 -top-16 h-48 w-48 rounded-full bg-primary/15 blur-3xl"
+          className="pointer-events-none absolute -left-16 -top-16 h-48 w-48 rounded-full bg-primary/10 blur-3xl"
         />
         <div
           aria-hidden
-          className="pointer-events-none absolute -right-20 -bottom-20 h-56 w-56 rounded-full bg-accent/30 blur-3xl"
+          className="pointer-events-none absolute -right-20 -bottom-20 h-56 w-56 rounded-full bg-accent/20 blur-3xl"
         />
 
         <img
