@@ -16,11 +16,27 @@ import type { CartItem } from "@/lib/cart-context";
 import { cn } from "@/lib/utils";
 import logoMark from "@/assets/upoharkabbo-logo.png";
 
+async function retryNetworkRequest<T>(request: () => Promise<T>): Promise<T> {
+  const delays = [150, 400];
+
+  for (let attempt = 0; ; attempt += 1) {
+    try {
+      return await request();
+    } catch (error) {
+      const isTransientNetworkError =
+        error instanceof TypeError && /failed to fetch|networkerror/i.test(error.message);
+      const delay = delays[attempt];
+      if (!isTransientNetworkError || delay === undefined) throw error;
+      await new Promise<void>((resolve) => globalThis.setTimeout(resolve, delay));
+    }
+  }
+}
+
 export const Route = createFileRoute("/lp/$slug")({
   loader: async ({ params }) => {
     const [data, rates] = await Promise.all([
-      getLandingPage({ data: { slug: params.slug } }),
-      getDeliveryRates(),
+      retryNetworkRequest(() => getLandingPage({ data: { slug: params.slug } })),
+      retryNetworkRequest(() => getDeliveryRates()),
     ]);
     if (!data) throw notFound();
     return { ...data, rates };
