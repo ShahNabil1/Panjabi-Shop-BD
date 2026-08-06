@@ -230,6 +230,7 @@ export function CheckoutForm({
     if (!code && silentWhenEmpty) {
       setCoupon(null);
       setCouponError(null);
+      lastCheckedCouponRef.current = "";
       return;
     }
     if (!COUPON_CODE_RE.test(code)) {
@@ -237,6 +238,7 @@ export function CheckoutForm({
       setCouponError(
         lang === "bn" ? "কুপনটি ভ্যালিড না" : "This coupon is not valid",
       );
+      lastCheckedCouponRef.current = code;
       return;
     }
 
@@ -262,7 +264,19 @@ export function CheckoutForm({
       setCouponError(lang === "bn" ? "কুপন যাচাই করা যায়নি" : "Could not verify the coupon");
     } finally {
       setCouponPending(false);
+      lastCheckedCouponRef.current = code;
     }
+  };
+
+  const handleCouponBlur = () => {
+    const code = maskCouponCode(couponCode);
+    if (!code) {
+      setCouponError(null);
+      lastCheckedCouponRef.current = "";
+      return;
+    }
+    if (code === lastCheckedCouponRef.current) return;
+    void applyCoupon(true);
   };
 
   const discount = coupon?.ok ? Math.min(Math.round(coupon.discount), subtotal) : 0;
