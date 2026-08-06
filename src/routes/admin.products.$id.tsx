@@ -557,14 +557,8 @@ function ProductEditor() {
             {draft.specs.map((s, i) => (
               <div
                 key={i}
-                className="grid gap-2 rounded-xl border border-border/70 bg-background/50 p-2 transition-all duration-300 hover:border-primary/30 sm:grid-cols-3"
+                className="grid gap-2 rounded-xl border border-border/70 bg-background/50 p-2 transition-all duration-300 hover:border-primary/30 sm:grid-cols-[1fr_auto]"
               >
-                <Input
-                  className="rounded-lg"
-                  placeholder="Label"
-                  value={s.label_bn}
-                  onChange={(e) => patchSpec(i, { label_bn: e.target.value, label_en: e.target.value })}
-                />
                 <Input
                   className="rounded-lg"
                   placeholder="Value"
