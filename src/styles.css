@@ -55,9 +55,32 @@
 
 @utility font-display-bn {
   font-family: "NotoSerifBanglaDisplay", "Times New Roman", Times, serif;
-  font-weight: 700;
-  letter-spacing: -0.01em;
+  font-weight: 900;
+  letter-spacing: -0.015em;
+  font-synthesis: weight style;
 }
+
+/* Faux-italic slant for Bangla display type (no true italic in the face). */
+@utility lp-slant {
+  transform: skewX(-7deg);
+  transform-origin: 50% 100%;
+}
+
+@utility lp-italic {
+  font-style: italic;
+  font-synthesis: style;
+}
+
+/* Bold editorial headline treatment for landing pages. */
+@utility lp-headline {
+  font-family: "NotoSerifBanglaDisplay", "Times New Roman", Times, serif;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  text-shadow: 0 1px 0 color-mix(in oklab, var(--accent) 30%, transparent);
+  paint-order: stroke fill;
+  -webkit-text-stroke: 0.6px color-mix(in oklab, var(--primary) 22%, transparent);
+}
+
 
 /* Premium off-white canvas used by landing pages. */
 @utility lp-canvas {
