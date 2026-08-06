@@ -636,7 +636,9 @@ export function CheckoutForm({
                 className={cn(
                   "group inline-flex items-center gap-2 rounded-full border border-dashed border-primary/40 bg-primary/5 px-3.5 py-1.5 text-[15px] font-black tracking-tight text-primary shadow-sm transition-all duration-300 ease-out hover:scale-[1.02] hover:border-primary/60 hover:bg-primary/10 hover:shadow-md active:scale-[0.98]",
                   lang === "bn" && "font-display-bn",
-                  couponOpen && "pointer-events-none -translate-x-3 opacity-0",
+                  couponOpen
+                    ? "pointer-events-none absolute left-0 top-0 h-0 py-0 opacity-0"
+                    : "relative translate-x-0",
                 )}
                 aria-hidden={couponOpen}
                 tabIndex={couponOpen ? -1 : 0}
