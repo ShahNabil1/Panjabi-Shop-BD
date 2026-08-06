@@ -22,9 +22,8 @@ function Node({ item, side }: { item: SpecItem; side: "left" | "right" }) {
           side === "left" ? "text-right" : "text-left",
         )}
       >
-        {item.label ? (
-          <p className="font-display-bn text-[12px] leading-tight text-primary sm:text-[13px]">{item.label}</p>
-        ) : null}
+        {null}
+
         {item.value ? (
           <p
             className={cn(
