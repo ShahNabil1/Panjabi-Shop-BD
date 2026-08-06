@@ -314,9 +314,18 @@ function LandingPage() {
 
 
       {landingFaqs.length > 0 ? (
-        <section className="mx-auto mt-10 max-w-3xl">
-          <h2 className="font-display-bn text-center text-xl leading-snug sm:text-2xl">{tr(lang, "productFaq")}</h2>
-          <FaqList items={landingFaqs} className="mt-3" />
+        <section className="mx-auto mt-14 max-w-3xl">
+          <div className="relative text-center">
+            <h2 className="lp-headline text-[28px] leading-[1.2] sm:text-[42px] sm:leading-[1.15]">
+              <span className="lp-slant text-gradient-lp inline-block">{tr(lang, "productFaq")}</span>
+            </h2>
+            <div aria-hidden className="mx-auto mt-3 flex items-center justify-center gap-2">
+              <span className="h-px w-12 bg-linear-to-r from-transparent to-accent" />
+              <span className="h-2 w-2 rotate-45 bg-linear-to-br from-primary to-accent" />
+              <span className="h-px w-12 bg-linear-to-l from-transparent to-accent" />
+            </div>
+          </div>
+          <FaqList items={landingFaqs} className="mt-6" />
         </section>
       ) : null}
 

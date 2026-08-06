@@ -55,7 +55,7 @@ export const t = {
   off: { bn: "ছাড়", en: "off" },
   description: { bn: "বিবরণ", en: "Description" },
   specs: { bn: "স্পেসিফিকেশন", en: "Specifications" },
-  productFaq: { bn: "এক নজরে", en: "At a glance" },
+  productFaq: { bn: "যে প্রশ্নগুলো আমরা প্রায়ই পেয়ে থাকি", en: "Frequently asked questions" },
   related: { bn: "সম্পর্কিত পণ্য", en: "Related products" },
   noProducts: { bn: "এই মুহূর্তে কোনো পণ্য নেই।", en: "No products here right now." },
   sku: { bn: "এসকেইউ", en: "SKU" },
