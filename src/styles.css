@@ -43,6 +43,22 @@
   unicode-range: U+0980-09FF, U+200C-200D, U+25CC;
 }
 
+/* Display face used ONLY for landing-page headings/titles. */
+@font-face {
+  font-family: "NotoSerifBanglaDisplay";
+  src: url("/__l5e/assets-v1/0bdeb3f3-5f96-4981-a5f9-369492efaaba/NotoSerifBengali-Bold.ttf")
+    format("truetype");
+  font-weight: 400 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@utility font-display-bn {
+  font-family: "NotoSerifBanglaDisplay", "Times New Roman", Times, serif;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
 @theme inline {
   --font-sans: "SolaimanLipi", "Times New Roman", Times, serif;
   --font-serif: "SolaimanLipi", "Times New Roman", Times, serif;

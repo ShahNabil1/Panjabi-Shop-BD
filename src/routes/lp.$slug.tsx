@@ -14,6 +14,7 @@ import { QuantityStepper } from "@/components/site/add-to-cart";
 import { Prose } from "@/components/site/ui";
 import type { CartItem } from "@/lib/cart-context";
 import { cn } from "@/lib/utils";
+import logoMark from "@/assets/upoharkabbo-logo.png";
 
 export const Route = createFileRoute("/lp/$slug")({
   loader: async ({ params }) => {
@@ -139,15 +140,42 @@ function LandingPage() {
   const description = pick(lang, product.descriptionBn, product.descriptionEn);
 
   return (
-    <div className="mx-auto max-w-4xl px-4 pb-16 pt-8 sm:px-6">
-      <header className="text-center">
-        <h1 className="text-2xl font-bold leading-snug tracking-tight sm:text-4xl">{headline}</h1>
+    <div className="mx-auto max-w-4xl px-4 pb-16 pt-6 sm:px-6">
+      <header className="relative overflow-hidden rounded-2xl border border-border bg-gradient-to-b from-secondary/60 via-card to-card px-5 py-8 text-center sm:px-10 sm:py-12">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -left-16 -top-16 h-48 w-48 rounded-full bg-primary/10 blur-3xl"
+        />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -right-20 -bottom-20 h-56 w-56 rounded-full bg-primary/10 blur-3xl"
+        />
+
+        <img
+          src={logoMark}
+          alt={pick(lang, product.nameBn, product.nameEn)}
+          width={1040}
+          height={375}
+          className="relative mx-auto h-14 w-auto object-contain sm:h-16"
+        />
+
+        <h1 className="font-display-bn relative mt-6 text-[26px] leading-[1.35] tracking-tight text-foreground sm:text-[40px] sm:leading-[1.3]">
+          {headline}
+        </h1>
+
+        <div aria-hidden className="relative mx-auto mt-5 flex items-center justify-center gap-2">
+          <span className="h-px w-10 bg-linear-to-r from-transparent to-primary/60" />
+          <span className="h-1.5 w-1.5 rotate-45 bg-primary/70" />
+          <span className="h-px w-10 bg-linear-to-l from-transparent to-primary/60" />
+        </div>
+
         {subheadline ? (
-          <p className="mx-auto mt-3 max-w-2xl text-[15px] leading-7 text-muted-foreground">
+          <p className="relative mx-auto mt-5 max-w-2xl text-[15px] font-medium leading-8 text-muted-foreground sm:text-base">
             {subheadline}
           </p>
         ) : null}
       </header>
+
 
       <div className="mt-7 grid gap-6 sm:grid-cols-2">
         <div className="grid gap-3">
@@ -246,14 +274,14 @@ function LandingPage() {
 
       {description ? (
         <section className="mx-auto mt-12 max-w-3xl">
-          <h2 className="text-center text-lg font-bold">{tr(lang, "description")}</h2>
+          <h2 className="font-display-bn text-center text-xl leading-snug sm:text-2xl">{tr(lang, "description")}</h2>
           <Prose text={description} className="mt-3" />
         </section>
       ) : null}
 
       {product.specs.length > 0 ? (
         <section className="mx-auto mt-10 max-w-3xl">
-          <h2 className="text-center text-lg font-bold">{tr(lang, "specs")}</h2>
+          <h2 className="font-display-bn text-center text-xl leading-snug sm:text-2xl">{tr(lang, "specs")}</h2>
           <dl className="mt-3 divide-y divide-border rounded-sm border border-border bg-card">
             {product.specs.map((spec, i) => (
               <div key={i} className="grid grid-cols-[40%_60%] gap-3 px-4 py-2.5 text-sm">
@@ -267,13 +295,13 @@ function LandingPage() {
 
       {landingFaqs.length > 0 ? (
         <section className="mx-auto mt-10 max-w-3xl">
-          <h2 className="text-center text-lg font-bold">{tr(lang, "productFaq")}</h2>
+          <h2 className="font-display-bn text-center text-xl leading-snug sm:text-2xl">{tr(lang, "productFaq")}</h2>
           <FaqList items={landingFaqs} className="mt-3" />
         </section>
       ) : null}
 
       <section id="order" className="mt-12 scroll-mt-24">
-        <h2 className="text-center text-xl font-bold">{tr(lang, "deliveryInfo")}</h2>
+        <h2 className="font-display-bn text-center text-2xl leading-snug sm:text-3xl">{tr(lang, "deliveryInfo")}</h2>
         <p className="mt-1 text-center text-sm text-muted-foreground">{tr(lang, "codNote")}</p>
         <div className="mx-auto mt-5 max-w-2xl">
           {stock > 0 ? (
