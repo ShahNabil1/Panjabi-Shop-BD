@@ -161,11 +161,11 @@ function LandingPage() {
       <header className="relative px-5 py-8 text-center sm:px-10 sm:py-12">
         <div
           aria-hidden
-          className="pointer-events-none absolute -left-16 -top-16 h-48 w-48 rounded-full bg-primary/10 blur-3xl"
+          className="pointer-events-none absolute -left-16 -top-16 h-48 w-48 rounded-full bg-primary/[0.06] blur-3xl"
         />
         <div
           aria-hidden
-          className="pointer-events-none absolute -right-20 -bottom-20 h-56 w-56 rounded-full bg-accent/20 blur-3xl"
+          className="pointer-events-none absolute -right-20 -bottom-20 h-56 w-56 rounded-full bg-accent/[0.10] blur-3xl"
         />
 
         <img
