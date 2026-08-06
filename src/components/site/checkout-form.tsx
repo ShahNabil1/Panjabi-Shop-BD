@@ -203,9 +203,16 @@ export function CheckoutForm({
   // ---- Coupon (validated on the server, re-checked again when ordering) ----
   const checkCoupon = useServerFn(validateCoupon);
   const [couponCode, setCouponCode] = useState("");
+  const [couponOpen, setCouponOpen] = useState(false);
+  const couponInputRef = useRef<HTMLInputElement | null>(null);
   const [coupon, setCoupon] = useState<CouponValidation | null>(null);
   const [couponError, setCouponError] = useState<string | null>(null);
   const [couponPending, setCouponPending] = useState(false);
+
+  useEffect(() => {
+    if (couponOpen) couponInputRef.current?.focus();
+  }, [couponOpen]);
+
 
   const productIds = useMemo(() => [...new Set(items.map((i) => i.productId))], [items]);
   const appliedCode = coupon?.ok ? coupon.code : null;
