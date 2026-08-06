@@ -22,40 +22,6 @@ export function useSiteData(): SiteData {
   return useLoaderData({ from: "__root__" }) as SiteData;
 }
 
-function LangToggle({ className }: { className?: string }) {
-  const { lang, setLang } = useLang();
-  return (
-    <div
-      className={cn(
-        "inline-flex items-center overflow-hidden rounded-sm border border-border/60",
-        className,
-      )}
-    >
-      <button
-        type="button"
-        onClick={() => setLang("bn")}
-        aria-pressed={lang === "bn"}
-        className={cn(
-          "px-2 py-0.5 text-xs font-semibold transition-colors",
-          lang === "bn" ? "bg-primary text-primary-foreground" : "text-muted-foreground",
-        )}
-      >
-        বাংলা
-      </button>
-      <button
-        type="button"
-        onClick={() => setLang("en")}
-        aria-pressed={lang === "en"}
-        className={cn(
-          "font-en px-2 py-0.5 text-xs font-semibold transition-colors",
-          lang === "en" ? "bg-primary text-primary-foreground" : "text-muted-foreground",
-        )}
-      >
-        EN
-      </button>
-    </div>
-  );
-}
 
 function SearchBox({ onDone }: { onDone?: () => void }) {
   const { lang } = useLang();
