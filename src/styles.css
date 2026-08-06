@@ -81,6 +81,16 @@
   -webkit-text-stroke: 0.6px color-mix(in oklab, var(--primary) 22%, transparent);
 }
 
+/* Extra-heavy SolaimanLipi for landing free-text callouts. */
+@utility lp-fat-bn {
+  font-family: "SolaimanLipi", "Times New Roman", Times, serif;
+  font-weight: 900;
+  -webkit-text-stroke: 0.35px currentColor;
+  paint-order: stroke fill;
+  letter-spacing: 0.002em;
+}
+
+
 
 /* Premium off-white canvas used by landing pages. */
 @utility lp-canvas {

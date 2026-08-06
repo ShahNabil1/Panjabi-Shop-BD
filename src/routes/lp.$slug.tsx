@@ -12,6 +12,7 @@ import { FaqList } from "@/components/site/faq-list";
 import { CheckoutForm } from "@/components/site/checkout-form";
 import { QuantityStepper } from "@/components/site/add-to-cart";
 import { Prose } from "@/components/site/ui";
+import { SpecShowcase } from "@/components/site/spec-showcase";
 import type { CartItem } from "@/lib/cart-context";
 import { cn } from "@/lib/utils";
 import logoMark from "@/assets/upoharkabbo-logo.png";
@@ -299,18 +300,18 @@ function LandingPage() {
       ) : null}
 
       {product.specs.length > 0 ? (
-        <section className="mx-auto mt-10 max-w-3xl">
-          <h2 className="font-display-bn text-center text-xl leading-snug sm:text-2xl">{tr(lang, "specs")}</h2>
-          <dl className="mt-3 divide-y divide-border rounded-sm border border-border bg-card">
-            {product.specs.map((spec, i) => (
-              <div key={i} className="grid grid-cols-[40%_60%] gap-3 px-4 py-2.5 text-sm">
-                <dt className="text-muted-foreground">{pick(lang, spec["label_bn"], spec["label_en"])}</dt>
-                <dd className="font-medium">{pick(lang, spec["value_bn"], spec["value_en"])}</dd>
-              </div>
-            ))}
-          </dl>
-        </section>
+        <SpecShowcase
+          className="mx-auto mt-14 max-w-4xl"
+          heading={tr(lang, "specs")}
+          imageUrl={images[0]?.url ?? null}
+          imageAlt={headline}
+          items={product.specs.map((spec) => ({
+            label: pick(lang, spec["label_bn"], spec["label_en"]),
+            value: pick(lang, spec["value_bn"], spec["value_en"]),
+          }))}
+        />
       ) : null}
+
 
       {landingFaqs.length > 0 ? (
         <section className="mx-auto mt-10 max-w-3xl">
