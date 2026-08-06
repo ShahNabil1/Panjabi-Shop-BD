@@ -121,7 +121,7 @@ export function LandingFooter({ brand }: { brand: string }) {
               rel={href.startsWith("http") ? "noopener noreferrer" : undefined}
               aria-label={label}
               className={cn(
-                "flex h-11 w-11 items-center justify-center rounded-full border border-border bg-white shadow-sm transition-transform hover:scale-105",
+                "flex h-11 w-11 items-center justify-center rounded-full border border-border bg-card shadow-sm transition-transform hover:scale-105",
                 colorClass,
               )}
             >
