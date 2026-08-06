@@ -176,8 +176,8 @@ function LandingPage() {
           className="relative mx-auto h-14 w-auto object-contain sm:h-16"
         />
 
-        <h1 className="font-display-bn text-gradient-lp relative mt-6 text-[28px] leading-[1.35] tracking-tight sm:text-[44px] sm:leading-[1.3]">
-          {headline}
+        <h1 className="lp-headline relative mt-6 text-[30px] leading-[1.28] sm:text-[52px] sm:leading-[1.2]">
+          <span className="lp-slant text-gradient-lp inline-block">{headline}</span>
         </h1>
 
         <div aria-hidden className="relative mx-auto mt-5 flex items-center justify-center gap-2">
@@ -187,10 +187,11 @@ function LandingPage() {
         </div>
 
         {subheadline ? (
-          <p className="relative mx-auto mt-5 max-w-2xl text-[15px] font-medium leading-8 text-foreground/70 sm:text-base">
+          <p className="lp-italic relative mx-auto mt-5 max-w-2xl text-[16px] font-semibold leading-8 tracking-[0.01em] text-foreground/80 sm:text-[18px]">
             {subheadline}
           </p>
         ) : null}
+
       </header>
 
 
