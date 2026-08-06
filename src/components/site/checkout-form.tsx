@@ -208,6 +208,7 @@ export function CheckoutForm({
   const [coupon, setCoupon] = useState<CouponValidation | null>(null);
   const [couponError, setCouponError] = useState<string | null>(null);
   const [couponPending, setCouponPending] = useState(false);
+  const lastCheckedCouponRef = useRef<string>("");
 
   useEffect(() => {
     if (couponOpen) couponInputRef.current?.focus();
