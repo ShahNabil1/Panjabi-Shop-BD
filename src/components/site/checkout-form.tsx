@@ -53,6 +53,14 @@ function Field({
   );
 }
 
+export type CheckoutVariant = {
+  id: string;
+  value_bn: string;
+  value_en: string;
+  group_name_bn: string;
+  group_name_en: string;
+};
+
 export function CheckoutForm({
   items,
   rates,
@@ -62,6 +70,9 @@ export function CheckoutForm({
   onSetQuantity,
   onRemove,
   allowAddMore,
+  variants,
+  variantId,
+  onVariantChange,
 }: {
   items: CartItem[];
   rates: DeliveryRates;
@@ -71,6 +82,9 @@ export function CheckoutForm({
   onSetQuantity?: (key: string, quantity: number) => void;
   onRemove?: (key: string) => void;
   allowAddMore?: boolean;
+  variants?: CheckoutVariant[];
+  variantId?: string | null;
+  onVariantChange?: (id: string) => void;
 }) {
   const { lang } = useLang();
   const navigate = useNavigate();
@@ -297,281 +311,410 @@ export function CheckoutForm({
   };
 
   return (
-    <form onSubmit={onSubmit} className={cn("grid gap-4", compact ? "" : "gap-5")} noValidate>
-      <div className="grid gap-4 sm:grid-cols-2">
-        <Field label={tr(lang, "fullName")} error={errors["name"]}>
-          <input
-            className={inputClass}
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            autoComplete="name"
-            maxLength={80}
-            required
-          />
-        </Field>
-        <Field label={tr(lang, "phone")} error={errors["phone"]}>
-          <input
-            className={cn(inputClass, "font-en")}
-            value={phone}
-            onChange={(e) => setPhone(normalizePhoneInput(e.target.value))}
-            inputMode="numeric"
-            autoComplete="tel"
-            placeholder="01XXXXXXXXX"
-            maxLength={11}
-            required
-          />
-        </Field>
+    <form
+      onSubmit={onSubmit}
+      className="overflow-hidden rounded-2xl border border-border bg-card shadow-[0_18px_50px_-30px_rgba(0,0,0,0.45)]"
+      noValidate
+    >
+      {/* Header */}
+      <div className="rounded-b-2xl bg-foreground px-5 py-8 text-center text-background sm:px-8">
+        <span className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-background">
+          <svg
+            viewBox="0 0 24 24"
+            aria-hidden
+            className="h-8 w-8 text-primary"
+            fill="currentColor"
+          >
+            <path d="M7 18a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm10 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4ZM2.2 2h2.1a1 1 0 0 1 .97.76L5.8 5H21a1 1 0 0 1 .97 1.24l-1.8 7.2A2 2 0 0 1 18.23 15H8.1a2 2 0 0 1-1.95-1.55L4.02 4H2.2a1 1 0 0 1 0-2Z" />
+          </svg>
+        </span>
+        <h2 className="font-display-bn mt-4 text-2xl sm:text-3xl">
+          {pick(lang, "অর্ডার ফর্ম", "Order form")}
+        </h2>
+        <p className="mx-auto mt-2 max-w-md text-[15px] leading-7 text-background/80">
+          {pick(
+            lang,
+            "আপনার অর্ডারটি প্লেস করতে, অনুগ্রহ করে নিচের তথ্য গুলো দিয়ে সহযোগীতা করুন।",
+            "To place your order, please fill in the details below.",
+          )}
+        </p>
       </div>
 
-      <Field label={tr(lang, "address")} hint={tr(lang, "addressHint")} error={errors["address"]}>
-        <textarea
-          className={cn(inputClass, "min-h-20 resize-y")}
-          value={address}
-          onChange={(e) => setAddress(e.target.value)}
-          autoComplete="street-address"
-          maxLength={300}
-          required
-        />
-      </Field>
+      <div className={cn("grid gap-8 px-4 py-7 sm:px-7", compact ? "" : "sm:py-9")}>
+        {/* Your products */}
+        <section>
+          <div className="flex items-center justify-between gap-3">
+            <h3 className="text-lg font-extrabold">{pick(lang, "আপনার প্রোডাক্ট", "Your Products")}</h3>
+            {allowAddMore ? (
+              <Link
+                to="/"
+                className="text-xs font-semibold text-primary underline-offset-4 hover:underline"
+              >
+                + {tr(lang, "addMoreProducts")}
+              </Link>
+            ) : null}
+          </div>
 
-      <div className="grid gap-4 sm:grid-cols-3">
-        <Field label={tr(lang, "division")} error={errors["division"]}>
-          <select
-            className={inputClass}
-            value={division}
-            onChange={(e) => {
-              setDivision(e.target.value);
-              setDistrict("");
-              setUpazila("");
-            }}
-            required
-          >
-            <option value="">{tr(lang, "selectDivision")}</option>
-            {BD_DIVISIONS.map((d) => (
-              <option key={d.id} value={d.bn}>
-                {pick(lang, d.bn, d.en)}
-              </option>
-            ))}
-          </select>
-        </Field>
+          <div className="mt-4 overflow-hidden rounded-xl border border-border">
+            <div className="grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-3 bg-secondary/60 px-3 py-2.5 text-xs font-bold uppercase tracking-wide text-muted-foreground sm:px-4">
+              <span>{pick(lang, "প্রোডাক্ট", "Product")}</span>
+              <span className="text-center">{pick(lang, "পরিমাণ", "Quantity")}</span>
+              <span className="text-right">{pick(lang, "দাম", "Price")}</span>
+            </div>
 
-        <Field label={tr(lang, "district")} error={errors["district"]}>
-          <select
-            className={cn(inputClass, !divisionObj && "opacity-60")}
-            value={district}
-            disabled={!divisionObj}
-            onChange={(e) => {
-              setDistrict(e.target.value);
-              setUpazila("");
-            }}
-            required
-          >
-            <option value="">{tr(lang, "selectDistrict")}</option>
-            {(divisionObj?.districts ?? []).map((d) => (
-              <option key={d.id} value={d.bn}>
-                {pick(lang, d.bn, d.en)}
-              </option>
-            ))}
-          </select>
-        </Field>
+            <ul className="divide-y divide-border">
+              {items.map((i) => (
+                <li
+                  key={i.key}
+                  className="grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-3 px-3 py-4 sm:px-4"
+                >
+                  <div className="flex min-w-0 items-center gap-3">
+                    <div className="h-14 w-14 shrink-0 overflow-hidden rounded-md bg-secondary">
+                      <ProductThumb
+                        src={i.image}
+                        alt={pick(lang, i.nameBn, i.nameEn)}
+                        label={i.nameEn}
+                      />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-sm font-bold leading-snug">{pick(lang, i.nameBn, i.nameEn)}</p>
+                      {i.variantLabelBn ? (
+                        <p className="text-xs text-muted-foreground">
+                          {pick(lang, i.variantLabelBn, i.variantLabelEn)}
+                        </p>
+                      ) : null}
+                      {onRemove ? (
+                        <button
+                          type="button"
+                          onClick={() => onRemove(i.key)}
+                          className="mt-1 text-xs font-semibold text-muted-foreground underline-offset-4 hover:text-destructive hover:underline"
+                        >
+                          {tr(lang, "remove")}
+                        </button>
+                      ) : null}
+                    </div>
+                  </div>
 
-        <Field label={tr(lang, "upazila")} error={errors["upazila"]}>
-          <select
-            className={cn(inputClass, !districtObj && "opacity-60")}
-            value={upazila}
-            disabled={!districtObj}
-            onChange={(e) => setUpazila(e.target.value)}
-            required
-          >
-            <option value="">{tr(lang, "selectUpazila")}</option>
-            {(districtObj?.upazilas ?? []).map((u) => (
-              <option key={u.en} value={u.bn}>
-                {pick(lang, u.bn, u.en)}
-              </option>
-            ))}
-          </select>
-        </Field>
-      </div>
-
-      <Field label={tr(lang, "note")}>
-        <textarea
-          className={cn(inputClass, "min-h-16 resize-y")}
-          value={note}
-          onChange={(e) => setNote(e.target.value)}
-          maxLength={500}
-        />
-      </Field>
-
-      <div className="rounded-sm border border-border bg-card p-4">
-        <div className="mb-3 flex items-center justify-between gap-3">
-          <h3 className="text-sm font-bold">{tr(lang, "yourItems")}</h3>
-          {allowAddMore ? (
-            <Link
-              to="/"
-              className="text-xs font-semibold text-primary underline-offset-4 hover:underline"
-            >
-              + {tr(lang, "addMoreProducts")}
-            </Link>
-          ) : null}
-        </div>
-
-        <ul className="grid gap-3">
-          {items.map((i) => (
-            <li key={i.key} className="grid grid-cols-[56px_minmax(0,1fr)] gap-3">
-              <div className="aspect-square overflow-hidden rounded-sm bg-secondary">
-                <ProductThumb
-                  src={i.image}
-                  alt={pick(lang, i.nameBn, i.nameEn)}
-                  label={i.nameEn}
-                />
-              </div>
-              <div className="min-w-0">
-                <div className="flex items-start justify-between gap-3">
-                  <p className="min-w-0 text-sm font-semibold">
-                    {pick(lang, i.nameBn, i.nameEn)}
-                    {i.variantLabelBn ? (
-                      <span className="block text-xs font-normal text-muted-foreground">
-                        {pick(lang, i.variantLabelBn, i.variantLabelEn)}
+                  <div className="justify-self-center">
+                    {onSetQuantity ? (
+                      <QuantityStepper
+                        value={i.quantity}
+                        max={i.stock}
+                        onChange={(next) => onSetQuantity(i.key, next)}
+                      />
+                    ) : (
+                      <span className="text-sm text-muted-foreground">
+                        × {formatNumber(lang, i.quantity)}
                       </span>
-                    ) : null}
-                  </p>
-                  <span className="shrink-0 text-sm font-bold tabular-nums">
+                    )}
+                  </div>
+
+                  <span className="justify-self-end text-sm font-bold tabular-nums">
                     {formatPrice(lang, i.price * i.quantity)}
                   </span>
-                </div>
-                <div className="mt-2 flex flex-wrap items-center gap-3">
-                  {onSetQuantity ? (
-                    <QuantityStepper
-                      value={i.quantity}
-                      max={i.stock}
-                      onChange={(next) => onSetQuantity(i.key, next)}
-                    />
-                  ) : (
-                    <span className="text-xs text-muted-foreground">
-                      × {formatNumber(lang, i.quantity)}
-                    </span>
-                  )}
-                  {onRemove ? (
+                </li>
+              ))}
+            </ul>
+
+            {variants && variants.length > 0 ? (
+              <div className="border-t border-border px-3 py-4 sm:px-4">
+                <p className="mb-2 text-sm font-bold">
+                  {pick(lang, variants[0]?.group_name_bn, variants[0]?.group_name_en)}
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {variants.map((v) => (
                     <button
+                      key={v.id}
                       type="button"
-                      onClick={() => onRemove(i.key)}
-                      className="text-xs font-semibold text-muted-foreground underline-offset-4 hover:text-destructive hover:underline"
+                      onClick={() => onVariantChange?.(v.id)}
+                      className={cn(
+                        "rounded-md border px-3.5 py-2 text-sm font-semibold transition-colors",
+                        v.id === variantId
+                          ? "border-primary bg-primary/10 text-primary"
+                          : "border-border bg-card hover:border-primary",
+                      )}
                     >
-                      {tr(lang, "remove")}
+                      {pick(lang, v.value_bn, v.value_en)}
                     </button>
-                  ) : null}
+                  ))}
                 </div>
               </div>
-            </li>
-          ))}
-        </ul>
-
-        <div className="mt-4 border-t border-border pt-3">
-          <span className="mb-1.5 block text-sm font-semibold">
-            {lang === "bn" ? "কুপন কোড" : "Coupon code"}
-          </span>
-          <div className="flex gap-2">
-            <input
-              className={cn(inputClass, "font-en uppercase tracking-widest")}
-              value={couponCode}
-              onChange={(e) => setCouponCode(maskCouponCode(e.target.value))}
-              onKeyDown={(e) => {
-                if (e.key.length === 1 && !/[A-Za-z0-9]/.test(e.key)) e.preventDefault();
-                if (e.key === "Enter") {
-                  e.preventDefault();
-                  void applyCoupon();
-                }
-              }}
-              placeholder={lang === "bn" ? "কোড লিখুন" : "Enter code"}
-              inputMode="text"
-              autoCapitalize="characters"
-              autoComplete="off"
-              maxLength={24}
-              disabled={Boolean(appliedCode)}
-            />
-            {appliedCode ? (
-              <button
-                type="button"
-                onClick={() => {
-                  setCoupon(null);
-                  setCouponCode("");
-                  setCouponError(null);
-                }}
-                className="shrink-0 rounded-sm border border-border px-4 text-sm font-bold transition-colors hover:border-destructive hover:text-destructive active:scale-95"
-              >
-                {lang === "bn" ? "বাতিল" : "Remove"}
-              </button>
-            ) : (
-              <button
-                type="button"
-                onClick={() => void applyCoupon()}
-                disabled={couponPending || !couponCode}
-                className="shrink-0 rounded-sm bg-foreground px-4 text-sm font-bold text-background transition-transform active:scale-95 disabled:opacity-50"
-              >
-                {couponPending
-                  ? lang === "bn"
-                    ? "যাচাই..."
-                    : "Checking…"
-                  : lang === "bn"
-                    ? "প্রয়োগ"
-                    : "Apply"}
-              </button>
-            )}
+            ) : null}
           </div>
-          {couponError ? (
-            <p className="mt-1.5 text-xs font-semibold text-destructive">{couponError}</p>
-          ) : null}
-          {appliedCode ? (
-            <p className="mt-1.5 text-xs font-semibold text-emerald-600">
-              {lang === "bn"
-                ? `কুপন ${appliedCode} প্রয়োগ হয়েছে`
-                : `Coupon ${appliedCode} applied`}
-            </p>
-          ) : null}
+        </section>
+
+        {/* Billing details — unchanged fields */}
+        <section className="grid gap-4">
+          <h3 className="text-lg font-extrabold text-primary">
+            {pick(lang, "বিলিং তথ্য", "Billing details")}
+          </h3>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field label={tr(lang, "fullName")} error={errors["name"]}>
+              <input
+                className={inputClass}
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                autoComplete="name"
+                maxLength={80}
+                required
+              />
+            </Field>
+            <Field label={tr(lang, "phone")} error={errors["phone"]}>
+              <input
+                className={cn(inputClass, "font-en")}
+                value={phone}
+                onChange={(e) => setPhone(normalizePhoneInput(e.target.value))}
+                inputMode="numeric"
+                autoComplete="tel"
+                placeholder="01XXXXXXXXX"
+                maxLength={11}
+                required
+              />
+            </Field>
+          </div>
+
+          <Field label={tr(lang, "address")} hint={tr(lang, "addressHint")} error={errors["address"]}>
+            <textarea
+              className={cn(inputClass, "min-h-20 resize-y")}
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+              autoComplete="street-address"
+              maxLength={300}
+              required
+            />
+          </Field>
+
+          <div className="grid gap-4 sm:grid-cols-3">
+            <Field label={tr(lang, "division")} error={errors["division"]}>
+              <select
+                className={inputClass}
+                value={division}
+                onChange={(e) => {
+                  setDivision(e.target.value);
+                  setDistrict("");
+                  setUpazila("");
+                }}
+                required
+              >
+                <option value="">{tr(lang, "selectDivision")}</option>
+                {BD_DIVISIONS.map((d) => (
+                  <option key={d.id} value={d.bn}>
+                    {pick(lang, d.bn, d.en)}
+                  </option>
+                ))}
+              </select>
+            </Field>
+
+            <Field label={tr(lang, "district")} error={errors["district"]}>
+              <select
+                className={cn(inputClass, !divisionObj && "opacity-60")}
+                value={district}
+                disabled={!divisionObj}
+                onChange={(e) => {
+                  setDistrict(e.target.value);
+                  setUpazila("");
+                }}
+                required
+              >
+                <option value="">{tr(lang, "selectDistrict")}</option>
+                {(divisionObj?.districts ?? []).map((d) => (
+                  <option key={d.id} value={d.bn}>
+                    {pick(lang, d.bn, d.en)}
+                  </option>
+                ))}
+              </select>
+            </Field>
+
+            <Field label={tr(lang, "upazila")} error={errors["upazila"]}>
+              <select
+                className={cn(inputClass, !districtObj && "opacity-60")}
+                value={upazila}
+                disabled={!districtObj}
+                onChange={(e) => setUpazila(e.target.value)}
+                required
+              >
+                <option value="">{tr(lang, "selectUpazila")}</option>
+                {(districtObj?.upazilas ?? []).map((u) => (
+                  <option key={u.en} value={u.bn}>
+                    {pick(lang, u.bn, u.en)}
+                  </option>
+                ))}
+              </select>
+            </Field>
+          </div>
+
+          <Field label={tr(lang, "note")}>
+            <textarea
+              className={cn(inputClass, "min-h-16 resize-y")}
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+              maxLength={500}
+            />
+          </Field>
+        </section>
+
+        {/* Shipping */}
+        <section>
+          <h3 className="text-lg font-extrabold">{pick(lang, "শিপিং", "Shipping")}</h3>
+          <div className="mt-3 flex items-center justify-between gap-3 rounded-xl border border-border px-4 py-3.5 text-sm">
+            <span className="text-muted-foreground">{tr(lang, "deliveryCharge")}</span>
+            <span className="font-bold tabular-nums">
+              {delivery === 0 ? tr(lang, "free") : formatPrice(lang, delivery)}
+            </span>
+          </div>
+        </section>
+
+        {/* Your order */}
+        <section>
+          <h3 className="text-lg font-extrabold text-primary">
+            {pick(lang, "আপনার অর্ডার", "Your order")}
+          </h3>
+
+          <div className="mt-3 grid gap-2 border-b border-dashed border-border pb-3 text-xs font-bold uppercase tracking-wide text-muted-foreground">
+            <div className="flex justify-between">
+              <span>{pick(lang, "প্রোডাক্ট", "Product")}</span>
+              <span>{tr(lang, "subtotal")}</span>
+            </div>
+          </div>
+
+          <ul className="divide-y divide-dashed divide-border">
+            {items.map((i) => (
+              <li key={i.key} className="flex items-center gap-3 py-3 text-sm">
+                <div className="h-10 w-10 shrink-0 overflow-hidden rounded-md bg-secondary">
+                  <ProductThumb src={i.image} alt={pick(lang, i.nameBn, i.nameEn)} label={i.nameEn} />
+                </div>
+                <span className="min-w-0 flex-1 truncate font-semibold">
+                  {pick(lang, i.nameBn, i.nameEn)}
+                </span>
+                <span className="shrink-0 text-muted-foreground">
+                  × {formatNumber(lang, i.quantity)}
+                </span>
+                <span className="shrink-0 font-bold tabular-nums">
+                  {formatPrice(lang, i.price * i.quantity)}
+                </span>
+              </li>
+            ))}
+          </ul>
+
+          {/* Coupon */}
+          <div className="mt-4">
+            <span className="mb-1.5 block text-sm font-semibold">
+              {lang === "bn" ? "কুপন কোড" : "Coupon code"}
+            </span>
+            <div className="flex gap-2">
+              <input
+                className={cn(inputClass, "font-en uppercase tracking-widest")}
+                value={couponCode}
+                onChange={(e) => setCouponCode(maskCouponCode(e.target.value))}
+                onKeyDown={(e) => {
+                  if (e.key.length === 1 && !/[A-Za-z0-9]/.test(e.key)) e.preventDefault();
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    void applyCoupon();
+                  }
+                }}
+                placeholder={lang === "bn" ? "কোড লিখুন" : "Enter code"}
+                inputMode="text"
+                autoCapitalize="characters"
+                autoComplete="off"
+                maxLength={24}
+                disabled={Boolean(appliedCode)}
+              />
+              {appliedCode ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCoupon(null);
+                    setCouponCode("");
+                    setCouponError(null);
+                  }}
+                  className="shrink-0 rounded-sm border border-border px-4 text-sm font-bold transition-colors hover:border-destructive hover:text-destructive active:scale-95"
+                >
+                  {lang === "bn" ? "বাতিল" : "Remove"}
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => void applyCoupon()}
+                  disabled={couponPending || !couponCode}
+                  className="shrink-0 rounded-sm bg-foreground px-4 text-sm font-bold text-background transition-transform active:scale-95 disabled:opacity-50"
+                >
+                  {couponPending
+                    ? lang === "bn"
+                      ? "যাচাই..."
+                      : "Checking…"
+                    : lang === "bn"
+                      ? "প্রয়োগ"
+                      : "Apply"}
+                </button>
+              )}
+            </div>
+            {couponError ? (
+              <p className="mt-1.5 text-xs font-semibold text-destructive">{couponError}</p>
+            ) : null}
+            {appliedCode ? (
+              <p className="mt-1.5 text-xs font-semibold text-emerald-600">
+                {lang === "bn"
+                  ? `কুপন ${appliedCode} প্রয়োগ হয়েছে`
+                  : `Coupon ${appliedCode} applied`}
+              </p>
+            ) : null}
+          </div>
+
+          <dl className="mt-4 grid gap-1.5 border-t border-dashed border-border pt-3 text-sm">
+            <div className="flex justify-between">
+              <dt className="text-muted-foreground">{tr(lang, "subtotal")}</dt>
+              <dd className="font-semibold tabular-nums">{formatPrice(lang, subtotal)}</dd>
+            </div>
+            <div className="flex justify-between">
+              <dt className="text-muted-foreground">{tr(lang, "deliveryCharge")}</dt>
+              <dd className="font-semibold tabular-nums">
+                {delivery === 0 ? tr(lang, "free") : formatPrice(lang, delivery)}
+              </dd>
+            </div>
+            {discount > 0 ? (
+              <div className="flex justify-between text-emerald-600">
+                <dt className="font-semibold">
+                  {lang === "bn" ? "কুপন ছাড়" : "Coupon discount"}
+                  {appliedCode ? <span className="font-en"> ({appliedCode})</span> : null}
+                </dt>
+                <dd className="font-bold tabular-nums">− {formatPrice(lang, discount)}</dd>
+              </div>
+            ) : null}
+            <div className="flex justify-between border-t border-border pt-2 text-base">
+              <dt className="font-bold">{tr(lang, "total")}</dt>
+              <dd className="font-bold tabular-nums text-primary">{formatPrice(lang, total)}</dd>
+            </div>
+          </dl>
+        </section>
+
+        {/* COD note */}
+        <div className="rounded-xl bg-secondary/70 p-4">
+          <p className="text-sm font-bold">{pick(lang, "ক্যাশ অন ডেলিভারি", "Cash on delivery")}</p>
+          <p className="mt-3 rounded-md bg-background px-4 py-3 text-sm text-muted-foreground">
+            {tr(lang, "codNote")}
+          </p>
         </div>
 
-        <dl className="mt-4 grid gap-1.5 border-t border-border pt-3 text-sm">
-          <div className="flex justify-between">
-            <dt className="text-muted-foreground">{tr(lang, "subtotal")}</dt>
-            <dd className="font-semibold tabular-nums">{formatPrice(lang, subtotal)}</dd>
-          </div>
-          <div className="flex justify-between">
-            <dt className="text-muted-foreground">{tr(lang, "deliveryCharge")}</dt>
-            <dd className="font-semibold tabular-nums">
-              {delivery === 0 ? tr(lang, "free") : formatPrice(lang, delivery)}
-            </dd>
-          </div>
-          {discount > 0 ? (
-            <div className="flex justify-between text-emerald-600">
-              <dt className="font-semibold">
-                {lang === "bn" ? "কুপন ছাড়" : "Coupon discount"}
-                {appliedCode ? <span className="font-en"> ({appliedCode})</span> : null}
-              </dt>
-              <dd className="font-bold tabular-nums">− {formatPrice(lang, discount)}</dd>
-            </div>
-          ) : null}
-          <div className="flex justify-between border-t border-border pt-2 text-base">
-            <dt className="font-bold">{tr(lang, "total")}</dt>
-            <dd className="font-bold tabular-nums text-primary">{formatPrice(lang, total)}</dd>
-          </div>
-        </dl>
+        {failed ? (
+          <p className="rounded-sm border border-destructive/40 bg-destructive/5 px-3 py-2 text-sm text-destructive">
+            {tr(lang, "orderFailed")}
+          </p>
+        ) : null}
 
+        <button
+          type="submit"
+          disabled={pending || items.length === 0}
+          className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-6 py-4 text-base font-bold text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-60"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden className="h-4 w-4" fill="currentColor">
+            <path d="M12 1a5 5 0 0 0-5 5v3H6a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-9a2 2 0 0 0-2-2h-1V6a5 5 0 0 0-5-5Zm3 8H9V6a3 3 0 1 1 6 0v3Z" />
+          </svg>
+          {pending ? tr(lang, "placing") : tr(lang, "placeOrder")} {formatPrice(lang, total)}
+        </button>
       </div>
-
-      {failed ? (
-        <p className="rounded-sm border border-destructive/40 bg-destructive/5 px-3 py-2 text-sm text-destructive">
-          {tr(lang, "orderFailed")}
-        </p>
-      ) : null}
-
-      <button
-        type="submit"
-        disabled={pending || items.length === 0}
-        className="rounded-sm bg-primary px-6 py-3.5 text-base font-bold text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-60"
-      >
-        {pending ? tr(lang, "placing") : tr(lang, "placeOrder")}
-      </button>
-      <p className="text-center text-xs text-muted-foreground">{tr(lang, "codNote")}</p>
     </form>
   );
 }
+

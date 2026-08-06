@@ -330,9 +330,7 @@ function LandingPage() {
       ) : null}
 
       <section id="order" className="mt-12 scroll-mt-24">
-        <h2 className="font-display-bn text-center text-2xl leading-snug sm:text-3xl">{tr(lang, "deliveryInfo")}</h2>
-        <p className="mt-1 text-center text-sm text-muted-foreground">{tr(lang, "codNote")}</p>
-        <div className="mx-auto mt-5 max-w-2xl">
+        <div className="mx-auto max-w-2xl">
           {stock > 0 ? (
             <CheckoutForm
               items={items}
@@ -340,6 +338,9 @@ function LandingPage() {
               source="landing"
               compact
               onSetQuantity={(_key, next) => setQty(next)}
+              variants={variants}
+              variantId={variantId}
+              onVariantChange={setVariantId}
             />
           ) : (
             <p className="rounded-sm border border-border bg-secondary px-4 py-3 text-center text-sm font-semibold text-muted-foreground">
@@ -348,6 +349,7 @@ function LandingPage() {
           )}
         </div>
       </section>
+
 
       </div>
     </div>
