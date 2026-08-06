@@ -158,7 +158,7 @@ function LandingPage() {
 
   return (
     <div className="lp-canvas -mt-px min-h-screen">
-      <div className="mx-auto max-w-4xl px-4 pb-16 pt-6 sm:px-6">
+      <div className="mx-auto max-w-4xl px-4 pb-8 pt-6 sm:px-6">
       <header className="relative px-5 py-8 text-center sm:px-10 sm:py-12">
         <div
           aria-hidden

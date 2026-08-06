@@ -368,7 +368,7 @@ export function CheckoutForm({
         </p>
       </div>
 
-      <div className={cn("grid gap-8 px-4 py-7 sm:px-7", compact ? "" : "sm:py-9")}>
+      <div className={cn("grid gap-8 px-4 pt-7 sm:px-7", compact ? "pb-5" : "pb-7 sm:pb-9")}>
         {/* Your products */}
         <section>
           <div className="flex items-center justify-between gap-3">

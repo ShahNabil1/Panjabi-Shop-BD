@@ -95,7 +95,7 @@ export function LandingFooter({ brand }: { brand: string }) {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="mt-8 border-t border-border bg-surface">
+    <footer className="mt-5 border-t border-border bg-surface">
       <div className="mx-auto flex max-w-4xl flex-col items-center px-4 py-6 text-center">
         <img
           src={logoMark}
