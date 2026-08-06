@@ -185,22 +185,39 @@ export function SiteHeader() {
           </button>
         )}
 
-        <Link
-          to="/"
-          className={cn(
-            "flex min-w-0 items-center justify-center",
-            isLanding ? "lg:justify-center" : "lg:shrink-0 lg:justify-start",
-          )}
-          aria-label={brand}
-        >
-          <img
-            src={logoMark}
-            alt={brand}
-            width={1040}
-            height={375}
-            className="h-12 w-auto max-w-full object-contain min-[380px]:h-14 sm:h-16 lg:h-[4.5rem]"
-          />
-        </Link>
+        {isLanding ? (
+          <a
+            href={pathname}
+            onClick={(e) => {
+              e.preventDefault();
+              window.location.reload();
+            }}
+            className="flex min-w-0 items-center justify-center lg:justify-center"
+            aria-label={brand}
+          >
+            <img
+              src={logoMark}
+              alt={brand}
+              width={1040}
+              height={375}
+              className="h-12 w-auto max-w-full object-contain min-[380px]:h-14 sm:h-16 lg:h-[4.5rem]"
+            />
+          </a>
+        ) : (
+          <Link
+            to="/"
+            className="flex min-w-0 items-center justify-center lg:shrink-0 lg:justify-start"
+            aria-label={brand}
+          >
+            <img
+              src={logoMark}
+              alt={brand}
+              width={1040}
+              height={375}
+              className="h-12 w-auto max-w-full object-contain min-[380px]:h-14 sm:h-16 lg:h-[4.5rem]"
+            />
+          </Link>
+        )}
 
         {isLanding ? null : (
           <>
