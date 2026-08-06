@@ -667,7 +667,7 @@ export function CheckoutForm({
                     : "pointer-events-none max-h-0 -translate-x-8 scale-95 opacity-0",
                 )}
               >
-                <div className="flex items-center gap-2 overflow-hidden rounded-lg border border-primary/20 bg-background p-1 shadow-sm focus-within:border-primary/50 focus-within:ring-1 focus-within:ring-primary/20">
+                <div className="flex items-center gap-2 overflow-hidden rounded-lg border-2 border-dashed border-primary/35 bg-primary/[0.04] p-1 shadow-sm focus-within:border-solid focus-within:border-primary/60 focus-within:bg-background focus-within:ring-1 focus-within:ring-primary/20">
                   <input
                     ref={couponInputRef}
                     className={cn(
@@ -679,7 +679,7 @@ export function CheckoutForm({
                       setCouponCode(maskCouponCode(e.target.value));
                       setCouponError(null);
                     }}
-                    onBlur={() => void applyCoupon(true)}
+                    onBlur={handleCouponBlur}
                     onKeyDown={(e) => {
                       if (e.key.length === 1 && !/[A-Za-z0-9]/.test(e.key)) e.preventDefault();
                       if (e.key === "Enter") {
@@ -703,6 +703,7 @@ export function CheckoutForm({
                         setCoupon(null);
                         setCouponCode("");
                         setCouponError(null);
+                        lastCheckedCouponRef.current = "";
                       }}
                       className="mr-1 shrink-0 rounded-md px-2 py-1 text-xs font-semibold text-muted-foreground underline-offset-4 transition-colors hover:bg-destructive/10 hover:text-destructive hover:underline"
                     >
