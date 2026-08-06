@@ -159,13 +159,13 @@ function RootShell({ children }: { children: ReactNode }) {
   );
 }
 
-function Chrome({ children }: { children: ReactNode }) {
+function Chrome({ children, brand }: { children: ReactNode; brand: string }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const bare =
     pathname.startsWith("/admin") ||
     pathname.startsWith("/auth") ||
     pathname.startsWith("/invoice");
-  const hideFooter = pathname.startsWith("/lp");
+  const isLanding = pathname.startsWith("/lp");
 
   if (bare) {
     return <div className="min-h-screen">{children}</div>;
@@ -175,14 +175,14 @@ function Chrome({ children }: { children: ReactNode }) {
     <div className="flex min-h-screen flex-col">
       <SiteHeader />
       <main className="flex-1">{children}</main>
-      {!hideFooter && <SiteFooter />}
+      {isLanding ? <LandingFooter brand={brand} /> : <SiteFooter />}
     </div>
   );
 }
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
-  const { lang } = Route.useLoaderData();
+  const { lang, brand } = Route.useLoaderData();
   // Bangla/Arabic-Indic digits typed in any field become English digits.
   useDigitNormalizer();
 
@@ -191,7 +191,7 @@ function RootComponent() {
       <LanguageProvider initialLang={lang}>
         <AuthProvider>
           <CartProvider>
-            <Chrome>
+            <Chrome brand={brand}>
               {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
               <Outlet />
             </Chrome>
