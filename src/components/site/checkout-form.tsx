@@ -581,9 +581,14 @@ export function CheckoutForm({
                 <div className="h-10 w-10 shrink-0 overflow-hidden rounded-md bg-secondary">
                   <ProductThumb src={i.image} alt={pick(lang, i.nameBn, i.nameEn)} label={i.nameEn} />
                 </div>
-                <span className="min-w-0 flex-1 truncate font-semibold">
-                  {pick(lang, i.nameBn, i.nameEn)}
-                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate font-semibold">{pick(lang, i.nameBn, i.nameEn)}</p>
+                  {i.variantLabelBn || i.variantLabelEn ? (
+                    <p className="text-xs text-muted-foreground">
+                      {pick(lang, i.variantLabelBn, i.variantLabelEn)}
+                    </p>
+                  ) : null}
+                </div>
                 <span className="shrink-0 text-muted-foreground">
                   × {formatNumber(lang, i.quantity)}
                 </span>
