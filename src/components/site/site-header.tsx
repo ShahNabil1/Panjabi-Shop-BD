@@ -201,26 +201,36 @@ export function SiteHeader() {
         </div>
       </div>
 
-      <div className="mx-auto grid max-w-6xl grid-cols-[3rem_minmax(0,1fr)_3rem] items-center gap-2 px-4 py-3 lg:flex lg:gap-3">
-        <button
-          type="button"
-          onClick={() => setOpen((v) => !v)}
-          aria-label="Menu"
-          aria-expanded={open}
-          className="w-fit shrink-0 rounded-sm border border-border p-2 lg:hidden"
-        >
-          <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2">
-            {open ? (
-              <path d="M6 6l12 12M18 6 6 18" strokeLinecap="round" />
-            ) : (
-              <path d="M4 7h16M4 12h16M4 17h16" strokeLinecap="round" />
-            )}
-          </svg>
-        </button>
+      <div
+        className={cn(
+          "mx-auto grid max-w-6xl items-center gap-2 px-4 py-3 lg:flex lg:gap-3",
+          isLanding ? "grid-cols-1" : "grid-cols-[3rem_minmax(0,1fr)_3rem]",
+        )}
+      >
+        {isLanding ? null : (
+          <button
+            type="button"
+            onClick={() => setOpen((v) => !v)}
+            aria-label="Menu"
+            aria-expanded={open}
+            className="w-fit shrink-0 rounded-sm border border-border p-2 lg:hidden"
+          >
+            <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2">
+              {open ? (
+                <path d="M6 6l12 12M18 6 6 18" strokeLinecap="round" />
+              ) : (
+                <path d="M4 7h16M4 12h16M4 17h16" strokeLinecap="round" />
+              )}
+            </svg>
+          </button>
+        )}
 
         <Link
           to="/"
-          className="flex min-w-0 items-center justify-center lg:shrink-0 lg:justify-start"
+          className={cn(
+            "flex min-w-0 items-center justify-center",
+            isLanding ? "lg:justify-center" : "lg:shrink-0 lg:justify-start",
+          )}
           aria-label={brand}
         >
           <img
@@ -232,20 +242,25 @@ export function SiteHeader() {
           />
         </Link>
 
-        <div className="ml-auto hidden max-w-md flex-1 lg:block">
+        {isLanding ? null : (
+          <>
+            <div className="ml-auto hidden max-w-md flex-1 lg:block">
+              <SearchBox />
+            </div>
+
+            <nav className="ml-4 hidden items-center gap-5 lg:flex">{navLinks}</nav>
+
+            <CartButton className="justify-self-end lg:ml-auto lg:shrink-0" />
+          </>
+        )}
+      </div>
+
+      {isLanding ? null : (
+        <div className="mx-auto max-w-6xl px-4 pb-3 lg:hidden">
           <SearchBox />
         </div>
+      )}
 
-        <nav className="ml-4 hidden items-center gap-5 lg:flex">{navLinks}</nav>
-
-        <CartButton className="justify-self-end lg:ml-auto lg:shrink-0" />
-      </div>
-
-
-
-      <div className="mx-auto max-w-6xl px-4 pb-3 lg:hidden">
-        <SearchBox />
-      </div>
 
       <div className="hidden border-t border-border/70 bg-surface lg:block">
         <div className="mx-auto flex max-w-6xl items-center gap-6 overflow-x-auto px-4 py-2">
