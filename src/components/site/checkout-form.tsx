@@ -104,13 +104,13 @@ export function CheckoutForm({
       const raw = localStorage.getItem(storageKey);
       if (!raw) return;
       const draft = JSON.parse(raw) as Record<string, string>;
-      if (typeof draft.name === "string") setName(draft.name);
-      if (typeof draft.phone === "string") setPhone(draft.phone);
-      if (typeof draft.address === "string") setAddress(draft.address);
-      if (typeof draft.division === "string") setDivision(draft.division);
-      if (typeof draft.district === "string") setDistrict(draft.district);
-      if (typeof draft.upazila === "string") setUpazila(draft.upazila);
-      if (typeof draft.note === "string") setNote(draft.note);
+      if (typeof draft["name"] === "string") setName(draft["name"]);
+      if (typeof draft["phone"] === "string") setPhone(draft["phone"]);
+      if (typeof draft["address"] === "string") setAddress(draft["address"]);
+      if (typeof draft["division"] === "string") setDivision(draft["division"]);
+      if (typeof draft["district"] === "string") setDistrict(draft["district"]);
+      if (typeof draft["upazila"] === "string") setUpazila(draft["upazila"]);
+      if (typeof draft["note"] === "string") setNote(draft["note"]);
     } catch {
       // Ignore corrupted draft data.
     }
