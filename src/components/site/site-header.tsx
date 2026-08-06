@@ -22,40 +22,6 @@ export function useSiteData(): SiteData {
   return useLoaderData({ from: "__root__" }) as SiteData;
 }
 
-function LangToggle({ className }: { className?: string }) {
-  const { lang, setLang } = useLang();
-  return (
-    <div
-      className={cn(
-        "inline-flex items-center overflow-hidden rounded-sm border border-border/60",
-        className,
-      )}
-    >
-      <button
-        type="button"
-        onClick={() => setLang("bn")}
-        aria-pressed={lang === "bn"}
-        className={cn(
-          "px-2 py-0.5 text-xs font-semibold transition-colors",
-          lang === "bn" ? "bg-primary text-primary-foreground" : "text-muted-foreground",
-        )}
-      >
-        বাংলা
-      </button>
-      <button
-        type="button"
-        onClick={() => setLang("en")}
-        aria-pressed={lang === "en"}
-        className={cn(
-          "font-en px-2 py-0.5 text-xs font-semibold transition-colors",
-          lang === "en" ? "bg-primary text-primary-foreground" : "text-muted-foreground",
-        )}
-      >
-        EN
-      </button>
-    </div>
-  );
-}
 
 function SearchBox({ onDone }: { onDone?: () => void }) {
   const { lang } = useLang();
@@ -133,7 +99,7 @@ function CartButton({ className }: { className?: string }) {
 export function SiteHeader() {
 
   const { lang } = useLang();
-  const { categories, brand, tagline } = useSiteData();
+  const { categories, brand } = useSiteData();
   const [open, setOpen] = useState(false);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const isLanding = pathname.startsWith("/lp/");
@@ -194,12 +160,6 @@ export function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/80">
-      <div className="border-b border-border/60 bg-foreground text-background">
-        <div className="mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-1.5">
-          <p className="truncate text-[11px] tracking-wide opacity-90 sm:text-xs">{tagline}</p>
-          <LangToggle className="shrink-0 border-background/30" />
-        </div>
-      </div>
 
       <div
         className={cn(
