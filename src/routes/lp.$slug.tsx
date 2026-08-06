@@ -176,18 +176,18 @@ function LandingPage() {
           className="relative mx-auto h-14 w-auto object-contain sm:h-16"
         />
 
-        <h1 className="lp-headline relative mt-6 text-[30px] leading-[1.28] sm:text-[52px] sm:leading-[1.2]">
+        <h1 className="lp-headline relative mt-6 text-[34px] leading-[1.18] sm:text-[58px] sm:leading-[1.12]">
           <span className="lp-slant text-gradient-lp inline-block">{headline}</span>
         </h1>
 
-        <div aria-hidden className="relative mx-auto mt-5 flex items-center justify-center gap-2">
-          <span className="h-px w-12 bg-linear-to-r from-transparent to-accent" />
-          <span className="h-2 w-2 rotate-45 bg-linear-to-br from-primary to-accent" />
-          <span className="h-px w-12 bg-linear-to-l from-transparent to-accent" />
+        <div aria-hidden className="relative mx-auto mt-6 flex items-center justify-center gap-2">
+          <span className="h-px w-14 bg-linear-to-r from-transparent to-accent" />
+          <span className="h-2.5 w-2.5 rotate-45 bg-linear-to-br from-primary to-accent" />
+          <span className="h-px w-14 bg-linear-to-l from-transparent to-accent" />
         </div>
 
         {subheadline ? (
-          <p className="lp-italic relative mx-auto mt-5 max-w-2xl text-[16px] font-semibold leading-8 tracking-[0.01em] text-foreground/80 sm:text-[18px]">
+          <p className="lp-italic relative mx-auto mt-6 max-w-2xl text-[17px] font-medium leading-[1.72] text-foreground/75 sm:text-[21px] sm:leading-[1.62]">
             {subheadline}
           </p>
         ) : null}
