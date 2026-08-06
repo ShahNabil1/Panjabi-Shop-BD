@@ -223,16 +223,22 @@ export function CheckoutForm({
     setCouponError(null);
   }, [subtotal, productIds.join(",")]);
 
-  const applyCoupon = async () => {
+  const applyCoupon = async (silentWhenEmpty = false) => {
     const code = maskCouponCode(couponCode);
     setCouponCode(code);
+    if (!code && silentWhenEmpty) {
+      setCoupon(null);
+      setCouponError(null);
+      return;
+    }
     if (!COUPON_CODE_RE.test(code)) {
       setCoupon(null);
       setCouponError(
-        lang === "bn" ? "সঠিক কুপন কোড লিখুন" : "Enter a valid coupon code",
+        lang === "bn" ? "কুপনটি ভ্যালিড না" : "This coupon is not valid",
       );
       return;
     }
+
     setCouponPending(true);
     setCouponError(null);
     try {
