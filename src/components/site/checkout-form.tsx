@@ -208,6 +208,7 @@ export function CheckoutForm({
   const [coupon, setCoupon] = useState<CouponValidation | null>(null);
   const [couponError, setCouponError] = useState<string | null>(null);
   const [couponPending, setCouponPending] = useState(false);
+  const lastCheckedCouponRef = useRef<string>("");
 
   useEffect(() => {
     if (couponOpen) couponInputRef.current?.focus();
@@ -229,6 +230,7 @@ export function CheckoutForm({
     if (!code && silentWhenEmpty) {
       setCoupon(null);
       setCouponError(null);
+      lastCheckedCouponRef.current = "";
       return;
     }
     if (!COUPON_CODE_RE.test(code)) {
@@ -236,6 +238,7 @@ export function CheckoutForm({
       setCouponError(
         lang === "bn" ? "কুপনটি ভ্যালিড না" : "This coupon is not valid",
       );
+      lastCheckedCouponRef.current = code;
       return;
     }
 
@@ -261,7 +264,19 @@ export function CheckoutForm({
       setCouponError(lang === "bn" ? "কুপন যাচাই করা যায়নি" : "Could not verify the coupon");
     } finally {
       setCouponPending(false);
+      lastCheckedCouponRef.current = code;
     }
+  };
+
+  const handleCouponBlur = () => {
+    const code = maskCouponCode(couponCode);
+    if (!code) {
+      setCouponError(null);
+      lastCheckedCouponRef.current = "";
+      return;
+    }
+    if (code === lastCheckedCouponRef.current) return;
+    void applyCoupon(true);
   };
 
   const discount = coupon?.ok ? Math.min(Math.round(coupon.discount), subtotal) : 0;
@@ -652,7 +667,7 @@ export function CheckoutForm({
                     : "pointer-events-none max-h-0 -translate-x-8 scale-95 opacity-0",
                 )}
               >
-                <div className="flex items-center gap-2 overflow-hidden rounded-lg border border-primary/20 bg-background p-1 shadow-sm focus-within:border-primary/50 focus-within:ring-1 focus-within:ring-primary/20">
+                <div className="flex items-center gap-2 overflow-hidden rounded-lg border-2 border-dashed border-primary/35 bg-primary/[0.04] p-1 shadow-sm focus-within:border-solid focus-within:border-primary/60 focus-within:bg-background focus-within:ring-1 focus-within:ring-primary/20">
                   <input
                     ref={couponInputRef}
                     className={cn(
@@ -664,7 +679,7 @@ export function CheckoutForm({
                       setCouponCode(maskCouponCode(e.target.value));
                       setCouponError(null);
                     }}
-                    onBlur={() => void applyCoupon(true)}
+                    onBlur={handleCouponBlur}
                     onKeyDown={(e) => {
                       if (e.key.length === 1 && !/[A-Za-z0-9]/.test(e.key)) e.preventDefault();
                       if (e.key === "Enter") {
@@ -688,6 +703,7 @@ export function CheckoutForm({
                         setCoupon(null);
                         setCouponCode("");
                         setCouponError(null);
+                        lastCheckedCouponRef.current = "";
                       }}
                       className="mr-1 shrink-0 rounded-md px-2 py-1 text-xs font-semibold text-muted-foreground underline-offset-4 transition-colors hover:bg-destructive/10 hover:text-destructive hover:underline"
                     >
