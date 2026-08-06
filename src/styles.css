@@ -81,11 +81,21 @@
   -webkit-text-stroke: 0.6px color-mix(in oklab, var(--primary) 22%, transparent);
 }
 
+/* Even heavier headline stroke for section titles that need extra presence. */
+@utility lp-headline-fat {
+  font-family: "NotoSerifBanglaDisplay", "Times New Roman", Times, serif;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  text-shadow: 0 1px 0 color-mix(in oklab, var(--accent) 35%, transparent);
+  paint-order: stroke fill;
+  -webkit-text-stroke: 1px color-mix(in oklab, var(--primary) 28%, transparent);
+}
+
 /* Extra-heavy SolaimanLipi for landing free-text callouts. */
 @utility lp-fat-bn {
   font-family: "SolaimanLipi", "Times New Roman", Times, serif;
   font-weight: 900;
-  -webkit-text-stroke: 0.35px currentColor;
+  -webkit-text-stroke: 0.45px currentColor;
   paint-order: stroke fill;
   letter-spacing: 0.002em;
 }

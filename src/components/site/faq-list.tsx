@@ -30,7 +30,7 @@ export function FaqList({ items, className }: { items: FaqItem[]; className?: st
               aria-expanded={expanded}
               className="grid w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-4 text-left"
             >
-              <span className="min-w-0 text-[15px] font-semibold leading-snug">
+              <span className="lp-fat-bn min-w-0 text-[15px] leading-snug text-foreground sm:text-[16px]">
                 {pick(lang, item.question_bn, item.question_en)}
               </span>
               <svg
@@ -52,7 +52,7 @@ export function FaqList({ items, className }: { items: FaqItem[]; className?: st
               style={{ gridTemplateRows: expanded ? "1fr" : "0fr", opacity: expanded ? 1 : 0 }}
             >
               <div className="overflow-hidden">
-                <p className="px-4 pb-4 text-sm leading-7 text-muted-foreground">
+                <p className="lp-fat-bn px-4 pb-4 text-sm leading-7 text-foreground/[0.88] sm:text-[15px]">
                   {pick(lang, item.answer_bn, item.answer_en)}
                 </p>
               </div>
