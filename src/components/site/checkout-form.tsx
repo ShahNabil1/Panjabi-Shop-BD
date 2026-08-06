@@ -377,9 +377,9 @@ export function CheckoutForm({
                       />
                     </div>
                     <div className="min-w-0">
-                      <p className="truncate text-sm font-bold">{pick(lang, i.nameBn, i.nameEn)}</p>
+                      <p className="text-sm font-bold leading-snug">{pick(lang, i.nameBn, i.nameEn)}</p>
                       {i.variantLabelBn ? (
-                        <p className="truncate text-xs text-muted-foreground">
+                        <p className="text-xs text-muted-foreground">
                           {pick(lang, i.variantLabelBn, i.variantLabelEn)}
                         </p>
                       ) : null}
