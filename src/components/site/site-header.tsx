@@ -99,7 +99,7 @@ function CartButton({ className }: { className?: string }) {
 export function SiteHeader() {
 
   const { lang } = useLang();
-  const { categories, brand, tagline } = useSiteData();
+  const { categories, brand } = useSiteData();
   const [open, setOpen] = useState(false);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const isLanding = pathname.startsWith("/lp/");
@@ -160,12 +160,6 @@ export function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/80">
-      <div className="border-b border-border/60 bg-foreground text-background">
-        <div className="mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-1.5">
-          <p className="truncate text-[11px] tracking-wide opacity-90 sm:text-xs">{tagline}</p>
-          <LangToggle className="shrink-0 border-background/30" />
-        </div>
-      </div>
 
       <div
         className={cn(
