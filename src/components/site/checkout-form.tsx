@@ -601,68 +601,86 @@ export function CheckoutForm({
 
           {/* Coupon */}
           <div className="mt-4">
-            <span className="mb-1.5 block text-sm font-semibold">
-              {lang === "bn" ? "কুপন কোড" : "Coupon code"}
-            </span>
-            <div className="flex gap-2">
-              <input
-                className={cn(inputClass, "font-en uppercase tracking-widest")}
-                value={couponCode}
-                onChange={(e) => setCouponCode(maskCouponCode(e.target.value))}
-                onKeyDown={(e) => {
-                  if (e.key.length === 1 && !/[A-Za-z0-9]/.test(e.key)) e.preventDefault();
-                  if (e.key === "Enter") {
-                    e.preventDefault();
-                    void applyCoupon();
-                  }
-                }}
-                placeholder={lang === "bn" ? "কোড লিখুন" : "Enter code"}
-                inputMode="text"
-                autoCapitalize="characters"
-                autoComplete="off"
-                maxLength={24}
-                disabled={Boolean(appliedCode)}
-              />
-              {appliedCode ? (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setCoupon(null);
-                    setCouponCode("");
-                    setCouponError(null);
-                  }}
-                  className="shrink-0 rounded-sm border border-border px-4 text-sm font-bold transition-colors hover:border-destructive hover:text-destructive active:scale-95"
-                >
-                  {lang === "bn" ? "বাতিল" : "Remove"}
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => void applyCoupon()}
-                  disabled={couponPending || !couponCode}
-                  className="shrink-0 rounded-sm bg-foreground px-4 text-sm font-bold text-background transition-transform active:scale-95 disabled:opacity-50"
-                >
-                  {couponPending
-                    ? lang === "bn"
-                      ? "যাচাই..."
-                      : "Checking…"
-                    : lang === "bn"
-                      ? "প্রয়োগ"
-                      : "Apply"}
-                </button>
-              )}
+            <div className="relative overflow-hidden">
+              <button
+                type="button"
+                onClick={() => setCouponOpen(true)}
+                className={cn(
+                  "inline-flex items-center gap-1.5 text-sm font-semibold text-primary underline-offset-4 transition-all duration-300 hover:underline",
+                  couponOpen && "pointer-events-none -translate-x-2 opacity-0",
+                )}
+                aria-hidden={couponOpen}
+                tabIndex={couponOpen ? -1 : 0}
+              >
+                {lang === "bn" ? "কুপন আছে?" : "Have a coupon?"}
+              </button>
+
+              <div
+                className={cn(
+                  "transition-all duration-300 ease-out",
+                  couponOpen
+                    ? "mt-2 max-h-24 translate-x-0 opacity-100"
+                    : "pointer-events-none max-h-0 -translate-x-6 opacity-0",
+                )}
+              >
+                <div className="flex items-center gap-2">
+                  <input
+                    ref={couponInputRef}
+                    className={cn(inputClass, "font-en uppercase tracking-widest")}
+                    value={couponCode}
+                    onChange={(e) => {
+                      setCouponCode(maskCouponCode(e.target.value));
+                      setCouponError(null);
+                    }}
+                    onBlur={() => void applyCoupon(true)}
+                    onKeyDown={(e) => {
+                      if (e.key.length === 1 && !/[A-Za-z0-9]/.test(e.key)) e.preventDefault();
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        void applyCoupon();
+                      }
+                    }}
+                    placeholder={lang === "bn" ? "কুপন কোড" : "Coupon code"}
+                    inputMode="text"
+                    autoCapitalize="characters"
+                    autoCorrect="off"
+                    spellCheck={false}
+                    autoComplete="off"
+                    maxLength={24}
+                    disabled={Boolean(appliedCode) || couponPending}
+                  />
+                  {appliedCode ? (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setCoupon(null);
+                        setCouponCode("");
+                        setCouponError(null);
+                      }}
+                      className="shrink-0 text-xs font-semibold text-muted-foreground underline-offset-4 transition-colors hover:text-destructive hover:underline"
+                    >
+                      {lang === "bn" ? "বাতিল" : "Remove"}
+                    </button>
+                  ) : couponPending ? (
+                    <span className="shrink-0 text-xs font-semibold text-muted-foreground">
+                      {lang === "bn" ? "যাচাই..." : "Checking…"}
+                    </span>
+                  ) : null}
+                </div>
+                {couponError ? (
+                  <p className="mt-1.5 text-xs font-semibold text-destructive">{couponError}</p>
+                ) : null}
+                {appliedCode ? (
+                  <p className="mt-1.5 text-xs font-semibold text-emerald-600">
+                    {lang === "bn"
+                      ? `কুপন ${appliedCode} প্রয়োগ হয়েছে`
+                      : `Coupon ${appliedCode} applied`}
+                  </p>
+                ) : null}
+              </div>
             </div>
-            {couponError ? (
-              <p className="mt-1.5 text-xs font-semibold text-destructive">{couponError}</p>
-            ) : null}
-            {appliedCode ? (
-              <p className="mt-1.5 text-xs font-semibold text-emerald-600">
-                {lang === "bn"
-                  ? `কুপন ${appliedCode} প্রয়োগ হয়েছে`
-                  : `Coupon ${appliedCode} applied`}
-              </p>
-            ) : null}
           </div>
+
 
           <dl className="mt-4 grid gap-1.5 border-t border-dashed border-border pt-3 text-sm">
             <div className="flex justify-between">
