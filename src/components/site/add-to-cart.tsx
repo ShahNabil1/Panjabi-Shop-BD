@@ -23,7 +23,7 @@ export function QuantityStepper({
   return (
     <div
       className={cn(
-        "inline-flex items-center overflow-hidden rounded-sm border border-border",
+        "inline-flex h-10 items-center overflow-hidden rounded-sm border border-border",
         className,
       )}
     >
@@ -31,19 +31,19 @@ export function QuantityStepper({
         type="button"
         aria-label="-"
         onClick={() => onChange(Math.max(1, value - 1))}
-        className="px-3 py-2 text-base leading-none text-foreground transition-colors hover:bg-secondary disabled:opacity-40"
+        className="flex h-full w-10 items-center justify-center text-base leading-none text-foreground transition-all duration-150 hover:bg-secondary active:scale-95 disabled:opacity-40"
         disabled={value <= 1}
       >
         −
       </button>
-      <span className="min-w-10 px-2 text-center text-sm font-semibold tabular-nums">
+      <span className="flex h-full w-12 items-center justify-center text-center text-sm font-semibold tabular-nums transition-all duration-150">
         {formatNumber(lang, value)}
       </span>
       <button
         type="button"
         aria-label="+"
         onClick={() => onChange(Math.min(limit, value + 1))}
-        className="px-3 py-2 text-base leading-none text-foreground transition-colors hover:bg-secondary disabled:opacity-40"
+        className="flex h-full w-10 items-center justify-center text-base leading-none text-foreground transition-all duration-150 hover:bg-secondary active:scale-95 disabled:opacity-40"
         disabled={value >= limit}
       >
         +
