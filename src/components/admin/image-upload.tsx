@@ -7,7 +7,14 @@ import { createUploadTicket } from "@/lib/media.functions";
 import { ImageCropperDialog } from "@/components/admin/image-cropper";
 import { cn } from "@/lib/utils";
 
-type Folder = "products" | "categories" | "promotions" | "landing" | "site" | "hero";
+type Folder =
+  | "products"
+  | "sub-products"
+  | "categories"
+  | "promotions"
+  | "landing"
+  | "site"
+  | "hero";
 
 async function uploadOne(file: File, folder: Folder): Promise<string> {
   const compressed = await compressImage(file);
