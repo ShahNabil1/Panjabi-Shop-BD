@@ -427,9 +427,6 @@ export function ProductEditor({ id, kind }: { id: string; kind: ProductKind }) {
             onChange={(v) => set("sort_order", v)}
           />
         </div>
-        <p className="mt-3 text-[11px] text-muted-foreground">
-          স্টক এখানে নেই — ইনভেন্টরি মডিউল থেকে হ্যান্ডেল হবে।
-        </p>
       </Panel>
 
       {isCombo ? (
