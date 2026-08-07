@@ -326,7 +326,56 @@ export const adminDeleteSubcategory = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-export const adminListProducts = createServerFn({ method: "GET" })
+/** Hidden internal category that holds every combo sub-item. */
+const SUB_ITEM_CATEGORY_SLUG = "internal-sub-items";
+
+async function subItemCategoryId(db: Awaited<ReturnType<typeof requireAdmin>>): Promise<string> {
+  const existing = await db
+    .from("categories")
+    .select("id")
+    .eq("slug", SUB_ITEM_CATEGORY_SLUG)
+    .maybeSingle();
+  if (existing.data?.id) return existing.data.id as string;
+  const created = await db
+    .from("categories")
+    .insert({
+      slug: SUB_ITEM_CATEGORY_SLUG,
+      name_bn: "সাব-আইটেম (ইন্টারনাল)",
+      name_en: "Sub items (internal)",
+      is_active: false,
+      sort_order: 999,
+    })
+    .select("id")
+    .single();
+  if (created.error) throw new Error(created.error.message);
+  return created.data.id as string;
+}
+
+export const adminListProducts = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z
+      .object({ kind: z.enum(["single", "component", "combo"]).optional() })
+      .default({})
+      .parse(input ?? {}),
+  )
+  .handler(async ({ data, context }) => {
+    const db = await requireAdmin(context.supabase, context.userId);
+    let q = db
+      .from("products")
+      .select(
+        "id, slug, kind, name_bn, name_en, price, cost_price, compare_at_price, sku, is_active, is_featured, sort_order, category_id, subcategory_id, product_images(url, sort_order), product_variants(id)",
+      )
+      .order("sort_order")
+      .limit(500);
+    if (data.kind === "component") q = q.eq("kind", "component");
+    else if (data.kind === "combo") q = q.eq("kind", "combo");
+    else if (data.kind === "single") q = q.neq("kind", "component");
+    return unwrap(await q);
+  });
+
+/** Sub-items available to drop into a combo box. */
+export const adminSubProductOptions = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const db = await requireAdmin(context.supabase, context.userId);
@@ -334,9 +383,10 @@ export const adminListProducts = createServerFn({ method: "GET" })
       await db
         .from("products")
         .select(
-          "id, slug, name_bn, name_en, price, compare_at_price, stock, is_active, is_featured, sort_order, category_id, subcategory_id, product_images(url, sort_order)",
+          "id, name_bn, name_en, sku, price, cost_price, product_images(url, sort_order), product_variants(id, group_name_bn, value_bn, price_delta)",
         )
-        .order("sort_order")
+        .eq("kind", "component")
+        .order("name_bn")
         .limit(500),
     );
   });
@@ -348,7 +398,7 @@ export const adminGetProduct = createServerFn({ method: "POST" })
     const db = await requireAdmin(context.supabase, context.userId);
     const { data: product, error } = await db
       .from("products")
-      .select("*, product_images(*), product_variants(*)")
+      .select("*, product_images(*), product_variants(*), combo_items!combo_items_combo_id_fkey(*)")
       .eq("id", data.id)
       .maybeSingle();
     if (error) throw new Error(error.message);
@@ -360,8 +410,13 @@ export const adminSaveProduct = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => productSchema.parse(mirrorLang(input)))
   .handler(async ({ data, context }) => {
     const db = await requireAdmin(context.supabase, context.userId);
-    const { id, images, variants, ...rest } = data;
-    const payload = { ...rest, specs: rest.specs, faq: rest.faq };
+    const { id, images, variants, combo_items, category_id, ...rest } = data;
+
+    const resolvedCategory =
+      category_id ?? (rest.kind === "component" ? await subItemCategoryId(db) : null);
+    if (!resolvedCategory) throw new Error("Category is required");
+
+    const payload = { ...rest, category_id: resolvedCategory };
 
     const res = id
       ? await db.from("products").update(payload).eq("id", id).select("id").single()
@@ -385,6 +440,16 @@ export const adminSaveProduct = createServerFn({ method: "POST" })
       if (ins.error) throw new Error(ins.error.message);
     }
 
+    if (rest.kind === "combo") {
+      await db.from("combo_items").delete().eq("combo_id", productId);
+      if (combo_items.length) {
+        const ins = await db
+          .from("combo_items")
+          .insert(combo_items.map((c, i) => ({ ...c, sort_order: i, combo_id: productId })));
+        if (ins.error) throw new Error(ins.error.message);
+      }
+    }
+
     return { id: productId };
   });
 
@@ -393,6 +458,14 @@ export const adminDeleteProduct = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => idSchema.parse(input))
   .handler(async ({ data, context }) => {
     const db = await requireAdmin(context.supabase, context.userId);
+    const used = await db
+      .from("combo_items")
+      .select("combo_id", { count: "exact", head: true })
+      .eq("item_id", data.id);
+    if ((used.count ?? 0) > 0) {
+      throw new Error("এই আইটেমটি একটি কম্বো বক্সে ব্যবহৃত হচ্ছে — আগে সেখান থেকে সরান।");
+    }
+    await db.from("combo_items").delete().eq("combo_id", data.id);
     await db.from("product_images").delete().eq("product_id", data.id);
     await db.from("product_variants").delete().eq("product_id", data.id);
     await db.from("promotion_products").delete().eq("product_id", data.id);
