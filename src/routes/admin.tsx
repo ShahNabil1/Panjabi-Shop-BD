@@ -7,6 +7,8 @@ import {
   ChevronLeft,
   Database,
   ExternalLink,
+  Gift,
+  Layers,
   HelpCircle,
   LayoutDashboard,
   LogOut,
