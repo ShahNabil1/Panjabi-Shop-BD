@@ -270,7 +270,7 @@ export function ProductEditor({ id, kind }: { id: string; kind: ProductKind }) {
     : draft.name_bn || "Edit";
 
   return (
-    <div className="space-y-5 pb-28">
+    <div className="space-y-5 pb-6">
       <AdminHeading
         backTo={backTo}
         backLabel={backLabel}
