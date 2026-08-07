@@ -95,6 +95,60 @@ export type Database = {
         }
         Relationships: []
       }
+      combo_items: {
+        Row: {
+          combo_id: string
+          created_at: string
+          id: string
+          is_free: boolean
+          item_id: string
+          label_bn: string | null
+          label_en: string | null
+          quantity: number
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          combo_id: string
+          created_at?: string
+          id?: string
+          is_free?: boolean
+          item_id: string
+          label_bn?: string | null
+          label_en?: string | null
+          quantity?: number
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          combo_id?: string
+          created_at?: string
+          id?: string
+          is_free?: boolean
+          item_id?: string
+          label_bn?: string | null
+          label_en?: string | null
+          quantity?: number
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "combo_items_combo_id_fkey"
+            columns: ["combo_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "combo_items_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       coupon_redemptions: {
         Row: {
           coupon_id: string
@@ -948,6 +1002,7 @@ export type Database = {
       }
       product_variants: {
         Row: {
+          cost_price: number
           created_at: string
           group_name_bn: string
           group_name_en: string
@@ -963,6 +1018,7 @@ export type Database = {
           value_en: string
         }
         Insert: {
+          cost_price?: number
           created_at?: string
           group_name_bn: string
           group_name_en: string
@@ -978,6 +1034,7 @@ export type Database = {
           value_en: string
         }
         Update: {
+          cost_price?: number
           created_at?: string
           group_name_bn?: string
           group_name_en?: string
@@ -1009,6 +1066,7 @@ export type Database = {
           brand: string | null
           category_id: string
           compare_at_price: number | null
+          cost_price: number
           created_at: string
           description_bn: string | null
           description_en: string | null
@@ -1016,6 +1074,7 @@ export type Database = {
           id: string
           is_active: boolean
           is_featured: boolean
+          kind: Database["public"]["Enums"]["product_kind"]
           meta_description: string | null
           meta_title: string | null
           name_bn: string
@@ -1040,6 +1099,7 @@ export type Database = {
           brand?: string | null
           category_id: string
           compare_at_price?: number | null
+          cost_price?: number
           created_at?: string
           description_bn?: string | null
           description_en?: string | null
@@ -1047,6 +1107,7 @@ export type Database = {
           id?: string
           is_active?: boolean
           is_featured?: boolean
+          kind?: Database["public"]["Enums"]["product_kind"]
           meta_description?: string | null
           meta_title?: string | null
           name_bn: string
@@ -1071,6 +1132,7 @@ export type Database = {
           brand?: string | null
           category_id?: string
           compare_at_price?: number | null
+          cost_price?: number
           created_at?: string
           description_bn?: string | null
           description_en?: string | null
@@ -1078,6 +1140,7 @@ export type Database = {
           id?: string
           is_active?: boolean
           is_featured?: boolean
+          kind?: Database["public"]["Enums"]["product_kind"]
           meta_description?: string | null
           meta_title?: string | null
           name_bn?: string
@@ -1530,6 +1593,7 @@ export type Database = {
         | "pre_order"
         | "scheduled_order"
         | "exchange"
+      product_kind: "single" | "component" | "combo"
       promotion_type: "offer" | "featured" | "flash" | "new_arrival"
     }
     CompositeTypes: {
@@ -1685,6 +1749,7 @@ export const Constants = {
         "scheduled_order",
         "exchange",
       ],
+      product_kind: ["single", "component", "combo"],
       promotion_type: ["offer", "featured", "flash", "new_arrival"],
     },
   },

@@ -33,6 +33,8 @@ import { Route as OffersIndexRouteImport } from './routes/offers.index'
 import { Route as OffersPromotionRouteImport } from './routes/offers.$promotion'
 import { Route as OrderOrderNumberRouteImport } from './routes/order.$orderNumber'
 import { Route as PProductRouteImport } from './routes/p.$product'
+import { Route as AdminCombosIndexRouteImport } from './routes/admin.combos.index'
+import { Route as AdminCombosIdRouteImport } from './routes/admin.combos.$id'
 import { Route as AdminOrdersIndexRouteImport } from './routes/admin.orders.index'
 import { Route as AdminOrdersIdRouteImport } from './routes/admin.orders.$id'
 import { Route as AdminOrdersCreateRouteImport } from './routes/admin.orders.create'
@@ -43,6 +45,8 @@ import { Route as AdminSettingsIndexRouteImport } from './routes/admin.settings.
 import { Route as AdminSettingsDeliveryRouteImport } from './routes/admin.settings.delivery'
 import { Route as AdminSettingsRetentionRouteImport } from './routes/admin.settings.retention'
 import { Route as AdminSettingsSmsTemplatesRouteImport } from './routes/admin.settings.sms-templates'
+import { Route as AdminSubProductsIndexRouteImport } from './routes/admin.sub-products.index'
+import { Route as AdminSubProductsIdRouteImport } from './routes/admin.sub-products.$id'
 import { Route as CCategoryIndexRouteImport } from './routes/c.$category.index'
 import { Route as CCategorySubcategoryRouteImport } from './routes/c.$category.$subcategory'
 import { Route as ApiPublicCourierProviderRouteImport } from './routes/api/public/courier.$provider'
@@ -168,6 +172,16 @@ const PProductRoute = PProductRouteImport.update({
   path: '/p/$product',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminCombosIndexRoute = AdminCombosIndexRouteImport.update({
+  id: '/combos/',
+  path: '/combos/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminCombosIdRoute = AdminCombosIdRouteImport.update({
+  id: '/combos/$id',
+  path: '/combos/$id',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminOrdersIndexRoute = AdminOrdersIndexRouteImport.update({
   id: '/orders/',
   path: '/orders/',
@@ -219,6 +233,16 @@ const AdminSettingsSmsTemplatesRoute =
     path: '/settings/sms-templates',
     getParentRoute: () => AdminRoute,
   } as any)
+const AdminSubProductsIndexRoute = AdminSubProductsIndexRouteImport.update({
+  id: '/sub-products/',
+  path: '/sub-products/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminSubProductsIdRoute = AdminSubProductsIdRouteImport.update({
+  id: '/sub-products/$id',
+  path: '/sub-products/$id',
+  getParentRoute: () => AdminRoute,
+} as any)
 const CCategoryIndexRoute = CCategoryIndexRouteImport.update({
   id: '/c/$category/',
   path: '/c/$category/',
@@ -267,6 +291,7 @@ export interface FileRoutesByFullPath {
   '/p/$product': typeof PProductRoute
   '/admin/': typeof AdminIndexRoute
   '/offers/': typeof OffersIndexRoute
+  '/admin/combos/$id': typeof AdminCombosIdRoute
   '/admin/orders/$id': typeof AdminOrdersIdRoute
   '/admin/orders/create': typeof AdminOrdersCreateRoute
   '/admin/orders/list': typeof AdminOrdersListRoute
@@ -274,10 +299,13 @@ export interface FileRoutesByFullPath {
   '/admin/settings/delivery': typeof AdminSettingsDeliveryRoute
   '/admin/settings/retention': typeof AdminSettingsRetentionRoute
   '/admin/settings/sms-templates': typeof AdminSettingsSmsTemplatesRoute
+  '/admin/sub-products/$id': typeof AdminSubProductsIdRoute
   '/c/$category/$subcategory': typeof CCategorySubcategoryRoute
+  '/admin/combos/': typeof AdminCombosIndexRoute
   '/admin/orders/': typeof AdminOrdersIndexRoute
   '/admin/products/': typeof AdminProductsIndexRoute
   '/admin/settings/': typeof AdminSettingsIndexRoute
+  '/admin/sub-products/': typeof AdminSubProductsIndexRoute
   '/c/$category/': typeof CCategoryIndexRoute
   '/api/public/courier/$provider': typeof ApiPublicCourierProviderRoute
   '/api/public/hooks/cleanup-old-logs': typeof ApiPublicHooksCleanupOldLogsRoute
@@ -306,6 +334,7 @@ export interface FileRoutesByTo {
   '/p/$product': typeof PProductRoute
   '/admin': typeof AdminIndexRoute
   '/offers': typeof OffersIndexRoute
+  '/admin/combos/$id': typeof AdminCombosIdRoute
   '/admin/orders/$id': typeof AdminOrdersIdRoute
   '/admin/orders/create': typeof AdminOrdersCreateRoute
   '/admin/orders/list': typeof AdminOrdersListRoute
@@ -313,10 +342,13 @@ export interface FileRoutesByTo {
   '/admin/settings/delivery': typeof AdminSettingsDeliveryRoute
   '/admin/settings/retention': typeof AdminSettingsRetentionRoute
   '/admin/settings/sms-templates': typeof AdminSettingsSmsTemplatesRoute
+  '/admin/sub-products/$id': typeof AdminSubProductsIdRoute
   '/c/$category/$subcategory': typeof CCategorySubcategoryRoute
+  '/admin/combos': typeof AdminCombosIndexRoute
   '/admin/orders': typeof AdminOrdersIndexRoute
   '/admin/products': typeof AdminProductsIndexRoute
   '/admin/settings': typeof AdminSettingsIndexRoute
+  '/admin/sub-products': typeof AdminSubProductsIndexRoute
   '/c/$category': typeof CCategoryIndexRoute
   '/api/public/courier/$provider': typeof ApiPublicCourierProviderRoute
   '/api/public/hooks/cleanup-old-logs': typeof ApiPublicHooksCleanupOldLogsRoute
@@ -347,6 +379,7 @@ export interface FileRoutesById {
   '/p/$product': typeof PProductRoute
   '/admin/': typeof AdminIndexRoute
   '/offers/': typeof OffersIndexRoute
+  '/admin/combos/$id': typeof AdminCombosIdRoute
   '/admin/orders/$id': typeof AdminOrdersIdRoute
   '/admin/orders/create': typeof AdminOrdersCreateRoute
   '/admin/orders/list': typeof AdminOrdersListRoute
@@ -354,10 +387,13 @@ export interface FileRoutesById {
   '/admin/settings/delivery': typeof AdminSettingsDeliveryRoute
   '/admin/settings/retention': typeof AdminSettingsRetentionRoute
   '/admin/settings/sms-templates': typeof AdminSettingsSmsTemplatesRoute
+  '/admin/sub-products/$id': typeof AdminSubProductsIdRoute
   '/c/$category/$subcategory': typeof CCategorySubcategoryRoute
+  '/admin/combos/': typeof AdminCombosIndexRoute
   '/admin/orders/': typeof AdminOrdersIndexRoute
   '/admin/products/': typeof AdminProductsIndexRoute
   '/admin/settings/': typeof AdminSettingsIndexRoute
+  '/admin/sub-products/': typeof AdminSubProductsIndexRoute
   '/c/$category/': typeof CCategoryIndexRoute
   '/api/public/courier/$provider': typeof ApiPublicCourierProviderRoute
   '/api/public/hooks/cleanup-old-logs': typeof ApiPublicHooksCleanupOldLogsRoute
@@ -389,6 +425,7 @@ export interface FileRouteTypes {
     | '/p/$product'
     | '/admin/'
     | '/offers/'
+    | '/admin/combos/$id'
     | '/admin/orders/$id'
     | '/admin/orders/create'
     | '/admin/orders/list'
@@ -396,10 +433,13 @@ export interface FileRouteTypes {
     | '/admin/settings/delivery'
     | '/admin/settings/retention'
     | '/admin/settings/sms-templates'
+    | '/admin/sub-products/$id'
     | '/c/$category/$subcategory'
+    | '/admin/combos/'
     | '/admin/orders/'
     | '/admin/products/'
     | '/admin/settings/'
+    | '/admin/sub-products/'
     | '/c/$category/'
     | '/api/public/courier/$provider'
     | '/api/public/hooks/cleanup-old-logs'
@@ -428,6 +468,7 @@ export interface FileRouteTypes {
     | '/p/$product'
     | '/admin'
     | '/offers'
+    | '/admin/combos/$id'
     | '/admin/orders/$id'
     | '/admin/orders/create'
     | '/admin/orders/list'
@@ -435,10 +476,13 @@ export interface FileRouteTypes {
     | '/admin/settings/delivery'
     | '/admin/settings/retention'
     | '/admin/settings/sms-templates'
+    | '/admin/sub-products/$id'
     | '/c/$category/$subcategory'
+    | '/admin/combos'
     | '/admin/orders'
     | '/admin/products'
     | '/admin/settings'
+    | '/admin/sub-products'
     | '/c/$category'
     | '/api/public/courier/$provider'
     | '/api/public/hooks/cleanup-old-logs'
@@ -468,6 +512,7 @@ export interface FileRouteTypes {
     | '/p/$product'
     | '/admin/'
     | '/offers/'
+    | '/admin/combos/$id'
     | '/admin/orders/$id'
     | '/admin/orders/create'
     | '/admin/orders/list'
@@ -475,10 +520,13 @@ export interface FileRouteTypes {
     | '/admin/settings/delivery'
     | '/admin/settings/retention'
     | '/admin/settings/sms-templates'
+    | '/admin/sub-products/$id'
     | '/c/$category/$subcategory'
+    | '/admin/combos/'
     | '/admin/orders/'
     | '/admin/products/'
     | '/admin/settings/'
+    | '/admin/sub-products/'
     | '/c/$category/'
     | '/api/public/courier/$provider'
     | '/api/public/hooks/cleanup-old-logs'
@@ -679,6 +727,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PProductRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/combos/': {
+      id: '/admin/combos/'
+      path: '/combos'
+      fullPath: '/admin/combos/'
+      preLoaderRoute: typeof AdminCombosIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/combos/$id': {
+      id: '/admin/combos/$id'
+      path: '/combos/$id'
+      fullPath: '/admin/combos/$id'
+      preLoaderRoute: typeof AdminCombosIdRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/orders/': {
       id: '/admin/orders/'
       path: '/orders'
@@ -749,6 +811,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminSettingsSmsTemplatesRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/sub-products/': {
+      id: '/admin/sub-products/'
+      path: '/sub-products'
+      fullPath: '/admin/sub-products/'
+      preLoaderRoute: typeof AdminSubProductsIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/sub-products/$id': {
+      id: '/admin/sub-products/$id'
+      path: '/sub-products/$id'
+      fullPath: '/admin/sub-products/$id'
+      preLoaderRoute: typeof AdminSubProductsIdRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/c/$category/': {
       id: '/c/$category/'
       path: '/c/$category'
@@ -787,6 +863,7 @@ interface AdminRouteChildren {
   AdminPromotionsRoute: typeof AdminPromotionsRoute
   AdminTaxonomyRoute: typeof AdminTaxonomyRoute
   AdminIndexRoute: typeof AdminIndexRoute
+  AdminCombosIdRoute: typeof AdminCombosIdRoute
   AdminOrdersIdRoute: typeof AdminOrdersIdRoute
   AdminOrdersCreateRoute: typeof AdminOrdersCreateRoute
   AdminOrdersListRoute: typeof AdminOrdersListRoute
@@ -794,9 +871,12 @@ interface AdminRouteChildren {
   AdminSettingsDeliveryRoute: typeof AdminSettingsDeliveryRoute
   AdminSettingsRetentionRoute: typeof AdminSettingsRetentionRoute
   AdminSettingsSmsTemplatesRoute: typeof AdminSettingsSmsTemplatesRoute
+  AdminSubProductsIdRoute: typeof AdminSubProductsIdRoute
+  AdminCombosIndexRoute: typeof AdminCombosIndexRoute
   AdminOrdersIndexRoute: typeof AdminOrdersIndexRoute
   AdminProductsIndexRoute: typeof AdminProductsIndexRoute
   AdminSettingsIndexRoute: typeof AdminSettingsIndexRoute
+  AdminSubProductsIndexRoute: typeof AdminSubProductsIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
@@ -806,6 +886,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminPromotionsRoute: AdminPromotionsRoute,
   AdminTaxonomyRoute: AdminTaxonomyRoute,
   AdminIndexRoute: AdminIndexRoute,
+  AdminCombosIdRoute: AdminCombosIdRoute,
   AdminOrdersIdRoute: AdminOrdersIdRoute,
   AdminOrdersCreateRoute: AdminOrdersCreateRoute,
   AdminOrdersListRoute: AdminOrdersListRoute,
@@ -813,9 +894,12 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminSettingsDeliveryRoute: AdminSettingsDeliveryRoute,
   AdminSettingsRetentionRoute: AdminSettingsRetentionRoute,
   AdminSettingsSmsTemplatesRoute: AdminSettingsSmsTemplatesRoute,
+  AdminSubProductsIdRoute: AdminSubProductsIdRoute,
+  AdminCombosIndexRoute: AdminCombosIndexRoute,
   AdminOrdersIndexRoute: AdminOrdersIndexRoute,
   AdminProductsIndexRoute: AdminProductsIndexRoute,
   AdminSettingsIndexRoute: AdminSettingsIndexRoute,
+  AdminSubProductsIndexRoute: AdminSubProductsIndexRoute,
 }
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
@@ -847,13 +931,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

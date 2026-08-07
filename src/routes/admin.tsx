@@ -7,6 +7,8 @@ import {
   ChevronLeft,
   Database,
   ExternalLink,
+  Gift,
+  Layers,
   HelpCircle,
   LayoutDashboard,
   LogOut,
@@ -57,6 +59,8 @@ const sections: Array<{ title: string; items: NavItem[] }> = [
     title: "Catalog",
     items: [
       { to: "/admin/products", label: "Products", icon: Package },
+      { to: "/admin/sub-products", label: "Sub-Products", icon: Layers },
+      { to: "/admin/combos", label: "Build Combo Box", icon: Gift },
       { to: "/admin/taxonomy", label: "Categories", icon: Boxes },
     ],
   },
