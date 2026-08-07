@@ -1,4 +1,4 @@
-import type { ComboContentItem } from "@/lib/catalog.server";
+import type { ComboContentItem } from "@/lib/types";
 import { useLang } from "@/lib/language-context";
 import { formatNumber, pick } from "@/lib/i18n";
 
