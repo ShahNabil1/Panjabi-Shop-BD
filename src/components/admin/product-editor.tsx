@@ -933,8 +933,9 @@ export function ProductEditor({ id, kind }: { id: string; kind: ProductKind }) {
         </>
       )}
 
-      <div className="fixed inset-x-0 bottom-0 z-30 border-t border-border/70 bg-card/90 px-4 py-3 backdrop-blur-md sm:left-64">
-        <div className="mx-auto flex max-w-5xl items-center justify-end gap-3">
+      <div className="sticky bottom-0 z-30 -mx-4 mt-2 border-t border-border/70 bg-card/90 px-4 py-3 backdrop-blur-md lg:-mx-10 lg:px-10">
+        <div className="flex items-center justify-end gap-3">
+
           <p className="mr-auto hidden text-xs text-muted-foreground sm:block">
             {isNew ? "Creating a new entry" : "Editing existing entry"}
           </p>
