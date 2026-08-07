@@ -234,8 +234,11 @@ export const productFaqSchema = z.object({
 
 export const productSchema = z.object({
   id: uuid.optional(),
+  /** single = normal product, component = combo sub-item, combo = gift box */
+  kind: z.enum(productKinds).default("single"),
   slug: z.string().trim().min(1).max(90),
-  category_id: uuid,
+  /** Nullable for sub-items — the server assigns the hidden internal category. */
+  category_id: uuid.nullable().default(null),
   subcategory_id: uuid.nullable().default(null),
   name_bn: z.string().trim().min(1).max(200),
   name_en: z.string().trim().min(1).max(200),
@@ -247,6 +250,7 @@ export const productSchema = z.object({
   faq: z.array(productFaqSchema).default([]),
   price: z.number().min(0),
   compare_at_price: z.number().min(0).nullable().default(null),
+  cost_price: z.number().min(0).default(0),
   stock: z.number().int().min(0).default(0),
   sku: optText,
   brand: optText,
@@ -260,6 +264,7 @@ export const productSchema = z.object({
   sort_order: z.number().int().min(0).default(0),
   images: z.array(productImageSchema).default([]),
   variants: z.array(productVariantSchema).default([]),
+  combo_items: z.array(comboItemSchema).default([]),
 });
 
 export const promotionSchema = z.object({
