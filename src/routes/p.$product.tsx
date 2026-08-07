@@ -11,6 +11,7 @@ import { absoluteUrl } from "@/lib/site";
 import { FaqList } from "@/components/site/faq-list";
 import { Breadcrumbs, Prose, Section } from "@/components/site/ui";
 import { AddToCartBar } from "@/components/site/add-to-cart";
+import { ComboContents } from "@/components/site/combo-contents";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/p/$product")({
@@ -142,7 +143,7 @@ export const Route = createFileRoute("/p/$product")({
 
 function ProductPage() {
   const { lang } = useLang();
-  const { product, images, variants, category, subcategory, related, landingSlug } =
+  const { product, images, variants, comboItems, category, subcategory, related, landingSlug } =
     Route.useLoaderData() as ProductPageData;
   const [active, setActive] = useState(0);
   const [selected, setSelected] = useState<Record<string, string>>({});
@@ -371,6 +372,8 @@ function ProductPage() {
             </div>
           </div>
         </div>
+
+        <ComboContents items={comboItems} />
 
         {description ? (
           <div className="mt-10 max-w-3xl">
