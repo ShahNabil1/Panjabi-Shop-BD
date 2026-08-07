@@ -1044,17 +1044,20 @@ function ComboItemPicker({
                 key={o.id}
                 type="button"
                 onClick={() => onPick(o.id)}
-                className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left transition-colors hover:bg-muted/60"
+                className="group flex w-full items-center gap-2.5 rounded-xl border border-transparent bg-muted/25 px-2.5 py-2 text-left transition-all hover:-translate-y-px hover:border-primary/40 hover:bg-primary/10 hover:shadow-sm"
               >
-                <div className="size-8 shrink-0 overflow-hidden rounded-md bg-muted">
+                <div className="size-9 shrink-0 overflow-hidden rounded-lg bg-muted ring-1 ring-border/70 transition-all group-hover:ring-2 group-hover:ring-primary/50">
                   {image ? (
                     <img src={image.url} alt="" className="size-full object-cover" />
                   ) : null}
                 </div>
-                <span className="min-w-0 flex-1 truncate text-sm">{o.name_bn}</span>
-                <span className="text-[11px] text-muted-foreground">
+                <span className="min-w-0 flex-1 truncate text-sm font-semibold text-foreground">
+                  {o.name_bn}
+                </span>
+                <span className="rounded-full bg-primary/12 px-2 py-0.5 text-[11px] font-bold text-primary">
                   {formatPrice("bn", Number(o.price))}
                 </span>
+
                 <Plus className="size-3.5 text-primary" />
               </button>
             );
