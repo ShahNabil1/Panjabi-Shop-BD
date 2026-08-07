@@ -1058,7 +1058,7 @@ function ComboItemPicker({
                   {formatPrice("bn", Number(o.price))}
                 </span>
 
-                <Plus className="size-3.5 text-primary" />
+                <Plus className="size-4 text-primary opacity-60 transition-opacity group-hover:opacity-100" />
               </button>
             );
           })
