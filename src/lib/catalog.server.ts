@@ -186,12 +186,69 @@ export async function fetchSubcategoryPage(categorySlug: string, subcategorySlug
   };
 }
 
+export type ComboContentItem = {
+  id: string;
+  quantity: number;
+  isFree: boolean;
+  nameBn: string;
+  nameEn: string;
+  image: string | null;
+  variantLabels: string[];
+};
+
+async function fetchComboContents(
+  db: ReturnType<typeof createPublicServerClient>,
+  comboId: string,
+): Promise<ComboContentItem[]> {
+  const { data } = await db
+    .from("combo_items")
+    .select(
+      `id, quantity, is_free, sort_order, label_bn, label_en,
+       products!combo_items_item_id_fkey(
+         id, name_bn, name_en,
+         product_images(url, sort_order),
+         product_variants(group_name_bn, value_bn, is_active, sort_order)
+       )`,
+    )
+    .eq("combo_id", comboId)
+    .order("sort_order");
+
+  return (data ?? []).map((row) => {
+    const item = row.products as unknown as {
+      name_bn: string;
+      name_en: string;
+      product_images: Array<{ url: string; sort_order: number }> | null;
+      product_variants: Array<{
+        group_name_bn: string;
+        value_bn: string;
+        is_active: boolean;
+        sort_order: number;
+      }> | null;
+    } | null;
+    const image = [...(item?.product_images ?? [])].sort(
+      (a, b) => a.sort_order - b.sort_order,
+    )[0];
+    return {
+      id: row.id,
+      quantity: row.quantity,
+      isFree: row.is_free,
+      nameBn: row.label_bn || item?.name_bn || "",
+      nameEn: row.label_en || item?.name_en || item?.name_bn || "",
+      image: image?.url ?? null,
+      variantLabels: [...(item?.product_variants ?? [])]
+        .filter((v) => v.is_active)
+        .sort((a, b) => a.sort_order - b.sort_order)
+        .map((v) => v.value_bn),
+    };
+  });
+}
+
 export async function fetchProduct(slug: string) {
   const db = createPublicServerClient();
   const { data: product } = await db
     .from("products")
     .select(
-      `id, slug, name_bn, name_en, short_description_bn, short_description_en,
+      `id, slug, kind, name_bn, name_en, short_description_bn, short_description_en,
        description_bn, description_en, specs, faq, price, compare_at_price, stock, sku, brand,
        badge_bn, badge_en, rating, review_count, meta_title, meta_description, og_image_url,
        category_id, subcategory_id,
@@ -202,9 +259,10 @@ export async function fetchProduct(slug: string) {
     .eq("is_active", true)
     .maybeSingle();
 
-  if (!product) return null;
+  // Combo sub-items never get a public product page.
+  if (!product || product.kind === "component") return null;
 
-  const [catRes, subRes, relatedRes, landingRes] = await Promise.all([
+  const [catRes, subRes, relatedRes, landingRes, comboItems] = await Promise.all([
     db.from("categories").select(CATEGORY_SELECT).eq("id", product.category_id).maybeSingle(),
     product.subcategory_id
       ? db
@@ -228,6 +286,9 @@ export async function fetchProduct(slug: string) {
       .eq("product_id", product.id)
       .eq("is_active", true)
       .maybeSingle(),
+    product.kind === "combo"
+      ? fetchComboContents(db, product.id)
+      : Promise.resolve([] as ComboContentItem[]),
   ]);
 
   const images = [...(product.product_images ?? [])].sort((a, b) => a.sort_order - b.sort_order);
@@ -239,6 +300,7 @@ export async function fetchProduct(slug: string) {
     product: {
       id: product.id,
       slug: product.slug,
+      kind: product.kind,
       nameBn: product.name_bn,
       nameEn: product.name_en,
       shortBn: product.short_description_bn,
@@ -262,6 +324,7 @@ export async function fetchProduct(slug: string) {
     },
     images,
     variants,
+    comboItems,
     category: (catRes.data ?? null) as CategoryRow | null,
     subcategory: (subRes.data ?? null) as SubcategoryRow | null,
     related: cards(relatedRes.data),
