@@ -124,7 +124,6 @@ export async function fetchCategoryPage(slug: string) {
       .select(SUBCATEGORY_SELECT)
       .eq("category_id", category.id)
       .eq("is_active", true)
-      .neq("kind", "component")
       .order("sort_order"),
     db
       .from("products")
@@ -169,7 +168,6 @@ export async function fetchSubcategoryPage(categorySlug: string, subcategorySlug
       .select(SUBCATEGORY_SELECT)
       .eq("category_id", category.id)
       .eq("is_active", true)
-      .neq("kind", "component")
       .order("sort_order"),
     db
       .from("products")
