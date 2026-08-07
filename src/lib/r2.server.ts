@@ -44,7 +44,16 @@ export function publicUrlFor(cfg: R2Config, key: string) {
   return `${cfg.publicBaseUrl}/${key.split("/").map(encodeURIComponent).join("/")}`;
 }
 
-const FOLDERS = ["products", "categories", "promotions", "landing", "site", "hero", "invoices"] as const;
+const FOLDERS = [
+  "products",
+  "sub-products",
+  "categories",
+  "promotions",
+  "landing",
+  "site",
+  "hero",
+  "invoices",
+] as const;
 export type MediaFolder = (typeof FOLDERS)[number];
 
 export function isMediaFolder(value: string): value is MediaFolder {
