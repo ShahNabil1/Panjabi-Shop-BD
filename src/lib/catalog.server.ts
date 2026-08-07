@@ -36,6 +36,7 @@ export async function fetchHome() {
         .from("products")
         .select(PRODUCT_CARD_SELECT)
         .eq("is_active", true)
+        .neq("kind", "component")
         .order("sort_order")
         .limit(12),
       db.from("faqs").select("id, question_bn, question_en, answer_bn, answer_en").order("sort_order"),
@@ -123,12 +124,14 @@ export async function fetchCategoryPage(slug: string) {
       .select(SUBCATEGORY_SELECT)
       .eq("category_id", category.id)
       .eq("is_active", true)
+      .neq("kind", "component")
       .order("sort_order"),
     db
       .from("products")
       .select(PRODUCT_CARD_SELECT)
       .eq("category_id", category.id)
       .eq("is_active", true)
+      .neq("kind", "component")
       .order("sort_order"),
   ]);
 
@@ -166,12 +169,14 @@ export async function fetchSubcategoryPage(categorySlug: string, subcategorySlug
       .select(SUBCATEGORY_SELECT)
       .eq("category_id", category.id)
       .eq("is_active", true)
+      .neq("kind", "component")
       .order("sort_order"),
     db
       .from("products")
       .select(PRODUCT_CARD_SELECT)
       .eq("subcategory_id", subcategory.id)
       .eq("is_active", true)
+      .neq("kind", "component")
       .order("sort_order"),
   ]);
 
@@ -215,6 +220,7 @@ export async function fetchProduct(slug: string) {
       .select(PRODUCT_CARD_SELECT)
       .eq("category_id", product.category_id)
       .eq("is_active", true)
+      .neq("kind", "component")
       .neq("id", product.id)
       .order("sort_order")
       .limit(4),
@@ -337,6 +343,7 @@ export async function fetchSearch(query: string) {
     .from("products")
     .select(PRODUCT_CARD_SELECT)
     .eq("is_active", true)
+    .neq("kind", "component")
     .or(
       `name_bn.ilike.%${escaped}%,name_en.ilike.%${escaped}%,brand.ilike.%${escaped}%,sku.ilike.%${escaped}%`,
     )
@@ -352,6 +359,7 @@ export async function fetchPopularProducts(limit = 4) {
     .from("products")
     .select(PRODUCT_CARD_SELECT)
     .eq("is_active", true)
+    .neq("kind", "component")
     .order("review_count", { ascending: false })
     .limit(limit);
   return cards(data);
@@ -362,7 +370,11 @@ export async function fetchSitemapData() {
   const [cats, subs, prods, landings, promos] = await Promise.all([
     db.from("categories").select("slug, updated_at").eq("is_active", true),
     db.from("subcategories").select("slug, updated_at, categories(slug)").eq("is_active", true),
-    db.from("products").select("slug, updated_at").eq("is_active", true),
+    db
+      .from("products")
+      .select("slug, updated_at")
+      .eq("is_active", true)
+      .neq("kind", "component"),
     db.from("landing_pages").select("slug, updated_at").eq("is_active", true),
     db.from("promotions").select("slug, updated_at").eq("is_active", true),
   ]);
@@ -387,6 +399,7 @@ export async function fetchCatalogFeed() {
       "id, slug, name_bn, name_en, short_description_bn, short_description_en, price, compare_at_price, stock, sku, brand, product_images(url, sort_order), categories(name_en)",
     )
     .eq("is_active", true)
+    .neq("kind", "component")
     .order("sort_order");
   return (data ?? []) as Array<{
     id: string;
