@@ -17,6 +17,7 @@ import { ComboContents } from "@/components/site/combo-contents";
 import type { CartItem } from "@/lib/cart-context";
 import { cn } from "@/lib/utils";
 import logoMark from "@/assets/upoharkabbo-logo.png";
+import { ImageLightbox, useLightbox } from "@/components/site/image-lightbox";
 
 async function retryNetworkRequest<T>(request: () => Promise<T>): Promise<T> {
   const delays = [150, 400];
@@ -117,6 +118,11 @@ function LandingPage() {
   const [comboSelected, setComboSelected] = useState<Record<string, string>>(() =>
     Object.fromEntries(comboItems.flatMap((item) => item.variants[0] ? [[item.id, item.variants[0].id]] : [])),
   );
+  const lightbox = useLightbox();
+  const galleryImages = images.map((img) => ({
+    src: img.url,
+    alt: pick(lang, img.alt_bn, img.alt_en) || pick(lang, product.nameBn, product.nameEn),
+  }));
 
   const activeVariant = variants.find((v) => v.id === variantId) ?? null;
   const unitPrice = product.price + Number(activeVariant?.price_delta ?? 0);
@@ -228,6 +234,7 @@ function LandingPage() {
                 src={img.url}
                 alt={pick(lang, img.alt_bn, img.alt_en) || headline}
                 label={product.nameEn}
+                onClick={() => lightbox.open(galleryImages, i)}
               />
             </div>
           ))}
@@ -346,7 +353,12 @@ function LandingPage() {
         </div>
       </section>
 
-
+      <ImageLightbox
+        images={galleryImages}
+        startIndex={lightbox.startIndex}
+        isOpen={lightbox.isOpen}
+        onClose={lightbox.close}
+      />
       </div>
     </div>
 

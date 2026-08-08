@@ -11,11 +11,13 @@ export function ProductThumb({
   alt,
   label,
   className,
+  onClick,
 }: {
   src: string | null;
   alt: string;
   label: string;
   className?: string;
+  onClick?: () => void;
 }) {
   const [failed, setFailed] = useState(false);
 
@@ -26,7 +28,8 @@ export function ProductThumb({
         alt={alt}
         loading="lazy"
         onError={() => setFailed(true)}
-        className={cn("h-full w-full object-cover", className)}
+        onClick={onClick}
+        className={cn("h-full w-full object-cover", onClick ? "cursor-zoom-in" : "", className)}
       />
     );
   }
@@ -34,8 +37,10 @@ export function ProductThumb({
   return (
     <div
       aria-hidden
+      onClick={onClick}
       className={cn(
         "flex h-full w-full items-center justify-center bg-secondary text-2xl font-bold text-muted-foreground/60",
+        onClick ? "cursor-zoom-in" : "",
         className,
       )}
     >

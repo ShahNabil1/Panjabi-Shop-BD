@@ -1,6 +1,7 @@
 import type { ComboContentItem } from "@/lib/types";
 import { useLang } from "@/lib/language-context";
 import { formatNumber, pick } from "@/lib/i18n";
+import { ImageLightbox, useLightbox } from "@/components/site/image-lightbox";
 
 export function ComboContents({
   items,
@@ -12,6 +13,13 @@ export function ComboContents({
   onSelect?: (itemId: string, variantId: string) => void;
 }) {
   const { lang } = useLang();
+  const lightbox = useLightbox();
+  const galleryImages = items
+    .map((item) => ({
+      src: item.image,
+      alt: pick(lang, item.nameBn, item.nameEn),
+    }))
+    .filter((img): img is { src: string; alt: string } => Boolean(img.src));
   if (items.length === 0) return null;
 
   return (
@@ -36,13 +44,16 @@ export function ComboContents({
             key={item.id}
             className="group flex items-center gap-3 rounded-xl border border-border bg-card p-3 transition-shadow duration-300 hover:shadow-[var(--shadow-lift)]"
           >
-            <div className="relative size-16 shrink-0 overflow-hidden rounded-lg bg-secondary">
+            <div
+              className="relative size-16 shrink-0 overflow-hidden rounded-lg bg-secondary"
+              onClick={() => item.image && lightbox.open(galleryImages, galleryImages.findIndex((img) => img.src === item.image))}
+            >
               {item.image ? (
                 <img
                   src={item.image}
                   alt={pick(lang, item.nameBn, item.nameEn)}
                   loading="lazy"
-                  className="size-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  className="size-full cursor-zoom-in object-cover transition-transform duration-500 group-hover:scale-105"
                 />
               ) : (
                 <div className="flex size-full items-center justify-center text-sm font-bold text-muted-foreground/60">
@@ -93,6 +104,12 @@ export function ComboContents({
           </li>
         ))}
       </ul>
+      <ImageLightbox
+        images={galleryImages}
+        startIndex={lightbox.startIndex}
+        isOpen={lightbox.isOpen}
+        onClose={lightbox.close}
+      />
     </section>
   );
 }
