@@ -264,6 +264,30 @@ async function fetchComboContents(
   });
 }
 
+/**
+ * Default combo selections for a product: EVERY child item of the combo, with
+ * the first available variant preselected. Items without variants are still
+ * included (variantId null) so the full package list always travels with the
+ * cart line, no matter which page added it.
+ */
+export async function fetchComboSelections(productId: string) {
+  const db = createPublicServerClient();
+  const items = await fetchComboContents(db, productId);
+  return items.map((item) => {
+    const variant = item.variants[0];
+    return {
+      itemId: item.itemId,
+      itemNameBn: item.nameBn,
+      itemNameEn: item.nameEn,
+      quantity: item.quantity,
+      variantId: variant?.id ?? null,
+      variantLabelBn: variant ? `${variant.groupNameBn}: ${variant.valueBn}` : null,
+      variantLabelEn: variant ? `${variant.groupNameEn}: ${variant.valueEn}` : null,
+      sku: variant?.sku ?? null,
+    };
+  });
+}
+
 export async function fetchProduct(slug: string) {
   const db = createPublicServerClient();
   const { data: product } = await db
