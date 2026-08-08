@@ -254,7 +254,7 @@ function PartnerCard({
       });
       setResult({ ok: true, message: res.message });
       setSavedSnapshot(JSON.stringify(values));
-      setSavedTemplate(noteTemplate);
+      setNoteTemplate(noteTemplate.trim()); setSavedTemplate(noteTemplate.trim());
       toast.success(`${providerLabels[provider]} saved`);
       onDone();
     } catch (error) {
