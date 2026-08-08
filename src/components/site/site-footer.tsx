@@ -135,9 +135,17 @@ export function SiteFooter() {
         </div>
       </div>
 
-      <div className="border-t border-border">
-        <p className="mx-auto max-w-6xl px-4 py-4 text-center text-xs text-muted-foreground">
-          © {year} {brand}. {lang === "bn" ? "সর্বস্বত্ব সংরক্ষিত।" : "All rights reserved."}
+      <div className="bg-primary py-3">
+        <p className="mx-auto max-w-6xl px-4 text-center text-xs font-medium text-primary-foreground">
+          © 2026 Upoharkabbo. All Rights Reserved. Design & Developed By{" "}
+          <a
+            href="https://shahnabil.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-semibold underline underline-offset-2 transition-opacity hover:opacity-80"
+          >
+            Shahriar Nabil
+          </a>
         </p>
       </div>
     </footer>
