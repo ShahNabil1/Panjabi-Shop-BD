@@ -210,12 +210,12 @@ export function CustomerCard({
         <div className="grid gap-4 sm:grid-cols-2">
           <Value label="Name">{order.customer_name}</Value>
           <Value label="Phone">
-            <span className="inline-flex items-center gap-1.5 rounded-md bg-muted px-2 py-1 font-mono text-xs">
-              <Phone className="size-3.5" />
-              {order.customer_phone}
-            </span>
+            <PhoneRow phone={order.customer_phone} />
           </Value>
-          <Value label="Alternative phone">{order.alt_phone || "—"}</Value>
+          <Value label="Alternative phone">
+            {order.alt_phone ? <PhoneRow phone={order.alt_phone} /> : "—"}
+          </Value>
+
           <Value label="Division">{order.division || "—"}</Value>
           <Value label="District">{order.district || "—"}</Value>
           <Value label="Thana / Upazila">{order.upazila || "—"}</Value>
