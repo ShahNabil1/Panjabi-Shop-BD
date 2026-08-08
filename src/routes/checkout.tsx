@@ -1,8 +1,6 @@
-import { Link, createFileRoute } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 
 import { useCart } from "@/lib/cart-context";
-import { useLang } from "@/lib/language-context";
-import { tr } from "@/lib/i18n";
 import { getDeliveryRates } from "@/lib/order.functions";
 import { CheckoutForm } from "@/components/site/checkout-form";
 import { Section } from "@/components/site/ui";
@@ -42,7 +40,6 @@ export const Route = createFileRoute("/checkout")({
 
 function CheckoutPage() {
   const { rates } = Route.useLoaderData();
-  const { lang } = useLang();
   const { items, ready, setQuantity, remove } = useCart();
 
   return (
@@ -53,17 +50,8 @@ function CheckoutPage() {
     >
       {!ready ? (
         <div className="h-64 animate-pulse rounded-sm bg-secondary" />
-      ) : items.length === 0 ? (
-        <div className="rounded-sm border border-border bg-card p-10 text-center">
-          <p className="text-muted-foreground">{tr(lang, "emptyCart")}</p>
-          <Link
-            to="/"
-            className="mt-5 inline-block rounded-sm bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
-          >
-            {tr(lang, "continueShopping")}
-          </Link>
-        </div>
       ) : (
+
         <div className="mx-auto max-w-2xl">
           <div className="mb-5 text-center">
             <h2 className="inline-flex items-center gap-2 text-base font-bold text-primary">

@@ -1,7 +1,10 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Trash2 } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
+
+import { useConfirm } from "@/components/ui/confirm-dialog";
+
 
 import { useCart, type CartItem } from "@/lib/cart-context";
 import { useLang } from "@/lib/language-context";
@@ -88,6 +91,8 @@ export function CheckoutForm({
   onVariantChange?: (id: string) => void;
 }) {
   const { lang } = useLang();
+  const confirmDialog = useConfirm();
+
   const navigate = useNavigate();
   const submit = useServerFn(placeOrder);
   const { clear } = useCart();
@@ -395,26 +400,43 @@ export function CheckoutForm({
       <div className={cn("grid gap-8 px-4 pt-7 sm:px-7", compact ? "pb-5" : "pb-7 sm:pb-9")}>
         {/* Your products */}
         <section>
-          <div className="flex items-center justify-between gap-3">
-            <h3 className="text-lg font-extrabold">{pick(lang, "আপনার প্রোডাক্ট", "Your Products")}</h3>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <h3 className="font-en text-xl font-extrabold tracking-tight sm:text-2xl">Your Products</h3>
             {allowAddMore ? (
               <Link
                 to="/"
-                className="text-xs font-semibold text-primary underline-offset-4 hover:underline"
+                className="font-en group inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-primary to-pink-500 px-5 py-2.5 text-sm font-extrabold text-primary-foreground shadow-md transition-all duration-300 hover:scale-[1.03] hover:shadow-lg active:scale-95 sm:text-base"
               >
-                + {tr(lang, "addMoreProducts")}
+                <Plus className="h-4 w-4 transition-transform duration-300 group-hover:rotate-90" />
+                Add Product
               </Link>
             ) : null}
           </div>
 
           <div className="mt-4 overflow-hidden rounded-xl border border-border">
-            <div className="flex items-center justify-between gap-3 bg-secondary/60 px-3 py-2.5 text-xs font-bold uppercase tracking-wide text-muted-foreground sm:px-4">
-              <span>{pick(lang, "প্রোডাক্ট", "Product")}</span>
+            <div className="font-en flex items-center justify-between gap-3 bg-secondary/60 px-3 py-3 text-sm font-extrabold uppercase tracking-wide text-foreground sm:px-4 sm:text-base">
+              <span>Product</span>
               <div className="flex items-center gap-4 sm:gap-5">
-                <span className="text-center">{pick(lang, "পরিমাণ", "Quantity")}</span>
-                <span className="text-right">{pick(lang, "দাম", "Price")}</span>
+                <span className="text-center">Quantity</span>
+                <span className="text-right">Price</span>
               </div>
             </div>
+
+            {items.length === 0 ? (
+              <div className="grid place-items-center gap-3 px-4 py-10 text-center">
+                <p className="font-en text-base font-bold text-muted-foreground">
+                  No products in your order
+                </p>
+                <Link
+                  to="/"
+                  className="font-en group inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-primary to-pink-500 px-6 py-3 text-base font-extrabold text-primary-foreground shadow-md transition-all duration-300 hover:scale-[1.03] hover:shadow-lg active:scale-95"
+                >
+                  <Plus className="h-5 w-5 transition-transform duration-300 group-hover:rotate-90" />
+                  Add Product
+                </Link>
+              </div>
+            ) : null}
+
 
             <ul className="divide-y divide-border">
               {items.map((i) => (
@@ -451,7 +473,23 @@ export function CheckoutForm({
                       {onRemove ? (
                         <button
                           type="button"
-                          onClick={() => onRemove(i.key)}
+                          onClick={() => {
+                            void (async () => {
+                              const ok = await confirmDialog({
+                                title: pick(
+                                  lang,
+                                  "প্রোডাক্টটি সরিয়ে ফেলবেন?",
+                                  "Remove this product?",
+                                ),
+                                description: pick(lang, i.nameBn, i.nameEn),
+                                confirmLabel: pick(lang, "ডিলিট করুন", "Delete"),
+                                cancelLabel: pick(lang, "বাতিল", "Cancel"),
+                                tone: "danger",
+                              });
+                              if (ok) onRemove(i.key);
+                            })();
+                          }}
+
                           aria-label={tr(lang, "remove")}
                           className="grid h-8 w-8 shrink-0 cursor-pointer place-items-center rounded-full border border-border bg-card text-muted-foreground transition-all duration-200 hover:scale-110 hover:border-destructive hover:text-destructive hover:shadow-sm active:scale-95"
                         >
@@ -621,27 +659,26 @@ export function CheckoutForm({
 
         {/* Shipping */}
         <section>
-          <h3 className="text-lg font-extrabold">{pick(lang, "শিপিং", "Shipping")}</h3>
-          <div className="mt-3 flex items-center justify-between gap-3 rounded-xl border border-border px-4 py-3.5 text-sm">
-            <span className="text-muted-foreground">{tr(lang, "deliveryCharge")}</span>
-            <span className="font-bold tabular-nums">
-              {delivery === 0 ? tr(lang, "free") : formatPrice(lang, delivery)}
+          <h3 className="font-en text-xl font-extrabold sm:text-2xl">Shipping</h3>
+          <div className="mt-3 flex items-center justify-between gap-3 rounded-xl border border-border px-4 py-3.5 text-base">
+            <span className="font-en font-bold">Delivery Charge</span>
+            <span className="font-en text-lg font-extrabold tabular-nums">
+              {delivery === 0 ? "Free" : formatPrice(lang, delivery)}
             </span>
           </div>
         </section>
 
         {/* Your order */}
         <section>
-          <h3 className="text-lg font-extrabold text-primary">
-            {pick(lang, "আপনার অর্ডার", "Your order")}
-          </h3>
+          <h3 className="font-en text-xl font-extrabold text-primary sm:text-2xl">Your Order</h3>
 
-          <div className="mt-3 grid gap-2 border-b border-dashed border-border pb-3 text-xs font-bold uppercase tracking-wide text-muted-foreground">
-            <div className="flex justify-between">
-              <span>{pick(lang, "প্রোডাক্ট", "Product")}</span>
-              <span>{tr(lang, "subtotal")}</span>
+          <div className="mt-3 grid gap-2 border-b border-dashed border-border pb-3 text-sm font-extrabold uppercase tracking-wide text-foreground sm:text-base">
+            <div className="font-en flex justify-between">
+              <span>Product</span>
+              <span>Subtotal</span>
             </div>
           </div>
+
 
           <ul className="divide-y divide-dashed divide-border">
             {items.map((i) => (
@@ -772,30 +809,31 @@ export function CheckoutForm({
           </div>
 
 
-          <dl className="mt-4 grid gap-1.5 border-t border-dashed border-border pt-3 text-sm">
+          <dl className="mt-4 grid gap-2 border-t border-dashed border-border pt-3 text-base">
             <div className="flex justify-between">
-              <dt className="text-muted-foreground">{tr(lang, "subtotal")}</dt>
-              <dd className="font-semibold tabular-nums">{formatPrice(lang, subtotal)}</dd>
+              <dt className="font-en font-bold text-foreground">Subtotal</dt>
+              <dd className="font-en text-lg font-extrabold tabular-nums">{formatPrice(lang, subtotal)}</dd>
             </div>
             <div className="flex justify-between">
-              <dt className="text-muted-foreground">{tr(lang, "deliveryCharge")}</dt>
-              <dd className="font-semibold tabular-nums">
-                {delivery === 0 ? tr(lang, "free") : formatPrice(lang, delivery)}
+              <dt className="font-en font-bold text-foreground">Delivery Charge</dt>
+              <dd className="font-en text-lg font-extrabold tabular-nums">
+                {delivery === 0 ? "Free" : formatPrice(lang, delivery)}
               </dd>
             </div>
             {discount > 0 ? (
               <div className="flex justify-between text-emerald-600">
-                <dt className="font-semibold">
-                  {lang === "bn" ? "কুপন ছাড়" : "Coupon discount"}
+                <dt className="font-en font-bold">
+                  Coupon Discount
                   {appliedCode ? <span className="font-en"> ({appliedCode})</span> : null}
                 </dt>
-                <dd className="font-bold tabular-nums">− {formatPrice(lang, discount)}</dd>
+                <dd className="font-en text-lg font-extrabold tabular-nums">− {formatPrice(lang, discount)}</dd>
               </div>
             ) : null}
-            <div className="flex justify-between border-t border-border pt-2 text-base">
-              <dt className="font-bold">{tr(lang, "total")}</dt>
-              <dd className="font-bold tabular-nums text-primary">{formatPrice(lang, total)}</dd>
+            <div className="flex items-center justify-between border-t border-border pt-2.5">
+              <dt className="font-en text-lg font-extrabold sm:text-xl">Total</dt>
+              <dd className="font-en text-xl font-extrabold tabular-nums text-primary sm:text-2xl">{formatPrice(lang, total)}</dd>
             </div>
+
           </dl>
         </section>
 
