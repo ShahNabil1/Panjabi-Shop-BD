@@ -9,12 +9,12 @@ import { cn } from "@/lib/utils";
 
 export function SiteFooter() {
   const { lang } = useLang();
-  const { brand, tagline, contact } = useSiteData();
+  const { brand, contact } = useSiteData();
   const year = new Date().getFullYear();
 
   return (
     <footer className="mt-16 border-t border-border bg-footer">
-      <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 sm:grid-cols-2 lg:grid-cols-4">
         <div className="min-w-0">
           <div className="flex items-center">
             <img
@@ -28,7 +28,8 @@ export function SiteFooter() {
           </div>
 
 
-          <p className="mt-3 text-sm font-medium leading-relaxed text-foreground">
+          <p className="mt-3 inline-flex items-center gap-2 text-sm font-bold uppercase tracking-wide text-primary">
+            <span className="inline-block h-2 w-2 rounded-full bg-primary animate-pulse" />
             Follow us on
           </p>
           <div className="mt-2 flex flex-wrap items-center gap-4">
@@ -72,6 +73,27 @@ export function SiteFooter() {
               <Link to="/contact" className="text-sm text-muted-foreground hover:text-primary">
                 {tr(lang, "contact")}
               </Link>
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <h2 className="text-sm font-semibold">Legal</h2>
+          <ul className="mt-3 space-y-2">
+            <li>
+              <span className="cursor-default text-sm text-muted-foreground">
+                Privacy Policy
+              </span>
+            </li>
+            <li>
+              <span className="cursor-default text-sm text-muted-foreground">
+                Terms & Conditions
+              </span>
+            </li>
+            <li>
+              <span className="cursor-default text-sm text-muted-foreground">
+                Return Policy
+              </span>
             </li>
           </ul>
         </div>
