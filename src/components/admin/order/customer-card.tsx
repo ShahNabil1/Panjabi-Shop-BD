@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Lock, MapPin, Pencil, Phone, PhoneCall, Save, X } from "lucide-react";
+import { Lock, MapPin, Pencil, Save, X } from "lucide-react";
+
+import { PhoneActions } from "@/components/admin/phone-actions";
 
 import { BD_DIVISIONS } from "@/lib/bd-geo";
 import { adminUpdateOrderCustomer } from "@/lib/order-admin.functions";
