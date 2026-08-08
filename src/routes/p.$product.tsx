@@ -224,6 +224,7 @@ function ProductPage() {
                 src={images[active]?.url ?? null}
                 alt={pick(lang, images[active]?.alt_bn, images[active]?.alt_en) || name}
                 label={name}
+                onClick={() => lightbox.open(galleryImages, active)}
               />
             </div>
             {images.length > 1 ? (
@@ -239,11 +240,22 @@ function ProductPage() {
                       i === active ? "border-primary" : "border-border",
                     )}
                   >
-                    <ProductThumb src={img.url} alt="" label={name} />
+                    <ProductThumb
+                      src={img.url}
+                      alt=""
+                      label={name}
+                      onClick={() => lightbox.open(galleryImages, i)}
+                    />
                   </button>
                 ))}
               </div>
             ) : null}
+            <ImageLightbox
+              images={galleryImages}
+              startIndex={lightbox.startIndex}
+              isOpen={lightbox.isOpen}
+              onClose={lightbox.close}
+            />
           </div>
 
           <div className="min-w-0">
