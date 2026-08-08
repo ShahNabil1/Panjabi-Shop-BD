@@ -25,9 +25,10 @@ export type ComboSelection = {
   itemNameBn: string;
   itemNameEn: string;
   quantity: number;
-  variantId: string;
-  variantLabelBn: string;
-  variantLabelEn: string;
+  /** null when the child item has no variants — it still ships in the box. */
+  variantId: string | null;
+  variantLabelBn: string | null;
+  variantLabelEn: string | null;
   sku: string | null;
 };
 
