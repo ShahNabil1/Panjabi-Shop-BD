@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Lock, MapPin, Pencil, Save, Truck, X } from "lucide-react";
 import {
@@ -11,6 +11,8 @@ import {
 } from "@/components/ui/select";
 
 import { PhoneActions } from "@/components/admin/phone-actions";
+import { CustomerOrdersDialog } from "@/components/admin/customer-orders-dialog";
+import { adminLookupCustomer } from "@/lib/admin.functions";
 
 import { BD_DIVISIONS } from "@/lib/bd-geo";
 import { adminUpdateOrderCustomer } from "@/lib/order-admin.functions";
@@ -70,6 +72,17 @@ export function CustomerCard({
 }) {
   const qc = useQueryClient();
   const [editing, setEditing] = useState(false);
+  const [historyOpen, setHistoryOpen] = useState(false);
+  const phoneForHistory = order.customer_phone.trim();
+  const lookup = useQuery({
+    queryKey: ["admin", "customer-lookup", phoneForHistory],
+    queryFn: () => adminLookupCustomer({ data: { phone: phoneForHistory } }),
+    enabled: /^01[3-9]\d{8}$/.test(phoneForHistory),
+    staleTime: 60 * 1000,
+  });
+  /** The current order is included in the count, so subtract it. */
+  const previousCount = Math.max(0, (lookup.data?.orderCount ?? 0) - 1);
+
   const baseline = {
     customerName: order.customer_name,
     customerPhone: order.customer_phone,
@@ -278,10 +291,23 @@ export function CustomerCard({
           <Value label="Name">{order.customer_name}</Value>
           <Value label="Phone">
             <PhoneRow phone={order.customer_phone} />
+            {previousCount > 0 ? (
+              <span className="mt-1 block text-xs font-semibold text-primary">
+                Returning customer ·{" "}
+                <button
+                  type="button"
+                  onClick={() => setHistoryOpen(true)}
+                  className="underline decoration-dotted underline-offset-2 transition-opacity hover:opacity-80"
+                >
+                  {previousCount} previous order(s)
+                </button>
+              </span>
+            ) : null}
           </Value>
           <Value label="Alternative phone">
             {order.alt_phone ? <PhoneRow phone={order.alt_phone} /> : "—"}
           </Value>
+
 
           <Value label="Division">{order.division || "—"}</Value>
           <Value label="District">{order.district || "—"}</Value>
@@ -299,6 +325,12 @@ export function CustomerCard({
           ) : null}
         </div>
       )}
+
+      <CustomerOrdersDialog
+        phone={phoneForHistory}
+        open={historyOpen}
+        onOpenChange={setHistoryOpen}
+      />
     </Panel>
   );
 }
