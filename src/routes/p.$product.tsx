@@ -8,8 +8,7 @@ import { discountPercent, formatPrice, pick, tr, formatNumber, toBnDigits } from
 import { ProductGrid, ProductThumb } from "@/components/site/product-card";
 import { NotFoundView } from "@/components/site/not-found-view";
 import { absoluteUrl } from "@/lib/site";
-import { FaqList } from "@/components/site/faq-list";
-import { Breadcrumbs, Prose, Section } from "@/components/site/ui";
+import { Breadcrumbs, Section } from "@/components/site/ui";
 import { AddToCartBar } from "@/components/site/add-to-cart";
 import { ComboContents } from "@/components/site/combo-contents";
 import { cn } from "@/lib/utils";
@@ -162,7 +161,6 @@ function ProductPage() {
   const name = pick(lang, product.nameBn, product.nameEn);
   const off = discountPercent(product.price, product.compareAtPrice);
   const short = pick(lang, product.shortBn, product.shortEn);
-  const description = pick(lang, product.descriptionBn, product.descriptionEn);
   const badge = pick(lang, product.badgeBn, product.badgeEn);
 
   const groups = new Map<string, typeof variants>();
@@ -180,14 +178,6 @@ function ProductPage() {
   const unitPrice = product.price + Number(activeVariant?.price_delta ?? 0);
 
 
-
-  const productFaqs = (product.faq ?? []).map((f, i) => ({
-    id: String(i),
-    question_bn: f["question_bn"] ?? f["question"] ?? "",
-    question_en: f["question_en"] ?? f["question"] ?? "",
-    answer_bn: f["answer_bn"] ?? f["answer"] ?? "",
-    answer_en: f["answer_en"] ?? f["answer"] ?? "",
-  }));
 
   return (
     <>
@@ -411,13 +401,6 @@ function ProductPage() {
           setComboSelected((current) => ({ ...current, [itemId]: variantId }))
         } />
 
-        {description ? (
-          <div className="mx-auto mt-10 max-w-3xl">
-            <h2 className="text-center text-lg font-bold">{tr(lang, "description")}</h2>
-            <Prose text={description} className="mt-3" />
-          </div>
-        ) : null}
-
         {product.specs.length > 0 ? (
           <div className="mx-auto mt-10 max-w-3xl">
             <h2 className="text-center text-lg font-bold">{tr(lang, "specs")}</h2>
@@ -436,12 +419,6 @@ function ProductPage() {
           </div>
         ) : null}
 
-        {productFaqs.length > 0 ? (
-          <div className="mx-auto mt-10 max-w-3xl">
-            <h2 className="text-center text-lg font-bold">{tr(lang, "productFaq")}</h2>
-            <FaqList items={productFaqs} className="mt-3" />
-          </div>
-        ) : null}
       </Section>
 
       {related.length > 0 ? (

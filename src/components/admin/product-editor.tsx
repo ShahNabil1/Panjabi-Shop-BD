@@ -382,7 +382,7 @@ export function ProductEditor({ id, kind }: { id: string; kind: ProductKind }) {
         </div>
 
         {isComponent ? null : (
-          <div className="mt-5 grid gap-4 sm:grid-cols-2">
+          <div className="mt-5">
             <AreaField
               label="Short description"
               rows={3}
@@ -393,14 +393,6 @@ export function ProductEditor({ id, kind }: { id: string; kind: ProductKind }) {
                   short_description_bn: v || null,
                   short_description_en: v || null,
                 }))
-              }
-            />
-            <AreaField
-              label="Full description"
-              rows={7}
-              value={draft.description_bn ?? ""}
-              onChange={(v) =>
-                setDraft((d) => ({ ...d, description_bn: v || null, description_en: v || null }))
               }
             />
           </div>
@@ -840,76 +832,6 @@ export function ProductEditor({ id, kind }: { id: string; kind: ProductKind }) {
                 ))}
               </div>
             )}
-
-            <div className="mt-6 border-t border-border/60 pt-5">
-              <SectionHeading
-                title="FAQ"
-                action={
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="rounded-xl"
-                    onClick={() =>
-                      set("faq", [
-                        ...draft.faq,
-                        { question_bn: "", question_en: "", answer_bn: "", answer_en: "" },
-                      ])
-                    }
-                  >
-                    <Plus className="mr-1.5 size-3.5" /> Add FAQ
-                  </Button>
-                }
-              />
-              {draft.faq.length === 0 ? (
-                <p className="rounded-xl border border-dashed border-border py-8 text-center text-sm text-muted-foreground">
-                  No FAQ entries yet
-                </p>
-              ) : (
-                <div className="space-y-2">
-                  {draft.faq.map((f, i) => (
-                    <div
-                      key={i}
-                      className="space-y-2 rounded-xl border border-border/70 bg-background/50 p-3 transition-all duration-300 hover:border-primary/30"
-                    >
-                      <div className="flex items-center gap-2">
-                        <Input
-                          className="rounded-lg"
-                          placeholder="Question"
-                          value={f.question_bn}
-                          onChange={(e) =>
-                            patchFaq(i, {
-                              question_bn: e.target.value,
-                              question_en: e.target.value,
-                            })
-                          }
-                        />
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          className="rounded-lg text-muted-foreground hover:text-destructive"
-                          onClick={() =>
-                            set(
-                              "faq",
-                              draft.faq.filter((_, j) => j !== i),
-                            )
-                          }
-                        >
-                          <Trash2 className="size-4" />
-                        </Button>
-                      </div>
-                      <Input
-                        className="rounded-lg"
-                        placeholder="Answer"
-                        value={f.answer_bn}
-                        onChange={(e) =>
-                          patchFaq(i, { answer_bn: e.target.value, answer_en: e.target.value })
-                        }
-                      />
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
           </Panel>
 
           <Panel className="admin-rise" style={{ animationDelay: "300ms" }}>
