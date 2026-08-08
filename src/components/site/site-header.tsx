@@ -103,6 +103,7 @@ export function SiteHeader() {
   const [open, setOpen] = useState(false);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const isLanding = pathname.startsWith("/lp/");
+  const isCheckout = pathname === "/checkout";
 
   useEffect(() => {
     if (typeof document === "undefined") return;
@@ -240,7 +241,7 @@ export function SiteHeader() {
       </div>
 
       {isLanding ? null : (
-        <div className="mx-auto max-w-6xl px-4 pb-3 lg:hidden">
+        <div className={cn("mx-auto max-w-6xl px-4 pb-3 lg:hidden", isCheckout && "hidden")}>
           <SearchBox />
         </div>
       )}

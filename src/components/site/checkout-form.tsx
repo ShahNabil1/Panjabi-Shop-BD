@@ -789,8 +789,9 @@ export function CheckoutForm({
                       {lang === "bn" ? "বাতিল" : "Remove"}
                     </button>
                   ) : couponPending ? (
-                    <span className="mr-2 shrink-0 text-xs font-semibold text-muted-foreground">
-                      {lang === "bn" ? "যাচাই..." : "Checking…"}
+                    <span className="mr-1 inline-flex shrink-0 items-center gap-1.5 rounded-full bg-emerald-100 px-3 py-1.5 text-xs font-extrabold text-emerald-700">
+                      <span className="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-emerald-300 border-t-emerald-600" />
+                      Verifying...
                     </span>
                   ) : null}
                 </div>
