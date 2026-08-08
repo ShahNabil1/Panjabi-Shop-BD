@@ -821,14 +821,14 @@ export function CheckoutForm({
           </div>
 
 
-          <dl className="mt-4 grid gap-2 border-t border-dashed border-border pt-3 text-base">
+          <dl className="mt-4 grid gap-2 border-t border-dashed border-border pt-3 text-sm">
             <div className="flex justify-between">
               <dt className="font-en font-bold text-foreground">Subtotal</dt>
-              <dd className="font-en text-lg font-extrabold tabular-nums">{formatPrice(lang, subtotal)}</dd>
+              <dd className="font-en text-base font-extrabold tabular-nums">{formatPrice(lang, subtotal)}</dd>
             </div>
             <div className="flex justify-between">
               <dt className="font-en font-bold text-foreground">Delivery Charge</dt>
-              <dd className="font-en text-lg font-extrabold tabular-nums">
+              <dd className="font-en text-base font-extrabold tabular-nums">
                 {delivery === 0 ? "Free" : formatPrice(lang, delivery)}
               </dd>
             </div>
@@ -838,12 +838,12 @@ export function CheckoutForm({
                   Coupon Discount
                   {appliedCode ? <span className="font-en"> ({appliedCode})</span> : null}
                 </dt>
-                <dd className="font-en text-lg font-extrabold tabular-nums">− {formatPrice(lang, discount)}</dd>
+                <dd className="font-en text-base font-extrabold tabular-nums">− {formatPrice(lang, discount)}</dd>
               </div>
             ) : null}
             <div className="flex items-center justify-between border-t border-border pt-2.5">
-              <dt className="font-en text-lg font-extrabold sm:text-xl">Total</dt>
-              <dd className="font-en text-xl font-extrabold tabular-nums text-primary sm:text-2xl">{formatPrice(lang, total)}</dd>
+              <dt className="font-en text-base font-extrabold sm:text-lg">Total</dt>
+              <dd className="font-en text-lg font-extrabold tabular-nums text-primary sm:text-xl">{formatPrice(lang, total)}</dd>
             </div>
 
           </dl>
