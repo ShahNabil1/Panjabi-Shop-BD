@@ -185,7 +185,7 @@ export async function carrybeeAddressDetails(
 }
 
 export type CarrybeeOrderInput = {
-  store_id: number;
+  store_id: string | number;
   merchant_order_id: string;
   /** 1 = Normal, 2 = Express. We always send 1 unless overridden. */
   delivery_type: 1 | 2;
