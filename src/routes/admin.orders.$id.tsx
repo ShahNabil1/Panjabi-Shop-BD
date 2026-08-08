@@ -2,7 +2,7 @@ import { CopyBadge } from "@/components/admin/copy-badge";
 import { Link, createFileRoute, useNavigate, useParams, useSearch } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { ArrowLeft, CheckCircle2, FileText, MessageSquare, ShieldAlert, UserRound, X } from "lucide-react";
+import { ArrowLeft, CheckCircle2, Copy, Download, ExternalLink, FileText, MessageSquare, ShieldAlert, UserRound, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 import { adminUpdateOrderStatus } from "@/lib/admin.functions";
@@ -226,6 +226,7 @@ function AdminOrderDetail() {
   /** `datetime-local` value used when moving the order to Scheduled Order. */
   const [scheduleAt, setScheduleAt] = useState(defaultScheduleValue);
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [invoiceOpen, setInvoiceOpen] = useState(false);
   const [silent, setSilent] = useState(false);
 
   const update = useMutation({
@@ -832,5 +833,98 @@ function AdminOrderDetail() {
         </DialogContent>
       </Dialog>
     </div>
+  );
+}
+
+
+function InvoiceActionsDialog({
+  open,
+  onOpenChange,
+  orderNumber,
+  phone,
+}: {
+  open: boolean;
+  onOpenChange: (value: boolean) => void;
+  orderNumber: string;
+  phone: string;
+}) {
+  const path = `/invoice/${encodeURIComponent(orderNumber)}?phone=${encodeURIComponent(phone)}`;
+  const url = typeof window === "undefined" ? path : `${window.location.origin}${path}`;
+
+  const actions = [
+    {
+      key: "copy",
+      label: "Copy link",
+      hint: "ইনভয়েসের লিংক কপি হবে",
+      icon: Copy,
+      className:
+        "border-slate-200 bg-slate-50 text-slate-700 hover:border-slate-300 hover:bg-slate-100",
+      run: async () => {
+        try {
+          await navigator.clipboard.writeText(url);
+          toast.success("ইনভয়েস লিংক কপি হয়েছে");
+        } catch {
+          toast.error("কপি করা যায়নি");
+        }
+        onOpenChange(false);
+      },
+    },
+    {
+      key: "download",
+      label: "Download PDF",
+      hint: "সরাসরি PDF সেভ হবে",
+      icon: Download,
+      className:
+        "border-emerald-200 bg-emerald-50 text-emerald-700 hover:border-emerald-300 hover:bg-emerald-100",
+      run: () => {
+        window.open(`${path}&print=1`, "_blank", "noopener,noreferrer");
+        onOpenChange(false);
+      },
+    },
+    {
+      key: "visit",
+      label: "Visit invoice",
+      hint: "নতুন ট্যাবে ইনভয়েস খুলবে",
+      icon: ExternalLink,
+      className:
+        "border-indigo-200 bg-indigo-50 text-indigo-700 hover:border-indigo-300 hover:bg-indigo-100",
+      run: () => {
+        window.open(path, "_blank", "noopener,noreferrer");
+        onOpenChange(false);
+      },
+    },
+  ];
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2 text-base">
+            <FileText className="size-4 text-indigo-500" />
+            ইনভয়েস — <span className="font-en">{orderNumber}</span>
+          </DialogTitle>
+          <DialogDescription>কী করতে চান সেটি বেছে নিন।</DialogDescription>
+        </DialogHeader>
+        <div className="grid gap-2">
+          {actions.map((action) => (
+            <button
+              key={action.key}
+              type="button"
+              onClick={action.run}
+              className={`flex items-center gap-3 rounded-xl border px-4 py-3 text-left transition-all active:scale-[0.98] ${action.className}`}
+            >
+              <action.icon className="size-4 shrink-0" />
+              <span className="flex-1">
+                <span className="block text-sm font-semibold">{action.label}</span>
+                <span className="block text-xs opacity-75">{action.hint}</span>
+              </span>
+            </button>
+          ))}
+        </div>
+        <p className="truncate rounded-lg bg-muted px-3 py-2 font-en text-[11px] text-muted-foreground">
+          {url}
+        </p>
+      </DialogContent>
+    </Dialog>
   );
 }
