@@ -14,10 +14,12 @@ export function ComboContents({
 }) {
   const { lang } = useLang();
   const lightbox = useLightbox();
-  const galleryImages = items.map((item) => ({
-    src: item.image,
-    alt: pick(lang, item.nameBn, item.nameEn),
-  })).filter((img) => img.src);
+  const galleryImages = items
+    .map((item) => ({
+      src: item.image,
+      alt: pick(lang, item.nameBn, item.nameEn),
+    }))
+    .filter((img): img is { src: string; alt: string } => Boolean(img.src));
   if (items.length === 0) return null;
 
   return (
