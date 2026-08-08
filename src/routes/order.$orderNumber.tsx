@@ -16,7 +16,7 @@ export const Route = createFileRoute("/order/$orderNumber")({
   component: OrderReceipt,
   head: ({ params }) => ({
     meta: [
-      { title: `অর্ডার ${params.orderNumber} | উপহারকাব্য` },
+      { title: pageTitle(`অর্ডার ${params.orderNumber}`) },
       { name: "description", content: "আপনার অর্ডারের বিস্তারিত ও স্ট্যাটাস দেখুন।" },
       { name: "robots", content: "noindex, nofollow" },
       { property: "og:title", content: "অর্ডার কনফার্মেশন | উপহারকাব্য" },
