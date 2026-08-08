@@ -248,6 +248,7 @@ function AdminOrderDetail() {
     customer_ip: string | null;
     device_fingerprint: string | null;
     delivery_note: string | null;
+    note: string | null;
     delivery_partner: string | null;
     delivery_charge: number | string;
     discount: number | string;
