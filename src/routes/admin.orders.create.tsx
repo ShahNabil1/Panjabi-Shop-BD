@@ -23,6 +23,7 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import { normalizePhoneInput } from "@/lib/phone";
+import { CustomerOrdersDialog } from "@/components/admin/customer-orders-dialog";
 
 export const Route = createFileRoute("/admin/orders/create")({
   component: CreateOrderPage,
@@ -90,6 +91,7 @@ function CreateOrderPage() {
 
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  const [historyOpen, setHistoryOpen] = useState(false);
   const [address, setAddress] = useState("");
   const [division, setDivision] = useState("");
   const [district, setDistrict] = useState("");
@@ -306,6 +308,8 @@ function CreateOrderPage() {
         description="Place a manual order on behalf of a customer."
       />
 
+      <CustomerOrdersDialog phone={phone.trim()} open={historyOpen} onOpenChange={setHistoryOpen} />
+
       <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_320px]">
         <div className="space-y-5">
           <Panel>
@@ -338,7 +342,14 @@ function CreateOrderPage() {
                 </div>
                 {lookup.data ? (
                   <span className="mt-1 block text-xs font-semibold text-primary">
-                    Returning customer · {lookup.data.orderCount} previous order(s)
+                    Returning customer ·{" "}
+                    <button
+                      type="button"
+                      onClick={() => setHistoryOpen(true)}
+                      className="underline decoration-dotted underline-offset-2 transition-opacity hover:opacity-80"
+                    >
+                      {lookup.data.orderCount} previous order(s)
+                    </button>
                   </span>
                 ) : null}
               </label>

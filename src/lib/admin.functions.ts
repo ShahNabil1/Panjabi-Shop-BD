@@ -747,6 +747,26 @@ export const adminLookupCustomer = createServerFn({ method: "POST" })
     return { ...last, orderCount: count ?? 1 };
   });
 
+/** All past orders for a phone number — powers the "previous orders" popup. */
+export const adminCustomerOrders = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => customerLookupSchema.parse(input))
+  .handler(async ({ data, context }) => {
+    const db = await requireAdmin(context.supabase, context.userId);
+    return unwrap(
+      await db
+        .from("orders")
+        .select(
+          `id, order_number, created_at, customer_name, customer_phone, delivery_partner,
+           total, status,
+           order_items(product_name, variant_label, sku, quantity)`,
+        )
+        .eq("customer_phone", data.phone)
+        .order("created_at", { ascending: false })
+        .limit(100),
+    );
+  });
+
 /** Creates a manual (admin-placed) order. Prices are re-resolved server-side. */
 export const adminCreateOrder = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
