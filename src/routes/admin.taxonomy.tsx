@@ -109,6 +109,15 @@ function TaxonomyPage() {
     },
     onError: (e: Error) => toast.error(e.message),
   });
+  const toggleCat = useMutation({
+    mutationFn: ({ id, is_active }: { id: string; is_active: boolean }) =>
+      adminToggleCategoryActive({ data: { id, is_active } }),
+    onSuccess: async (_, vars) => {
+      toast.success(vars.is_active ? "Category page visible" : "Category page hidden");
+      await refresh();
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
   const saveSub = useMutation({
     mutationFn: (input: SubcategoryInput) => adminSaveSubcategory({ data: input }),
     onSuccess: async () => {
