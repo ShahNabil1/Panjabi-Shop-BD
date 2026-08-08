@@ -144,7 +144,7 @@ export const Route = createFileRoute("/p/$product")({
 
 function ProductPage() {
   const { lang } = useLang();
-  const { product, images, variants, comboItems, category, subcategory, related, landingSlug } =
+  const { product, images, variants, comboItems, category, subcategory, related } =
     Route.useLoaderData() as ProductPageData;
   const [active, setActive] = useState(0);
   const [selected, setSelected] = useState<Record<string, string>>({});
