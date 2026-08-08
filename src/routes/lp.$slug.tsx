@@ -353,7 +353,12 @@ function LandingPage() {
         </div>
       </section>
 
-
+      <ImageLightbox
+        images={galleryImages}
+        startIndex={lightbox.startIndex}
+        isOpen={lightbox.isOpen}
+        onClose={lightbox.close}
+      />
       </div>
     </div>
 
