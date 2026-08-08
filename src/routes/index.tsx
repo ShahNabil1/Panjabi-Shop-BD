@@ -46,6 +46,11 @@ function HomePage() {
   return (
     <>
       <PromoPopup config={popup} />
+      <h1 className="sr-only">
+        {lang === "bn"
+          ? "উপহারকাব্য — গিফট কম্বো ও উপহার সামগ্রীর অনলাইন শপ"
+          : "Upoharkabbo — Gift combos and premium gift items online shop"}
+      </h1>
       {slides.length > 0 ? (
         <HeroSlider slides={slides} />
       ) : (
