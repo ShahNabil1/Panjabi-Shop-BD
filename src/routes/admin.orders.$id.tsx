@@ -630,6 +630,7 @@ function AdminOrderDetail() {
           sku: i.sku,
           unitPrice: Number(i.unit_price),
           quantity: i.quantity,
+          image: i.image ?? null,
           comboSelections: (i.combo_selections ?? []).flatMap((selection) =>
             selection.item_id && selection.variant_id
               ? [{
@@ -641,10 +642,12 @@ function AdminOrderDetail() {
                   variantLabelBn: selection.variant_label_bn ?? "",
                   variantLabelEn: selection.variant_label_en ?? selection.variant_label_bn ?? "",
                   sku: selection.sku ?? null,
+                  image: selection.image ?? null,
                 }]
               : [],
           ),
         }))}
+
       />
 
       <FulfillmentCard
