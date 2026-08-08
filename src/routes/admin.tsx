@@ -273,7 +273,7 @@ function AdminLayout() {
           const open = collapsed || openSections.includes(section.title);
           const hasActive = section.items.some(isActive);
           return (
-            <div key={section.title}>
+            <div key={section.title} data-section={section.title}>
               <div
                 className={cn(
                   "grid transition-[grid-template-rows,opacity] duration-[600ms] ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none",
