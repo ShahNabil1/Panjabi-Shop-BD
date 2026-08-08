@@ -107,15 +107,50 @@ function AdminLayout() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [openSections, setOpenSections] = useState<string[]>(() =>
+    sections.map((s) => s.title),
+  );
+
+  const matches = (item: NavItem) =>
+    item.exact ? pathname === item.to : pathname.startsWith(item.to);
+
+  const activeSection = useMemo(
+    () => sections.find((s) => s.items.some(matches))?.title ?? sections[0]!.title,
+    [pathname],
+  );
+
+  const topItems = useMemo(
+    () => sections.find((s) => s.title === activeSection)?.items ?? [],
+    [activeSection],
+  );
 
   useEffect(() => {
     const saved = localStorage.getItem("admin-sidebar-collapsed");
     if (saved === "1") setCollapsed(true);
+    const savedSections = localStorage.getItem("admin-sidebar-sections");
+    if (savedSections) {
+      try {
+        const parsed = JSON.parse(savedSections) as string[];
+        if (Array.isArray(parsed)) setOpenSections(parsed);
+      } catch {
+        /* ignore */
+      }
+    }
   }, []);
 
   useEffect(() => {
     localStorage.setItem("admin-sidebar-collapsed", collapsed ? "1" : "0");
   }, [collapsed]);
+
+  useEffect(() => {
+    localStorage.setItem("admin-sidebar-sections", JSON.stringify(openSections));
+  }, [openSections]);
+
+  // Always reveal the section that contains the current page.
+  useEffect(() => {
+    setOpenSections((prev) => (prev.includes(activeSection) ? prev : [...prev, activeSection]));
+  }, [activeSection]);
+
 
   useEffect(() => {
     setMobileOpen(false);
