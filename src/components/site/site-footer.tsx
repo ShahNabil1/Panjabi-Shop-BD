@@ -79,7 +79,7 @@ export function SiteFooter() {
         </div>
 
         <div>
-          <h2 className="text-sm font-semibold">Legal</h2>
+          <h2 className="text-base font-bold text-primary">Legal</h2>
           <ul className="mt-3 space-y-2">
             <li>
               <span className="cursor-default text-sm text-muted-foreground">
