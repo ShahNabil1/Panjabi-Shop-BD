@@ -165,12 +165,9 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function Chrome({ children, brand }: { children: ReactNode; brand: string }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const bare =
-    pathname.startsWith("/admin") ||
-    pathname.startsWith("/auth") ||
-    pathname.startsWith("/invoice") ||
-    pathname.startsWith("/inv/");
+  const bare = pathname.startsWith("/admin") || pathname.startsWith("/auth");
   const isLanding = pathname.startsWith("/lp");
+  const bareOnMobile = pathname.startsWith("/invoice") || pathname.startsWith("/inv/");
 
   if (bare) {
     return <div className="min-h-screen">{children}</div>;
@@ -178,9 +175,13 @@ function Chrome({ children, brand }: { children: ReactNode; brand: string }) {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <SiteHeader />
+      <div className={bareOnMobile ? "hidden md:block" : ""}>
+        <SiteHeader />
+      </div>
       <main className="flex-1">{children}</main>
-      {isLanding ? <LandingFooter brand={brand} /> : <SiteFooter />}
+      <div className={bareOnMobile ? "hidden md:block" : ""}>
+        {isLanding ? <LandingFooter brand={brand} /> : <SiteFooter />}
+      </div>
     </div>
   );
 }
