@@ -214,6 +214,7 @@ export function FulfillmentCard({
   orderStatus,
   partner,
   courierStatus,
+  courierStatusRaw,
   consignmentId,
   returnConsignmentId,
   trackingCode,
