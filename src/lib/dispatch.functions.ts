@@ -78,7 +78,9 @@ export const adminProcessRtsChunk = createServerFn({ method: "POST" })
       source: string | null;
     }>;
 
+    // One order = single-order API. Two or more CarryBee orders = bulk API.
     const allCarrybee =
+      data.orderIds.length > 1 &&
       orderMeta.length === data.orderIds.length &&
       orderMeta.every(
         (o) =>
@@ -86,6 +88,7 @@ export const adminProcessRtsChunk = createServerFn({ method: "POST" })
           !o.courier_consignment_id &&
           (o.source ?? "").toLowerCase() !== "exchange",
       );
+
 
     let results: RtsItemResult[] = [];
 

@@ -59,8 +59,11 @@ async function call(
     body = { raw: text };
   }
   const b = (body ?? {}) as Record<string, unknown>;
-  if (!res.ok || b["error"] === true) throw new Error(errorText(b, res.status, path));
+  if (!res.ok || b["error"] === true || b["success"] === false) {
+    throw new Error(errorText(b, res.status, path));
+  }
   return b;
+
 }
 
 const listOf = (body: Record<string, unknown>): Array<Record<string, unknown>> => {
@@ -215,15 +218,48 @@ export type CarrybeeOrderResult = {
   raw: Record<string, unknown>;
 };
 
+/**
+ * CarryBee nests the created order differently per endpoint
+ * (`data`, `data.order`, `data.orders[0]`, or the body itself), so we walk the
+ * payload and take the first object that actually carries a consignment id.
+ */
+function findOrderNode(value: unknown, depth = 0): Record<string, unknown> | null {
+  if (!value || typeof value !== "object" || depth > 4) return null;
+  if (Array.isArray(value)) {
+    for (const entry of value) {
+      const hit = findOrderNode(entry, depth + 1);
+      if (hit) return hit;
+    }
+    return null;
+  }
+  const obj = value as Record<string, unknown>;
+  const cid = obj["consignment_id"] ?? obj["consignmentId"] ?? obj["tracking_id"];
+  if (cid != null && cid !== "") return obj;
+  for (const v of Object.values(obj)) {
+    const hit = findOrderNode(v, depth + 1);
+    if (hit) return hit;
+  }
+  return null;
+}
+
 function readOrder(row: Record<string, unknown>): CarrybeeOrderResult {
-  const d = (row["data"] ?? row) as Record<string, unknown>;
-  const cid = d["consignment_id"] ?? d["consignmentId"] ?? d["id"];
+  const node = findOrderNode(row) ?? ((row["data"] ?? row) as Record<string, unknown>);
+  const cid = node["consignment_id"] ?? node["consignmentId"] ?? node["tracking_id"] ?? node["id"];
   return {
-    consignmentId: cid == null ? null : String(cid),
-    merchantOrderId: d["merchant_order_id"] == null ? null : String(d["merchant_order_id"]),
-    status: String(d["order_status"] ?? d["status"] ?? "order.created"),
+    consignmentId: cid == null || cid === "" ? null : String(cid),
+    merchantOrderId: node["merchant_order_id"] == null ? null : String(node["merchant_order_id"]),
+    status: String(node["order_status"] ?? node["status"] ?? "order.created"),
     raw: row,
   };
+}
+
+/** Turns an unexpected-but-successful response into a debuggable error. */
+function noConsignment(body: Record<string, unknown>, label: string): Error {
+  const msg = typeof body["message"] === "string" ? body["message"] : "";
+  const snippet = JSON.stringify(body).slice(0, 300);
+  return new Error(
+    `CarryBee ${label}: no consignment id in response${msg ? ` — ${msg}` : ""} · ${snippet}`,
+  );
 }
 
 /** POST /api/v2/orders */
@@ -232,10 +268,16 @@ export async function carrybeeCreateOrder(creds: CarrybeeCreds, input: CarrybeeO
     method: "POST",
     body: JSON.stringify(input),
   });
-  return readOrder(body);
+  const res = readOrder(body);
+  if (!res.consignmentId) throw noConsignment(body, "create order");
+  return res;
 }
 
-/** POST /api/v2/orders-bulk — up to the courier's per-call limit. */
+/**
+ * POST /api/v2/orders-bulk — used only when more than one order is dispatched.
+ * Results are matched back by `merchant_order_id` because CarryBee does not
+ * guarantee the response keeps the request order.
+ */
 export async function carrybeeCreateBulkOrders(
   creds: CarrybeeCreds,
   orders: CarrybeeOrderInput[],
@@ -245,8 +287,26 @@ export async function carrybeeCreateBulkOrders(
     body: JSON.stringify({ orders }),
   });
   const rows = listOf(body);
-  return { results: rows.map(readOrder), raw: body };
+  const parsed = rows.map(readOrder).filter((r) => r.consignmentId);
+  const byMerchant = new Map(parsed.map((r) => [r.merchantOrderId ?? "", r]));
+
+  const results = orders.map((o, i) => {
+    const byId = byMerchant.get(String(o.merchant_order_id));
+    if (byId) return byId;
+    // Fall back to positional matching when merchant ids are not echoed back.
+    return (
+      parsed[i] ?? {
+        consignmentId: null,
+        merchantOrderId: String(o.merchant_order_id),
+        status: "unknown",
+        raw: body,
+      }
+    );
+  });
+
+  return { results, raw: body };
 }
+
 
 /** GET /api/v2/orders/{consignment_id}/details */
 export async function carrybeeOrderDetails(creds: CarrybeeCreds, consignmentId: string) {

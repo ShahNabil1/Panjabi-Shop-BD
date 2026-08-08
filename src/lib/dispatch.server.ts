@@ -255,7 +255,7 @@ export async function dispatchBulkOrdersToCarrybee(
   orderIds: string[],
   actor: string,
 ): Promise<DispatchResult[]> {
-  const { carrybeeCreateOrder } = await import("./carrybee.server");
+  const { carrybeeCreateOrder, carrybeeCreateBulkOrders } = await import("./carrybee.server");
   const { logActivity } = await import("./admin.server");
 
   const orders: { row: OrderRow; items: Awaited<ReturnType<typeof loadItems>> }[] = [];
@@ -323,32 +323,36 @@ export async function dispatchBulkOrdersToCarrybee(
     orders.map(({ row, items }) => buildCarrybeePayload(db, row, items, partner)),
   );
 
-  // CarryBee's `orders-bulk` response does not reliably echo consignment ids
-  // back per order, so we create each parcel through the single-order endpoint
-  // in small concurrent chunks. Same throughput, but every order gets a real
-  // consignment id or a real error message.
+  // Multiple orders go out in one `orders-bulk` call. If CarryBee omits a
+  // consignment id for some rows, those individual orders are retried through
+  // the single-order endpoint so nothing silently fails.
   const created: Array<
     | { ok: true; res: import("./carrybee.server").CarrybeeOrderResult }
     | { ok: false; message: string }
   > = [];
-  const CHUNK = 4;
-  for (let i = 0; i < payloads.length; i += CHUNK) {
-    const slice = payloads.slice(i, i + CHUNK);
-    const settled = await Promise.all(
-      slice.map(async (payload) => {
-        try {
-          const res = await carrybeeCreateOrder(creds, payload);
-          if (!res.consignmentId) {
-            return { ok: false as const, message: "CarryBee did not return a consignment id" };
-          }
-          return { ok: true as const, res };
-        } catch (error) {
-          return { ok: false as const, message: (error as Error).message };
-        }
-      }),
-    );
-    created.push(...settled);
+
+  let bulk: import("./carrybee.server").CarrybeeOrderResult[] = [];
+  let bulkError: string | null = null;
+  try {
+    bulk = (await carrybeeCreateBulkOrders(creds, payloads)).results;
+  } catch (error) {
+    bulkError = (error as Error).message;
   }
+
+  for (let i = 0; i < payloads.length; i++) {
+    const hit = bulk[i];
+    if (hit?.consignmentId) {
+      created.push({ ok: true, res: hit });
+      continue;
+    }
+    try {
+      const res = await carrybeeCreateOrder(creds, payloads[i]!);
+      created.push({ ok: true, res });
+    } catch (error) {
+      created.push({ ok: false, message: bulkError ?? (error as Error).message });
+    }
+  }
+
 
   const out: DispatchResult[] = [];
 
