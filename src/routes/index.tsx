@@ -58,7 +58,7 @@ function HomePage() {
                 </>
               )}
             </h1>
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-wrap justify-center gap-3 sm:justify-start">
               {data.categories[0] ? (
                 <Link
                   to="/c/$category"
