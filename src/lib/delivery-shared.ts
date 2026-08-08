@@ -90,7 +90,10 @@ export const courierToOrderStatus: Record<CourierStatus, string | null> = {
   pending: "rts",
   // Steadfast puts every freshly-created consignment in `in_review`.
   in_review: "rts",
+  // CarryBee `order.create-failed` — the parcel was never created, fix + resend.
+  failed: "pending",
   unknown: null,
+
   // Pathao payment invoices settle money, not parcels — order status untouched.
   paid_invoice: null,
   hold: "courier_hold",
