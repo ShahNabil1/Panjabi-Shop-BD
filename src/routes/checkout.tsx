@@ -44,16 +44,17 @@ function CheckoutPage() {
   const { items, ready, setQuantity, remove } = useCart();
 
   return (
-    <Section
-      title="Checkout"
-      centerTitle
-      titleClassName="bg-gradient-to-r from-primary via-primary to-pink-500 bg-clip-text text-transparent drop-shadow-sm"
-    >
+    <Section>
       {!ready ? (
         <div className="h-64 animate-pulse rounded-sm bg-secondary" />
       ) : (
 
         <div className="mx-auto max-w-2xl">
+          <div className="mb-5 text-center">
+            <h1 className="bg-gradient-to-r from-primary via-primary to-pink-500 bg-clip-text text-transparent text-xl font-bold tracking-tight drop-shadow-sm sm:text-2xl">
+              Checkout
+            </h1>
+          </div>
           <div className="mb-5 text-center">
             <h2 className="inline-flex items-center gap-2 text-base font-bold text-primary">
               <span className="inline-block h-2 w-2 rounded-full bg-primary shadow-[0_0_8px_var(--color-primary)]" />
