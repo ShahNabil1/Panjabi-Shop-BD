@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 
 import { useLang } from "@/lib/language-context";
-import { pick, tr } from "@/lib/i18n";
+import { tr } from "@/lib/i18n";
 import { useSiteData } from "./site-header";
 import logoMark from "@/assets/upoharkabbo-logo.png";
 import { SOCIAL_LINKS } from "./social-links";
