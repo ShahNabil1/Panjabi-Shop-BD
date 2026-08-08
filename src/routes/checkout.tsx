@@ -40,7 +40,6 @@ export const Route = createFileRoute("/checkout")({
 
 function CheckoutPage() {
   const { rates } = Route.useLoaderData();
-  const { lang } = useLang();
   const { items, ready, setQuantity, remove } = useCart();
 
   return (
