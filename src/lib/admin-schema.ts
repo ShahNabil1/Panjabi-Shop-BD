@@ -137,7 +137,11 @@ export const adminOrderItemSchema = z.object({
   variantId: uuid.nullable().default(null),
   quantity: z.number().int().min(1).max(99),
   unitPrice: z.number().min(0),
-  comboSelections: z.array(z.object({ itemId: uuid, variantId: uuid })).max(50).default([]),
+  comboSelections: z.array(z.object({
+    itemId: uuid,
+    variantId: uuid,
+    quantity: z.number().int().min(1).max(99).default(1),
+  })).max(50).default([]),
 });
 
 export const adminCreateOrderSchema = z.object({

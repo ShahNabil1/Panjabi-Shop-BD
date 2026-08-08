@@ -167,6 +167,7 @@ export function CheckoutForm({
             comboSelections: i.comboSelections.map((selection) => ({
               itemId: selection.itemId,
               variantId: selection.variantId,
+              quantity: selection.quantity,
             })),
           })),
         },
@@ -327,6 +328,7 @@ export function CheckoutForm({
             comboSelections: i.comboSelections.map((selection) => ({
               itemId: selection.itemId,
               variantId: selection.variantId,
+              quantity: selection.quantity,
             })),
           })),
         },

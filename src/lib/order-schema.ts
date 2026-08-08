@@ -10,6 +10,7 @@ export const orderLineSchema = z.object({
   comboSelections: z.array(z.object({
     itemId: z.string().uuid(),
     variantId: z.string().uuid(),
+    quantity: z.number().int().min(1).max(99).default(1),
   })).max(50).default([]),
 });
 

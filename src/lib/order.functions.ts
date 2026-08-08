@@ -136,7 +136,7 @@ export const placeOrder = createServerFn({ method: "POST" })
           item_id: child.id,
           item_name_bn: child.name_bn,
           item_name_en: child.name_en,
-          quantity: 1,
+          quantity: selection.quantity,
           variant_id: childVariant.id,
           variant_label_bn: `${childVariant.group_name_bn}: ${childVariant.value_bn}`,
           variant_label_en: `${childVariant.group_name_en}: ${childVariant.value_en}`,
@@ -385,7 +385,7 @@ export const captureIncompleteOrder = createServerFn({ method: "POST" })
             );
             return child && childVariant ? [{
               item_id: child.id, item_name_bn: child.name_bn, item_name_en: child.name_en,
-              quantity: 1, variant_id: childVariant.id,
+              quantity: selection.quantity, variant_id: childVariant.id,
               variant_label_bn: `${childVariant.group_name_bn}: ${childVariant.value_bn}`,
               variant_label_en: `${childVariant.group_name_en}: ${childVariant.value_en}`,
               sku: childVariant.sku,

@@ -274,6 +274,7 @@ function CreateOrderPage() {
             comboSelections: l.comboSelections.map((selection) => ({
               itemId: selection.itemId,
               variantId: selection.variantId,
+              quantity: selection.quantity,
             })),
           })),
         },
