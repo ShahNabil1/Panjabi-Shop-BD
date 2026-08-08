@@ -89,7 +89,7 @@ function CartButton({ className }: { className?: string }) {
       </svg>
       {ready && count > 0 ? (
         <span className="absolute -right-1.5 -top-1.5 grid h-5 min-w-5 place-items-center rounded-full bg-primary px-1 text-[11px] font-bold text-primary-foreground">
-          {formatNumber(lang, count)}
+          {count}
         </span>
       ) : null}
     </button>
