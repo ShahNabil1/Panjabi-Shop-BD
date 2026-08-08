@@ -26,6 +26,7 @@ import { CourierBadge } from "@/components/admin/courier-logo";
 import { cn } from "@/lib/utils";
 import { Pagination } from "@/components/admin/pagination";
 import { useOrderPresence } from "@/lib/use-order-presence";
+import { useOrderRealtime } from "@/lib/use-order-realtime";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import {
@@ -188,6 +189,7 @@ export function OrdersBoard({
 
   const { user } = useAuth();
   const navigate = useNavigate();
+  useOrderRealtime();
   const presence = useOrderPresence(rows.map((o) => o.id));
   const [takeover, setTakeover] = useState<{ id: string; name: string } | null>(null);
 
