@@ -81,7 +81,7 @@ const dt = (value: string) =>
   });
 
 /** Small copy-to-clipboard control that flips to a tick for a moment. */
-function CopyButton({ value, accent }: { value: string; accent?: "pathao" | "steadfast" }) {
+function CopyButton({ value, accent }: { value: string; accent?: "pathao" | "steadfast" | undefined }) {
   const [copied, setCopied] = useState(false);
   return (
     <button
