@@ -608,7 +608,10 @@ export function FulfillmentCard({
                         {returnConsignmentId}
                       </span>
                     )}
-                    <CopyButton value={returnConsignmentId} accent={isPathao} />
+                    <CopyButton
+                      value={returnConsignmentId}
+                      accent={isPathao ? "pathao" : undefined}
+                    />
                   </div>
                 </div>
               ) : null}
