@@ -810,30 +810,31 @@ export function CheckoutForm({
           </div>
 
 
-          <dl className="mt-4 grid gap-1.5 border-t border-dashed border-border pt-3 text-sm">
+          <dl className="mt-4 grid gap-2 border-t border-dashed border-border pt-3 text-base">
             <div className="flex justify-between">
-              <dt className="text-muted-foreground">{tr(lang, "subtotal")}</dt>
-              <dd className="font-semibold tabular-nums">{formatPrice(lang, subtotal)}</dd>
+              <dt className="font-en font-bold text-foreground">Subtotal</dt>
+              <dd className="font-en text-lg font-extrabold tabular-nums">{formatPrice(lang, subtotal)}</dd>
             </div>
             <div className="flex justify-between">
-              <dt className="text-muted-foreground">{tr(lang, "deliveryCharge")}</dt>
-              <dd className="font-semibold tabular-nums">
-                {delivery === 0 ? tr(lang, "free") : formatPrice(lang, delivery)}
+              <dt className="font-en font-bold text-foreground">Delivery Charge</dt>
+              <dd className="font-en text-lg font-extrabold tabular-nums">
+                {delivery === 0 ? "Free" : formatPrice(lang, delivery)}
               </dd>
             </div>
             {discount > 0 ? (
               <div className="flex justify-between text-emerald-600">
-                <dt className="font-semibold">
-                  {lang === "bn" ? "কুপন ছাড়" : "Coupon discount"}
+                <dt className="font-en font-bold">
+                  Coupon Discount
                   {appliedCode ? <span className="font-en"> ({appliedCode})</span> : null}
                 </dt>
-                <dd className="font-bold tabular-nums">− {formatPrice(lang, discount)}</dd>
+                <dd className="font-en text-lg font-extrabold tabular-nums">− {formatPrice(lang, discount)}</dd>
               </div>
             ) : null}
-            <div className="flex justify-between border-t border-border pt-2 text-base">
-              <dt className="font-bold">{tr(lang, "total")}</dt>
-              <dd className="font-bold tabular-nums text-primary">{formatPrice(lang, total)}</dd>
+            <div className="flex items-center justify-between border-t border-border pt-2.5">
+              <dt className="font-en text-lg font-extrabold sm:text-xl">Total</dt>
+              <dd className="font-en text-xl font-extrabold tabular-nums text-primary sm:text-2xl">{formatPrice(lang, total)}</dd>
             </div>
+
           </dl>
         </section>
 
