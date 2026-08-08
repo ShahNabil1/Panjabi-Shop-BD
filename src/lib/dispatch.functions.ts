@@ -382,12 +382,12 @@ export type PathaoDeliveryCost = {
   ok: boolean;
   message?: string;
   paid: boolean;
-  provider: "pathao" | "carrybee" | null;
+  provider: "pathao" | "carrybee" | "steadfast" | null;
   lines: { label: string; amount: number; negative?: boolean }[];
   total: number;
 };
 
-/** "Cost of Delivery" breakdown for a single order (Pathao + CarryBee). */
+/** "Cost of Delivery" breakdown for a single order (Pathao, CarryBee, Steadfast). */
 export const adminPathaoDeliveryCost = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => z.object({ orderId: z.string().uuid() }).parse(input))
@@ -405,21 +405,66 @@ export const adminPathaoDeliveryCost = createServerFn({ method: "GET" })
 
     const { data: row } = await db
       .from("orders")
-      .select("delivery_partner, courier_consignment_id")
+      .select(
+        "delivery_partner, courier_consignment_id, city, district, division, total, advance_amount",
+      )
       .eq("id", data.orderId)
       .maybeSingle();
     const order = row as {
       delivery_partner: string | null;
       courier_consignment_id: string | null;
+      city: string | null;
+      district: string | null;
+      division: string | null;
+      total: number | null;
+      advance_amount: number | null;
     } | null;
     if (!order) return { ...empty, message: "Order not found" };
     const provider = providerKey(order.delivery_partner);
-    if (provider !== "pathao" && provider !== "carrybee") {
+    if (provider !== "pathao" && provider !== "carrybee" && provider !== "steadfast") {
       return { ...empty, message: "Cost breakdown is not available for this courier" };
     }
     if (!order.courier_consignment_id) {
       return { ...empty, message: "Not sent to the courier yet" };
     }
+
+    // Steadfast exposes no cost data through its API, so the breakdown comes
+    // from the rate card saved in Delivery Settings.
+    if (provider === "steadfast") {
+      try {
+        const partner = await loadPartner(db, "steadfast");
+        const { steadfastCostBreakdown } = await import("./dispatch.server");
+        const cod = Math.max(0, Math.round(Number(order.total ?? 0) - Number(order.advance_amount ?? 0)));
+        const breakdown = steadfastCostBreakdown(partner.config, order, cod);
+        if (!breakdown) {
+          return {
+            ...empty,
+            message: "Add Steadfast delivery charges in Delivery Settings to see the cost breakdown",
+          };
+        }
+        const { data: cons } = await db
+          .from("order_consignments")
+          .select("paid_at")
+          .eq("order_id", data.orderId)
+          .eq("provider", "steadfast")
+          .maybeSingle();
+        await db
+          .from("order_consignments")
+          .update({ total_cost: breakdown.total })
+          .eq("order_id", data.orderId)
+          .eq("provider", "steadfast");
+        return {
+          ok: true,
+          provider: "steadfast",
+          paid: Boolean((cons as { paid_at?: string | null } | null)?.paid_at),
+          lines: breakdown.lines,
+          total: breakdown.total,
+        };
+      } catch (error) {
+        return { ...empty, message: (error as Error).message };
+      }
+    }
+
 
     try {
       const partner = await loadPartner(db, provider);
