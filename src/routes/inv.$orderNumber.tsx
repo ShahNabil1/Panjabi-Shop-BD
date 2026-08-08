@@ -111,7 +111,7 @@ function InvoicePage() {
               src={logoMark}
               alt={`${site.brand} logo`}
               className="h-20 w-auto object-contain"
-            /}
+            />
             {site.contact.address ? (
               <p className="mt-2 text-sm font-semibold text-foreground/80">{site.contact.address}</p>
             ) : null}
