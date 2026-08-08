@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useEffect, useRef } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useLoaderData } from "@tanstack/react-router";
 import { z } from "zod";
@@ -7,7 +8,10 @@ import { z } from "zod";
 import { getOrderSummary } from "@/lib/order.functions";
 import { formatPrice } from "@/lib/i18n";
 
-const searchSchema = z.object({ phone: z.string().catch("") });
+const searchSchema = z.object({
+  phone: z.string().catch(""),
+  print: z.string().catch(""),
+});
 
 export const Route = createFileRoute("/invoice/$orderNumber")({
   validateSearch: searchSchema,
@@ -30,7 +34,7 @@ type SiteData = {
 
 function InvoicePage() {
   const { orderNumber } = Route.useParams();
-  const { phone } = Route.useSearch();
+  const { phone, print } = Route.useSearch();
   const site = useLoaderData({ from: "__root__" }) as SiteData;
   const fetchSummary = useServerFn(getOrderSummary);
 
@@ -40,6 +44,14 @@ function InvoicePage() {
     enabled: Boolean(phone),
     retry: false,
   });
+
+  const printed = useRef(false);
+  useEffect(() => {
+    if (print !== "1" || !data || printed.current) return;
+    printed.current = true;
+    const timer = window.setTimeout(() => window.print(), 400);
+    return () => window.clearTimeout(timer);
+  }, [print, data]);
 
   if (!phone || (!isPending && !data)) {
     return (
