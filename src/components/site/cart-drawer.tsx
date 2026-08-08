@@ -76,7 +76,7 @@ export function CartDrawer() {
           <h2 className="min-w-0 flex-1 text-lg font-bold sm:text-xl">
             {tr(lang, "cart")}
             <span className="ml-1.5 text-base font-semibold text-primary">
-              ({formatNumber(lang, items.reduce((sum, item) => sum + item.quantity, 0))} items)
+              ({formatNumber("en", items.reduce((sum, item) => sum + item.quantity, 0))} items)
             </span>
           </h2>
         </header>
