@@ -299,6 +299,7 @@ function AdminOrderDetail() {
     courier_sent_at?: string | null;
     auto_sms_status: string;
     source: string;
+    coupon?: { code: string; name: string; amount: number } | null;
     order_items: OrderItemRow[];
     order_activity?: Array<{
       id: string;
