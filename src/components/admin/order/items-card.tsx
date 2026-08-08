@@ -161,6 +161,7 @@ export function ItemsCard({
   initialItems: EditableItem[];
   deliveryCharge: number;
   discount: number;
+  couponCode?: string | null;
   advanceAmount?: number;
   advanceMethod?: string | null;
   locked?: boolean;
