@@ -412,15 +412,15 @@ function ProductPage() {
         } />
 
         {description ? (
-          <div className="mt-10 max-w-3xl">
-            <h2 className="text-lg font-bold">{tr(lang, "description")}</h2>
+          <div className="mx-auto mt-10 max-w-3xl">
+            <h2 className="text-center text-lg font-bold">{tr(lang, "description")}</h2>
             <Prose text={description} className="mt-3" />
           </div>
         ) : null}
 
         {product.specs.length > 0 ? (
-          <div className="mt-10 max-w-3xl">
-            <h2 className="text-lg font-bold">{tr(lang, "specs")}</h2>
+          <div className="mx-auto mt-10 max-w-3xl">
+            <h2 className="text-center text-lg font-bold">{tr(lang, "specs")}</h2>
             <dl className="mt-3 divide-y divide-border overflow-hidden rounded-lg border border-border bg-card">
               {product.specs.map((spec, i) => (
                 <div key={i} className="grid grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)] gap-3 px-4 py-3">
@@ -437,8 +437,8 @@ function ProductPage() {
         ) : null}
 
         {productFaqs.length > 0 ? (
-          <div className="mt-10 max-w-3xl">
-            <h2 className="text-lg font-bold">{tr(lang, "productFaq")}</h2>
+          <div className="mx-auto mt-10 max-w-3xl">
+            <h2 className="text-center text-lg font-bold">{tr(lang, "productFaq")}</h2>
             <FaqList items={productFaqs} className="mt-3" />
           </div>
         ) : null}
