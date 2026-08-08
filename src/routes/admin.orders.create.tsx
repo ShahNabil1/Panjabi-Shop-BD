@@ -727,6 +727,7 @@ function CreateOrderPage() {
               />
             ) : null}
           </div>
+          ) : null}
 
           <Panel>
             <h2 className="text-sm font-bold">Payment</h2>
