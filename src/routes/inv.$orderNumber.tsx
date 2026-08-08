@@ -2,17 +2,18 @@ import { createFileRoute, Link, useLoaderData } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useRef } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { z } from "zod";
 
 import logoMark from "@/assets/upoharkabbo-logo.png";
 import { getOrderSummaryShort } from "@/lib/order.functions";
 import { orderStatusLabel } from "@/lib/order-receipt";
 import { formatPrice } from "@/lib/i18n";
 
-const searchSchema = z.object({
-  p: z.coerce.string().catch(""),
-  print: z.coerce.string().catch(""),
-});
+function searchSchema(input: Record<string, unknown>) {
+  return {
+    p: input["p"] == null ? "" : String(input["p"]),
+    print: input["print"] == null ? "" : String(input["print"]),
+  };
+}
 
 export const Route = createFileRoute("/inv/$orderNumber")({
   validateSearch: searchSchema,
