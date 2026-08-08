@@ -153,7 +153,7 @@ export function ImageLightbox({
             setIsZoomed(false);
           }}
           aria-label="Previous image"
-          className="absolute left-2 top-1/2 z-10 flex size-11 -translate-y-1/2 items-center justify-center rounded-full bg-card/90 text-foreground shadow-lg backdrop-blur transition-all hover:bg-primary hover:text-primary-foreground active:scale-95 disabled:opacity-30 sm:left-5"
+          className="absolute left-2 top-1/2 z-10 flex size-11 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-card/90 text-foreground shadow-lg backdrop-blur transition-all hover:bg-primary hover:text-primary-foreground active:scale-95 disabled:opacity-30 sm:left-5"
         >
           <ChevronLeft className="size-5" />
         </button>
@@ -170,7 +170,7 @@ export function ImageLightbox({
             setIsZoomed(false);
           }}
           aria-label="Next image"
-          className="absolute right-2 top-1/2 z-10 flex size-11 -translate-y-1/2 items-center justify-center rounded-full bg-card/90 text-foreground shadow-lg backdrop-blur transition-all hover:bg-primary hover:text-primary-foreground active:scale-95 disabled:opacity-30 sm:right-5"
+          className="absolute right-2 top-1/2 z-10 flex size-11 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-card/90 text-foreground shadow-lg backdrop-blur transition-all hover:bg-primary hover:text-primary-foreground active:scale-95 disabled:opacity-30 sm:right-5"
         >
           <ChevronRight className="size-5" />
         </button>
@@ -188,7 +188,7 @@ export function ImageLightbox({
               alt={current.alt || ""}
               onClick={toggleZoom}
               className={cn(
-                "block max-h-[80vh] w-auto max-w-[92vw] object-contain transition-transform duration-300",
+                "block max-h-[80vh] w-auto max-w-[92vw] cursor-pointer object-contain transition-transform duration-300",
                 isZoomed ? "cursor-zoom-out" : "cursor-zoom-in",
               )}
               style={{ transform: `scale(${scale})` }}
@@ -198,13 +198,13 @@ export function ImageLightbox({
               type="button"
               onClick={onClose}
               aria-label="Close preview"
-              className="absolute right-2 top-2 z-10 flex size-9 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg ring-2 ring-background/70 transition-all hover:bg-primary/90 active:scale-95"
+              className="absolute right-2 top-2 z-10 flex size-9 cursor-pointer items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg ring-2 ring-background/70 transition-all hover:bg-primary/90 active:scale-95"
             >
               <X className="size-5" strokeWidth={2.5} />
             </button>
 
             {current.alt ? (
-              <p className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-foreground/70 to-transparent px-4 pb-3 pt-8 text-center text-sm font-semibold text-background">
+              <p className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-foreground/80 via-foreground/40 to-transparent px-4 pb-4 pt-10 text-center text-base font-bold leading-snug text-background drop-shadow-md sm:text-lg">
                 {current.alt}
               </p>
             ) : null}
