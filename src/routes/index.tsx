@@ -98,7 +98,7 @@ function HomePage() {
                   className="transition-transform duration-500 group-hover:scale-105"
                 />
               </div>
-              <div className="p-3.5">
+              <div className="p-3.5 text-center sm:text-left">
                 <h3 className="text-[15px] font-semibold">{pick(lang, c.name_bn, c.name_en)}</h3>
                 {c.subcategories.length > 0 ? (
                   <p className="mt-1 line-clamp-1 text-xs text-muted-foreground">
@@ -141,10 +141,10 @@ function HomePage() {
               <span className="h-1.5 w-1.5 rounded-full bg-primary" />
               Help Center
             </span>
-            <h2 className="mt-3 text-2xl font-bold tracking-tight text-primary sm:text-3xl">
+            <h2 className="mx-auto mt-3 max-w-full text-xl font-bold tracking-tight text-primary min-[380px]:text-2xl sm:text-3xl">
               Frequently asked questions
             </h2>
-            <p className="mx-auto mt-2 max-w-xl text-balance px-2 text-sm font-semibold text-muted-foreground lg:max-w-none lg:whitespace-nowrap">
+            <p className="mx-auto mt-2 max-w-xl text-balance px-2 text-sm font-semibold leading-6 text-muted-foreground lg:max-w-none lg:whitespace-nowrap">
               Everything you need to know about shopping, delivery and payments on Upoharkabbo.
             </p>
           </div>

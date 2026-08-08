@@ -90,7 +90,7 @@ export function ProductCard({ product }: { product: ProductCardData }) {
         ) : null}
       </div>
 
-      <div className="flex min-w-0 flex-1 flex-col gap-1.5 p-3.5">
+      <div className="flex min-w-0 flex-1 flex-col gap-1.5 p-3.5 text-center sm:text-left">
         <h3 className="line-clamp-2 text-[15px] font-semibold leading-snug text-card-foreground">
           {name}
         </h3>
@@ -100,7 +100,7 @@ export function ProductCard({ product }: { product: ProductCardData }) {
             {formatNumber(lang, product.reviewCount)} {tr(lang, "reviews")}
           </p>
         ) : null}
-        <div className="mt-auto flex flex-wrap items-baseline gap-2 pt-1.5">
+        <div className="mt-auto flex flex-wrap items-baseline justify-center gap-2 pt-1.5 sm:justify-start">
           <span className="text-base font-bold text-primary">
             {formatPrice(lang, product.price)}
           </span>

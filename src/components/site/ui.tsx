@@ -50,14 +50,14 @@ export function Section({
   return (
     <section className={cn("mx-auto w-full max-w-6xl px-4 py-8 sm:py-10", className)}>
       {title ? (
-        <div className="mb-5 grid grid-cols-[minmax(0,1fr)_auto] items-end gap-3">
-          <div className="min-w-0">
+        <div className="mb-5 grid grid-cols-1 items-end justify-items-center gap-3 text-center sm:grid-cols-[minmax(0,1fr)_auto] sm:justify-items-stretch sm:text-left">
+          <div className="min-w-0 max-w-full">
             <h2 className="text-xl font-bold tracking-tight sm:text-2xl">{title}</h2>
             {description ? (
               <p className="mt-1 text-sm text-muted-foreground">{description}</p>
             ) : null}
           </div>
-          {action ? <div className="shrink-0">{action}</div> : null}
+          {action ? <div className="shrink-0 sm:justify-self-end">{action}</div> : null}
         </div>
       ) : null}
       {children}
