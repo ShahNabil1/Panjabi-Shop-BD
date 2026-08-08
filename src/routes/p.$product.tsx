@@ -411,13 +411,6 @@ function ProductPage() {
           setComboSelected((current) => ({ ...current, [itemId]: variantId }))
         } />
 
-        {description ? (
-          <div className="mx-auto mt-10 max-w-3xl">
-            <h2 className="text-center text-lg font-bold">{tr(lang, "description")}</h2>
-            <Prose text={description} className="mt-3" />
-          </div>
-        ) : null}
-
         {product.specs.length > 0 ? (
           <div className="mx-auto mt-10 max-w-3xl">
             <h2 className="text-center text-lg font-bold">{tr(lang, "specs")}</h2>
@@ -436,12 +429,6 @@ function ProductPage() {
           </div>
         ) : null}
 
-        {productFaqs.length > 0 ? (
-          <div className="mx-auto mt-10 max-w-3xl">
-            <h2 className="text-center text-lg font-bold">{tr(lang, "productFaq")}</h2>
-            <FaqList items={productFaqs} className="mt-3" />
-          </div>
-        ) : null}
       </Section>
 
       {related.length > 0 ? (
