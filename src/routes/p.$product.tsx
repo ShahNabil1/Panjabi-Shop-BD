@@ -275,6 +275,29 @@ function ProductPage() {
 
             {short ? <p className="mt-4 text-[15px] leading-7 text-foreground/90">{short}</p> : null}
 
+            {product.specs.length > 0 ? (
+              <dl className="mt-4 divide-y divide-border overflow-hidden rounded-lg border border-border bg-card">
+                {product.specs.map((spec, i) => {
+                  const label = pick(lang, spec["label_bn"], spec["label_en"]) || spec["label"] || "";
+                  const value = pick(lang, spec["value_bn"], spec["value_en"]) || spec["value"] || "";
+                  return (
+                    <div
+                      key={i}
+                      className={cn(
+                        "gap-2 px-4 py-2.5 text-sm",
+                        label ? "grid grid-cols-[minmax(0,7rem)_minmax(0,1fr)]" : "block",
+                      )}
+                    >
+                      {label ? (
+                        <dt className="min-w-0 font-semibold text-muted-foreground">{label} :</dt>
+                      ) : null}
+                      <dd className="min-w-0 font-medium">{value}</dd>
+                    </div>
+                  );
+                })}
+              </dl>
+            ) : null}
+
             <div className="mt-5 flex flex-wrap items-baseline gap-3">
               <span className="text-3xl font-bold text-primary">
                 {formatPrice(lang, product.price)}
@@ -401,23 +424,8 @@ function ProductPage() {
           setComboSelected((current) => ({ ...current, [itemId]: variantId }))
         } />
 
-        {product.specs.length > 0 ? (
-          <div className="mx-auto mt-10 max-w-3xl">
-            <h2 className="text-center text-lg font-bold">{tr(lang, "specs")}</h2>
-            <dl className="mt-3 divide-y divide-border overflow-hidden rounded-lg border border-border bg-card">
-              {product.specs.map((spec, i) => (
-                <div key={i} className="grid grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)] gap-3 px-4 py-3">
-                  <dt className="min-w-0 text-sm text-muted-foreground">
-                    {pick(lang, spec["label_bn"], spec["label_en"]) || spec["label"] || ""}
-                  </dt>
-                  <dd className="min-w-0 text-sm font-medium">
-                    {pick(lang, spec["value_bn"], spec["value_en"]) || spec["value"] || ""}
-                  </dd>
-                </div>
-              ))}
-            </dl>
-          </div>
-        ) : null}
+
+
 
       </Section>
 

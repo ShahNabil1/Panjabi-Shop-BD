@@ -792,10 +792,14 @@ export function ProductEditor({ id, kind }: { id: string; kind: ProductKind }) {
                     ])
                   }
                 >
-                  <Plus className="mr-1.5 size-3.5" /> Add spec
+                  <Plus className="mr-1.5 size-3.5" /> Add row
                 </Button>
               }
             />
+            <p className="mb-3 text-xs text-muted-foreground">
+              Shown right under the short description on the product page, e.g. Brand : Swiss
+              Beauty, Country : P.R.C, SKU : 890440…
+            </p>
             {draft.specs.length === 0 ? (
               <p className="rounded-xl border border-dashed border-border py-8 text-center text-sm text-muted-foreground">
                 No specifications yet
@@ -805,8 +809,17 @@ export function ProductEditor({ id, kind }: { id: string; kind: ProductKind }) {
                 {draft.specs.map((s, i) => (
                   <div
                     key={i}
-                    className="grid gap-2 rounded-xl border border-border/70 bg-background/50 p-2 transition-all duration-300 hover:border-primary/30 sm:grid-cols-[1fr_auto]"
+                    className="grid gap-2 rounded-xl border border-border/70 bg-background/50 p-2 transition-all duration-300 hover:border-primary/30 sm:grid-cols-[minmax(0,10rem)_minmax(0,1fr)_auto]"
                   >
+                    <Input
+                      className="rounded-lg"
+                      placeholder="Label (Brand)"
+                      list="spec-label-presets"
+                      value={s.label_bn}
+                      onChange={(e) =>
+                        patchSpec(i, { label_bn: e.target.value, label_en: e.target.value })
+                      }
+                    />
                     <Input
                       className="rounded-lg"
                       placeholder="Value"
@@ -830,9 +843,17 @@ export function ProductEditor({ id, kind }: { id: string; kind: ProductKind }) {
                     </Button>
                   </div>
                 ))}
+                <datalist id="spec-label-presets">
+                  {["Brand", "Category", "Country", "Stock", "Sold", "SKU", "Weight", "Warranty"].map(
+                    (label) => (
+                      <option key={label} value={label} />
+                    ),
+                  )}
+                </datalist>
               </div>
             )}
           </Panel>
+
 
           <Panel className="admin-rise" style={{ animationDelay: "300ms" }}>
             <SectionHeading title="SEO" />
