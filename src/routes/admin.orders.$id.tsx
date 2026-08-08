@@ -370,6 +370,12 @@ function AdminOrderDetail() {
 
           <div className="flex flex-wrap items-center gap-2">
             <StatusPill status={order.status} />
+            {courierCancelled ? (
+              <span className="inline-flex items-center gap-1.5 rounded-xl border border-rose-200 bg-rose-50 px-3 py-1.5 text-xs font-semibold text-rose-800">
+                <X className="size-3.5" />
+                Cancelled at courier — locked. Create a new order to reship.
+              </span>
+            ) : (
             <Select
               {...(pending ? { value: pending } : {})}
               onValueChange={(v) => {
@@ -391,6 +397,7 @@ function AdminOrderDetail() {
                 ))}
               </SelectContent>
             </Select>
+            )}
             {pending ? (
               <button
                 aria-label="Clear"
