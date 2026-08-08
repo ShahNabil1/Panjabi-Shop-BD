@@ -282,11 +282,13 @@ function CreateOrderPage() {
           advanceAmount,
           advanceMethod: advanceAmount > 0 ? advanceMethod : null,
           source,
-          deliveryPartner: deliveryPartner === "" ? null : deliveryPartner,
-          deliveryNote: deliveryNoteOn ? deliveryNote.trim() : "",
-          preOrder,
+          mode,
+          deliveryPartner:
+            mode === "approved" && deliveryPartner !== "" ? deliveryPartner : null,
+          deliveryNote: mode === "approved" && deliveryNoteOn ? deliveryNote.trim() : "",
+          preOrder: mode === "manual" ? preOrder : false,
           scheduledFor:
-            !preOrder && scheduleOn && scheduledFor
+            mode === "manual" && !preOrder && scheduleOn && scheduledFor
               ? new Date(`${scheduledFor}T00:00:00`).toISOString()
               : null,
           items: lines.map((l) => ({
