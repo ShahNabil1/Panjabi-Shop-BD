@@ -540,7 +540,17 @@ export function FulfillmentCard({
                 ) : null}
               </div>
 
+              {returnConsignmentId ? (
+                <div
+                  className={cn(
+                    "rounded-lg border px-3 py-2.5",
+                    isPathao
+                      ? "border-orange-300/60 bg-orange-50/70"
+                      : "border-border/70 bg-background",
+                  )}
+                >
                   <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-orange-700">
+
                     Return ID
                   </p>
                   <div className="mt-1 flex items-center gap-2">
