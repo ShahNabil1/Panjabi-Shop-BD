@@ -235,7 +235,10 @@ function TaxonomyPage() {
               {(data?.categories ?? []).map((c, i) => (
                 <li
                   key={c.id}
-                  className="admin-rise group flex items-center gap-2 px-4 py-3 text-sm transition-colors duration-300 hover:bg-primary/5"
+                  className={cn(
+                    "admin-rise group flex items-center gap-2 px-4 py-3 text-sm transition-colors duration-300 hover:bg-primary/5",
+                    !c.is_active && "bg-muted/40 text-muted-foreground",
+                  )}
                   style={{ animationDelay: `${i * 30}ms` }}
                 >
                   <div className="min-w-0 flex-1">
@@ -243,6 +246,25 @@ function TaxonomyPage() {
                     <p className="truncate text-xs text-muted-foreground">/c/{c.slug}</p>
                   </div>
                   <div className="flex items-center gap-1 opacity-70 transition-opacity duration-200 group-hover:opacity-100">
+                    <span
+                      className={cn(
+                        "rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide",
+                        c.is_active
+                          ? "bg-emerald-100 text-emerald-700"
+                          : "bg-amber-100 text-amber-700",
+                      )}
+                    >
+                      {c.is_active ? "Visible" : "Hidden"}
+                    </span>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      title={c.is_active ? "Hide page" : "Show page"}
+                      loading={toggleCat.isPending && toggleCat.variables?.id === c.id}
+                      onClick={() => toggleCat.mutate({ id: c.id, is_active: !c.is_active })}
+                    >
+                      {c.is_active ? <EyeOff className="size-3.5" /> : <Eye className="size-3.5" />}
+                    </Button>
                     <Button
                       size="sm"
                       variant="outline"
