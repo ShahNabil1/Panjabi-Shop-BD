@@ -21,6 +21,8 @@ import {
 
 /** Fixed value Pathao expects echoed back on every webhook response. */
 export const PATHAO_INTEGRATION_SECRET = "f3992ecc-59da-4cbe-a049-a13da2018d51";
+/** Fixed value registered in CarryBee's webhook configuration. */
+export const CARRYBEE_INTEGRATION_SECRET = "40489fe0-9386-4fc9-8e92-2b2fcb9d451c";
 
 type Payload = Record<string, unknown>;
 

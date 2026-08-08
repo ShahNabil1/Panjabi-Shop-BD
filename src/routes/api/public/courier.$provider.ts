@@ -25,6 +25,7 @@ export const Route = createFileRoute("/api/public/courier/$provider")({
         }
 
         const {
+          CARRYBEE_INTEGRATION_SECRET,
           PATHAO_INTEGRATION_SECRET,
           verifyWebhookSecret,
           processCourierWebhook,
@@ -35,8 +36,7 @@ export const Route = createFileRoute("/api/public/courier/$provider")({
         const pathaoHeaders = { "X-Pathao-Merchant-Webhook-Integration-Secret": PATHAO_INTEGRATION_SECRET };
         // CarryBee's webhook validator requires a 202 plus this fixed header on
         // every response, otherwise "Add Webhook" fails with a 401 mismatch.
-        const carrybeeIntegrationSecret = "40489fe0-9386-4fc9-8e92-2b2fcb9d451c";
-        const carrybeeHeaders = { "X-CB-Webhook-Integration-Header": carrybeeIntegrationSecret };
+        const carrybeeHeaders = { "X-CB-Webhook-Integration-Header": CARRYBEE_INTEGRATION_SECRET };
         const respond = (body: unknown, status: number) => {
           if (provider === "pathao") {
             return Response.json(body, { status: status === 200 ? 202 : status, headers: pathaoHeaders });
@@ -62,7 +62,7 @@ export const Route = createFileRoute("/api/public/courier/$provider")({
         // asked the endpoint to echo. Other couriers use the generated secret
         // saved in Delivery Settings.
         const check =
-          provider === "carrybee" && supplied === carrybeeIntegrationSecret
+          provider === "carrybee" && supplied === CARRYBEE_INTEGRATION_SECRET
             ? "ok"
             : await verifyWebhookSecret(db, provider, supplied);
         if (check === "unconfigured") {

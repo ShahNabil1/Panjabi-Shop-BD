@@ -325,7 +325,7 @@ export const adminTestCourierWebhook = createServerFn({ method: "POST" })
       };
     }
 
-    const { PATHAO_INTEGRATION_SECRET } = await import("@/lib/courier-webhook.server");
+    const { CARRYBEE_INTEGRATION_SECRET, PATHAO_INTEGRATION_SECRET } = await import("@/lib/courier-webhook.server");
 
     // Always probe the real, branded public endpoint that couriers actually call —
     // never a local self-request, so the result can't be falsely optimistic.
@@ -337,6 +337,7 @@ export const adminTestCourierWebhook = createServerFn({ method: "POST" })
         : data.provider === "steadfast"
           ? "Steadfast-Secret-Key"
           : "X-CB-Webhook-Integration-Header";
+    const webhookSecret = data.provider === "carrybee" ? CARRYBEE_INTEGRATION_SECRET : secret;
 
     // Pathao's own integration probe: exact body, and it demands 202 + echoed header.
     const payload =
@@ -353,7 +354,7 @@ export const adminTestCourierWebhook = createServerFn({ method: "POST" })
     try {
       const res = await fetch(url, {
         method: "POST",
-        headers: { "Content-Type": "application/json", [headerName]: secret },
+        headers: { "Content-Type": "application/json", [headerName]: webhookSecret },
         body: JSON.stringify(payload),
       });
       const body = await res.text();
@@ -371,7 +372,7 @@ export const adminTestCourierWebhook = createServerFn({ method: "POST" })
       } else if (data.provider === "carrybee") {
         const echoed = res.headers.get("x-cb-webhook-integration-header") ?? "";
         const statusOk = res.status === 202;
-        const headerOk = echoed === secret;
+        const headerOk = echoed === CARRYBEE_INTEGRATION_SECRET;
         ok = statusOk && headerOk;
         if (!statusOk) note = `CarryBee requires HTTP 202 — endpoint returned ${res.status}. `;
         else if (!headerOk) note = "Missing/incorrect X-CB-Webhook-Integration-Header response header. ";
