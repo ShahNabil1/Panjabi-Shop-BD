@@ -8,6 +8,7 @@ import { adminListOrders } from "@/lib/admin.functions";
 import { paymentFilters, type OrderBucket, type OrderStatus, type PaymentFilter } from "@/lib/admin-schema";
 import { EmptyState, Panel, StatusPill, statusLabels } from "@/components/admin/kit";
 import { BrandLoader } from "@/components/admin/brand-loader";
+import { PhoneActions } from "@/components/admin/phone-actions";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { courierCachedRatios } from "@/lib/courier.functions";
@@ -319,6 +320,8 @@ export function OrdersBoard({
                     <span className="rounded-md bg-muted px-1.5 py-0.5 font-mono text-xs text-muted-foreground">
                       {o.order_number}
                     </span>
+                    <PhoneActions phone={o.customer_phone} size="sm" />
+
                     {ratios?.[o.customer_phone] !== undefined ? (
                       <span
                         className={cn(
