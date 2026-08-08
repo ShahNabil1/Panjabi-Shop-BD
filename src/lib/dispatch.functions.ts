@@ -348,7 +348,7 @@ export const adminOrderWebhookEvents = createServerFn({ method: "GET" })
       .select("id, provider, event, payload, created_at")
       .or(filters.join(","))
       .order("created_at", { ascending: false })
-      .limit(200);
+      .range(data.offset ?? 0, (data.offset ?? 0) + (data.limit ?? 200) - 1);
     if (error) throw new Error(error.message);
 
     return (rows ?? []).map((r) => {
