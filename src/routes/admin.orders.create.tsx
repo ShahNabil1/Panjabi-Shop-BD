@@ -32,6 +32,41 @@ export const Route = createFileRoute("/admin/orders/create")({
 const input =
   "w-full rounded-xl border border-border bg-background px-3 py-2.5 text-sm text-foreground outline-none transition-colors focus:border-primary";
 
+/**
+ * Height-animated container: keeps children mounted and collapses them with a
+ * grid-rows transition so switching modes never causes a layout jump.
+ * `gapClass` cancels the parent's vertical rhythm while collapsed.
+ */
+function Collapse({
+  open,
+  children,
+  gapClass = "-mb-5",
+}: {
+  open: boolean;
+  children: React.ReactNode;
+  gapClass?: string;
+}) {
+  return (
+    <div
+      aria-hidden={!open}
+      className={cn(
+        "grid transition-all duration-[420ms] ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none",
+        open ? "grid-rows-[1fr] opacity-100 blur-0" : cn("grid-rows-[0fr] opacity-0 blur-[2px]", gapClass),
+      )}
+    >
+      <div
+        className={cn(
+          "min-h-0 overflow-hidden transition-transform duration-[420ms] ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none",
+          open ? "translate-y-0 scale-100" : "-translate-y-1 scale-[0.98]",
+        )}
+      >
+        {!open ? <div className="pointer-events-none">{children}</div> : children}
+      </div>
+    </div>
+  );
+}
+
+
 type Line = {
   key: string;
   productId: string;
