@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 
-import { incompleteOrderSchema, orderLookupSchema, placeOrderSchema } from "./order-schema";
+import { incompleteOrderSchema, orderLookupSchema, placeOrderSchema, shortLookupSchema } from "./order-schema";
 import type { DeliveryArea } from "./order-schema";
 
 export type PlacedOrder = {
