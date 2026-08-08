@@ -848,7 +848,7 @@ function InvoiceActionsDialog({
   orderNumber: string;
   phone: string;
 }) {
-  const path = `/invoice/${encodeURIComponent(orderNumber)}?phone=${encodeURIComponent(phone)}`;
+  const path = `/inv/${encodeURIComponent(orderNumber)}?p=${phone.replace(/\D/g, "").slice(-4)}`;
   const url = typeof window === "undefined" ? path : `${window.location.origin}${path}`;
 
   const actions = [
