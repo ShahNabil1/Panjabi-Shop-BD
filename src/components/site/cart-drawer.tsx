@@ -177,7 +177,7 @@ export function CartDrawer() {
                       </p>
                     ) : null}
                     {item.comboSelections.length > 0 ? (
-                      <ul className="mt-1.5 space-y-0.5 text-xs text-muted-foreground">
+                      <ul className="mt-2 space-y-1 text-[13px] font-medium text-foreground">
                         {item.comboSelections.map((selection) => (
                           <li key={`${selection.itemId}-${selection.variantId ?? "base"}`}>
                             {pick(lang, selection.itemNameBn, selection.itemNameEn)} ·{" "}
