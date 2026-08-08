@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
+import { ImageLightbox, useLightbox } from "@/components/site/image-lightbox";
 
 export type EditableItem = {
   productId: string | null;
@@ -164,6 +165,8 @@ export function ItemsCard({
   locked?: boolean;
 }) {
   const qc = useQueryClient();
+  const lightbox = useLightbox();
+  const openImage = (src: string, alt = "") => lightbox.open([{ src, alt }], 0);
   const [items, setItems] = useState<EditableItem[]>(initialItems);
   const [adding, setAdding] = useState(false);
   const [query, setQuery] = useState("");
@@ -339,7 +342,14 @@ export function ItemsCard({
             className="flex flex-wrap items-center gap-3 rounded-xl border border-border/70 bg-background/60 p-2.5"
           >
             {item.image ? (
-              <img src={item.image} alt="" className="size-11 rounded-md object-cover" />
+              <button
+                type="button"
+                onClick={() => openImage(item.image!, item.productName)}
+                className="shrink-0 rounded-md transition-transform hover:scale-[1.04]"
+                title="Preview image"
+              >
+                <img src={item.image} alt="" className="size-11 rounded-md object-cover" />
+              </button>
             ) : (
               <span className="size-11 rounded-md bg-muted" />
             )}
@@ -356,15 +366,23 @@ export function ItemsCard({
                       className="flex items-center gap-2"
                     >
                       {selection.image ? (
-                        <img
-                          src={selection.image}
-                          alt=""
-                          loading="lazy"
-                          className="size-8 shrink-0 rounded-md object-cover ring-1 ring-border"
-                        />
+                        <button
+                          type="button"
+                          onClick={() => openImage(selection.image!, selection.itemNameBn)}
+                          className="shrink-0 rounded-md transition-transform hover:scale-[1.06]"
+                          title="Preview image"
+                        >
+                          <img
+                            src={selection.image}
+                            alt=""
+                            loading="lazy"
+                            className="size-8 rounded-md object-cover ring-1 ring-border"
+                          />
+                        </button>
                       ) : (
                         <span className="size-8 shrink-0 rounded-md bg-muted ring-1 ring-border" />
                       )}
+
                       <span className="min-w-0 flex-1">
                         <span className="block truncate">
                           <span className="font-semibold">{selection.itemNameBn}</span>
@@ -501,6 +519,12 @@ export function ItemsCard({
         </div>
       </dl>
 
+      <ImageLightbox
+        images={lightbox.images}
+        startIndex={lightbox.startIndex}
+        isOpen={lightbox.isOpen}
+        onClose={lightbox.close}
+      />
     </Panel>
   );
 }
