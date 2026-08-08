@@ -267,6 +267,39 @@ export function FulfillmentCard({
 
   const normalised = (courierStatus ?? "unknown") as CourierStatus;
   const isPathao = (partner ?? "").toLowerCase() === "pathao";
+  const isCarrybee = (partner ?? "").toLowerCase() === "carrybee";
+  const canCancelCarrybee =
+    isCarrybee &&
+    !!consignmentId &&
+    CARRYBEE_CANCELLABLE.includes(normalised as never) &&
+    orderStatus !== "cancelled";
+
+  const [cancelOpen, setCancelOpen] = useState(false);
+  const [cancelReason, setCancelReason] = useState("");
+
+  const cancelCarrybee = useMutation({
+    mutationFn: () =>
+      adminCancelCarrybeeConsignment({ data: { orderId, reason: cancelReason.trim() } }),
+    onSuccess: async (res) => {
+      if (res.ok) {
+        toast.success(res.message);
+        setCancelOpen(false);
+        setCancelReason("");
+      } else toast.error(res.message);
+      await qc.invalidateQueries({ queryKey: ["admin"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const resolveAddress = useMutation({
+    mutationFn: () => adminResolveCarrybeeAddress({ data: { orderId } }),
+    onSuccess: (res) => {
+      if (res.ok) toast.success(`CarryBee address resolved · ${res.message}`);
+      else toast.error(res.message);
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
   const consignmentUrl = consignmentId
     ? `https://merchant.pathao.com/courier/orders/${consignmentId}`
     : null;
@@ -276,6 +309,7 @@ export function FulfillmentCard({
           customerPhone ? `&phone=${encodeURIComponent(customerPhone)}` : ""
         }`
       : null;
+
 
   return (
     <div className="grid gap-4 lg:grid-cols-2">
