@@ -8,7 +8,21 @@ import { CheckoutForm } from "@/components/site/checkout-form";
 import { Section } from "@/components/site/ui";
 
 export const Route = createFileRoute("/checkout")({
-  loader: async () => ({ rates: await getDeliveryRates() }),
+  loader: async () => {
+    try {
+      return { rates: await getDeliveryRates() };
+    } catch {
+      // Transient network/RPC failure shouldn't blank the checkout page.
+      return {
+        rates: {
+          inside_dhaka: 60,
+          outside_dhaka: 120,
+          freeAbove: 0,
+          freeAll: false,
+        },
+      };
+    }
+  },
   component: CheckoutPage,
   head: () => ({
     meta: [
