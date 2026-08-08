@@ -671,10 +671,10 @@ export function CheckoutForm({
 
         {/* Shipping */}
         <section>
-          <h3 className="font-en text-xl font-extrabold sm:text-2xl">Shipping</h3>
-          <div className="mt-3 flex items-center justify-between gap-3 rounded-xl border border-border px-4 py-3.5 text-base">
+          <h3 className="font-en text-lg font-extrabold sm:text-xl">Shipping</h3>
+          <div className="mt-3 flex items-center justify-between gap-3 rounded-xl border border-border px-4 py-3 text-sm">
             <span className="font-en font-bold">Delivery Charge</span>
-            <span className="font-en text-lg font-extrabold tabular-nums">
+            <span className="font-en text-base font-extrabold tabular-nums">
               {delivery === 0 ? "Free" : formatPrice(lang, delivery)}
             </span>
           </div>
@@ -682,9 +682,9 @@ export function CheckoutForm({
 
         {/* Your order */}
         <section>
-          <h3 className="font-en text-xl font-extrabold text-primary sm:text-2xl">Your Order</h3>
+          <h3 className="font-en text-lg font-extrabold text-primary sm:text-xl">Your Order</h3>
 
-          <div className="mt-3 grid gap-2 border-b border-dashed border-border pb-3 text-sm font-extrabold uppercase tracking-wide text-foreground sm:text-base">
+          <div className="mt-3 grid gap-2 border-b border-dashed border-border pb-3 text-xs font-extrabold uppercase tracking-wide text-foreground sm:text-sm">
             <div className="font-en flex justify-between">
               <span>Product</span>
               <span>Subtotal</span>
