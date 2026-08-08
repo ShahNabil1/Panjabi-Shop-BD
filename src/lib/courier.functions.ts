@@ -129,20 +129,72 @@ export const courierCheck = createServerFn({ method: "POST" })
     return { ...fresh, cached: false };
   });
 
+export type PhoneCourierBreakdown = {
+  key: string;
+  name: string;
+  total: number;
+  success: number;
+  cancelled: number;
+  ratio: number;
+};
+
+export type PhoneRatioSummary = {
+  ratio: number;
+  total: number;
+  success: number;
+  cancelled: number;
+  couriers: PhoneCourierBreakdown[];
+};
+
+const BREAKDOWN_COURIERS = ["steadfast", "pathao", "carrybee", "redx"];
+
 /** Cached ratios only (no API calls) for a batch of phones — used by the order list. */
 export const courierCachedRatios = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) =>
     z.object({ phones: z.array(z.string().trim().min(6).max(20)).max(200) }).parse(input),
   )
-  .handler(async ({ data, context }): Promise<Record<string, number>> => {
+  .handler(async ({ data, context }): Promise<Record<string, PhoneRatioSummary>> => {
     if (data.phones.length === 0) return {};
     const db = await requireAdmin(context.supabase, context.userId);
     const { data: rows } = await db
       .from("courier_checks")
-      .select("phone, success_ratio")
+      .select("phone, success_ratio, total_parcel, success_parcel, cancelled_parcel, data")
       .in("phone", [...new Set(data.phones)]);
-    const map: Record<string, number> = {};
-    for (const row of rows ?? []) map[row.phone] = Number(row.success_ratio);
+    const map: Record<string, PhoneRatioSummary> = {};
+    for (const row of rows ?? []) {
+      const raw = (row.data ?? {}) as {
+        couriers?: Array<{
+          key?: string;
+          name?: string;
+          total_parcel?: number;
+          success_parcel?: number;
+          cancelled_parcel?: number;
+          success_ratio?: number;
+        }>;
+      };
+      const couriers = (raw.couriers ?? [])
+        .filter((c) => BREAKDOWN_COURIERS.includes(String(c.key ?? "").toLowerCase()))
+        .sort(
+          (a, b) =>
+            BREAKDOWN_COURIERS.indexOf(String(a.key).toLowerCase()) -
+            BREAKDOWN_COURIERS.indexOf(String(b.key).toLowerCase()),
+        )
+        .map((c) => ({
+          key: String(c.key ?? ""),
+          name: String(c.name ?? c.key ?? ""),
+          total: Number(c.total_parcel ?? 0),
+          success: Number(c.success_parcel ?? 0),
+          cancelled: Number(c.cancelled_parcel ?? 0),
+          ratio: Math.round(Number(c.success_ratio ?? 0)),
+        }));
+      map[row.phone] = {
+        ratio: Math.round(Number(row.success_ratio ?? 0)),
+        total: Number(row.total_parcel ?? 0),
+        success: Number(row.success_parcel ?? 0),
+        cancelled: Number(row.cancelled_parcel ?? 0),
+        couriers,
+      };
+    }
     return map;
   });
