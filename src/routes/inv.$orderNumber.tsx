@@ -82,6 +82,13 @@ function InvoicePage() {
     return <div className="mx-auto mt-10 h-64 max-w-2xl animate-pulse rounded-sm bg-secondary" />;
   }
 
+  const trackingUrl = courierTrackingUrl(
+    data.courierProvider,
+    data.courierConsignmentId,
+    data.courierTrackingCode,
+    data.customerPhone,
+  );
+
   return (
     <div className="mx-auto max-w-[820px] px-4 py-8 print:px-0 print:py-0">
       <div className="mb-5 flex items-center justify-between gap-3 print:hidden">
