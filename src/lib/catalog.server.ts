@@ -363,7 +363,7 @@ export async function fetchProduct(slug: string) {
     comboItems,
     category: (catRes.data ?? null) as CategoryRow | null,
     subcategory: (subRes.data ?? null) as SubcategoryRow | null,
-    related: cards(relatedRes.data),
+    related: cards(relatedRows),
     landingSlug: landingRes.data?.slug ?? null,
   };
 }
