@@ -118,7 +118,7 @@ function OrderReceipt() {
             <Link
               to="/inv/$orderNumber"
               params={{ orderNumber }}
-              search={{ p: phone.replace(/\D/g, "").slice(-4), print: "" }}
+              search={{ p: phone.replace(/\D/g, "").slice(-4) }}
               className="inline-block rounded-sm bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
             >
               {tr(lang, "downloadInvoice")}
