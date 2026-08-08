@@ -184,7 +184,7 @@ function Chrome({ children, brand }: { children: ReactNode; brand: string }) {
       </div>
       <main className="flex-1">{children}</main>
       <div className={bareOnMobile ? "hidden md:block" : ""}>
-        {isLanding ? <LandingFooter brand={brand} /> : <SiteFooter />}
+        {isLanding ? <LandingFooter brand={brand} /> : <SiteFooter minimalOnMobile={isCheckout} />}
       </div>
     </div>
   );

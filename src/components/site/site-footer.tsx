@@ -14,7 +14,7 @@ export function SiteFooter({ minimalOnMobile }: { minimalOnMobile?: boolean }) {
 
   return (
     <footer className="mt-16 border-t border-border bg-footer">
-      <div className="mx-auto grid w-full max-w-6xl justify-items-center gap-8 px-4 py-10 text-center sm:grid-cols-2 sm:justify-items-stretch sm:text-left lg:grid-cols-4">
+      <div className={cn("mx-auto grid w-full max-w-6xl justify-items-center gap-8 px-4 py-10 text-center sm:grid-cols-2 sm:justify-items-stretch sm:text-left lg:grid-cols-4", minimalOnMobile && "hidden sm:grid")}>
         <div className="w-full min-w-0">
           <div className="flex items-center justify-center sm:justify-start">
             <button
