@@ -77,17 +77,17 @@ export function SiteFooter() {
           <h2 className="text-base font-bold text-primary">Legal</h2>
           <ul className="mt-3 space-y-2">
             <li>
-              <span className="cursor-default text-sm text-muted-foreground">
+              <span className="cursor-default text-sm text-muted-foreground hover:text-primary">
                 Privacy Policy
               </span>
             </li>
             <li>
-              <span className="cursor-default text-sm text-muted-foreground">
+              <span className="cursor-default text-sm text-muted-foreground hover:text-primary">
                 Terms & Conditions
               </span>
             </li>
             <li>
-              <span className="cursor-default text-sm text-muted-foreground">
+              <span className="cursor-default text-sm text-muted-foreground hover:text-primary">
                 Return Policy
               </span>
             </li>
@@ -116,7 +116,7 @@ export function SiteFooter() {
             {contact.address ? (
               <li className="flex items-start gap-2">
                 <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-                <span>{contact.address}</span>
+                <span className="hover:text-primary">{contact.address}</span>
               </li>
             ) : null}
             <li className="pt-2">
