@@ -276,14 +276,10 @@ function ProductPage() {
                 </span>
               ) : null}
               {product.brand ? (
-                <span>
-                  {tr(lang, "brand")}: {product.brand}
-                </span>
+                <span className="font-en">Brand: {product.brand}</span>
               ) : null}
               {product.sku ? (
-                <span className="font-en">
-                  {tr(lang, "sku")}: {product.sku}
-                </span>
+                <span className="font-en">SKU: {product.sku}</span>
               ) : null}
             </div>
 
