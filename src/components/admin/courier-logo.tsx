@@ -48,10 +48,15 @@ const COURIERS: Record<
   steadfast: {
     label: "Steadfast",
     src: steadfastAsset.url,
-    chip: "bg-white text-[#37A184] ring-[#37A184]/30",
-    ring: "ring-[#37A184]/25 bg-white",
+    chip: "bg-white text-[#349574] ring-[#349574]/30",
+    ring: "ring-[#349574]/25 bg-white",
+    iconSrc: steadfastIconAsset.url,
+    markClass: "size-full object-cover p-0",
+    hideLabel: true,
+    badgeClass: "px-3 py-1.5",
+    logoClass: "h-4 w-auto max-w-[112px]",
     watermarkClass:
-      "w-[72%] max-w-[460px] self-start justify-self-center pt-5 opacity-[0.16] -rotate-6",
+      "w-[78%] max-w-[520px] self-start justify-self-center pt-6 opacity-[0.3] -rotate-6",
   },
 };
 
