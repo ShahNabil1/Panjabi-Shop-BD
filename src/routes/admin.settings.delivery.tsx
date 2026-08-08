@@ -177,6 +177,17 @@ function PartnerCard({
     JSON.stringify(values) !== savedSnapshot ||
     noteTemplate !== savedTemplate;
 
+  const noteError = (() => {
+    const value = noteTemplate;
+    if (!value) return null;
+    if (!value.trim()) return "Note template can't be only spaces.";
+    if (value.trim().length < 3) return "Note template must be at least 3 characters.";
+    if (value.length > 500) return "Note template must be 500 characters or fewer.";
+    if (/[<>]/.test(value)) return "Note template can't contain < or > characters.";
+    if (/(https?:\/\/|www\.)/i.test(value)) return "Links aren't allowed in the delivery note.";
+    return null;
+  })();
+
   const [removeOpen, setRemoveOpen] = useState(false);
   const [testing, setTesting] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -232,14 +243,18 @@ function PartnerCard({
   };
 
   const save = async () => {
+    if (noteError) {
+      toast.error(noteError);
+      return;
+    }
     setSaving(true);
     try {
       const res = await adminSaveDeliveryPartner({
-        data: { provider, enabled, credentials: values, noteTemplate, config: {} },
+        data: { provider, enabled, credentials: values, noteTemplate: noteTemplate.trim(), config: {} },
       });
       setResult({ ok: true, message: res.message });
       setSavedSnapshot(JSON.stringify(values));
-      setSavedTemplate(noteTemplate);
+      setNoteTemplate(noteTemplate.trim()); setSavedTemplate(noteTemplate.trim());
       toast.success(`${providerLabels[provider]} saved`);
       onDone();
     } catch (error) {
@@ -379,11 +394,16 @@ function PartnerCard({
         <Textarea
           rows={3}
           maxLength={500}
-          className="rounded-xl"
+          aria-invalid={noteError ? true : undefined}
+          className={`rounded-xl ${noteError ? "border-destructive focus-visible:ring-destructive/40" : ""}`}
           placeholder="e.g. Please call before delivery. Fragile item — handle with care."
           value={noteTemplate}
           onChange={(e) => setNoteTemplate(e.target.value)}
+          onBlur={() => setNoteTemplate((v) => v.replace(/[ \t]+\n/g, "\n").trim())}
         />
+        {noteError ? (
+          <p className="text-[11px] font-medium text-destructive">{noteError}</p>
+        ) : null}
         <p className="text-[11px] text-muted-foreground">
           {noteTemplate.length}/500 · Applied automatically to the order's delivery note when this
           courier is chosen. Turning the delivery-note checkbox off clears it again.
@@ -515,7 +535,7 @@ function PartnerCard({
         <Button
           type="button"
           onClick={save}
-          disabled={saving || !result?.ok || !isDirty}
+          disabled={saving || !result?.ok || !isDirty || !!noteError}
           className="bg-emerald-600 text-white hover:bg-emerald-700 active:scale-95 disabled:opacity-60"
         >
           {saving ? (
