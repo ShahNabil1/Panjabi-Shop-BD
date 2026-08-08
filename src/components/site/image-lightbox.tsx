@@ -188,7 +188,7 @@ export function ImageLightbox({
               alt={current.alt || ""}
               onClick={toggleZoom}
               className={cn(
-                "block max-h-[80vh] w-auto max-w-[92vw] object-contain transition-transform duration-300",
+                "block max-h-[80vh] w-auto max-w-[92vw] cursor-pointer object-contain transition-transform duration-300",
                 isZoomed ? "cursor-zoom-out" : "cursor-zoom-in",
               )}
               style={{ transform: `scale(${scale})` }}
