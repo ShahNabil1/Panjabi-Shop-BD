@@ -242,32 +242,44 @@ function AdminLayout() {
           const hasActive = section.items.some(isActive);
           return (
             <div key={section.title}>
-              {!collapsed && (
-                <button
-                  type="button"
-                  onClick={() => toggleSection(section.title)}
-                  aria-expanded={open}
-                  className={cn(
-                    "flex w-full items-center justify-between gap-2 rounded-lg px-2 py-1.5 text-[11px] font-bold uppercase tracking-[0.16em] transition-colors",
-                    hasActive ? "text-slate-200" : "text-slate-400",
-                    "hover:bg-white/5 hover:text-white",
-                  )}
-                >
-                  <span className="truncate">{section.title}</span>
-                  <ChevronDown
+              <div
+                className={cn(
+                  "grid transition-[grid-template-rows,opacity] duration-[600ms] ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none",
+                  collapsed ? "grid-rows-[0fr] opacity-0" : "grid-rows-[1fr] opacity-100",
+                )}
+              >
+                <div className="overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => toggleSection(section.title)}
+                    aria-expanded={open}
+                    tabIndex={collapsed ? -1 : 0}
                     className={cn(
-                      "size-3.5 shrink-0 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
-                      open ? "rotate-0" : "-rotate-90",
+                      "flex w-full items-center justify-between gap-2 rounded-lg px-2 py-1.5 text-[11px] font-bold uppercase tracking-[0.16em] transition-colors duration-300",
+                      hasActive ? "text-slate-200" : "text-slate-400",
+                      "hover:bg-white/5 hover:text-white",
                     )}
-                  />
-                </button>
-              )}
+                  >
+                    <span className="truncate">{section.title}</span>
+                    <ChevronDown
+                      className={cn(
+                        "size-3.5 shrink-0 transition-transform duration-[600ms] ease-[cubic-bezier(0.16,1,0.3,1)]",
+                        open ? "rotate-0" : "-rotate-90",
+                      )}
+                    />
+                  </button>
+                </div>
+              </div>
+
 
               <div
                 className={cn(
-                  "grid transition-[grid-template-rows,opacity] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
-                  open ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0",
+                  "grid transition-[grid-template-rows,opacity,filter] duration-[600ms] ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none",
+                  open
+                    ? "grid-rows-[1fr] opacity-100 blur-0"
+                    : "grid-rows-[0fr] opacity-0 blur-[2px]",
                 )}
+              
               >
                 <div className="overflow-hidden">
                   <ul className={cn("space-y-1.5", collapsed ? "pt-0" : "pt-1.5")}>
@@ -353,7 +365,7 @@ function AdminLayout() {
       {/* Desktop sidebar */}
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-40 hidden bg-[#0a0a0a] shadow-2xl shadow-black/40 transition-[width] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] lg:block",
+          "fixed inset-y-0 left-0 z-40 hidden bg-[#0a0a0a] shadow-2xl shadow-black/40 transition-[width] duration-[600ms] ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none lg:block",
           collapsed ? "w-20" : "w-72",
         )}
       >
@@ -392,7 +404,7 @@ function AdminLayout() {
       />
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-50 w-80 bg-[#0a0a0a] text-slate-100 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] lg:hidden",
+          "fixed inset-y-0 left-0 z-50 w-80 bg-[#0a0a0a] text-slate-100 transition-transform duration-[600ms] ease-[cubic-bezier(0.16,1,0.3,1)] lg:hidden",
           mobileOpen ? "translate-x-0" : "-translate-x-full",
         )}
       >
@@ -408,38 +420,37 @@ function AdminLayout() {
 
       <div
         className={cn(
-          "transition-[padding] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
+          "transition-[padding] duration-[600ms] ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none",
           collapsed ? "lg:pl-20" : "lg:pl-72",
         )}
       >
         {/* Quick section switcher — same links as the active sidebar section */}
-        {topItems.length > 1 ? (
-          <div className="sticky top-0 z-20 border-b border-border bg-card/85 backdrop-blur-md">
-            <div className="mx-auto flex w-full max-w-6xl items-center gap-2 overflow-x-auto px-4 py-2.5 lg:px-10">
-              {topItems.map((item) => {
-                const active = isActive(item);
-                return (
-                  <Link
-                    key={item.to}
-                    to={item.to as "/admin"}
-                    preload="intent"
-                    className={cn(
-                      "inline-flex shrink-0 items-center gap-2 rounded-full px-3.5 py-1.5 text-sm font-semibold transition-all duration-200",
-                      active
-                        ? "bg-primary text-primary-foreground shadow-sm"
-                        : "text-muted-foreground hover:bg-accent hover:text-foreground",
-                    )}
-                  >
-                    <item.icon className="size-4" />
-                    {item.label}
-                  </Link>
-                );
-              })}
-            </div>
+        <div className="sticky top-0 z-20 border-b border-border bg-card/85 backdrop-blur-md">
+          <div className="mx-auto flex h-[53px] w-full max-w-6xl items-center gap-2 overflow-x-auto px-4 lg:px-10">
+            {topItems.map((item) => {
+              const active = isActive(item);
+              return (
+                <Link
+                  key={item.to}
+                  to={item.to as "/admin"}
+                  preload="intent"
+                  className={cn(
+                    "inline-flex shrink-0 items-center gap-2 rounded-full px-3.5 py-1.5 text-sm font-semibold transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]",
+                    active
+                      ? "bg-primary text-primary-foreground shadow-sm"
+                      : "text-muted-foreground hover:bg-accent hover:text-foreground",
+                  )}
+                >
+                  <item.icon className="size-4" />
+                  {item.label}
+                </Link>
+              );
+            })}
           </div>
-        ) : null}
+        </div>
 
-        <main key={pathname} className="admin-fade mx-auto w-full max-w-6xl space-y-6 px-4 py-6 lg:px-10 lg:py-10">
+
+        <main key={pathname} className="admin-page mx-auto w-full max-w-6xl space-y-6 px-4 py-6 lg:px-10 lg:py-10">
           <Outlet />
         </main>
       </div>

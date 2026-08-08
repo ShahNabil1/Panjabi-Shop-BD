@@ -507,12 +507,45 @@
   animation: admin-fade 0.22s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
+/* Page-level transition: opacity/blur only (no transform) so route switches
+   never shift layout, plus a reserved min-height so the scrollbar stays put. */
+@keyframes admin-page-in {
+  from {
+    opacity: 0;
+    filter: blur(3px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+
+.admin-page {
+  min-height: calc(100vh - 53px);
+  animation: admin-page-in 0.42s cubic-bezier(0.16, 1, 0.3, 1) both;
+  will-change: opacity, filter;
+}
+
+/* Global admin smoothness: consistent easing for interactive surfaces. */
+.admin-scope a,
+.admin-scope button,
+.admin-scope [role="button"],
+.admin-scope input,
+.admin-scope select,
+.admin-scope textarea,
+.admin-scope .transition-colors,
+.admin-scope .transition-all {
+  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .admin-rise,
-  .admin-fade {
+  .admin-fade,
+  .admin-page {
     animation: none;
   }
 }
+
 
 .admin-shimmer {
   background-size: 200% 200%;
