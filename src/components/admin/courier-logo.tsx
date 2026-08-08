@@ -1,7 +1,9 @@
 import { Truck } from "lucide-react";
 
 import pathaoAsset from "@/assets/pathao.png.asset.json";
-import carrybeeAsset from "@/assets/carrybee-mark-onlight.png.asset.json";
+import carrybeeAsset from "@/assets/carrybee-mark.png.asset.json";
+import carrybeeLightAsset from "@/assets/carrybee-mark-onlight.png.asset.json";
+import carrybeeIconAsset from "@/assets/carrybee-icon.jpg.asset.json";
 import steadfastAsset from "@/assets/steadfast.jpg.asset.json";
 import { cn } from "@/lib/utils";
 
@@ -9,7 +11,18 @@ type CourierKey = "pathao" | "carrybee" | "steadfast";
 
 const COURIERS: Record<
   CourierKey,
-  { label: string; src: string; chip: string; ring: string; markClass?: string; watermarkClass?: string; hideLabel?: boolean; badgeClass?: string }
+  {
+    label: string;
+    src: string;
+    chip: string;
+    ring: string; markClass?: string;
+    watermarkClass?: string;
+    hideLabel?: boolean;
+    badgeClass?: string;
+    iconSrc?: string;
+    watermarkSrc?: string;
+    logoClass?: string;
+  }
 > = {
   pathao: {
     label: "Pathao",
@@ -20,12 +33,15 @@ const COURIERS: Record<
   carrybee: {
     label: "CarryBee",
     src: carrybeeAsset.url,
-    chip: "bg-white text-[#111111] ring-[#FFCB05]/60",
-    ring: "ring-[#FFCB05]/60 bg-white",
-    markClass: "scale-[1.3] p-0",
-    watermarkClass: "opacity-[0.14]",
+    chip: "bg-[#111111] text-white ring-[#FFCB05]/50",
+    ring: "ring-[#FFCB05]/50 bg-[#FFCB05]",
+    iconSrc: carrybeeIconAsset.url,
+    watermarkSrc: carrybeeLightAsset.url,
+    markClass: "size-full object-cover p-0",
+    watermarkClass: "w-[92%] max-w-[560px] -rotate-[18deg] opacity-[0.22] mix-blend-normal",
     hideLabel: true,
-    badgeClass: "px-2 py-1",
+    badgeClass: "px-3 py-1.5",
+    logoClass: "h-5 w-auto max-w-[104px]",
   },
   steadfast: {
     label: "Steadfast",
@@ -62,7 +78,7 @@ export function CourierMark({
       )}
     >
       <img
-        src={c.src}
+        src={c.iconSrc ?? c.src}
         alt={`${c.label} logo`}
         className={cn("size-full object-contain p-0.5", c.markClass)}
       />
@@ -108,7 +124,8 @@ export function CourierBadge({
         aria-hidden
         className={cn(
           "h-4 w-4 rounded-full object-contain",
-          c.hideLabel && "h-3.5 w-auto max-w-[68px] rounded-none",
+          c.hideLabel && "rounded-none",
+          c.logoClass,
         )}
       />
       {c.hideLabel ? <span className="sr-only">{c.label}</span> : c.label}
@@ -135,10 +152,11 @@ export function CourierWatermark({
       )}
     >
       <img
-        src={c.src}
+        src={c.watermarkSrc ?? c.src}
         alt=""
         className={cn(
           "w-[65%] max-w-[420px] object-contain opacity-[0.06] mix-blend-multiply",
+          "origin-center",
           c.watermarkClass,
         )}
       />
