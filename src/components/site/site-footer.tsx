@@ -47,7 +47,7 @@ export function SiteFooter() {
         </div>
 
         <div>
-          <h2 className="text-sm font-semibold">{lang === "bn" ? "তথ্য" : "Information"}</h2>
+          <h2 className="text-sm font-semibold">About Upoharkabbo</h2>
           <ul className="mt-3 space-y-2">
             <li>
               <Link to="/about" className="text-sm text-muted-foreground hover:text-primary">
