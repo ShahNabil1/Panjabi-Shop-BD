@@ -410,3 +410,134 @@ export const adminPathaoDeliveryCost = createServerFn({ method: "GET" })
       return { ...empty, message: (error as Error).message };
     }
   });
+
+/** Courier states where a CarryBee parcel can still be cancelled (not picked yet). */
+export const CARRYBEE_CANCELLABLE = ["pending", "unknown", "failed", "hold"] as const;
+
+/** Cancels a CarryBee consignment with a reason, then cancels the order. */
+export const adminCancelCarrybeeConsignment = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        orderId: z.string().uuid(),
+        reason: z.string().trim().min(3).max(199),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }): Promise<{ ok: boolean; message: string }> => {
+    const db = await requireAdmin(context.supabase, context.userId);
+    const { actorName, logActivity } = await import("./admin.server");
+    const { loadPartner, providerKey, carrybeeCreds } = await import("./dispatch.server");
+
+    const { data: row } = await db
+      .from("orders")
+      .select("delivery_partner, courier_consignment_id, courier_status, status")
+      .eq("id", data.orderId)
+      .maybeSingle();
+    const order = row as {
+      delivery_partner: string | null;
+      courier_consignment_id: string | null;
+      courier_status: string | null;
+      status: string;
+    } | null;
+    if (!order) return { ok: false, message: "Order not found" };
+    if (providerKey(order.delivery_partner) !== "carrybee") {
+      return { ok: false, message: "Cancellation is only available for CarryBee orders" };
+    }
+    if (!order.courier_consignment_id) {
+      return { ok: false, message: "This order has not been sent to CarryBee yet" };
+    }
+    if (!CARRYBEE_CANCELLABLE.includes((order.courier_status ?? "unknown") as never)) {
+      return {
+        ok: false,
+        message: "The parcel has already been picked up — CarryBee can no longer cancel it",
+      };
+    }
+
+    try {
+      const partner = await loadPartner(db, "carrybee");
+      const { carrybeeCancelOrder } = await import("./carrybee.server");
+      await carrybeeCancelOrder(
+        carrybeeCreds(partner),
+        order.courier_consignment_id,
+        data.reason,
+      );
+
+      await db
+        .from("orders")
+        .update({ status: "cancelled", courier_status: "cancelled" })
+        .eq("id", data.orderId);
+      await db
+        .from("order_consignments")
+        .update({ status: "cancelled", status_message: data.reason })
+        .eq("order_id", data.orderId)
+        .eq("provider", "carrybee");
+
+      const who = await actorName(db, context.userId);
+      await logActivity(
+        db,
+        data.orderId,
+        "courier",
+        `${who} cancelled the CarryBee consignment ${order.courier_consignment_id} — ${data.reason}`,
+        { actor: who, meta: { provider: "carrybee", reason: data.reason } },
+      );
+
+      return { ok: true, message: "CarryBee consignment cancelled" };
+    } catch (error) {
+      return { ok: false, message: (error as Error).message };
+    }
+  });
+
+export type CarrybeeAddressResolution = {
+  ok: boolean;
+  message: string;
+  source?: "address-details" | "name-match";
+  cityId?: number;
+  cityName?: string;
+  zoneId?: number;
+  zoneName?: string;
+  areaId?: number | null;
+};
+
+/** Re-resolves an order's address against CarryBee (address-details first). */
+export const adminResolveCarrybeeAddress = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => z.object({ orderId: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }): Promise<CarrybeeAddressResolution> => {
+    const db = await requireAdmin(context.supabase, context.userId);
+    const { loadPartner, resolveCarrybeeLocation } = await import("./dispatch.server");
+
+    const { data: row } = await db
+      .from("orders")
+      .select("address_line, division, district, upazila, city")
+      .eq("id", data.orderId)
+      .maybeSingle();
+    if (!row) return { ok: false, message: "Order not found" };
+
+    try {
+      const partner = await loadPartner(db, "carrybee");
+      const place = await resolveCarrybeeLocation(
+        row as {
+          address_line: string;
+          division: string | null;
+          district: string | null;
+          upazila: string | null;
+          city: string | null;
+        },
+        partner,
+      );
+      return {
+        ok: true,
+        message: `${place.cityName} · ${place.zoneName}`,
+        source: place.source,
+        cityId: place.cityId,
+        cityName: place.cityName,
+        zoneId: place.zoneId,
+        zoneName: place.zoneName,
+        areaId: place.areaId ?? null,
+      };
+    } catch (error) {
+      return { ok: false, message: (error as Error).message };
+    }
+  });
