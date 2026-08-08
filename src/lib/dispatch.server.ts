@@ -63,6 +63,7 @@ type OrderRow = {
   city: string | null;
   delivery_note: string | null;
   note: string | null;
+  source: string | null;
   total: number | string;
   advance_amount: number | string;
   delivery_partner: string | null;
@@ -73,7 +74,7 @@ async function loadOrder(db: Db, orderId: string) {
   const { data, error } = await db
     .from("orders")
     .select(
-      "id, order_number, customer_name, customer_phone, alt_phone, address_line, division, district, upazila, city, delivery_note, note, total, advance_amount, delivery_partner, courier_consignment_id",
+      "id, order_number, customer_name, customer_phone, alt_phone, address_line, division, district, upazila, city, delivery_note, note, source, total, advance_amount, delivery_partner, courier_consignment_id",
     )
     .eq("id", orderId)
     .maybeSingle();
@@ -85,14 +86,119 @@ async function loadOrder(db: Db, orderId: string) {
 async function loadItems(db: Db, orderId: string) {
   const { data } = await db
     .from("order_items")
-    .select("product_name, variant_label, quantity")
+    .select("product_name, variant_label, quantity, product_id")
     .eq("order_id", orderId);
   return (data ?? []) as Array<{
     product_name: string;
     variant_label: string | null;
     quantity: number;
+    product_id: string | null;
   }>;
 }
+
+/** True when any line on the order is a combo gift box (heavier parcel). */
+async function hasCombo(db: Db, items: Array<{ product_id: string | null }>) {
+  const ids = items.map((i) => i.product_id).filter((v): v is string => !!v);
+  if (!ids.length) return false;
+  const { data } = await db.from("products").select("kind").in("id", ids);
+  return (data ?? []).some((p) => (p as { kind?: string }).kind === "combo");
+}
+
+/** CarryBee auth headers come straight from the saved credentials. */
+export function carrybeeCreds(partner: PartnerRow) {
+  return {
+    client_id: partner.credentials["client_id"]!,
+    client_secret: partner.credentials["client_secret"]!,
+    client_context: partner.credentials["client_context"]!,
+  };
+}
+
+/**
+ * Builds one CarryBee order payload from a stored order.
+ * Shared by single dispatch and the bulk endpoint so both stay identical.
+ */
+export async function buildCarrybeePayload(
+  db: Db,
+  order: OrderRow,
+  items: Array<{ product_name: string; variant_label: string | null; quantity: number; product_id: string | null }>,
+  partner: PartnerRow,
+) {
+  const { carrybeeStores, carrybeeCities, carrybeeZones, carrybeeAreas } = await import(
+    "./carrybee.server"
+  );
+  const creds = carrybeeCreds(partner);
+
+  const saved = (partner.config["stores"] ?? []) as Array<{ store_id: number }>;
+  const storeId = saved[0]?.store_id ?? (await carrybeeStores(creds))[0]?.store_id;
+  if (!storeId) throw new Error("No CarryBee store found for this merchant account");
+
+  const cities = await carrybeeCities(creds);
+  const city =
+    pickPlace(cities, "name", order.district, DISTRICT_EN) ??
+    pickPlace(cities, "city_name", order.district, DISTRICT_EN) ??
+    pickPlace(cities, "name", order.city, DISTRICT_EN);
+  if (!city)
+    throw new Error(
+      `CarryBee city not found for "${order.district ?? order.city}" — check the district on this order`,
+    );
+  const cityId = Number(city["id"] ?? city["city_id"]);
+
+  const zones = await carrybeeZones(creds, cityId);
+  const zone =
+    pickPlace(zones, "name", order.upazila, UPAZILA_EN) ??
+    pickPlace(zones, "zone_name", order.upazila, UPAZILA_EN) ??
+    pickPlace(zones, "name", order.city, UPAZILA_EN) ??
+    pickByName(zones, "name", `${String(city["name"] ?? city["city_name"] ?? "")} Sadar`);
+  if (!zone)
+    throw new Error(
+      `CarryBee zone not found for "${order.upazila ?? order.city}" under ${String(city["name"] ?? "")}`,
+    );
+  const zoneId = Number(zone["id"] ?? zone["zone_id"]);
+
+  // Area is optional: match it against the free-text address when we can.
+  let areaId: number | undefined;
+  try {
+    const areas = await carrybeeAreas(creds, cityId, zoneId);
+    const area =
+      pickByName(areas, "name", order.address_line) ??
+      pickByName(areas, "name", order.upazila ?? "") ??
+      areas[0];
+    const id = area?.["id"] ?? area?.["area_id"];
+    if (id != null) areaId = Number(id);
+  } catch {
+    areaId = undefined;
+  }
+
+  const combo = await hasCombo(db, items);
+  const quantity = combo ? 1 : totalLot(items);
+  // Single parcels ship at 400g, combo gift boxes at 1kg.
+  const weight = combo ? 1000 : 400 * quantity;
+  // CarryBee caps the special instruction at 255 characters.
+  const instruction = (order.delivery_note ?? "").trim().slice(0, 255);
+
+  return {
+    store_id: storeId,
+    merchant_order_id: order.order_number,
+    delivery_type: 1 as const,
+    product_type: 1 as const,
+    recipient_name: order.customer_name,
+    recipient_phone: order.customer_phone,
+    ...(order.alt_phone ? { recipient_secendary_phone: order.alt_phone } : {}),
+    recipient_address: fullAddress(order),
+    city_id: cityId,
+    zone_id: zoneId,
+    ...(areaId ? { area_id: areaId } : {}),
+    ...(instruction ? { special_instruction: instruction } : {}),
+    product_description: itemSummary(items).slice(0, 255),
+    item_weight: weight,
+    item_quantity: quantity,
+    collectable_amount: codAmount(order),
+    // Manual exchange orders go out flagged so CarryBee collects the old parcel.
+    ...((order.source ?? "").toLowerCase() === "exchange" ? { is_exchange: true } : {}),
+  };
+}
+
+
 
 function fullAddress(o: OrderRow) {
   return [o.address_line, o.upazila, o.district, o.division || o.city]
@@ -359,8 +465,14 @@ export async function dispatchOrder(
       deliveryFee = res.deliveryFee;
       raw = res.raw;
     } else {
-      throw new Error("Carrybee integration is not available yet");
+      const { carrybeeCreateOrder } = await import("./carrybee.server");
+      const payload = await buildCarrybeePayload(db, order, items, partner);
+      const res = await carrybeeCreateOrder(carrybeeCreds(partner), payload);
+      consignmentId = res.consignmentId;
+      rawStatus = res.status;
+      raw = res.raw;
     }
+
 
     const status = normaliseCourierStatus(provider, rawStatus);
 

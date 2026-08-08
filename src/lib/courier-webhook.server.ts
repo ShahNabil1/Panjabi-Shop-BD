@@ -47,7 +47,24 @@ export function parseCourierPayload(provider: DeliveryProvider, payload: Payload
 
     };
   }
-  // Steadfast + Carrybee share a flat delivery-status shape.
+  if (provider === "carrybee") {
+    const causes = payload["causes"];
+    return {
+      event: str(payload["event"]),
+      consignmentId: str(payload["consignment_id"]),
+      merchantOrderId: str(payload["merchant_order_id"]),
+      rawStatus: str(payload["event"]) ?? str(payload["status"]) ?? "",
+      message:
+        str(payload["reason"]) ??
+        (Array.isArray(causes) ? causes.map((c) => String(c)).join(", ") : str(causes)) ??
+        ([str(payload["agent_name"]), str(payload["agent_phone"])]
+          .filter(Boolean)
+          .join(" · ") || null),
+
+    };
+  }
+  // Steadfast shares a flat delivery-status shape.
+
   return {
     event: str(payload["notification_type"]) ?? "delivery_status",
     consignmentId: str(payload["consignment_id"]),

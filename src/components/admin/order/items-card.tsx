@@ -52,6 +52,9 @@ export function DeliveryNoteCard({
   const qc = useQueryClient();
   const [enabled, setEnabled] = useState(Boolean(initial));
   const [note, setNote] = useState(initial);
+  // CarryBee caps the special instruction at 255 characters.
+  const limit = (partner ?? "").toLowerCase().replace(/\s+/g, "") === "carrybee" ? 255 : 500;
+
 
   const save = useMutation({
     mutationFn: (value?: string) =>
@@ -115,7 +118,7 @@ export function DeliveryNoteCard({
         <div className="space-y-2">
           <Textarea
             rows={3}
-            maxLength={500}
+            maxLength={limit}
             readOnly={locked}
             className="rounded-xl"
             placeholder="Optional — e.g. Deliver by 3 PM, call before arrival, leave with security…"
@@ -124,7 +127,9 @@ export function DeliveryNoteCard({
           />
           {locked ? null : (
             <div className="flex items-center justify-between">
-              <span className="text-xs text-muted-foreground">{note.length}/500 characters</span>
+              <span className="text-xs text-muted-foreground">
+                {note.length}/{limit} characters
+              </span>
               <Button size="sm" loading={save.isPending} onClick={() => save.mutate(undefined)}>
                 <Save className="size-3.5" />
                 Save note
@@ -133,6 +138,7 @@ export function DeliveryNoteCard({
           )}
         </div>
       ) : null}
+
     </Panel>
   );
 }

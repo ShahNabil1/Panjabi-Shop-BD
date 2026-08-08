@@ -34,16 +34,18 @@ export const providerFields: Record<DeliveryProvider, CredentialField[]> = {
     { key: "password", label: "Merchant Password", placeholder: "••••••••", secret: true },
   ],
   carrybee: [
-    { key: "base_url", label: "Base URL", placeholder: "https://api.carrybee.com" },
-    { key: "api_key", label: "API Key / Token", placeholder: "Merchant API token", secret: true },
-    { key: "secret_key", label: "Secret Key", placeholder: "Optional secret", secret: true, optional: true },
+    { key: "client_id", label: "Client ID", placeholder: "CarryBee Client-ID", secret: true },
+    { key: "client_secret", label: "Client Secret", placeholder: "CarryBee Client-Secret", secret: true },
+    { key: "client_context", label: "Client Context", placeholder: "CarryBee Client-Context", secret: true },
   ],
+
 };
 
 /** Normalised courier status used across the admin UI. */
 export type CourierStatus =
   | "pending"
   | "in_review"
+  | "failed"
   | "picked"
   | "in_transit"
   | "delivered"
@@ -61,6 +63,7 @@ export type CourierStatus =
 export const courierStatusLabels: Record<CourierStatus, string> = {
   pending: "Pending",
   in_review: "In review",
+  failed: "Create failed",
   picked: "Picked up",
   in_transit: "In transit",
   delivered: "Delivered",
@@ -76,6 +79,7 @@ export const courierStatusLabels: Record<CourierStatus, string> = {
   unknown: "Unknown",
 };
 
+
 /**
  * Order status each normalised courier status drives.
  * `null` means the courier event is informational only — the order keeps
@@ -86,7 +90,10 @@ export const courierToOrderStatus: Record<CourierStatus, string | null> = {
   pending: "rts",
   // Steadfast puts every freshly-created consignment in `in_review`.
   in_review: "rts",
+  // CarryBee `order.create-failed` — the parcel was never created, fix + resend.
+  failed: "pending",
   unknown: null,
+
   // Pathao payment invoices settle money, not parcels — order status untouched.
   paid_invoice: null,
   hold: "courier_hold",
@@ -160,8 +167,54 @@ export function normaliseCourierStatus(provider: DeliveryProvider, raw: string):
     return map[key] ?? "unknown";
   }
 
+  if (provider === "carrybee") {
+    // CarryBee webhook events arrive as "order.at-the-sorting-hub" etc.
+    const key = s.replace(/^order_/, "");
+    const map: Record<string, CourierStatus> = {
+      // → RTS
+      created: "pending",
+      updated: "pending",
+      pickup_requested: "pending",
+      assigned_for_pickup: "pending",
+      // → Pending again (creation rejected, fix the order and resend)
+      create_failed: "failed",
+      failed: "failed",
+      // → Shipped
+      picked: "picked",
+      at_the_sorting_hub: "in_transit",
+      on_the_way_to_central_warehouse: "in_transit",
+      at_central_warehouse: "in_transit",
+      in_transit: "in_transit",
+      received_at_last_mile_hub: "in_transit",
+      assigned_for_delivery: "in_transit",
+      // → Courier Hold
+      pickup_failed: "hold",
+      delivery_on_hold: "hold",
+      delivery_failed: "hold",
+      // → Cancelled
+      pickup_cancelled: "cancelled",
+      cancelled: "cancelled",
+      // → Returned (CarryBee has no awaiting-return step for us)
+      returned: "returned",
+      returned_at_sorting: "returned",
+      returned_in_transit: "returned",
+      returned_to_merchant: "returned",
+      // → Partial delivered (money collected, payout still pending)
+      partial_delivery: "partial_delivered",
+      paid_return: "partial_delivered",
+      // → Delivered
+      delivered: "delivered",
+      // → Exchange
+      exchange: "exchange",
+      // Money settlement only — flips the payment view to Paid.
+      paid: "paid_invoice",
+    };
+    return map[key] ?? "unknown";
+  }
+
   return genericStatus(s);
 }
+
 
 
 function genericStatus(s: string): CourierStatus {
