@@ -712,7 +712,12 @@ export const adminSearchProducts = createServerFn({ method: "POST" })
     let query = db
       .from("products")
       .select(
-        "id, name_bn, name_en, sku, price, stock, product_images(url, sort_order), product_variants(id, value_bn, group_name_bn, sku, price_delta, stock, is_active)",
+        `id, kind, name_bn, name_en, sku, price, stock,
+         product_images(url, sort_order),
+         product_variants(id, value_bn, value_en, group_name_bn, group_name_en, sku, price_delta, stock, is_active),
+         combo_items(id, quantity, label_bn, label_en, products!combo_items_item_id_fkey(
+           id, name_bn, name_en, product_variants(id, value_bn, value_en, group_name_bn, group_name_en, sku, is_active)
+         ))`,
       )
       .eq("is_active", true)
       .order("sort_order")
@@ -751,26 +756,36 @@ export const adminCreateOrder = createServerFn({ method: "POST" })
 
     const productIds = [...new Set(data.items.map((i) => i.productId))];
     const variantIds = [
-      ...new Set(data.items.map((i) => i.variantId).filter((v): v is string => Boolean(v))),
+      ...new Set([
+        ...data.items.map((i) => i.variantId).filter((v): v is string => Boolean(v)),
+        ...data.items.flatMap((i) => i.comboSelections.map((selection) => selection.variantId)),
+      ]),
     ];
 
-    const [productsRes, variantsRes] = await Promise.all([
+    const comboProductIds = [...new Set(data.items.flatMap((item) => item.comboSelections.map((selection) => selection.itemId)))];
+    const [productsRes, variantsRes, comboProductsRes] = await Promise.all([
       db.from("products").select("id, slug, name_bn, price, sku").in("id", productIds),
       variantIds.length
         ? db
             .from("product_variants")
-            .select("id, product_id, group_name_bn, value_bn, sku, price_delta")
+            .select("id, product_id, group_name_bn, group_name_en, value_bn, value_en, sku, price_delta")
             .in("id", variantIds)
+        : Promise.resolve({ data: [], error: null }),
+      comboProductIds.length
+        ? db.from("products").select("id, name_bn, name_en").in("id", comboProductIds)
         : Promise.resolve({ data: [], error: null }),
     ]);
     if (productsRes.error) throw new Error(productsRes.error.message);
 
     const products = productsRes.data ?? [];
+    const comboProducts = comboProductsRes.data ?? [];
     const variants = (variantsRes.data ?? []) as Array<{
       id: string;
       product_id: string;
       group_name_bn: string;
       value_bn: string;
+      value_en: string;
+      group_name_en: string;
       sku: string | null;
       price_delta: number | string;
     }>;
@@ -780,7 +795,24 @@ export const adminCreateOrder = createServerFn({ method: "POST" })
       if (!product) throw new Error("Product not found");
       const variant = item.variantId ? variants.find((v) => v.id === item.variantId) : null;
       const unitPrice = item.unitPrice;
-      return { product, variant, quantity: item.quantity, unitPrice, lineTotal: unitPrice * item.quantity };
+      const comboSelections = item.comboSelections.map((selection) => {
+        const childVariant = variants.find(
+          (candidate) => candidate.id === selection.variantId && candidate.product_id === selection.itemId,
+        );
+        const childProduct = comboProducts.find((candidate) => candidate.id === selection.itemId);
+        if (!childVariant || !childProduct) throw new Error("Combo variant not found");
+        return {
+          item_id: selection.itemId,
+          item_name_bn: childProduct.name_bn,
+          item_name_en: childProduct.name_en,
+          quantity: selection.quantity,
+          variant_id: childVariant.id,
+          variant_label_bn: `${childVariant.group_name_bn}: ${childVariant.value_bn}`,
+          variant_label_en: `${childVariant.group_name_en}: ${childVariant.value_en}`,
+          sku: childVariant.sku,
+        };
+      });
+      return { product, variant, quantity: item.quantity, unitPrice, lineTotal: unitPrice * item.quantity, comboSelections };
     });
 
     const subtotal = lines.reduce((sum, l) => sum + l.lineTotal, 0);
@@ -830,6 +862,7 @@ export const adminCreateOrder = createServerFn({ method: "POST" })
         unit_price: l.unitPrice,
         quantity: l.quantity,
         line_total: l.lineTotal,
+        combo_selections: l.comboSelections,
       })),
     );
     if (itemsError) throw new Error(itemsError.message);

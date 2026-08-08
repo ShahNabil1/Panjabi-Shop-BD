@@ -176,6 +176,15 @@ export function CartDrawer() {
                         {pick(lang, item.variantLabelBn, item.variantLabelEn)}
                       </p>
                     ) : null}
+                    {item.comboSelections.length > 0 ? (
+                      <ul className="mt-1.5 space-y-0.5 text-xs text-muted-foreground">
+                        {item.comboSelections.map((selection) => (
+                          <li key={`${selection.itemId}-${selection.variantId}`}>
+                            {pick(lang, selection.itemNameBn, selection.itemNameEn)} · {pick(lang, selection.variantLabelBn, selection.variantLabelEn)}
+                          </li>
+                        ))}
+                      </ul>
+                    ) : null}
                     <div className="mt-2 flex flex-wrap items-center gap-3">
                       <QuantityStepper
                         value={item.quantity}

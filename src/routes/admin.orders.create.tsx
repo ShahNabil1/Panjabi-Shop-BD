@@ -41,6 +41,40 @@ type Line = {
   unitPrice: number;
   quantity: number;
   imageUrl: string | null;
+  comboSelections: Array<{
+    itemId: string;
+    itemNameBn: string;
+    itemNameEn: string;
+    quantity: number;
+    variantId: string;
+    variantLabelBn: string;
+    variantLabelEn: string;
+    sku: string | null;
+  }>;
+};
+
+type SearchProduct = {
+  id: string;
+  kind: string;
+  name_bn: string;
+  sku: string | null;
+  price: number | string;
+  stock: number;
+  product_images?: Array<{ url: string; sort_order: number | null }>;
+  product_variants?: Array<{
+    id: string; value_bn: string; value_en: string; group_name_bn: string; group_name_en: string;
+    sku: string | null; price_delta: number | string; is_active: boolean;
+  }>;
+  combo_items?: Array<{
+    id: string; quantity: number; label_bn: string | null; label_en: string | null;
+    products: {
+      id: string; name_bn: string; name_en: string;
+      product_variants: Array<{
+        id: string; value_bn: string; value_en: string; group_name_bn: string; group_name_en: string;
+        sku: string | null; is_active: boolean;
+      }>;
+    } | null;
+  }>;
 };
 
 function money(n: number) {
@@ -64,6 +98,7 @@ function CreateOrderPage() {
 
   const [lines, setLines] = useState<Line[]>([]);
   const [search, setSearch] = useState("");
+  const [comboDrafts, setComboDrafts] = useState<Record<string, Record<string, string>>>({});
 
   const [discount, setDiscount] = useState(0);
   const [deliveryCharge, setDeliveryCharge] = useState(0);
@@ -159,22 +194,9 @@ function CreateOrderPage() {
   };
 
   const addLine = (
-    product: {
-      id: string;
-      name_bn: string;
-      sku: string | null;
-      price: number | string;
-      product_images?: Array<{ url: string; sort_order: number | null }>;
-      product_variants?: Array<{
-        id: string;
-        value_bn: string;
-        group_name_bn: string;
-        sku: string | null;
-        price_delta: number | string;
-        is_active: boolean;
-      }>;
-    },
+    product: SearchProduct,
     variantId: string | null,
+    comboPicks: Record<string, string> = {},
   ) => {
     const variant = product.product_variants?.find((v) => v.id === variantId) ?? null;
     const imageUrl =
@@ -182,7 +204,22 @@ function CreateOrderPage() {
         (a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0),
       )[0]?.url ?? null;
     const unitPrice = Number(product.price) + Number(variant?.price_delta ?? 0);
-    const key = `${product.id}:${variantId ?? "-"}`;
+    const comboSelections = (product.combo_items ?? []).flatMap((comboItem) => {
+      const child = comboItem.products;
+      const selectedId = comboPicks[comboItem.id];
+      const selectedVariant = child?.product_variants.find((candidate) => candidate.id === selectedId);
+      return child && selectedVariant ? [{
+        itemId: child.id,
+        itemNameBn: comboItem.label_bn || child.name_bn,
+        itemNameEn: comboItem.label_en || child.name_en,
+        quantity: comboItem.quantity,
+        variantId: selectedVariant.id,
+        variantLabelBn: `${selectedVariant.group_name_bn}: ${selectedVariant.value_bn}`,
+        variantLabelEn: `${selectedVariant.group_name_en}: ${selectedVariant.value_en}`,
+        sku: selectedVariant.sku,
+      }] : [];
+    });
+    const key = `${product.id}:${variantId ?? "-"}:${comboSelections.map((selection) => selection.variantId).join("+")}`;
     setLines((prev) => {
       const existing = prev.find((l) => l.key === key);
       if (existing) {
@@ -200,6 +237,7 @@ function CreateOrderPage() {
           unitPrice,
           quantity: 1,
           imageUrl,
+          comboSelections,
         },
       ];
     });
@@ -233,6 +271,11 @@ function CreateOrderPage() {
             variantId: l.variantId,
             quantity: l.quantity,
             unitPrice: l.unitPrice,
+            comboSelections: l.comboSelections.map((selection) => ({
+              itemId: selection.itemId,
+              variantId: selection.variantId,
+              quantity: selection.quantity,
+            })),
           })),
         },
       }),
@@ -408,8 +451,13 @@ function CreateOrderPage() {
               <BrandLoader size="sm" className="py-6" />
             ) : (
               <ul className="mt-3 max-h-64 space-y-1.5 overflow-y-auto">
-                {(products.data ?? []).map((p) => {
+                {(products.data ?? []).map((rawProduct) => {
+                  const p = rawProduct as unknown as SearchProduct;
                   const variants = (p.product_variants ?? []).filter((v) => v.is_active);
+                  const comboDefaults = comboDrafts[p.id] ?? Object.fromEntries((p.combo_items ?? []).flatMap((item) => {
+                    const first = item.products?.product_variants.find((variant) => variant.is_active);
+                    return first ? [[item.id, first.id]] : [];
+                  }));
                   const thumb = [...(p.product_images ?? [])].sort(
                     (a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0),
                   )[0]?.url;
@@ -444,7 +492,7 @@ function CreateOrderPage() {
                             type="button"
                             size="sm"
                             variant="outline"
-                            onClick={() => addLine(p, null)}
+                            onClick={() => addLine(p, null, comboDefaults)}
                           >
                             <Plus className="size-4" />
                             Add
@@ -464,6 +512,33 @@ function CreateOrderPage() {
                           </div>
                         )}
                       </div>
+                      {(p.combo_items ?? []).some((item) => item.products?.product_variants.some((variant) => variant.is_active)) ? (
+                        <div className="mt-2 grid gap-2 border-t border-border/70 pt-2 sm:grid-cols-2">
+                          {(p.combo_items ?? []).map((comboItem) => {
+                            const child = comboItem.products;
+                            const options = child?.product_variants.filter((variant) => variant.is_active) ?? [];
+                            if (!child || options.length === 0) return null;
+                            return (
+                              <label key={comboItem.id} className="text-xs font-semibold">
+                                {comboItem.label_bn || child.name_bn}
+                                <select
+                                  className="mt-1 w-full rounded-lg border border-border bg-background px-2 py-1.5"
+                                  defaultValue={options[0]?.id}
+                                  value={comboDefaults[comboItem.id] ?? options[0]?.id}
+                                  onChange={(event) => setComboDrafts((current) => ({
+                                    ...current,
+                                    [p.id]: { ...comboDefaults, [comboItem.id]: event.target.value },
+                                  }))}
+                                >
+                                  {options.map((option) => (
+                                    <option key={option.id} value={option.id}>{option.value_bn}</option>
+                                  ))}
+                                </select>
+                              </label>
+                            );
+                          })}
+                        </div>
+                      ) : null}
                     </li>
                   );
                 })}
@@ -500,6 +575,15 @@ function CreateOrderPage() {
                     <p className="text-xs text-muted-foreground">
                       {l.sku ?? "—"} · {money(l.unitPrice)}
                     </p>
+                    {l.comboSelections.length > 0 ? (
+                      <ul className="mt-1 space-y-0.5 text-xs text-muted-foreground">
+                        {l.comboSelections.map((selection) => (
+                          <li key={`${selection.itemId}-${selection.variantId}`}>
+                            {selection.itemNameBn} · {selection.variantLabelBn}
+                          </li>
+                        ))}
+                      </ul>
+                    ) : null}
                   </div>
                   <input
                     type="number"

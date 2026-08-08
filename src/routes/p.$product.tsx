@@ -147,6 +147,11 @@ function ProductPage() {
     Route.useLoaderData() as ProductPageData;
   const [active, setActive] = useState(0);
   const [selected, setSelected] = useState<Record<string, string>>({});
+  const [comboSelected, setComboSelected] = useState<Record<string, string>>(() =>
+    Object.fromEntries(
+      comboItems.flatMap((item) => item.variants[0] ? [[item.id, item.variants[0].id]] : []),
+    ),
+  );
 
   const name = pick(lang, product.nameBn, product.nameEn);
   const off = discountPercent(product.price, product.compareAtPrice);
@@ -349,6 +354,21 @@ function ProductPage() {
                 variantLabelEn: activeVariant
                   ? `${activeVariant.group_name_en}: ${activeVariant.value_en}`
                   : null,
+                comboSelections: comboItems.flatMap((comboItem) => {
+                  const variant = comboItem.variants.find((option) => option.id === comboSelected[comboItem.id]);
+                  return variant
+                    ? [{
+                        itemId: comboItem.itemId,
+                        itemNameBn: comboItem.nameBn,
+                        itemNameEn: comboItem.nameEn,
+                        quantity: comboItem.quantity,
+                        variantId: variant.id,
+                        variantLabelBn: `${variant.groupNameBn}: ${variant.valueBn}`,
+                        variantLabelEn: `${variant.groupNameEn}: ${variant.valueEn}`,
+                        sku: variant.sku,
+                      }]
+                    : [];
+                }),
               }}
             />
 
@@ -373,7 +393,9 @@ function ProductPage() {
           </div>
         </div>
 
-        <ComboContents items={comboItems} />
+        <ComboContents items={comboItems} selected={comboSelected} onSelect={(itemId, variantId) =>
+          setComboSelected((current) => ({ ...current, [itemId]: variantId }))
+        } />
 
         {description ? (
           <div className="mt-10 max-w-3xl">

@@ -210,6 +210,16 @@ export const adminSaveOrderItems = createServerFn({ method: "POST" })
         unit_price: i.unitPrice,
         quantity: i.quantity,
         line_total: i.unitPrice * i.quantity,
+        combo_selections: i.comboSelections.map((selection) => ({
+          item_id: selection.itemId,
+          item_name_bn: selection.itemNameBn,
+          item_name_en: selection.itemNameEn,
+          quantity: selection.quantity,
+          variant_id: selection.variantId,
+          variant_label_bn: selection.variantLabelBn,
+          variant_label_en: selection.variantLabelEn,
+          sku: selection.sku,
+        })),
       })),
     );
     if (ins.error) throw new Error(ins.error.message);

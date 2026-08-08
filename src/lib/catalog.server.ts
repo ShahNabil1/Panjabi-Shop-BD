@@ -188,12 +188,20 @@ export async function fetchSubcategoryPage(categorySlug: string, subcategorySlug
 
 export type ComboContentItem = {
   id: string;
+  itemId: string;
   quantity: number;
   isFree: boolean;
   nameBn: string;
   nameEn: string;
   image: string | null;
-  variantLabels: string[];
+  variants: Array<{
+    id: string;
+    groupNameBn: string;
+    groupNameEn: string;
+    valueBn: string;
+    valueEn: string;
+    sku: string | null;
+  }>;
 };
 
 async function fetchComboContents(
@@ -207,7 +215,7 @@ async function fetchComboContents(
        products!combo_items_item_id_fkey(
          id, name_bn, name_en,
          product_images(url, sort_order),
-         product_variants(group_name_bn, value_bn, is_active, sort_order)
+          product_variants(id, group_name_bn, group_name_en, value_bn, value_en, sku, is_active, sort_order)
        )`,
     )
     .eq("combo_id", comboId)
@@ -215,12 +223,17 @@ async function fetchComboContents(
 
   return (data ?? []).map((row) => {
     const item = row.products as unknown as {
+      id: string;
       name_bn: string;
       name_en: string;
       product_images: Array<{ url: string; sort_order: number }> | null;
       product_variants: Array<{
+        id: string;
         group_name_bn: string;
+        group_name_en: string;
         value_bn: string;
+        value_en: string;
+        sku: string | null;
         is_active: boolean;
         sort_order: number;
       }> | null;
@@ -230,15 +243,23 @@ async function fetchComboContents(
     )[0];
     return {
       id: row.id,
+      itemId: item?.id ?? "",
       quantity: row.quantity,
       isFree: row.is_free,
       nameBn: row.label_bn || item?.name_bn || "",
       nameEn: row.label_en || item?.name_en || item?.name_bn || "",
       image: image?.url ?? null,
-      variantLabels: [...(item?.product_variants ?? [])]
+      variants: [...(item?.product_variants ?? [])]
         .filter((v) => v.is_active)
         .sort((a, b) => a.sort_order - b.sort_order)
-        .map((v) => v.value_bn),
+        .map((v) => ({
+          id: v.id,
+          groupNameBn: v.group_name_bn,
+          groupNameEn: v.group_name_en,
+          valueBn: v.value_bn,
+          valueEn: v.value_en,
+          sku: v.sku,
+        })),
     };
   });
 }
@@ -498,7 +519,7 @@ export async function fetchLandingPage(slug: string) {
     .from("products")
     .select(
       `id, slug, name_bn, name_en, short_description_bn, short_description_en,
-       description_bn, description_en, specs, faq, price, compare_at_price, stock, sku, brand,
+       kind, description_bn, description_en, specs, faq, price, compare_at_price, stock, sku, brand,
        rating, review_count,
        product_images(id, url, alt_bn, alt_en, sort_order),
        product_variants(id, group_name_bn, group_name_en, value_bn, value_en, price_delta, stock, sort_order, is_active)`,
@@ -508,6 +529,10 @@ export async function fetchLandingPage(slug: string) {
     .maybeSingle();
 
   if (!product) return null;
+
+  const comboItems = product.kind === "combo"
+    ? await fetchComboContents(db, product.id)
+    : [];
 
   const images = [...(product.product_images ?? [])].sort((a, b) => a.sort_order - b.sort_order);
   const variants = [...(product.product_variants ?? [])]
@@ -563,5 +588,6 @@ export async function fetchLandingPage(slug: string) {
     },
     images,
     variants,
+    comboItems,
   };
 }

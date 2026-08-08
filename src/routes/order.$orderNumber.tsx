@@ -69,6 +69,13 @@ function OrderReceipt() {
                       {" "}
                       × {formatNumber(lang, item.quantity)}
                     </span>
+                    {item.comboSelections.length > 0 ? (
+                      <ul className="mt-1 space-y-0.5 pl-3 text-xs text-muted-foreground">
+                        {item.comboSelections.map((selection, selectionIndex) => (
+                          <li key={selectionIndex}>{selection.itemNameBn} · {selection.variantLabelBn}</li>
+                        ))}
+                      </ul>
+                    ) : null}
                   </span>
                   <span className="shrink-0 font-semibold tabular-nums">
                     {formatPrice(lang, item.lineTotal)}

@@ -20,6 +20,16 @@ export type EditableItem = {
   unitPrice: number;
   quantity: number;
   image?: string | null;
+  comboSelections: Array<{
+    itemId: string;
+    itemNameBn: string;
+    itemNameEn: string;
+    quantity: number;
+    variantId: string;
+    variantLabelBn: string;
+    variantLabelEn: string;
+    sku: string | null;
+  }>;
 };
 
 const money = (n: number) => `৳ ${Number(n || 0).toLocaleString("en-US")}`;
@@ -284,6 +294,7 @@ export function ItemsCard({
                           unitPrice: Number(row.price),
                           quantity: 1,
                           image: row.product_images?.[0]?.url ?? null,
+                          comboSelections: [],
                         },
                       ]);
                       setAdding(false);
@@ -329,6 +340,17 @@ export function ItemsCard({
               <p className="font-mono text-xs text-muted-foreground">
                 {item.sku ?? "no-sku"} · {item.variantLabel ?? "physical"}
               </p>
+              {item.comboSelections.length > 0 ? (
+                <ul className="mt-1.5 space-y-1 rounded-lg bg-muted/60 px-2.5 py-2 text-xs">
+                  {item.comboSelections.map((selection) => (
+                    <li key={`${selection.itemId}-${selection.variantId}`} className="flex flex-wrap gap-x-1">
+                      <span className="font-semibold">{selection.itemNameBn}</span>
+                      <span className="text-muted-foreground">· {selection.variantLabelBn}</span>
+                      {selection.quantity > 1 ? <span className="text-muted-foreground">× {selection.quantity}</span> : null}
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
             </div>
             <Input
               type="number"

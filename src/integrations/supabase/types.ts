@@ -708,6 +708,7 @@ export type Database = {
       }
       order_items: {
         Row: {
+          combo_selections: Json
           created_at: string
           id: string
           line_total: number
@@ -721,6 +722,7 @@ export type Database = {
           variant_label: string | null
         }
         Insert: {
+          combo_selections?: Json
           created_at?: string
           id?: string
           line_total: number
@@ -734,6 +736,7 @@ export type Database = {
           variant_label?: string | null
         }
         Update: {
+          combo_selections?: Json
           created_at?: string
           id?: string
           line_total?: number
