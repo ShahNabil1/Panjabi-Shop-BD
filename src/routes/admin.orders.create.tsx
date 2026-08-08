@@ -173,12 +173,13 @@ function CreateOrderPage() {
     const last = lookup.data;
     if (!last) return;
     setName(last.customer_name);
-    const parts = last.address_line.split(",").map((p) => p.trim());
-    if (parts.length >= 4) {
-      const div = parts[parts.length - 1] ?? "";
-      const dist = parts[parts.length - 2] ?? "";
-      const upa = parts[parts.length - 3] ?? "";
-      setAddress(parts.slice(0, parts.length - 3).join(", "));
+
+    // Prefer the stored structured location columns; fall back to parsing the address line.
+    const hasStructured = last.division && last.district && last.upazila;
+    if (hasStructured) {
+      const div = last.division!;
+      const dist = last.district!;
+      const upa = last.upazila!;
       const dv = BD_DIVISIONS.find((d) => d.bn === div);
       if (dv) {
         setDivision(dv.bn);
@@ -188,9 +189,28 @@ function CreateOrderPage() {
           if (ds.upazilas.some((u) => u.bn === upa)) setUpazila(upa);
         }
       }
-    } else {
       setAddress(last.address_line);
+    } else {
+      const parts = last.address_line.split(",").map((p) => p.trim());
+      if (parts.length >= 4) {
+        const div = parts[parts.length - 1] ?? "";
+        const dist = parts[parts.length - 2] ?? "";
+        const upa = parts[parts.length - 3] ?? "";
+        setAddress(parts.slice(0, parts.length - 3).join(", "));
+        const dv = BD_DIVISIONS.find((d) => d.bn === div);
+        if (dv) {
+          setDivision(dv.bn);
+          const ds = dv.districts.find((d) => d.bn === dist);
+          if (ds) {
+            setDistrict(ds.bn);
+            if (ds.upazilas.some((u) => u.bn === upa)) setUpazila(upa);
+          }
+        }
+      } else {
+        setAddress(last.address_line);
+      }
     }
+
     if (last.note) setNote(last.note);
     toast.success("Previous customer details filled");
   };
