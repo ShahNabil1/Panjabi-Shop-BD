@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 
 import { useLang } from "@/lib/language-context";
-import { discountPercent, formatNumber, formatPrice, pick, toBnDigits, tr } from "@/lib/i18n";
+import { badgeLabel, discountPercent, formatNumber, formatPrice, pick, toBnDigits, tr } from "@/lib/i18n";
 import type { ProductCard as ProductCardData } from "@/lib/supabase-public";
 import { cn } from "@/lib/utils";
 
@@ -52,7 +52,7 @@ export function ProductThumb({
 export function ProductCard({ product }: { product: ProductCardData }) {
   const { lang } = useLang();
   const name = pick(lang, product.nameBn, product.nameEn);
-  const badge = pick(lang, product.badgeBn, product.badgeEn);
+  const badge = badgeLabel(product.badgeBn, product.badgeEn);
   const off = discountPercent(product.price, product.compareAtPrice);
   const soldOut = product.stock <= 0;
 
