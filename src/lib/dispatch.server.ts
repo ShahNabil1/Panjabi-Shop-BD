@@ -637,10 +637,10 @@ export async function dispatchOrder(
   try {
     const partner = await loadPartner(db, provider);
     const items = await loadItems(db, orderId);
-    const note = [order.delivery_note, order.note].filter(Boolean).join(" | ").slice(0, 250);
-    // Pathao: only our own delivery note goes out as special instruction —
-    // never the customer's checkout note.
-    const pathaoInstruction = (order.delivery_note ?? "").trim().slice(0, 250);
+    // Couriers only ever receive our own delivery note — never the
+    // customer's checkout note.
+    const note = (order.delivery_note ?? "").trim().slice(0, 250);
+    const pathaoInstruction = note;
 
     let consignmentId: string | null = null;
     let trackingCode: string | null = null;
