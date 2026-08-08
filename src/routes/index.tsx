@@ -144,7 +144,7 @@ function HomePage() {
             <h2 className="mt-3 text-2xl font-bold tracking-tight text-primary sm:text-3xl">
               Frequently asked questions
             </h2>
-            <p className="mx-auto mt-2 max-w-xl text-sm font-semibold text-muted-foreground sm:whitespace-nowrap">
+            <p className="mx-auto mt-2 max-w-xl text-balance px-2 text-sm font-semibold text-muted-foreground lg:whitespace-nowrap">
               Everything you need to know about shopping, delivery and payments on Upoharkabbo.
             </p>
           </div>
