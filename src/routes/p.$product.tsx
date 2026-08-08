@@ -379,20 +379,22 @@ function ProductPage() {
                 variantLabelEn: activeVariant
                   ? `${activeVariant.group_name_en}: ${activeVariant.value_en}`
                   : null,
-                comboSelections: comboItems.flatMap((comboItem) => {
-                  const variant = comboItem.variants.find((option) => option.id === comboSelected[comboItem.id]);
-                  return variant
-                    ? [{
-                        itemId: comboItem.itemId,
-                        itemNameBn: comboItem.nameBn,
-                        itemNameEn: comboItem.nameEn,
-                        quantity: comboItem.quantity,
-                        variantId: variant.id,
-                        variantLabelBn: `${variant.groupNameBn}: ${variant.valueBn}`,
-                        variantLabelEn: `${variant.groupNameEn}: ${variant.valueEn}`,
-                        sku: variant.sku,
-                      }]
-                    : [];
+                // Every child of the combo travels with the cart line, even the
+                // ones the customer never picks a variant for.
+                comboSelections: comboItems.map((comboItem) => {
+                  const variant =
+                    comboItem.variants.find((option) => option.id === comboSelected[comboItem.id]) ??
+                    comboItem.variants[0];
+                  return {
+                    itemId: comboItem.itemId,
+                    itemNameBn: comboItem.nameBn,
+                    itemNameEn: comboItem.nameEn,
+                    quantity: comboItem.quantity,
+                    variantId: variant?.id ?? null,
+                    variantLabelBn: variant ? `${variant.groupNameBn}: ${variant.valueBn}` : null,
+                    variantLabelEn: variant ? `${variant.groupNameEn}: ${variant.valueEn}` : null,
+                    sku: variant?.sku ?? null,
+                  };
                 }),
               }}
             />

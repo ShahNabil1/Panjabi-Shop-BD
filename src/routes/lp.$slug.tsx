@@ -149,18 +149,20 @@ function LandingPage() {
         variantLabelEn: activeVariant
           ? `${activeVariant.group_name_en}: ${activeVariant.value_en}`
           : null,
-        comboSelections: comboItems.flatMap((comboItem) => {
-          const comboVariant = comboItem.variants.find((option) => option.id === comboSelected[comboItem.id]);
-          return comboVariant ? [{
+        comboSelections: comboItems.map((comboItem) => {
+          const comboVariant =
+            comboItem.variants.find((option) => option.id === comboSelected[comboItem.id]) ??
+            comboItem.variants[0];
+          return {
             itemId: comboItem.itemId,
             itemNameBn: comboItem.nameBn,
             itemNameEn: comboItem.nameEn,
             quantity: comboItem.quantity,
-            variantId: comboVariant.id,
-            variantLabelBn: `${comboVariant.groupNameBn}: ${comboVariant.valueBn}`,
-            variantLabelEn: `${comboVariant.groupNameEn}: ${comboVariant.valueEn}`,
-            sku: comboVariant.sku,
-          }] : [];
+            variantId: comboVariant?.id ?? null,
+            variantLabelBn: comboVariant ? `${comboVariant.groupNameBn}: ${comboVariant.valueBn}` : null,
+            variantLabelEn: comboVariant ? `${comboVariant.groupNameEn}: ${comboVariant.valueEn}` : null,
+            sku: comboVariant?.sku ?? null,
+          };
         }),
       },
     ],
