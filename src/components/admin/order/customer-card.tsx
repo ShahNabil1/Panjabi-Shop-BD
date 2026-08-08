@@ -50,9 +50,16 @@ function PhoneRow({ phone }: { phone: string }) {
 export function CustomerCard({
   order,
   locked = false,
+  courierOptions = [],
+  courier = "",
+  onCourierChange,
 }: {
   order: OrderCustomer;
   locked?: boolean;
+  /** Enabled delivery partner labels (Steadfast / Pathao / CarryBee …). */
+  courierOptions?: string[];
+  courier?: string;
+  onCourierChange?: (value: string) => void;
 }) {
   const qc = useQueryClient();
   const [editing, setEditing] = useState(false);
