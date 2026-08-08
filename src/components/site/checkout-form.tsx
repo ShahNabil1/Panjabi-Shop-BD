@@ -799,11 +799,10 @@ export function CheckoutForm({
                 ) : null}
                 {appliedCode ? (
                   <p className="mt-2 text-xs font-semibold text-emerald-600 animate-fade-in">
-                    {lang === "bn"
-                      ? `কুপন ${appliedCode} প্রয়োগ হয়েছে`
-                      : `Coupon ${appliedCode} applied`}
+                    {`Coupon ${appliedCode} applied`}
                   </p>
                 ) : null}
+
               </div>
             </div>
           </div>
