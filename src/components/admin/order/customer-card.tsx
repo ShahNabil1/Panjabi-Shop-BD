@@ -232,6 +232,14 @@ export function CustomerCard({
           <div className="sm:col-span-2">
             <Value label="Address (village / area / house / road)">{order.address_line}</Value>
           </div>
+          {order.note && order.note.trim() ? (
+            <div className="sm:col-span-2">
+              <p className={labelClass}>Customer note (from checkout)</p>
+              <p className="mt-1 whitespace-pre-wrap rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm font-semibold text-amber-900">
+                {order.note}
+              </p>
+            </div>
+          ) : null}
         </div>
       )}
     </Panel>
