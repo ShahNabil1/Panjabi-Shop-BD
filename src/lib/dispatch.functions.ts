@@ -374,19 +374,26 @@ export type PathaoDeliveryCost = {
   ok: boolean;
   message?: string;
   paid: boolean;
+  provider: "pathao" | "carrybee" | null;
   lines: { label: string; amount: number; negative?: boolean }[];
   total: number;
 };
 
-/** Pathao "Cost of Delivery" breakdown for a single order. */
+/** "Cost of Delivery" breakdown for a single order (Pathao + CarryBee). */
 export const adminPathaoDeliveryCost = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => z.object({ orderId: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }): Promise<PathaoDeliveryCost> => {
     const db = await requireAdmin(context.supabase, context.userId);
-    const { loadPartner, providerKey } = await import("./dispatch.server");
+    const { loadPartner, providerKey, carrybeeCreds } = await import("./dispatch.server");
 
-    const empty: PathaoDeliveryCost = { ok: false, paid: false, lines: [], total: 0 };
+    const empty: PathaoDeliveryCost = {
+      ok: false,
+      paid: false,
+      provider: null,
+      lines: [],
+      total: 0,
+    };
 
     const { data: row } = await db
       .from("orders")
@@ -398,25 +405,34 @@ export const adminPathaoDeliveryCost = createServerFn({ method: "GET" })
       courier_consignment_id: string | null;
     } | null;
     if (!order) return { ...empty, message: "Order not found" };
-    if (providerKey(order.delivery_partner) !== "pathao") {
-      return { ...empty, message: "Only available for Pathao" };
+    const provider = providerKey(order.delivery_partner);
+    if (provider !== "pathao" && provider !== "carrybee") {
+      return { ...empty, message: "Cost breakdown is not available for this courier" };
     }
     if (!order.courier_consignment_id) {
-      return { ...empty, message: "Not sent to Pathao yet" };
+      return { ...empty, message: "Not sent to the courier yet" };
     }
 
     try {
-      const partner = await loadPartner(db, "pathao");
-      const { pathaoToken, pathaoOrderInfo } = await import("./pathao.server");
-      const creds = {
-        client_id: partner.credentials["client_id"]!,
-        client_secret: partner.credentials["client_secret"]!,
-        username: partner.credentials["username"]!,
-        password: partner.credentials["password"]!,
-      };
-      const token = await pathaoToken(creds);
-      const info = await pathaoOrderInfo(creds, token, order.courier_consignment_id);
-      const d = (info["data"] ?? {}) as Record<string, unknown>;
+      const partner = await loadPartner(db, provider);
+      let d: Record<string, unknown> = {};
+
+      if (provider === "pathao") {
+        const { pathaoToken, pathaoOrderInfo } = await import("./pathao.server");
+        const creds = {
+          client_id: partner.credentials["client_id"]!,
+          client_secret: partner.credentials["client_secret"]!,
+          username: partner.credentials["username"]!,
+          password: partner.credentials["password"]!,
+        };
+        const token = await pathaoToken(creds);
+        const info = await pathaoOrderInfo(creds, token, order.courier_consignment_id);
+        d = (info["data"] ?? {}) as Record<string, unknown>;
+      } else {
+        const { carrybeeOrderDetails } = await import("./carrybee.server");
+        d = await carrybeeOrderDetails(carrybeeCreds(partner), order.courier_consignment_id);
+      }
+
       const num = (...keys: string[]) => {
         for (const k of keys) {
           const v = d[k];
@@ -425,13 +441,13 @@ export const adminPathaoDeliveryCost = createServerFn({ method: "GET" })
         return 0;
       };
 
-      const deliveryFee = num("delivery_fee");
-      const codFee = num("cod_fee", "collection_fee");
+      const deliveryFee = num("delivery_fee", "delivery_charge");
+      const codFee = num("cod_fee", "collection_fee", "cod_charge");
       const discount = num("discount");
       const promoDiscount = num("promo_discount");
       const additional = num("additional_charge");
       const compensation = num("compensation_cost", "compensation");
-      const invoiceId = d["invoice_id"];
+      const invoiceId = d["invoice_id"] ?? d["payment_invoice_id"];
       const total =
         deliveryFee + codFee + additional + compensation - discount - promoDiscount;
 
@@ -439,25 +455,29 @@ export const adminPathaoDeliveryCost = createServerFn({ method: "GET" })
         .from("order_consignments")
         .update({ total_cost: total })
         .eq("order_id", data.orderId)
-        .eq("provider", "pathao");
+        .eq("provider", provider);
+
+      const lines = [
+        { label: "Delivery Fee", amount: deliveryFee },
+        { label: "COD Fee", amount: codFee },
+        { label: "Discount", amount: discount, negative: true },
+        { label: "Promo Discount", amount: promoDiscount, negative: true },
+        { label: "Additional Charge", amount: additional },
+        { label: "Compensation Cost", amount: compensation },
+      ].filter((l) => provider === "pathao" || l.amount > 0 || l.label !== "Compensation Cost");
 
       return {
         ok: true,
+        provider,
         paid: Boolean(invoiceId),
         total,
-        lines: [
-          { label: "Delivery Fee", amount: deliveryFee },
-          { label: "COD Fee", amount: codFee },
-          { label: "Discount", amount: discount, negative: true },
-          { label: "Promo Discount", amount: promoDiscount, negative: true },
-          { label: "Additional Charge", amount: additional },
-          { label: "Compensation Cost", amount: compensation },
-        ],
+        lines,
       };
     } catch (error) {
       return { ...empty, message: (error as Error).message };
     }
   });
+
 
 /** Courier states where a CarryBee parcel can still be cancelled (not picked yet). */
 export const CARRYBEE_CANCELLABLE = ["pending", "unknown", "failed", "hold"] as const;
