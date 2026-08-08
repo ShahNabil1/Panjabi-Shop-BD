@@ -231,6 +231,7 @@ export function FulfillmentCard({
   orderStatus: string;
   partner: string | null;
   courierStatus: string | null;
+  courierStatusRaw?: string | null;
   consignmentId: string | null;
   returnConsignmentId?: string | null;
   trackingCode: string | null;
