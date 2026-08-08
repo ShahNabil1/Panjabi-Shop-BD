@@ -370,8 +370,14 @@ export async function dispatchOrder(
       deliveryFee = res.deliveryFee;
       raw = res.raw;
     } else {
-      throw new Error("Carrybee integration is not available yet");
+      const { carrybeeCreateOrder } = await import("./carrybee.server");
+      const payload = await buildCarrybeePayload(db, order, items, partner);
+      const res = await carrybeeCreateOrder(carrybeeCreds(partner), payload);
+      consignmentId = res.consignmentId;
+      rawStatus = res.status;
+      raw = res.raw;
     }
+
 
     const status = normaliseCourierStatus(provider, rawStatus);
 
