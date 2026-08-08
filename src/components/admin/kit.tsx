@@ -109,6 +109,7 @@ export function TextField({
   label,
   value,
   onChange,
+  onBlur,
   hint,
   placeholder,
   type = "text",
@@ -117,6 +118,7 @@ export function TextField({
   label: string;
   value: string;
   onChange: (value: string) => void;
+  onBlur?: () => void;
   hint?: string;
   placeholder?: string;
   type?: string;
@@ -130,6 +132,7 @@ export function TextField({
         value={value}
         placeholder={placeholder ?? ""}
         onChange={(e) => onChange(e.target.value)}
+        onBlur={onBlur}
       />
     </Field>
   );
