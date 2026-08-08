@@ -253,7 +253,14 @@ function InvoicePage() {
             </div>
             {data.discount > 0 ? (
               <div className="flex justify-between">
-                <dt className="text-foreground/70">Discount</dt>
+                <dt className="text-foreground/70">
+                  Discount
+                  {data.couponCode ? (
+                    <span className="ml-1.5 rounded border border-primary/40 bg-primary/10 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-primary">
+                      {data.couponCode}
+                    </span>
+                  ) : null}
+                </dt>
                 <dd className="tabular-nums">− {formatPrice("en", data.discount)}</dd>
               </div>
             ) : null}
