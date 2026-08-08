@@ -284,7 +284,7 @@ export function CheckoutForm({
       }
     } catch {
       setCoupon(null);
-      setCouponError(lang === "bn" ? "কুপন যাচাই করা যায়নি" : "Could not verify the coupon");
+      setCouponError("Could not verify the coupon");
     } finally {
       setCouponPending(false);
       lastCheckedCouponRef.current = code;
