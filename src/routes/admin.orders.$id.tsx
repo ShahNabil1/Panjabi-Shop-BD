@@ -295,17 +295,25 @@ function AdminOrderDetail() {
   const isWeb = (webOrderStatuses as readonly string[]).includes(order.status);
   const isDanger = pending === "hold" || pending === "cancelled";
   /** Once dispatched to a courier the shipment data is frozen. */
-  const dispatchLocked = [
-    "rts",
-    "shipped",
-    "courier_hold",
-    "partial_delivered",
-    "exchange",
-    "delivered",
-    "awaiting_return",
-    "returned",
-    "lost_damaged",
-  ].includes(order.status);
+  /** Cancelled by/after courier entry — the order is final, a new entry is required. */
+  const courierCancelled =
+    order.status === "cancelled" &&
+    Boolean(order.courier_consignment_id || order.courier_sent_at);
+
+  const dispatchLocked =
+    courierCancelled ||
+    [
+      "rts",
+      "shipped",
+      "courier_hold",
+      "partial_delivered",
+      "exchange",
+      "delivered",
+      "awaiting_return",
+      "returned",
+      "lost_damaged",
+    ].includes(order.status);
+
 
   return (
     <div className="space-y-5">
