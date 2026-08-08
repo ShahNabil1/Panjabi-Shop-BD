@@ -409,20 +409,20 @@ export function CheckoutForm({
         {/* Your products */}
         <section>
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <h3 className="font-en text-xl font-extrabold tracking-tight sm:text-2xl">Your Products</h3>
+            <h3 className="font-en text-lg font-extrabold tracking-tight sm:text-xl">Your Products</h3>
             {allowAddMore ? (
               <Link
                 to="/"
-                className="font-en group inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-primary to-pink-500 px-5 py-2.5 text-sm font-extrabold text-primary-foreground shadow-md transition-all duration-300 hover:scale-[1.03] hover:shadow-lg active:scale-95 sm:text-base"
+                className="font-en group inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-primary to-pink-500 px-4 py-2 text-xs font-extrabold text-primary-foreground shadow-md transition-all duration-300 hover:scale-[1.03] hover:shadow-lg active:scale-95 sm:text-sm"
               >
-                <Plus className="h-4 w-4 transition-transform duration-300 group-hover:rotate-90" />
+                <Plus className="h-3.5 w-3.5 transition-transform duration-300 group-hover:rotate-90" />
                 Add Product
               </Link>
             ) : null}
           </div>
 
           <div className="mt-4 overflow-hidden rounded-xl border border-border">
-            <div className="font-en flex items-center justify-between gap-3 bg-secondary/60 px-3 py-3 text-sm font-extrabold uppercase tracking-wide text-foreground sm:px-4 sm:text-base">
+            <div className="font-en flex items-center justify-between gap-3 bg-secondary/60 px-3 py-2.5 text-xs font-extrabold uppercase tracking-wide text-foreground sm:px-4 sm:text-sm">
               <span>Product</span>
               <div className="flex items-center gap-4 sm:gap-5">
                 <span className="text-center">Quantity</span>
