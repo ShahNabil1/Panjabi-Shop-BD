@@ -254,9 +254,10 @@ export function SiteHeader() {
               to="/c/$category"
               params={{ category: c.slug }}
               activeProps={{ className: "text-primary" }}
-              className="whitespace-nowrap text-sm font-medium text-surface-foreground transition-colors hover:text-primary"
+              className="group relative whitespace-nowrap text-sm font-medium text-surface-foreground transition-all duration-200 hover:scale-105 hover:text-primary active:scale-95"
             >
               {pick(lang, c.name_bn, c.name_en)}
+              <span className="absolute -bottom-0.5 left-0 h-0.5 w-0 bg-primary transition-all duration-300 group-hover:w-full" />
             </Link>
           ))}
         </div>
