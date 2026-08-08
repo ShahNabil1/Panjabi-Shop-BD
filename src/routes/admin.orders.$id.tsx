@@ -1,3 +1,4 @@
+import { CopyBadge } from "@/components/admin/copy-badge";
 import { Link, createFileRoute, useNavigate, useParams, useSearch } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
