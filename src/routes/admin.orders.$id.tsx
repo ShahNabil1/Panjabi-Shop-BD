@@ -180,6 +180,7 @@ function AdminOrderDetail() {
   // Pre-select the order's saved courier, else the one marked default in Settings → Delivery.
   useEffect(() => {
     if (defaultPartnerApplied.current || courier) return;
+    if (!data?.order) return; // wait for the order, else the default overrides the saved partner
     if (savedPartner) {
       defaultPartnerApplied.current = true;
       setCourier(savedPartner);
@@ -190,7 +191,8 @@ function AdminOrderDetail() {
     if (!fallback) return;
     defaultPartnerApplied.current = true;
     setCourier(providerLabels[fallback.provider]);
-  }, [activePartners, courier, savedPartner]);
+  }, [activePartners, courier, savedPartner, data?.order]);
+
 
   const courierTemplate =
     activePartners.find((p) => providerLabels[p.provider] === courier)?.note_template ?? "";
@@ -293,17 +295,25 @@ function AdminOrderDetail() {
   const isWeb = (webOrderStatuses as readonly string[]).includes(order.status);
   const isDanger = pending === "hold" || pending === "cancelled";
   /** Once dispatched to a courier the shipment data is frozen. */
-  const dispatchLocked = [
-    "rts",
-    "shipped",
-    "courier_hold",
-    "partial_delivered",
-    "exchange",
-    "delivered",
-    "awaiting_return",
-    "returned",
-    "lost_damaged",
-  ].includes(order.status);
+  /** Cancelled by/after courier entry — the order is final, a new entry is required. */
+  const courierCancelled =
+    order.status === "cancelled" &&
+    Boolean(order.courier_consignment_id || order.courier_sent_at);
+
+  const dispatchLocked =
+    courierCancelled ||
+    [
+      "rts",
+      "shipped",
+      "courier_hold",
+      "partial_delivered",
+      "exchange",
+      "delivered",
+      "awaiting_return",
+      "returned",
+      "lost_damaged",
+    ].includes(order.status);
+
 
   return (
     <div className="space-y-5">
@@ -360,6 +370,12 @@ function AdminOrderDetail() {
 
           <div className="flex flex-wrap items-center gap-2">
             <StatusPill status={order.status} />
+            {courierCancelled ? (
+              <span className="inline-flex items-center gap-1.5 rounded-xl border border-rose-200 bg-rose-50 px-3 py-1.5 text-xs font-semibold text-rose-800">
+                <X className="size-3.5" />
+                Cancelled at courier — locked. Create a new order to reship.
+              </span>
+            ) : (
             <Select
               {...(pending ? { value: pending } : {})}
               onValueChange={(v) => {
@@ -381,6 +397,7 @@ function AdminOrderDetail() {
                 ))}
               </SelectContent>
             </Select>
+            )}
             {pending ? (
               <button
                 aria-label="Clear"
@@ -510,7 +527,7 @@ function AdminOrderDetail() {
           </div>
         ) : null}
 
-        {isWeb ? (
+        {isWeb && !courierCancelled ? (
           <>
             <Button
               size="lg"
