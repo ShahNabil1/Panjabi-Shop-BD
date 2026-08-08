@@ -815,60 +815,64 @@ function CreateOrderPage() {
               </label>
 
 
-              <label className="block">
-                <Label>Delivery partner</Label>
-                <select
-                  className={input}
-                  value={deliveryPartner}
-                  onChange={(e) => applyPartner(e.target.value)}
-                  disabled={activePartners.isLoading}
-                >
-                  <option value="">Not selected</option>
-                  {partnerOptions.map((p) => (
-                    <option key={p.provider} value={providerLabels[p.provider]}>
-                      {providerLabels[p.provider]}
-                      {p.isDefault ? " (default)" : ""}
-                    </option>
-                  ))}
-                </select>
-                {!activePartners.isLoading && partnerOptions.length === 0 ? (
-                  <span className="mt-1 block text-xs font-semibold text-muted-foreground">
-                    No delivery partner is enabled yet — add one in Settings → Delivery.
-                  </span>
-                ) : null}
-              </label>
+              {mode === "approved" ? (
+                <>
+                  <label className="block">
+                    <Label>Delivery partner</Label>
+                    <select
+                      className={input}
+                      value={deliveryPartner}
+                      onChange={(e) => applyPartner(e.target.value)}
+                      disabled={activePartners.isLoading}
+                    >
+                      <option value="">Not selected</option>
+                      {partnerOptions.map((p) => (
+                        <option key={p.provider} value={providerLabels[p.provider]}>
+                          {providerLabels[p.provider]}
+                          {p.isDefault ? " (default)" : ""}
+                        </option>
+                      ))}
+                    </select>
+                    {!activePartners.isLoading && partnerOptions.length === 0 ? (
+                      <span className="mt-1 block text-xs font-semibold text-muted-foreground">
+                        No delivery partner is enabled yet — add one in Settings → Delivery.
+                      </span>
+                    ) : null}
+                  </label>
 
-              <div className="sm:col-span-2">
-                <label className="flex cursor-pointer items-center gap-2 text-sm font-semibold">
-                  <input
-                    type="checkbox"
-                    className="size-4 accent-primary"
-                    checked={deliveryNoteOn}
-                    onChange={(e) => {
-                      const on = e.target.checked;
-                      setDeliveryNoteOn(on);
-                      if (!on) setDeliveryNote("");
-                      else {
-                        const match = partnerOptions.find(
-                          (p) => providerLabels[p.provider] === deliveryPartner,
-                        );
-                        setDeliveryNote(match?.noteTemplate ?? "");
-                      }
-                    }}
-                  />
-                  Add delivery note
-                </label>
-                {deliveryNoteOn ? (
-                  <textarea
-                    rows={3}
-                    maxLength={500}
-                    className={cn(input, "mt-2 h-auto py-2")}
-                    placeholder="Sent to the courier as special instruction"
-                    value={deliveryNote}
-                    onChange={(e) => setDeliveryNote(e.target.value)}
-                  />
-                ) : null}
-              </div>
+                  <div className="sm:col-span-2">
+                    <label className="flex cursor-pointer items-center gap-2 text-sm font-semibold">
+                      <input
+                        type="checkbox"
+                        className="size-4 accent-primary"
+                        checked={deliveryNoteOn}
+                        onChange={(e) => {
+                          const on = e.target.checked;
+                          setDeliveryNoteOn(on);
+                          if (!on) setDeliveryNote("");
+                          else {
+                            const match = partnerOptions.find(
+                              (p) => providerLabels[p.provider] === deliveryPartner,
+                            );
+                            setDeliveryNote(match?.noteTemplate ?? "");
+                          }
+                        }}
+                      />
+                      Add delivery note
+                    </label>
+                    {deliveryNoteOn ? (
+                      <textarea
+                        rows={3}
+                        maxLength={500}
+                        className={cn(input, "mt-2 h-auto py-2")}
+                        placeholder="Sent to the courier as special instruction"
+                        value={deliveryNote}
+                        onChange={(e) => setDeliveryNote(e.target.value)}
+                      />
+                    ) : null}
+                  </div>
+                </>
+              ) : null}
             </div>
 
             <Button
@@ -880,11 +884,13 @@ function CreateOrderPage() {
               {create.isPending ? "Creating…" : "Create order"}
             </Button>
             <p className="mt-2 text-center text-xs text-muted-foreground">
-              {preOrder
-                ? "This order will be created with the Pre-Order status."
-                : scheduleOn && scheduledFor
-                  ? "This order will stay in Scheduled Order and move to Processing automatically on the chosen date."
-                  : "New orders are created with the Pending status."}
+              {mode === "approved"
+                ? "Approved orders go straight to Order List → Pending."
+                : preOrder
+                  ? "This order will be created with the Pre-Order status."
+                  : scheduleOn && scheduledFor
+                    ? "This order will stay in Scheduled Order and move to Processing automatically on the chosen date."
+                    : "Manual orders go to Web Orders → Processing."}
             </p>
           </Panel>
         </div>
