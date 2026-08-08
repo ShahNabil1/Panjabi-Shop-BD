@@ -534,13 +534,26 @@ export async function dispatchOrder(
       deliveryFee = res.deliveryFee;
       raw = res.raw;
     } else {
-      const { carrybeeCreateOrder } = await import("./carrybee.server");
+      const { carrybeeCreateOrder, carrybeeCreateExchange } = await import("./carrybee.server");
       const payload = await buildCarrybeePayload(db, order, items, partner);
-      const res = await carrybeeCreateOrder(carrybeeCreds(partner), payload);
+      const isExchange = (order.source ?? "").toLowerCase() === "exchange";
+      let res;
+      if (isExchange) {
+        const sourceCid = await findExchangeSourceConsignment(db, order);
+        if (!sourceCid) {
+          throw new Error(
+            "CarryBee exchange needs an earlier CarryBee order for this phone that was delivered — none found",
+          );
+        }
+        res = await carrybeeCreateExchange(carrybeeCreds(partner), sourceCid, payload);
+      } else {
+        res = await carrybeeCreateOrder(carrybeeCreds(partner), payload);
+      }
       consignmentId = res.consignmentId;
       rawStatus = res.status;
       raw = res.raw;
     }
+
 
 
     const status = normaliseCourierStatus(provider, rawStatus);
