@@ -134,7 +134,19 @@ function HomePage() {
       </Section>
 
       {data.faqs.length > 0 ? (
-        <Section title={tr(lang, "faq")}>
+        <Section>
+          <div className="mb-8 text-center">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-[11px] font-bold uppercase tracking-widest text-primary">
+              <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+              Help Center
+            </span>
+            <h2 className="mt-3 text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+              Frequently asked questions
+            </h2>
+            <p className="mx-auto mt-2 max-w-xl text-sm text-muted-foreground">
+              Everything you need to know about shopping, delivery and payments on Upoharkabbo.
+            </p>
+          </div>
           <FaqList items={data.faqs} />
         </Section>
       ) : null}
