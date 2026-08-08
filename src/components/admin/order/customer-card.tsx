@@ -23,6 +23,7 @@ export type OrderCustomer = {
   district: string | null;
   upazila: string | null;
   address_line: string;
+  note?: string | null;
 };
 
 const labelClass =
