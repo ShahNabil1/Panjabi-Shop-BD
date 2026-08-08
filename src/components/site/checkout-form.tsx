@@ -141,39 +141,51 @@ export function CheckoutForm({
   const snapshot = useRef({ name, phone, address, division, district, upazila, note, items, source });
   snapshot.current = { name, phone, address, division, district, upazila, note, items, source };
 
-  useEffect(() => {
-    const flush = () => {
-      const s = snapshot.current;
-      if (placedRef.current) return;
-      if (!/^01[3-9]\d{8}$/.test(s.phone.trim())) return;
-      if (!s.items.length) return;
-      const key = `${s.phone.trim()}|${s.items.map((i) => `${i.productId}:${i.variantId ?? ""}:${i.comboSelections.map((selection) => selection.variantId).join("+")}:${i.quantity}`).join(",")}|${s.name}|${s.address}`;
-      if (capturedRef.current === key) return;
-      capturedRef.current = key;
-      void captureIncompleteOrder({
-        data: {
-          customerPhone: s.phone.trim(),
-          customerName: s.name.trim(),
-          addressLine: s.address.trim(),
-          division: s.division,
-          district: s.district,
-          upazila: s.upazila,
-          note: s.note.trim(),
-          source: s.source,
-          items: s.items.map((i) => ({
-            productId: i.productId,
-            variantId: i.variantId,
-            quantity: i.quantity,
-            comboSelections: i.comboSelections.map((selection) => ({
-              itemId: selection.itemId,
-              variantId: selection.variantId,
-              quantity: selection.quantity,
-            })),
+  const flushRef = useRef<() => void>(() => {});
+  flushRef.current = () => {
+    const s = snapshot.current;
+    if (placedRef.current) return;
+    if (!/^01[3-9]\d{8}$/.test(s.phone.trim())) return;
+    if (!s.items.length) return;
+    const key = `${s.phone.trim()}|${s.items.map((i) => `${i.productId}:${i.variantId ?? ""}:${i.comboSelections.map((selection) => selection.variantId).join("+")}:${i.quantity}`).join(",")}|${s.name}|${s.address}`;
+    if (capturedRef.current === key) return;
+    capturedRef.current = key;
+    void captureIncompleteOrder({
+      data: {
+        customerPhone: s.phone.trim(),
+        customerName: s.name.trim(),
+        addressLine: s.address.trim(),
+        division: s.division,
+        district: s.district,
+        upazila: s.upazila,
+        note: s.note.trim(),
+        source: s.source,
+        items: s.items.map((i) => ({
+          productId: i.productId,
+          variantId: i.variantId,
+          quantity: i.quantity,
+          comboSelections: i.comboSelections.map((selection) => ({
+            itemId: selection.itemId,
+            variantId: selection.variantId,
+            quantity: selection.quantity,
           })),
-        },
-      }).catch(() => undefined);
-    };
+        })),
+      },
+    }).catch(() => undefined);
+  };
 
+  // Requests fired during `pagehide` are usually killed with the document, so
+  // the capture also runs proactively a few seconds after the visitor has
+  // typed a valid phone number.
+  useEffect(() => {
+    if (!/^01[3-9]\d{8}$/.test(phone.trim())) return;
+    if (!items.length) return;
+    const timer = window.setTimeout(() => flushRef.current(), 2500);
+    return () => window.clearTimeout(timer);
+  }, [phone, items, name, address, division, district, upazila, note]);
+
+  useEffect(() => {
+    const flush = () => flushRef.current();
     const onHide = () => {
       if (document.visibilityState === "hidden") flush();
     };
@@ -185,6 +197,7 @@ export function CheckoutForm({
       flush();
     };
   }, []);
+
 
   const divisionObj = useMemo(
     () => BD_DIVISIONS.find((d) => d.bn === division) ?? null,
