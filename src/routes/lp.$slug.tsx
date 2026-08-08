@@ -18,6 +18,7 @@ import type { CartItem } from "@/lib/cart-context";
 import { cn } from "@/lib/utils";
 import logoMark from "@/assets/upoharkabbo-logo.png";
 import { ImageLightbox, useLightbox } from "@/components/site/image-lightbox";
+import { pageTitle } from "@/lib/site";
 
 async function retryNetworkRequest<T>(request: () => Promise<T>): Promise<T> {
   const delays = [150, 400];
