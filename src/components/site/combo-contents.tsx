@@ -42,13 +42,16 @@ export function ComboContents({
             key={item.id}
             className="group flex items-center gap-3 rounded-xl border border-border bg-card p-3 transition-shadow duration-300 hover:shadow-[var(--shadow-lift)]"
           >
-            <div className="relative size-16 shrink-0 overflow-hidden rounded-lg bg-secondary">
+            <div
+              className="relative size-16 shrink-0 overflow-hidden rounded-lg bg-secondary"
+              onClick={() => item.image && lightbox.open(galleryImages, galleryImages.findIndex((img) => img.src === item.image))}
+            >
               {item.image ? (
                 <img
                   src={item.image}
                   alt={pick(lang, item.nameBn, item.nameEn)}
                   loading="lazy"
-                  className="size-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  className="size-full cursor-zoom-in object-cover transition-transform duration-500 group-hover:scale-105"
                 />
               ) : (
                 <div className="flex size-full items-center justify-center text-sm font-bold text-muted-foreground/60">
