@@ -29,7 +29,9 @@ export type EditableItem = {
     variantLabelBn: string;
     variantLabelEn: string;
     sku: string | null;
+    image?: string | null;
   }>;
+
 };
 
 const money = (n: number) => `৳ ${Number(n || 0).toLocaleString("en-US")}`;
@@ -347,16 +349,39 @@ export function ItemsCard({
                 {item.sku ?? "no-sku"} · {item.variantLabel ?? "physical"}
               </p>
               {item.comboSelections.length > 0 ? (
-                <ul className="mt-1.5 space-y-1 rounded-lg bg-muted/60 px-2.5 py-2 text-xs">
+                <ul className="mt-1.5 space-y-1.5 rounded-lg bg-muted/60 px-2.5 py-2 text-xs">
                   {item.comboSelections.map((selection) => (
-                    <li key={`${selection.itemId}-${selection.variantId}`} className="flex flex-wrap gap-x-1">
-                      <span className="font-semibold">{selection.itemNameBn}</span>
-                      <span className="text-muted-foreground">· {selection.variantLabelBn}</span>
-                      {selection.quantity > 1 ? <span className="text-muted-foreground">× {selection.quantity}</span> : null}
+                    <li
+                      key={`${selection.itemId}-${selection.variantId}`}
+                      className="flex items-center gap-2"
+                    >
+                      {selection.image ? (
+                        <img
+                          src={selection.image}
+                          alt=""
+                          loading="lazy"
+                          className="size-8 shrink-0 rounded-md object-cover ring-1 ring-border"
+                        />
+                      ) : (
+                        <span className="size-8 shrink-0 rounded-md bg-muted ring-1 ring-border" />
+                      )}
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate">
+                          <span className="font-semibold">{selection.itemNameBn}</span>
+                          <span className="text-muted-foreground"> · {selection.variantLabelBn}</span>
+                          {selection.quantity > 1 ? (
+                            <span className="text-muted-foreground"> × {selection.quantity}</span>
+                          ) : null}
+                        </span>
+                        <span className="block font-mono text-[11px] text-muted-foreground">
+                          {selection.sku ?? "no-sku"}
+                        </span>
+                      </span>
                     </li>
                   ))}
                 </ul>
               ) : null}
+
             </div>
             <Input
               type="number"
