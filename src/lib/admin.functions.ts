@@ -802,8 +802,7 @@ export const adminCreateOrder = createServerFn({ method: "POST" })
       ]),
     ];
 
-    const comboProductIds = [...new Set(data.items.flatMap((item) => item.comboSelections.map((selection) => selection.itemId)))];
-    const [productsRes, variantsRes, comboProductsRes] = await Promise.all([
+    const [productsRes, variantsRes] = await Promise.all([
       db.from("products").select("id, slug, name_bn, price, sku").in("id", productIds),
       variantIds.length
         ? db
@@ -811,14 +810,10 @@ export const adminCreateOrder = createServerFn({ method: "POST" })
             .select("id, product_id, group_name_bn, group_name_en, value_bn, value_en, sku, price_delta")
             .in("id", variantIds)
         : Promise.resolve({ data: [], error: null }),
-      comboProductIds.length
-        ? db.from("products").select("id, name_bn, name_en").in("id", comboProductIds)
-        : Promise.resolve({ data: [], error: null }),
     ]);
     if (productsRes.error) throw new Error(productsRes.error.message);
 
     const products = productsRes.data ?? [];
-    const comboProducts = comboProductsRes.data ?? [];
     const variants = (variantsRes.data ?? []) as Array<{
       id: string;
       product_id: string;
@@ -830,30 +825,22 @@ export const adminCreateOrder = createServerFn({ method: "POST" })
       price_delta: number | string;
     }>;
 
+    const { loadComboChildren, buildComboSelections } = await import("./combo-selections.server");
+    const comboChildren = await loadComboChildren(db, productIds);
+
     const lines = data.items.map((item) => {
       const product = products.find((p) => p.id === item.productId);
       if (!product) throw new Error("Product not found");
       const variant = item.variantId ? variants.find((v) => v.id === item.variantId) : null;
       const unitPrice = item.unitPrice;
-      const comboSelections = item.comboSelections.map((selection) => {
-        const childVariant = variants.find(
-          (candidate) => candidate.id === selection.variantId && candidate.product_id === selection.itemId,
-        );
-        const childProduct = comboProducts.find((candidate) => candidate.id === selection.itemId);
-        if (!childVariant || !childProduct) throw new Error("Combo variant not found");
-        return {
-          item_id: selection.itemId,
-          item_name_bn: childProduct.name_bn,
-          item_name_en: childProduct.name_en,
-          quantity: selection.quantity,
-          variant_id: childVariant.id,
-          variant_label_bn: `${childVariant.group_name_bn}: ${childVariant.value_bn}`,
-          variant_label_en: `${childVariant.group_name_en}: ${childVariant.value_en}`,
-          sku: childVariant.sku,
-        };
-      });
+      const comboSelections = buildComboSelections(
+        comboChildren.get(product.id),
+        item.comboSelections as never,
+        variants as never,
+      );
       return { product, variant, quantity: item.quantity, unitPrice, lineTotal: unitPrice * item.quantity, comboSelections };
     });
+
 
     const subtotal = lines.reduce((sum, l) => sum + l.lineTotal, 0);
     const total = Math.max(0, subtotal + data.deliveryCharge - data.discount);

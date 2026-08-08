@@ -444,7 +444,7 @@ export const orderItemsSchema = z.object({
           itemNameBn: z.string().trim().max(200),
           itemNameEn: z.string().trim().max(200),
           quantity: z.number().int().min(1).max(99),
-          variantId: uuid,
+          variantId: uuid.nullable().default(null),
           variantLabelBn: z.string().trim().max(200),
           variantLabelEn: z.string().trim().max(200),
           sku: z.string().trim().max(120).nullable(),
