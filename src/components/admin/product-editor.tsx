@@ -382,7 +382,7 @@ export function ProductEditor({ id, kind }: { id: string; kind: ProductKind }) {
         </div>
 
         {isComponent ? null : (
-          <div className="mt-5 grid gap-4 sm:grid-cols-2">
+          <div className="mt-5">
             <AreaField
               label="Short description"
               rows={3}
@@ -393,14 +393,6 @@ export function ProductEditor({ id, kind }: { id: string; kind: ProductKind }) {
                   short_description_bn: v || null,
                   short_description_en: v || null,
                 }))
-              }
-            />
-            <AreaField
-              label="Full description"
-              rows={7}
-              value={draft.description_bn ?? ""}
-              onChange={(v) =>
-                setDraft((d) => ({ ...d, description_bn: v || null, description_en: v || null }))
               }
             />
           </div>
