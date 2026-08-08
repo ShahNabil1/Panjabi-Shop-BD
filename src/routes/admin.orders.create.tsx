@@ -664,19 +664,33 @@ function CreateOrderPage() {
 
         <div className="space-y-5">
           {/* Creation mode: Manual → Web Orders/Processing, Approved → Order List/Pending. */}
-          <div className="grid grid-cols-2 gap-1 rounded-xl border border-border bg-muted/40 p-1 shadow-sm">
+          <div className="grid grid-cols-2 gap-1.5 rounded-xl border border-border bg-muted/40 p-1.5 shadow-sm">
             {(["manual", "approved"] as const).map((m) => (
               <button
                 key={m}
                 type="button"
                 onClick={() => setMode(m)}
                 className={cn(
-                  "rounded-lg px-3 py-2 text-xs font-bold capitalize transition-all duration-200",
+                  "flex items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-xs font-bold capitalize transition-all duration-200",
                   mode === m
-                    ? "bg-card text-foreground shadow"
-                    : "text-muted-foreground hover:text-foreground",
+                    ? m === "manual"
+                      ? "bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-md shadow-amber-500/30 ring-1 ring-amber-400/50"
+                      : "bg-gradient-to-r from-emerald-500 to-green-600 text-white shadow-md shadow-emerald-500/30 ring-1 ring-emerald-400/50"
+                    : m === "manual"
+                      ? "text-amber-700 hover:bg-amber-500/10 dark:text-amber-400"
+                      : "text-emerald-700 hover:bg-emerald-500/10 dark:text-emerald-400",
                 )}
               >
+                <span
+                  className={cn(
+                    "size-1.5 rounded-full",
+                    mode === m
+                      ? "bg-white"
+                      : m === "manual"
+                        ? "bg-amber-500"
+                        : "bg-emerald-500",
+                  )}
+                />
                 {m}
               </button>
             ))}
