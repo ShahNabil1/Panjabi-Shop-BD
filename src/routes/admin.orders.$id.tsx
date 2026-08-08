@@ -527,7 +527,7 @@ function AdminOrderDetail() {
           </div>
         ) : null}
 
-        {isWeb ? (
+        {isWeb && !courierCancelled ? (
           <>
             <Button
               size="lg"
