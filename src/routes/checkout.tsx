@@ -33,9 +33,9 @@ export const Route = createFileRoute("/checkout")({
       { name: "robots", content: "noindex" },
       { property: "og:title", content: "চেকআউট | উপহারকাব্য" },
       { property: "og:description", content: "ক্যাশ অন ডেলিভারিতে অর্ডার সম্পন্ন করুন।" },
-      { property: "og:url", content: "https://upoharkabbo.lovable.app/checkout" },
+      { property: "og:url", content: `${SITE_URL}/checkout` },
     ],
-    links: [{ rel: "canonical", href: "https://upoharkabbo.lovable.app/checkout" }],
+    links: [{ rel: "canonical", href: `${SITE_URL}/checkout` }],
   }),
 });
 
