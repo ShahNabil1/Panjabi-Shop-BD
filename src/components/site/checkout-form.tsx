@@ -259,9 +259,8 @@ export function CheckoutForm({
     }
     if (!COUPON_CODE_RE.test(code)) {
       setCoupon(null);
-      setCouponError(
-        lang === "bn" ? "কুপনটি ভ্যালিড না" : "This coupon is not valid",
-      );
+      setCouponError("This coupon is not valid");
+
       lastCheckedCouponRef.current = code;
       return;
     }
