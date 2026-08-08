@@ -312,6 +312,21 @@ export async function fetchProduct(slug: string) {
       : Promise.resolve([] as ComboContentItem[]),
   ]);
 
+  // Same-category picks first; top up with other products so suggestions are never empty.
+  let relatedRows = [...(relatedRes.data ?? [])];
+  if (relatedRows.length < 4) {
+    const exclude = [product.id, ...relatedRows.map((r: any) => r.id)];
+    const { data: fillers } = await db
+      .from("products")
+      .select(PRODUCT_CARD_SELECT)
+      .eq("is_active", true)
+      .neq("kind", "component")
+      .not("id", "in", `(${exclude.join(",")})`)
+      .order("sort_order")
+      .limit(4 - relatedRows.length);
+    relatedRows = [...relatedRows, ...(fillers ?? [])];
+  }
+
   const images = [...(product.product_images ?? [])].sort((a, b) => a.sort_order - b.sort_order);
   const variants = [...(product.product_variants ?? [])]
     .filter((v) => v.is_active)
