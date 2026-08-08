@@ -9,6 +9,7 @@ export type CategoryRow = {
   meta_title: string | null;
   meta_description: string | null;
   sort_order: number;
+  is_active: boolean;
 };
 
 export type SubcategoryRow = {
@@ -23,6 +24,7 @@ export type SubcategoryRow = {
   meta_title: string | null;
   meta_description: string | null;
   sort_order: number;
+  is_active: boolean;
 };
 
 export type CategoryWithSubs = CategoryRow & { subcategories: SubcategoryRow[] };
