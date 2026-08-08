@@ -317,20 +317,11 @@ export function OrdersBoard({
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="text-[15px] font-bold text-foreground">{o.customer_name}</span>
                     <StatusPill status={o.status} />
-                    <span className="rounded-md bg-muted px-1.5 py-0.5 font-mono text-xs text-muted-foreground">
-                      {o.order_number}
-                    </span>
+                    <CopyBadge value={o.order_number} />
                     <PhoneActions phone={o.customer_phone} size="sm" />
 
-                    {ratios?.[o.customer_phone] !== undefined ? (
-                      <span
-                        className={cn(
-                          "rounded-full px-2 py-0.5 text-xs font-bold ring-1 tabular-nums",
-                          ratioTone(ratios[o.customer_phone] as number),
-                        )}
-                      >
-                        {ratios[o.customer_phone]}%
-                      </span>
+                    {ratios?.[o.customer_phone] ? (
+                      <RatioBadge data={ratios[o.customer_phone]!} />
                     ) : null}
                     {(o as { delivery_partner?: string | null }).delivery_partner ? (
                       <CourierBadge
