@@ -526,29 +526,15 @@ function AdminOrderDetail() {
                   </DialogDescription>
                 </DialogHeader>
 
-                <div className="space-y-1.5">
+                <div className="flex items-center justify-between gap-3 rounded-xl border border-border bg-muted/40 px-3 py-2">
                   <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground">
                     Delivery partner
                   </p>
-                  {activePartners.length === 0 ? (
-                    <p className="rounded-lg bg-amber-50 px-3 py-2 text-xs font-medium text-amber-800">
-                      No delivery partner saved yet. Add one in Settings → Delivery Settings.
-                    </p>
-                  ) : (
-                    <Select value={courier} onValueChange={setCourier}>
-                      <SelectTrigger className="h-10 rounded-xl border-border bg-background text-sm font-semibold">
-                        <SelectValue placeholder="Select where this order will be shipped" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {activePartners.map((p) => (
-                          <SelectItem key={p.provider} value={providerLabels[p.provider]}>
-                            {providerLabels[p.provider]}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  )}
+                  <p className="text-sm font-bold">
+                    {courier || "Not selected — pick it in Customer & Delivery"}
+                  </p>
                 </div>
+
 
                 {autoSmsEnabled ? (
                   <div className="rounded-xl border border-border bg-muted/40 p-3">
