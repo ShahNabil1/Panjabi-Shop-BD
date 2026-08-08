@@ -23,34 +23,21 @@ export function BrandLoader({
   fullScreen,
   showProgress = true,
 }: BrandLoaderProps) {
-  const [progress, setProgress] = useState(0);
+  // Ease-out progress that starts moving immediately and settles near 95%,
+  // so the loader never sits at 0% or snaps back to zero while waiting.
+  const [progress, setProgress] = useState(8);
 
   useEffect(() => {
     if (!showProgress) return;
-    let raf = 0;
-    const duration = 2200;
-
-    const loop = () => {
-      const start = Date.now();
-      const tick = () => {
-        const elapsed = Date.now() - start;
-        const pct = Math.min(100, Math.round((elapsed / duration) * 100));
-        setProgress(pct);
-        if (pct < 100) {
-          raf = requestAnimationFrame(tick);
-        } else {
-          setTimeout(() => {
-            setProgress(0);
-            raf = requestAnimationFrame(loop);
-          }, 260);
-        }
-      };
-      raf = requestAnimationFrame(tick);
-    };
-
-    loop();
-    return () => cancelAnimationFrame(raf);
+    const start = Date.now();
+    const id = window.setInterval(() => {
+      const elapsed = Date.now() - start;
+      const pct = 95 - 87 * Math.exp(-elapsed / 900);
+      setProgress(Math.round(pct));
+    }, 120);
+    return () => window.clearInterval(id);
   }, [showProgress]);
+
 
   const wrapper = (
     <div className={cn("flex flex-col items-center justify-center gap-5", className)}>
