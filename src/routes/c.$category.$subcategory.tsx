@@ -23,7 +23,7 @@ export const Route = createFileRoute("/c/$category/$subcategory")({
     }
     const s = loaderData.subcategory;
     const c = loaderData.category;
-    const title = s.meta_title || `${s.name_bn} — ${c.name_bn} | ${s.name_en}`;
+    const title = s.meta_title || pageTitle(`${s.name_bn} — ${c.name_bn}`);
     const description =
       s.meta_description ||
       s.description_bn ||
