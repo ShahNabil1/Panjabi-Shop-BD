@@ -103,6 +103,7 @@ export function SiteHeader() {
   const [open, setOpen] = useState(false);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const isLanding = pathname.startsWith("/lp/");
+  const isCheckout = pathname === "/checkout";
 
   useEffect(() => {
     if (typeof document === "undefined") return;
