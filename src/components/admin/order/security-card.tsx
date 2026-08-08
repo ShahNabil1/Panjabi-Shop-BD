@@ -326,19 +326,18 @@ export function FulfillmentCard({
         : isSteadfast
           ? `https://steadfast.com.bd/user/consignment/${encodeURIComponent(consignmentId)}`
           : null;
-  const publicTrackingUrl = isSteadfast
-    ? trackingCode
-      ? `https://steadfast.com.bd/t/${encodeURIComponent(trackingCode)}`
-      : null
-    : !consignmentId
-      ? null
-      : isPathao
-        ? `https://merchant.pathao.com/tracking?consignment_id=${encodeURIComponent(consignmentId)}${
-            customerPhone ? `&phone=${encodeURIComponent(customerPhone)}` : ""
-          }`
-        : isCarrybee
-          ? `https://merchant.carrybee.com/order-track/${encodeURIComponent(consignmentId)}`
+  const publicTrackingUrl = !consignmentId
+    ? null
+    : isPathao
+      ? `https://merchant.pathao.com/tracking?consignment_id=${encodeURIComponent(consignmentId)}${
+          customerPhone ? `&phone=${encodeURIComponent(customerPhone)}` : ""
+        }`
+      : isCarrybee
+        ? `https://merchant.carrybee.com/order-track/${encodeURIComponent(consignmentId)}`
+        : isSteadfast
+          ? `https://steadfast.com.bd/user/consignment/${encodeURIComponent(consignmentId)}`
           : null;
+
 
 
 
