@@ -4,6 +4,8 @@ import { useLang } from "@/lib/language-context";
 import { pick, tr } from "@/lib/i18n";
 import { useSiteData } from "./site-header";
 import logoMark from "@/assets/upoharkabbo-logo.png";
+import { SOCIAL_LINKS } from "./social-links";
+import { cn } from "@/lib/utils";
 
 export function SiteFooter() {
   const { lang } = useLang();
