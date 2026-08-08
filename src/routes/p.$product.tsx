@@ -303,11 +303,11 @@ function ProductPage() {
 
             <p
               className={cn(
-                "mt-2 text-sm font-medium",
+                "mt-2 font-en text-sm font-medium",
                 product.stock > 0 ? "text-success" : "text-destructive",
               )}
             >
-              {product.stock > 0 ? tr(lang, "inStock") : tr(lang, "outOfStock")}
+              {product.stock > 0 ? "In Stock" : "Out of Stock"}
             </p>
 
             {groups.size > 0 ? (
