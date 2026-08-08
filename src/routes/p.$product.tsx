@@ -1,5 +1,6 @@
 import { Link, createFileRoute, notFound } from "@tanstack/react-router";
 import { useState } from "react";
+import { ArrowRight } from "lucide-react";
 
 import { getProductPage } from "@/lib/catalog.functions";
 import type { ProductPageData } from "@/lib/types";
@@ -433,13 +434,18 @@ function ProductPage() {
       ) : null}
 
       {category ? (
-        <div className="mx-auto max-w-6xl px-4 pb-8">
+        <div className="mx-auto max-w-6xl px-4 pb-10">
           <Link
             to="/c/$category"
             params={{ category: category.slug }}
-            className="text-sm font-semibold text-primary hover:underline"
+            className="group flex items-center justify-between gap-4 rounded-2xl bg-primary px-5 py-4 text-primary-foreground shadow-lg shadow-primary/25 transition-transform hover:scale-[1.02] active:scale-[0.98] sm:px-6"
           >
-            ← {pick(lang, category.name_bn, category.name_en)}
+            <span className="font-solaiman text-lg font-bold leading-snug sm:text-xl">
+              আরও গিফট কম্বো দেখতে
+            </span>
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary-foreground/20 backdrop-blur-sm transition-transform group-hover:translate-x-1 sm:h-11 sm:w-11">
+              <ArrowRight className="h-5 w-5 text-primary-foreground sm:h-6 sm:w-6" />
+            </span>
           </Link>
         </div>
       ) : null}
