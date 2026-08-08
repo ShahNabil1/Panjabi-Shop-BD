@@ -61,24 +61,23 @@ export function CartDrawer() {
         )}
       >
         <header className="flex items-center gap-3 border-b border-border px-4 py-3">
-          <h2 className="min-w-0 flex-1 truncate text-base font-bold">
-            {tr(lang, "cart")}
-            {items.length ? (
-              <span className="ml-1.5 text-sm font-normal text-muted-foreground">
-                ({formatNumber(lang, items.length)})
-              </span>
-            ) : null}
-          </h2>
           <button
             type="button"
             onClick={closeCart}
             aria-label={tr(lang, "close")}
-            className="grid h-9 w-9 shrink-0 place-items-center rounded-sm border border-border transition-colors hover:border-primary hover:text-primary"
+            className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-border bg-card text-foreground transition-all duration-200 hover:scale-105 hover:border-primary hover:text-primary hover:shadow-sm active:scale-95"
           >
-            <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M6 6l12 12M18 6 6 18" strokeLinecap="round" />
+            <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M19 12H5" />
+              <path d="M12 19l-7-7 7-7" />
             </svg>
           </button>
+          <h2 className="min-w-0 flex-1 text-lg font-bold sm:text-xl">
+            {tr(lang, "cart")}
+            <span className="ml-1.5 text-base font-semibold text-primary">
+              ({formatNumber(lang, items.reduce((sum, item) => sum + item.quantity, 0))} items)
+            </span>
+          </h2>
         </header>
 
         {items.length === 0 ? (
