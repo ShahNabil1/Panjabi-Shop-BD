@@ -288,7 +288,10 @@ function AdminLayout() {
                   <button
                     type="button"
                     onClick={(e) =>
-                      toggleSection(section.title, e.currentTarget.closest("div[data-section]"))
+                      toggleSection(
+                        section.title,
+                        e.currentTarget.closest("div[data-section]") as HTMLElement | null,
+                      )
                     }
                     aria-expanded={open}
                     tabIndex={collapsed ? -1 : 0}
