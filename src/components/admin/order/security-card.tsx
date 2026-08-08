@@ -620,6 +620,36 @@ export function FulfillmentCard({
                   </div>
                 ) : null}
               </dl>
+
+              {isCarrybee ? (
+                <div className="flex flex-wrap items-center gap-2 border-t border-dashed border-border pt-2.5">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    loading={resolveAddress.isPending}
+                    onClick={() => resolveAddress.mutate()}
+                    className="active:scale-95"
+                  >
+                    <MapPin className="size-3.5" />
+                    Resolve address
+                  </Button>
+                  {canCancelCarrybee ? (
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      onClick={() => setCancelOpen(true)}
+                      className="active:scale-95"
+                    >
+                      <Ban className="size-3.5" />
+                      Cancel consignment
+                    </Button>
+                  ) : (
+                    <span className="text-[11px] text-muted-foreground">
+                      Already picked up — CarryBee cancellation is closed.
+                    </span>
+                  )}
+                </div>
+              ) : null}
             </div>
           ) : orderStatus === "pending" ? (
             <div className="mt-3 space-y-2">
@@ -633,6 +663,18 @@ export function FulfillmentCard({
                 <Truck className="size-4" />
                 Send to {partner ?? "courier"}
               </Button>
+              {isCarrybee ? (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  loading={resolveAddress.isPending}
+                  onClick={() => resolveAddress.mutate()}
+                  className="ml-2 active:scale-95"
+                >
+                  <MapPin className="size-3.5" />
+                  Resolve address
+                </Button>
+              ) : null}
               {!partner ? (
                 <p className="text-xs text-muted-foreground">
                   Select a delivery partner on this order first.
@@ -640,6 +682,47 @@ export function FulfillmentCard({
               ) : null}
             </div>
           ) : null}
+
+          <Dialog open={cancelOpen} onOpenChange={setCancelOpen}>
+            <DialogContent className="sm:max-w-md">
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2 text-base">
+                  <Ban className="size-4 text-rose-600" />
+                  Cancel CarryBee consignment
+                </DialogTitle>
+                <DialogDescription>
+                  The parcel has not been picked up yet, so CarryBee can still cancel it. A reason
+                  is required and is sent to CarryBee.
+                </DialogDescription>
+              </DialogHeader>
+              <Textarea
+                value={cancelReason}
+                maxLength={199}
+                onChange={(e) => setCancelReason(e.target.value.slice(0, 199))}
+                placeholder="Reason for cancellation…"
+                className="min-h-24"
+              />
+              <p className="text-right text-[11px] text-muted-foreground">
+                {cancelReason.length}/199
+              </p>
+              <div className="flex justify-end gap-2">
+                <Button variant="outline" size="sm" onClick={() => setCancelOpen(false)}>
+                  Keep order
+                </Button>
+                <Button
+                  size="sm"
+                  variant="destructive"
+                  loading={cancelCarrybee.isPending}
+                  disabled={cancelReason.trim().length < 3}
+                  onClick={() => cancelCarrybee.mutate()}
+                >
+                  <Ban className="size-3.5" />
+                  Cancel consignment
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
+
         </div>
       </Panel>
 
