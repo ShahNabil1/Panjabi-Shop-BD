@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 
 export function SiteFooter() {
   const { lang } = useLang();
-  const { brand, tagline, contact } = useSiteData();
+  const { brand, contact } = useSiteData();
   const year = new Date().getFullYear();
 
   return (
