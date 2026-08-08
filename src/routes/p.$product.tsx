@@ -1,5 +1,6 @@
 import { Link, createFileRoute, notFound } from "@tanstack/react-router";
 import { useState } from "react";
+import { ArrowRight } from "lucide-react";
 
 import { getProductPage } from "@/lib/catalog.functions";
 import type { ProductPageData } from "@/lib/types";
