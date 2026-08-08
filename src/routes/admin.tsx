@@ -222,17 +222,16 @@ function AdminLayout() {
 
   const isActive = matches;
   const toggleSection = (title: string, el?: HTMLElement | null) => {
-    let opening = false;
-    setOpenSections((prev) => {
-      opening = !prev.includes(title);
-      return opening ? [...prev, title] : prev.filter((t) => t !== title);
-    });
+    const opening = !openSections.includes(title);
+    setOpenSections((prev) =>
+      prev.includes(title) ? prev.filter((t) => t !== title) : [...prev, title],
+    );
     if (!opening || !el) return;
     // Reveal the newly expanded items — otherwise the last sections stay
     // below the scroll fold and feel unreachable.
     globalThis.setTimeout(() => {
       el.scrollIntoView({ behavior: "smooth", block: "end" });
-    }, 320);
+    }, 420);
   };
 
   const sidebar = (
