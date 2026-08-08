@@ -8,6 +8,7 @@ import { pick, tr } from "@/lib/i18n";
 import { ProductGrid, ProductThumb } from "@/components/site/product-card";
 import { FaqList } from "@/components/site/faq-list";
 import { HeroSlider, readHeroSlides } from "@/components/site/hero-slider";
+import { PromoPopup, readPromoPopup } from "@/components/site/promo-popup";
 
 import { Section } from "@/components/site/ui";
 
@@ -39,9 +40,11 @@ function HomePage() {
   const { lang } = useLang();
   const data = Route.useLoaderData() as HomeData;
   const slides = readHeroSlides(data.settings["hero"]);
+  const popup = readPromoPopup(data.settings["popup"]);
 
   return (
     <>
+      <PromoPopup config={popup} />
       {slides.length > 0 ? (
         <HeroSlider slides={slides} />
       ) : (

@@ -591,3 +591,14 @@
     cursor: pointer;
   }
 }
+
+@keyframes promo-popup-in {
+  from { opacity: 0; transform: scale(0.94) translateY(12px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+@keyframes promo-overlay-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.promo-popup-overlay { animation: promo-overlay-in 200ms ease-out both; }
+.promo-popup-card { animation: promo-popup-in 320ms cubic-bezier(0.16, 1, 0.3, 1) both; }

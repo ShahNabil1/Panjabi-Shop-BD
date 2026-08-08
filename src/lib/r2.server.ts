@@ -51,6 +51,7 @@ const FOLDERS = [
   "promotions",
   "landing",
   "site",
+  "popup",
   "hero",
   "invoices",
 ] as const;

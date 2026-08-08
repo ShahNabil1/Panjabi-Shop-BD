@@ -8,6 +8,7 @@ import { adminListSettings, adminSaveSetting } from "@/lib/admin.functions";
 import { AdminHeading, NumberField, Panel, TextField } from "@/components/admin/kit";
 import { ImageField } from "@/components/admin/image-upload";
 import { MAX_HERO_SLIDES, readHeroSlides, type HeroSlide } from "@/components/site/hero-slider";
+import { readPromoPopup, type PromoPopup } from "@/components/site/promo-popup";
 import { Button } from "@/components/ui/button";
 import { normalizeContactPhoneInput } from "@/lib/phone";
 
@@ -34,6 +35,7 @@ function SettingsAdmin() {
   const [contact, setContact] = useState<Obj>({});
   const [delivery, setDelivery] = useState<Obj>({});
   const [slides, setSlides] = useState<HeroSlide[]>([]);
+  const [popup, setPopup] = useState<PromoPopup>(() => readPromoPopup(undefined));
 
   useEffect(() => {
     if (!data) return;
@@ -43,7 +45,9 @@ function SettingsAdmin() {
     setContact(find("contact"));
     setDelivery(find("delivery"));
     setSlides(readHeroSlides(find("hero") as never));
+    setPopup(readPromoPopup(find("popup") as never));
   }, [data]);
+
 
 
   const save = useMutation({
@@ -176,6 +180,111 @@ function SettingsAdmin() {
             Save
           </Button>
         </div>
+      </Panel>
+
+      <Panel className="space-y-4">
+        <div>
+          <h2 className="ig-text text-sm font-bold">Homepage popup</h2>
+          <p className="mt-1 text-xs text-muted-foreground">
+            A promotional image popup on the homepage. Shown once per visitor session.
+          </p>
+        </div>
+
+        <label className="flex cursor-pointer items-center justify-between gap-4 rounded-xl border border-border/70 bg-background/40 px-3 py-2.5 transition-colors hover:border-primary/30">
+          <span>
+            <span className="ig-text block text-sm font-bold">Enable popup</span>
+            <span className="block text-xs text-muted-foreground">
+              Turn off to hide the popup instantly without deleting the image.
+            </span>
+          </span>
+          <input
+            type="checkbox"
+            role="switch"
+            checked={popup.enabled}
+            onChange={(e) => setPopup({ ...popup, enabled: e.target.checked })}
+            className="peer sr-only"
+          />
+          <span className="relative inline-flex h-6 w-11 shrink-0 items-center rounded-full bg-muted transition-colors duration-200 peer-checked:bg-emerald-500 peer-focus-visible:ring-2 peer-focus-visible:ring-emerald-500/40">
+            <span
+              className={`absolute left-0.5 size-5 rounded-full bg-white shadow transition-transform duration-200 ${
+                popup.enabled ? "translate-x-5" : "translate-x-0"
+              }`}
+            />
+          </span>
+        </label>
+
+        <ImageField
+          label="Popup image"
+          folder="popup"
+          value={popup.url || null}
+          onChange={(url) => setPopup({ ...popup, url: url ?? "" })}
+          hint="Portrait or square works best (e.g. 900×1200)."
+        />
+
+        <div className="grid gap-3 sm:grid-cols-2">
+          <TextField
+            label="Link (optional)"
+            value={popup.link ?? ""}
+            onChange={(v) => setPopup({ ...popup, link: v || null })}
+          />
+          <TextField
+            label="Alt text (optional)"
+            value={popup.alt ?? ""}
+            onChange={(v) => setPopup({ ...popup, alt: v || null })}
+          />
+        </div>
+
+        <div className="grid gap-3 sm:grid-cols-3">
+          <label className="block">
+            <span className="ig-text mb-1.5 block text-xs font-bold">Trigger</span>
+            <select
+              value={popup.trigger}
+              onChange={(e) =>
+                setPopup({ ...popup, trigger: e.target.value as PromoPopup["trigger"] })
+              }
+              className="h-10 w-full cursor-pointer rounded-xl border border-border bg-background px-3 text-sm outline-none transition-colors focus:border-primary/60"
+            >
+              <option value="delay">After delay</option>
+              <option value="scroll">On scroll</option>
+              <option value="both">Both (whichever first)</option>
+            </select>
+          </label>
+          <NumberField
+            label="Delay (seconds)"
+            value={popup.delaySeconds}
+            onChange={(v) => setPopup({ ...popup, delaySeconds: v })}
+          />
+          <NumberField
+            label="Scroll depth (%)"
+            value={popup.scrollPercent}
+            onChange={(v) => setPopup({ ...popup, scrollPercent: v })}
+          />
+        </div>
+
+        <Button
+          loading={save.isPending}
+          onClick={() => {
+            if (popup.enabled && !popup.url.trim()) {
+              toast.error("Upload a popup image first.");
+              return;
+            }
+            save.mutate({
+              key: "popup",
+              value: {
+                enabled: popup.enabled,
+                url: popup.url.trim(),
+                link: popup.link?.trim() || null,
+                alt: popup.alt?.trim() || null,
+                trigger: popup.trigger,
+                delay_seconds: popup.delaySeconds,
+                scroll_percent: popup.scrollPercent,
+              },
+            });
+          }}
+          className="transition-transform duration-200 hover:-translate-y-0.5"
+        >
+          Save
+        </Button>
       </Panel>
 
 
