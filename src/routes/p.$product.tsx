@@ -224,20 +224,17 @@ function ProductPage() {
                     key={img.id}
                     type="button"
                     onClick={() => setActive(i)}
+                    onMouseEnter={() => setActive(i)}
                     aria-label={`${name} ${i + 1}`}
                     className={cn(
-                      "h-16 w-16 shrink-0 overflow-hidden rounded-sm border",
+                      "h-16 w-16 shrink-0 cursor-pointer overflow-hidden rounded-sm border",
                       i === active ? "border-primary" : "border-border",
                     )}
                   >
-                    <ProductThumb
-                      src={img.url}
-                      alt=""
-                      label={name}
-                      onClick={() => lightbox.open(galleryImages, i)}
-                    />
+                    <ProductThumb src={img.url} alt="" label={name} />
                   </button>
                 ))}
+
               </div>
             ) : null}
             <ImageLightbox
