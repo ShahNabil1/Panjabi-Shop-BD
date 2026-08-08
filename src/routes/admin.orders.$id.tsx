@@ -684,6 +684,16 @@ function AdminOrderDetail() {
         orderStatus={order.status}
         partner={order.delivery_partner}
         courierStatus={order.courier_status ?? null}
+        courierStatusRaw={(() => {
+          // The courier's own wording ("Assigned for Pickup"), so the badge shows
+          // the real provider state instead of our coarse internal bucket.
+          const rows = (
+            order as unknown as {
+              order_consignments?: Array<{ status_message?: string | null }>;
+            }
+          ).order_consignments;
+          return rows?.map((r) => r.status_message).find((x) => !!x) ?? null;
+        })()}
         consignmentId={order.courier_consignment_id ?? null}
         trackingCode={order.courier_tracking_code ?? null}
         sentAt={order.courier_sent_at ?? null}
