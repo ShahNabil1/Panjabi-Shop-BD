@@ -174,14 +174,23 @@ function AdminOrderDetail() {
   const [courier, setCourier] = useState("");
   const defaultPartnerApplied = useRef(false);
 
-  // Pre-select the courier marked as default in Settings → Delivery.
+  const savedPartner =
+    (data?.order as { delivery_partner?: string | null } | undefined)?.delivery_partner ?? "";
+
+  // Pre-select the order's saved courier, else the one marked default in Settings → Delivery.
   useEffect(() => {
-    if (defaultPartnerApplied.current || courier || activePartners.length === 0) return;
+    if (defaultPartnerApplied.current || courier) return;
+    if (savedPartner) {
+      defaultPartnerApplied.current = true;
+      setCourier(savedPartner);
+      return;
+    }
+    if (activePartners.length === 0) return;
     const fallback = activePartners.find((p) => p.is_default);
     if (!fallback) return;
     defaultPartnerApplied.current = true;
     setCourier(providerLabels[fallback.provider]);
-  }, [activePartners, courier]);
+  }, [activePartners, courier, savedPartner]);
 
   const courierTemplate =
     activePartners.find((p) => providerLabels[p.provider] === courier)?.note_template ?? "";
@@ -526,29 +535,15 @@ function AdminOrderDetail() {
                   </DialogDescription>
                 </DialogHeader>
 
-                <div className="space-y-1.5">
+                <div className="flex items-center justify-between gap-3 rounded-xl border border-border bg-muted/40 px-3 py-2">
                   <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground">
                     Delivery partner
                   </p>
-                  {activePartners.length === 0 ? (
-                    <p className="rounded-lg bg-amber-50 px-3 py-2 text-xs font-medium text-amber-800">
-                      No delivery partner saved yet. Add one in Settings → Delivery Settings.
-                    </p>
-                  ) : (
-                    <Select value={courier} onValueChange={setCourier}>
-                      <SelectTrigger className="h-10 rounded-xl border-border bg-background text-sm font-semibold">
-                        <SelectValue placeholder="Select where this order will be shipped" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {activePartners.map((p) => (
-                          <SelectItem key={p.provider} value={providerLabels[p.provider]}>
-                            {providerLabels[p.provider]}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  )}
+                  <p className="text-sm font-bold">
+                    {courier || "Not selected — pick it in Customer & Delivery"}
+                  </p>
                 </div>
+
 
                 {autoSmsEnabled ? (
                   <div className="rounded-xl border border-border bg-muted/40 p-3">
@@ -613,7 +608,13 @@ function AdminOrderDetail() {
       {/* Fraud checker directly under the order title */}
       <CourierReport phone={order.customer_phone} />
 
-      <CustomerCard order={order} locked={dispatchLocked} />
+      <CustomerCard
+        order={order}
+        locked={dispatchLocked}
+        courierOptions={activePartners.map((p) => providerLabels[p.provider])}
+        courier={courier || order.delivery_partner || ""}
+        onCourierChange={setCourier}
+      />
 
       <DeliveryNoteCard
         orderId={order.id}

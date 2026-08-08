@@ -1,7 +1,14 @@
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Lock, MapPin, Pencil, Save, X } from "lucide-react";
+import { Lock, MapPin, Pencil, Save, Truck, X } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 import { PhoneActions } from "@/components/admin/phone-actions";
 
@@ -50,9 +57,16 @@ function PhoneRow({ phone }: { phone: string }) {
 export function CustomerCard({
   order,
   locked = false,
+  courierOptions = [],
+  courier = "",
+  onCourierChange,
 }: {
   order: OrderCustomer;
   locked?: boolean;
+  /** Enabled delivery partner labels (Steadfast / Pathao / CarryBee …). */
+  courierOptions?: string[];
+  courier?: string;
+  onCourierChange?: (value: string) => void;
 }) {
   const qc = useQueryClient();
   const [editing, setEditing] = useState(false);
@@ -125,6 +139,49 @@ export function CustomerCard({
           </Button>
         )}
       </div>
+
+      {onCourierChange ? (
+        <div className="rounded-2xl border border-primary/20 bg-primary/[0.04] p-3 sm:p-4">
+          <div className="flex flex-wrap items-center gap-3 sm:flex-nowrap">
+            <div className="flex min-w-0 items-center gap-2">
+              <span className="inline-flex size-8 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                <Truck className="size-4" />
+              </span>
+              <div className="min-w-0">
+                <p className={labelClass}>Delivery partner</p>
+                <p className="text-xs text-muted-foreground">
+                  {locked ? "Locked — already dispatched" : "Used when this order is sent to courier"}
+                </p>
+              </div>
+            </div>
+            <div className="ms-auto w-full sm:w-64">
+              {courierOptions.length === 0 ? (
+                <p className="rounded-xl bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-800">
+                  No delivery partner saved yet — add one in Settings → Delivery Settings.
+                </p>
+              ) : (
+                <Select
+                  value={courier}
+                  onValueChange={onCourierChange}
+                  disabled={locked}
+                >
+                  <SelectTrigger className="h-10 w-full rounded-xl border-primary/25 bg-background text-sm font-bold">
+                    <SelectValue placeholder="Select delivery partner" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {courierOptions.map((label) => (
+                      <SelectItem key={label} value={label}>
+                        {label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            </div>
+          </div>
+        </div>
+      ) : null}
+
 
       {editing && !locked ? (
         <div className="grid gap-4 sm:grid-cols-2">
