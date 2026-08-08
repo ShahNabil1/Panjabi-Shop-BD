@@ -20,7 +20,7 @@ import {
   courierStatusTone,
   type CourierStatus,
 } from "@/lib/delivery-shared";
-import { CourierStatusBar, ratioTone } from "@/components/admin/courier-status";
+import { CourierStatusBar } from "@/components/admin/courier-status";
 import { CourierApiStatusBar } from "@/components/admin/courier-api-status";
 import { CourierBadge } from "@/components/admin/courier-logo";
 import { cn } from "@/lib/utils";
