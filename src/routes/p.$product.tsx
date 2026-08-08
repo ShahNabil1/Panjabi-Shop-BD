@@ -401,23 +401,8 @@ function ProductPage() {
           setComboSelected((current) => ({ ...current, [itemId]: variantId }))
         } />
 
-        {product.specs.length > 0 ? (
-          <div className="mx-auto mt-10 max-w-3xl">
-            <h2 className="text-center text-lg font-bold">{tr(lang, "specs")}</h2>
-            <dl className="mt-3 divide-y divide-border overflow-hidden rounded-lg border border-border bg-card">
-              {product.specs.map((spec, i) => (
-                <div key={i} className="grid grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)] gap-3 px-4 py-3">
-                  <dt className="min-w-0 text-sm text-muted-foreground">
-                    {pick(lang, spec["label_bn"], spec["label_en"]) || spec["label"] || ""}
-                  </dt>
-                  <dd className="min-w-0 text-sm font-medium">
-                    {pick(lang, spec["value_bn"], spec["value_en"]) || spec["value"] || ""}
-                  </dd>
-                </div>
-              ))}
-            </dl>
-          </div>
-        ) : null}
+
+
 
       </Section>
 
