@@ -214,9 +214,12 @@ export function OrdersBoard({
     localStorage.setItem(PAGE_SIZE_KEY, String(pageSize));
   }, [pageSize]);
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isFetching } = useQuery({
     enabled: !isSearchBoard || search.trim().length > 0,
+    placeholderData: (prev) => prev,
+    staleTime: 15 * 1000,
     queryKey: ["admin", "orders", bucket, status, search],
+
     queryFn: () =>
       adminListOrders({
         data: {
