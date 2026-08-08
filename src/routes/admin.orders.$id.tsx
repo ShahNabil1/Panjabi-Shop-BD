@@ -84,6 +84,16 @@ type OrderItemRow = {
   sku: string | null;
   unit_price: number | string;
   quantity: number;
+  combo_selections?: Array<{
+    item_id?: string;
+    item_name_bn?: string;
+    item_name_en?: string;
+    quantity?: number;
+    variant_id?: string;
+    variant_label_bn?: string;
+    variant_label_en?: string;
+    sku?: string | null;
+  }>;
 };
 
 function AdminOrderDetail() {
@@ -620,6 +630,20 @@ function AdminOrderDetail() {
           sku: i.sku,
           unitPrice: Number(i.unit_price),
           quantity: i.quantity,
+          comboSelections: (i.combo_selections ?? []).flatMap((selection) =>
+            selection.item_id && selection.variant_id
+              ? [{
+                  itemId: selection.item_id,
+                  itemNameBn: selection.item_name_bn ?? "",
+                  itemNameEn: selection.item_name_en ?? selection.item_name_bn ?? "",
+                  quantity: Number(selection.quantity ?? 1),
+                  variantId: selection.variant_id,
+                  variantLabelBn: selection.variant_label_bn ?? "",
+                  variantLabelEn: selection.variant_label_en ?? selection.variant_label_bn ?? "",
+                  sku: selection.sku ?? null,
+                }]
+              : [],
+          ),
         }))}
       />
 

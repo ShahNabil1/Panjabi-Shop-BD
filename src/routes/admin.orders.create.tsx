@@ -98,6 +98,7 @@ function CreateOrderPage() {
 
   const [lines, setLines] = useState<Line[]>([]);
   const [search, setSearch] = useState("");
+  const [comboDrafts, setComboDrafts] = useState<Record<string, Record<string, string>>>({});
 
   const [discount, setDiscount] = useState(0);
   const [deliveryCharge, setDeliveryCharge] = useState(0);
@@ -452,7 +453,7 @@ function CreateOrderPage() {
                 {(products.data ?? []).map((rawProduct) => {
                   const p = rawProduct as unknown as SearchProduct;
                   const variants = (p.product_variants ?? []).filter((v) => v.is_active);
-                  const comboDefaults = Object.fromEntries((p.combo_items ?? []).flatMap((item) => {
+                  const comboDefaults = comboDrafts[p.id] ?? Object.fromEntries((p.combo_items ?? []).flatMap((item) => {
                     const first = item.products?.product_variants.find((variant) => variant.is_active);
                     return first ? [[item.id, first.id]] : [];
                   }));
@@ -522,7 +523,11 @@ function CreateOrderPage() {
                                 <select
                                   className="mt-1 w-full rounded-lg border border-border bg-background px-2 py-1.5"
                                   defaultValue={options[0]?.id}
-                                  onChange={(event) => { comboDefaults[comboItem.id] = event.target.value; }}
+                                  value={comboDefaults[comboItem.id] ?? options[0]?.id}
+                                  onChange={(event) => setComboDrafts((current) => ({
+                                    ...current,
+                                    [p.id]: { ...comboDefaults, [comboItem.id]: event.target.value },
+                                  }))}
                                 >
                                   {options.map((option) => (
                                     <option key={option.id} value={option.id}>{option.value_bn}</option>
