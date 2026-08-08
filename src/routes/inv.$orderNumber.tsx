@@ -123,9 +123,9 @@ function InvoicePage() {
             ) : null}
           </div>
           <div className="text-right font-en">
-            <p className="text-lg font-extrabold uppercase tracking-wide">Invoice</p>
-            <p className="mt-1 text-xl font-extrabold text-primary">{data.orderNumber}</p>
-            <p className="text-sm font-semibold text-foreground/70">
+            <p className="text-base font-bold uppercase tracking-wide">Invoice</p>
+            <p className="mt-1 text-lg font-bold text-primary">{data.orderNumber}</p>
+            <p className="text-xs font-medium text-foreground/70">
               {new Date(data.createdAt).toLocaleString("en-GB", {
                 day: "2-digit",
                 month: "short",
@@ -134,29 +134,29 @@ function InvoicePage() {
                 minute: "2-digit",
               })}
             </p>
-            <p className="text-sm font-semibold text-foreground/70">Payment: Cash on Delivery</p>
+            <p className="text-xs font-medium text-foreground/70">Payment: Cash on Delivery</p>
           </div>
         </header>
 
         <section className="mt-5 grid gap-4 font-en sm:grid-cols-2">
           <div>
-            <h2 className="text-sm font-extrabold uppercase tracking-wide text-muted-foreground">
+            <h2 className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
               Customer
             </h2>
-            <p className="mt-1 text-lg font-extrabold">{data.customerName}</p>
-            <p className="text-base font-bold">{data.customerPhone}</p>
-            <p className="text-base font-semibold">
+            <p className="mt-1 text-base font-bold">{data.customerName}</p>
+            <p className="text-sm font-semibold">{data.customerPhone}</p>
+            <p className="text-sm font-medium">
               {data.addressLine}, {data.city}
             </p>
           </div>
           <div className="sm:text-right">
-            <h2 className="text-sm font-extrabold uppercase tracking-wide text-muted-foreground">
+            <h2 className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
               Status
             </h2>
-            <p className="mt-1 text-lg font-extrabold">{orderStatusLabel(data.status)}</p>
+            <p className="mt-1 text-base font-bold">{orderStatusLabel(data.status)}</p>
             {trackingUrl ? (
               <div className="mt-2">
-                <p className="text-sm font-bold text-foreground/70">
+                <p className="text-xs font-semibold text-foreground/70">
                   {courierLabel(data.courierProvider)} ·{" "}
                   {data.courierTrackingCode || data.courierConsignmentId}
                 </p>
@@ -164,7 +164,7 @@ function InvoicePage() {
                   href={trackingUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="mt-1 inline-block rounded-sm border-2 border-primary px-3 py-1.5 text-sm font-extrabold text-primary"
+                  className="mt-1 inline-block rounded-sm border-2 border-primary px-3 py-1.5 text-xs font-bold text-primary"
                 >
                   Track parcel →
                 </a>
