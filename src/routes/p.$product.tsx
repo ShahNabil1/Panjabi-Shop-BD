@@ -8,7 +8,7 @@ import { useLang } from "@/lib/language-context";
 import { badgeLabel, discountPercent, formatPrice, pick, tr, formatNumber, toBnDigits } from "@/lib/i18n";
 import { ProductGrid, ProductThumb } from "@/components/site/product-card";
 import { NotFoundView } from "@/components/site/not-found-view";
-import { absoluteUrl } from "@/lib/site";
+import { absoluteUrl, pageTitle } from "@/lib/site";
 import { Breadcrumbs, Section } from "@/components/site/ui";
 import { AddToCartBar } from "@/components/site/add-to-cart";
 import { ComboContents } from "@/components/site/combo-contents";
