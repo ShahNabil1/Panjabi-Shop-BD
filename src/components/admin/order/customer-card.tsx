@@ -11,6 +11,8 @@ import {
 } from "@/components/ui/select";
 
 import { PhoneActions } from "@/components/admin/phone-actions";
+import { CustomerOrdersDialog } from "@/components/admin/customer-orders-dialog";
+import { adminLookupCustomer } from "@/lib/admin.functions";
 
 import { BD_DIVISIONS } from "@/lib/bd-geo";
 import { adminUpdateOrderCustomer } from "@/lib/order-admin.functions";
