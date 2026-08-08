@@ -1,8 +1,6 @@
-import { Link, createFileRoute } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 
 import { useCart } from "@/lib/cart-context";
-import { useLang } from "@/lib/language-context";
-import { tr } from "@/lib/i18n";
 import { getDeliveryRates } from "@/lib/order.functions";
 import { CheckoutForm } from "@/components/site/checkout-form";
 import { Section } from "@/components/site/ui";
