@@ -59,8 +59,11 @@ async function call(
     body = { raw: text };
   }
   const b = (body ?? {}) as Record<string, unknown>;
-  if (!res.ok || b["error"] === true) throw new Error(errorText(b, res.status, path));
+  if (!res.ok || b["error"] === true || b["success"] === false) {
+    throw new Error(errorText(b, res.status, path));
+  }
   return b;
+
 }
 
 const listOf = (body: Record<string, unknown>): Array<Record<string, unknown>> => {
