@@ -508,7 +508,11 @@ export function FulfillmentCard({
               <div
                 className={cn(
                   "rounded-lg border px-3 py-2.5",
-                  isPathao ? "border-[#E32227]/25 bg-white" : "border-border/70 bg-background",
+                  isPathao
+                    ? "border-[#E32227]/25 bg-white"
+                    : isSteadfast
+                      ? "border-[#37A184]/25 bg-[#37A184]/5"
+                      : "border-border/70 bg-background",
                 )}
               >
                 <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
@@ -523,11 +527,17 @@ export function FulfillmentCard({
                       title={
                         isPathao
                           ? "Open in Pathao merchant panel"
-                          : "Open in CarryBee merchant panel"
+                          : isCarrybee
+                            ? "Open in CarryBee merchant panel"
+                            : "Open tracking"
                       }
                       className={cn(
                         "truncate font-mono text-lg font-extrabold tracking-tight text-black underline-offset-4 transition hover:underline",
-                        isPathao ? "hover:text-[#E32227]" : "hover:text-[#B8860B]",
+                        isPathao
+                          ? "hover:text-[#E32227]"
+                          : isSteadfast
+                            ? "hover:text-[#37A184]"
+                            : "hover:text-[#B8860B]",
                       )}
                     >
                       {consignmentId}
@@ -537,7 +547,10 @@ export function FulfillmentCard({
                       {consignmentId}
                     </span>
                   )}
-                  <CopyButton value={consignmentId} accent={isPathao} />
+                  <CopyButton
+                    value={consignmentId}
+                    accent={isPathao ? "pathao" : isSteadfast ? "steadfast" : undefined}
+                  />
                 </div>
                 {publicTrackingUrl ? (
                   <div className="mt-2.5 flex flex-wrap items-center gap-2">
@@ -549,7 +562,9 @@ export function FulfillmentCard({
                         "inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-xs font-semibold transition active:scale-95",
                         isPathao
                           ? "border-[#E32227]/30 bg-[#E32227]/5 text-[#E32227] hover:bg-[#E32227]/10"
-                          : "border-[#F5C518]/60 bg-[#F5C518]/10 text-[#8a6d00] hover:bg-[#F5C518]/20",
+                          : isSteadfast
+                            ? "border-[#37A184]/40 bg-[#37A184]/10 text-[#37A184] hover:bg-[#37A184]/20"
+                            : "border-[#F5C518]/60 bg-[#F5C518]/10 text-[#8a6d00] hover:bg-[#F5C518]/20",
                       )}
                     >
                       <ExternalLink className="size-3.5" />
@@ -558,7 +573,7 @@ export function FulfillmentCard({
                     <CopyTextButton
                       value={publicTrackingUrl}
                       label="Copy tracking link"
-                      accent={isPathao}
+                      accent={isPathao ? "pathao" : isSteadfast ? "steadfast" : undefined}
                     />
                   </div>
                 ) : null}
