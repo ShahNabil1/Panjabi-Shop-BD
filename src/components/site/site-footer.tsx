@@ -28,7 +28,8 @@ export function SiteFooter() {
           </div>
 
 
-          <p className="mt-3 text-sm font-medium leading-relaxed text-foreground">
+          <p className="mt-3 inline-flex items-center gap-2 text-sm font-bold uppercase tracking-wide text-primary">
+            <span className="inline-block h-2 w-2 rounded-full bg-primary animate-pulse" />
             Follow us on
           </p>
           <div className="mt-2 flex flex-wrap items-center gap-4">
