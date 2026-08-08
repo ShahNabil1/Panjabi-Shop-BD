@@ -115,11 +115,8 @@ export const placeOrder = createServerFn({ method: "POST" })
     const products = productsRes.data ?? [];
     const variants = variantsRes.data ?? [];
 
-    const comboProductIds = [...new Set(data.items.flatMap((item) => item.comboSelections.map((selection) => selection.itemId)))];
-    const comboProductsRes = comboProductIds.length
-      ? await db.from("products").select("id, name_bn, name_en").in("id", comboProductIds)
-      : { data: [], error: null };
-    const comboProducts = comboProductsRes.data ?? [];
+    const { loadComboChildren, buildComboSelections } = await import("./combo-selections.server");
+    const comboChildren = await loadComboChildren(db, productIds);
 
     const lines = data.items.map((item) => {
       const product = products.find((p) => p.id === item.productId);
@@ -134,23 +131,18 @@ export const placeOrder = createServerFn({ method: "POST" })
       if (available < item.quantity) throw new Error("OUT_OF_STOCK");
 
       const unitPrice = Number(product.price) + Number(variant?.price_delta ?? 0);
-      const comboSelections = item.comboSelections.map((selection) => {
-        const child = comboProducts.find((candidate) => candidate.id === selection.itemId);
+      for (const selection of item.comboSelections) {
         const childVariant = variants.find(
           (candidate) => candidate.id === selection.variantId && candidate.product_id === selection.itemId,
         );
-        if (!child || !childVariant || !childVariant.is_active) throw new Error("COMBO_VARIANT_UNAVAILABLE");
-        return {
-          item_id: child.id,
-          item_name_bn: child.name_bn,
-          item_name_en: child.name_en,
-          quantity: selection.quantity,
-          variant_id: childVariant.id,
-          variant_label_bn: `${childVariant.group_name_bn}: ${childVariant.value_bn}`,
-          variant_label_en: `${childVariant.group_name_en}: ${childVariant.value_en}`,
-          sku: childVariant.sku,
-        };
-      });
+        if (!childVariant || !childVariant.is_active) throw new Error("COMBO_VARIANT_UNAVAILABLE");
+      }
+      const comboSelections = buildComboSelections(
+        comboChildren.get(product.id),
+        item.comboSelections,
+        variants as never,
+      );
+
       return {
         product,
         variant,
