@@ -1,5 +1,5 @@
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 import { cn } from "@/lib/utils";
@@ -14,19 +14,20 @@ export function useLightbox() {
   const [images, setImages] = useState<LightboxImage[]>([]);
   const [startIndex, setStartIndex] = useState(0);
 
-  const open = (imgs: LightboxImage[], index = 0) => {
+  const open = useCallback((imgs: LightboxImage[], index = 0) => {
     setImages(imgs);
     setStartIndex(index);
     setIsOpen(true);
-  };
+  }, []);
 
-  const close = () => setIsOpen(false);
+  const close = useCallback(() => setIsOpen(false), []);
 
   return useMemo(
     () => ({ isOpen, images, startIndex, open, close }),
-    [isOpen, images, startIndex],
+    [isOpen, images, startIndex, open, close],
   );
 }
+
 
 export function ImageLightbox({
   images,
@@ -49,6 +50,11 @@ export function ImageLightbox({
     if (isOpen) setIndex(startIndex);
   }, [isOpen, startIndex]);
 
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
+  const countRef = useRef(images.length);
+  countRef.current = images.length;
+
   useEffect(() => {
     if (!isOpen) {
       setScale(1);
@@ -56,8 +62,8 @@ export function ImageLightbox({
       return;
     }
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-      if (e.key === "ArrowRight") setIndex((i) => Math.min(i + 1, images.length - 1));
+      if (e.key === "Escape") onCloseRef.current();
+      if (e.key === "ArrowRight") setIndex((i) => Math.min(i + 1, countRef.current - 1));
       if (e.key === "ArrowLeft") setIndex((i) => Math.max(i - 1, 0));
     };
     document.addEventListener("keydown", onKey);
@@ -65,6 +71,7 @@ export function ImageLightbox({
     const html = document.documentElement;
     const body = document.body;
     const originalHtmlOverflow = html.style.overflow;
+    const originalHtmlScrollBehavior = html.style.scrollBehavior;
     const originalBodyOverflow = body.style.overflow;
     const originalBodyPosition = body.style.position;
     const originalBodyTop = body.style.top;
@@ -85,14 +92,20 @@ export function ImageLightbox({
     return () => {
       document.removeEventListener("keydown", onKey);
       document.removeEventListener("touchmove", onTouchMove);
+      // Disable smooth scrolling so restoring the position is instant, not animated.
+      html.style.scrollBehavior = "auto";
       html.style.overflow = originalHtmlOverflow;
       body.style.overflow = originalBodyOverflow;
       body.style.position = originalBodyPosition;
       body.style.top = originalBodyTop;
       body.style.width = originalBodyWidth;
       window.scrollTo(0, scrollY);
+      requestAnimationFrame(() => {
+        html.style.scrollBehavior = originalHtmlScrollBehavior;
+      });
     };
-  }, [isOpen, images.length, onClose]);
+  }, [isOpen]);
+
 
   if (!isOpen || images.length === 0) return null;
 
