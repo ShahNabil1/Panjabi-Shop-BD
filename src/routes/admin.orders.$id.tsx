@@ -683,13 +683,13 @@ function AdminOrderDetail() {
           quantity: i.quantity,
           image: i.image ?? null,
           comboSelections: (i.combo_selections ?? []).flatMap((selection) =>
-            selection.item_id && selection.variant_id
+            selection.item_id
               ? [{
                   itemId: selection.item_id,
                   itemNameBn: selection.item_name_bn ?? "",
                   itemNameEn: selection.item_name_en ?? selection.item_name_bn ?? "",
                   quantity: Number(selection.quantity ?? 1),
-                  variantId: selection.variant_id,
+                  variantId: selection.variant_id ?? null,
                   variantLabelBn: selection.variant_label_bn ?? "",
                   variantLabelEn: selection.variant_label_en ?? selection.variant_label_bn ?? "",
                   sku: selection.sku ?? null,
@@ -697,6 +697,7 @@ function AdminOrderDetail() {
                 }]
               : [],
           ),
+
         }))}
 
       />
