@@ -335,7 +335,7 @@ export function FulfillmentCard({
       : isCarrybee
         ? `https://merchant.carrybee.com/order-track/${encodeURIComponent(consignmentId)}`
         : isSteadfast
-          ? `https://steadfast.com.bd/user/consignment/${encodeURIComponent(consignmentId)}`
+          ? `https://steadfast.com.bd/user/tracking/${encodeURIComponent(trackingCode ?? consignmentId)}`
           : null;
 
 
@@ -698,12 +698,7 @@ export function FulfillmentCard({
 
 
               <dl className="grid gap-1 text-xs text-muted-foreground">
-                {trackingCode ? (
-                  <div className="flex gap-2">
-                    <dt className="font-semibold">Tracking</dt>
-                    <dd className="font-mono text-foreground">{trackingCode}</dd>
-                  </div>
-                ) : null}
+                
                 {sentAt ? (
                   <div className="flex gap-2">
                     <dt className="font-semibold">Sent</dt>
