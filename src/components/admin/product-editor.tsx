@@ -312,7 +312,8 @@ export function ProductEditor({ id, kind }: { id: string; kind: ProductKind }) {
             <TextField
               label="Slug"
               value={draft.slug}
-              onChange={(v) => set("slug", slugify(v))}
+              onChange={(v) => set("slug", slugifyInput(v))}
+              onBlur={() => set("slug", slugify(draft.slug))}
               hint="URL: /p/your-slug"
             />
           )}
