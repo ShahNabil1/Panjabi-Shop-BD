@@ -384,13 +384,13 @@ export function FulfillmentCard({
             <div className="-mx-1 flex-1 overflow-y-auto px-1">
               {events.isLoading ? (
                 <p className="py-6 text-center text-sm text-muted-foreground">Loading…</p>
-              ) : (events.data ?? []).length === 0 ? (
+              ) : eventList.length === 0 ? (
                 <p className="py-6 text-center text-sm text-muted-foreground">
                   No webhook events received for this order yet.
                 </p>
               ) : (
                 <ol className="relative space-y-3 border-l border-border/70 pl-4">
-                  {(events.data ?? []).map((ev) => (
+                  {eventList.map((ev) => (
                     <li key={ev.id} className="relative">
                       <span className="absolute -left-[21px] top-2 size-2.5 rounded-full bg-primary ring-4 ring-background" />
                       <div className="rounded-xl border border-border/70 bg-background/60 p-3">
