@@ -153,6 +153,11 @@ function ProductPage() {
       comboItems.flatMap((item) => item.variants[0] ? [[item.id, item.variants[0].id]] : []),
     ),
   );
+  const lightbox = useLightbox();
+  const galleryImages = images.map((img) => ({
+    src: img.url,
+    alt: pick(lang, img.alt_bn, img.alt_en) || pick(lang, product.nameBn, product.nameEn),
+  }));
 
   const name = pick(lang, product.nameBn, product.nameEn);
   const off = discountPercent(product.price, product.compareAtPrice);
