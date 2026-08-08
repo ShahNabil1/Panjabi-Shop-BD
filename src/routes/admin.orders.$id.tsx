@@ -180,6 +180,7 @@ function AdminOrderDetail() {
   // Pre-select the order's saved courier, else the one marked default in Settings → Delivery.
   useEffect(() => {
     if (defaultPartnerApplied.current || courier) return;
+    if (!data?.order) return; // wait for the order, else the default overrides the saved partner
     if (savedPartner) {
       defaultPartnerApplied.current = true;
       setCourier(savedPartner);
@@ -190,7 +191,8 @@ function AdminOrderDetail() {
     if (!fallback) return;
     defaultPartnerApplied.current = true;
     setCourier(providerLabels[fallback.provider]);
-  }, [activePartners, courier, savedPartner]);
+  }, [activePartners, courier, savedPartner, data?.order]);
+
 
   const courierTemplate =
     activePartners.find((p) => providerLabels[p.provider] === courier)?.note_template ?? "";
