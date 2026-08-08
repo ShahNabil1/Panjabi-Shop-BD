@@ -1,7 +1,14 @@
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Lock, MapPin, Pencil, Save, X } from "lucide-react";
+import { Lock, MapPin, Pencil, Save, Truck, X } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 import { PhoneActions } from "@/components/admin/phone-actions";
 
