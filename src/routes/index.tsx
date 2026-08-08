@@ -8,6 +8,7 @@ import { pick, tr } from "@/lib/i18n";
 import { ProductGrid, ProductThumb } from "@/components/site/product-card";
 import { FaqList } from "@/components/site/faq-list";
 import { HeroSlider, readHeroSlides } from "@/components/site/hero-slider";
+import { PromoPopup, readPromoPopup } from "@/components/site/promo-popup";
 
 import { Section } from "@/components/site/ui";
 
