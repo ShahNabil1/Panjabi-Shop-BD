@@ -425,6 +425,17 @@ export function FulfillmentCard({
                   ))}
                 </ol>
               )}
+              {events.hasNextPage ? (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="mt-3 w-full"
+                  disabled={events.isFetchingNextPage}
+                  onClick={() => void events.fetchNextPage()}
+                >
+                  {events.isFetchingNextPage ? "Loading…" : "View more"}
+                </Button>
+              ) : null}
             </div>
           </DialogContent>
         </Dialog>
