@@ -89,24 +89,25 @@ export const couponValidateSchema = z.object({
 export function couponReasonMessage(reason: string | null, minSpend?: number): string {
   switch (reason) {
     case "not_found":
-      return "কুপন কোডটি সঠিক নয়";
+      return "This coupon code is not valid";
     case "inactive":
-      return "এই কুপনটি এখন সক্রিয় নেই";
+      return "This coupon is not active";
     case "not_started":
-      return "এই কুপনটি এখনো শুরু হয়নি";
+      return "This coupon has not started yet";
     case "expired":
-      return "কুপনের মেয়াদ শেষ হয়ে গেছে";
+      return "This coupon has expired";
     case "min_spend":
       return minSpend
-        ? `এই কুপন ব্যবহারে সর্বনিম্ন ৳${minSpend} কেনাকাটা প্রয়োজন`
-        : "সর্বনিম্ন কেনাকাটার শর্ত পূরণ হয়নি";
+        ? `Minimum purchase of ৳${minSpend} required to use this coupon`
+        : "Minimum purchase requirement not met";
     case "usage_limit":
-      return "এই কুপনের ব্যবহারের সীমা শেষ";
+      return "This coupon has reached its usage limit";
     case "customer_limit":
-      return "আপনি এই কুপনটি আগেই ব্যবহার করেছেন";
+      return "You have already used this coupon";
     case "not_applicable":
-      return "এই কুপন আপনার নির্বাচিত পণ্যে প্রযোজ্য নয়";
+      return "This coupon does not apply to your selected items";
     default:
-      return "কুপনটি প্রয়োগ করা যায়নি";
+      return "This coupon could not be applied";
   }
 }
+
