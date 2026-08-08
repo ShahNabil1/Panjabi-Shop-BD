@@ -13,6 +13,7 @@ import { Breadcrumbs, Prose, Section } from "@/components/site/ui";
 import { AddToCartBar } from "@/components/site/add-to-cart";
 import { ComboContents } from "@/components/site/combo-contents";
 import { cn } from "@/lib/utils";
+import { ImageLightbox, useLightbox } from "@/components/site/image-lightbox";
 
 export const Route = createFileRoute("/p/$product")({
   loader: async ({ params }): Promise<ProductPageData> => {
