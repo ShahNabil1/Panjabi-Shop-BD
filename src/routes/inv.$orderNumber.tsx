@@ -5,7 +5,7 @@ import { useServerFn } from "@tanstack/react-start";
 
 import logoMark from "@/assets/upoharkabbo-logo.png";
 import { getOrderSummaryShort } from "@/lib/order.functions";
-import { orderStatusLabel } from "@/lib/order-receipt";
+import { courierLabel, courierTrackingUrl, orderStatusLabel } from "@/lib/order-receipt";
 import { formatPrice } from "@/lib/i18n";
 
 function searchSchema(input: Record<string, unknown>): {
