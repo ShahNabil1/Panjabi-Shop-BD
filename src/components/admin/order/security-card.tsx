@@ -117,7 +117,7 @@ function CopyTextButton({
 }: {
   value: string;
   label: string;
-  accent?: boolean;
+  accent?: "pathao" | "steadfast";
 }) {
   const [copied, setCopied] = useState(false);
   return (
@@ -133,9 +133,11 @@ function CopyTextButton({
         "inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-xs font-semibold transition active:scale-95",
         copied
           ? "border-emerald-300 bg-emerald-50 text-emerald-700"
-          : accent
+          : accent === "pathao"
             ? "border-[#E32227]/30 text-[#E32227] hover:bg-[#E32227]/10"
-            : "border-border text-muted-foreground hover:bg-muted",
+            : accent === "steadfast"
+              ? "border-[#37A184]/40 text-[#37A184] hover:bg-[#37A184]/10"
+              : "border-border text-muted-foreground hover:bg-muted",
       )}
     >
       {copied ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}
