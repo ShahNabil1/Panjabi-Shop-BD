@@ -36,8 +36,8 @@ export function QuantityStepper({
       >
         −
       </button>
-      <span className="flex h-full w-12 items-center justify-center text-center text-sm font-semibold tabular-nums transition-all duration-150">
-        {formatNumber(lang, value)}
+      <span className="font-en flex h-full w-12 items-center justify-center text-center text-sm font-semibold tabular-nums transition-all duration-150">
+        {formatNumber("en", value)}
       </span>
       <button
         type="button"
