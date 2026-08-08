@@ -34,10 +34,11 @@ export const providerFields: Record<DeliveryProvider, CredentialField[]> = {
     { key: "password", label: "Merchant Password", placeholder: "••••••••", secret: true },
   ],
   carrybee: [
-    { key: "base_url", label: "Base URL", placeholder: "https://api.carrybee.com" },
-    { key: "api_key", label: "API Key / Token", placeholder: "Merchant API token", secret: true },
-    { key: "secret_key", label: "Secret Key", placeholder: "Optional secret", secret: true, optional: true },
+    { key: "client_id", label: "Client ID", placeholder: "CarryBee Client-ID", secret: true },
+    { key: "client_secret", label: "Client Secret", placeholder: "CarryBee Client-Secret", secret: true },
+    { key: "client_context", label: "Client Context", placeholder: "CarryBee Client-Context", secret: true },
   ],
+
 };
 
 /** Normalised courier status used across the admin UI. */
