@@ -6,10 +6,13 @@ import { Banknote, Check, Copy, ExternalLink, Fingerprint, Globe, History, Noteb
 import type { BlockKind } from "@/lib/admin-schema";
 import { adminAddOrderNote, adminSetBlocked } from "@/lib/order-admin.functions";
 import {
+  adminCancelCarrybeeConsignment,
   adminOrderWebhookEvents,
   adminPathaoDeliveryCost,
   adminRefreshCourierStatus,
+  adminResolveCarrybeeAddress,
   adminSendOrderToCourier,
+  CARRYBEE_CANCELLABLE,
 } from "@/lib/dispatch.functions";
 import {
   courierStatusLabels,
