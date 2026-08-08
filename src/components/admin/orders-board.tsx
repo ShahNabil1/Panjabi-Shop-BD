@@ -319,6 +319,8 @@ export function OrdersBoard({
                     <span className="rounded-md bg-muted px-1.5 py-0.5 font-mono text-xs text-muted-foreground">
                       {o.order_number}
                     </span>
+                    <PhoneActions phone={o.customer_phone} size="sm" />
+
                     {ratios?.[o.customer_phone] !== undefined ? (
                       <span
                         className={cn(
