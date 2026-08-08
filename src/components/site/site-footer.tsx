@@ -119,14 +119,14 @@ export function SiteFooter() {
               </li>
             ) : null}
             <li className="pt-2">
-              <span className="flex w-full flex-col items-center justify-center gap-1.5 rounded-lg bg-primary px-2 py-2 text-center text-xs font-bold text-primary-foreground shadow-sm sm:flex-row sm:gap-2 sm:px-3 sm:text-sm">
+              <span className="flex w-full flex-row items-start justify-start gap-2 rounded-lg bg-primary px-3 py-2 text-left text-xs font-bold leading-tight text-primary-foreground shadow-sm sm:items-center sm:justify-center sm:text-center sm:text-sm">
                 <span className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary-foreground/20 text-xs">✓</span>
                 <span>সম্পূর্ণ ক্যাশ অন ডেলিভারি</span>
               </span>
             </li>
             <li className="pt-1">
-              <span className="flex w-full flex-col items-center justify-center gap-1.5 rounded-lg border-2 border-primary bg-primary/5 px-2 py-2 text-center text-xs font-bold text-primary sm:flex-row sm:gap-2 sm:px-3 sm:text-sm">
-                <span className="shrink-0 animate-pulse text-base sm:text-sm">🚚</span>
+              <span className="flex w-full flex-row items-start justify-start gap-2 rounded-lg border-2 border-primary bg-primary/5 px-3 py-2 text-left text-xs font-bold leading-tight text-primary sm:items-center sm:justify-center sm:text-center sm:text-sm">
+                <span className="shrink-0 animate-pulse text-base leading-none sm:text-sm">🚚</span>
                 <span>সারা বাংলাদেশে ফ্রী ডেলিভারি</span>
               </span>
             </li>
