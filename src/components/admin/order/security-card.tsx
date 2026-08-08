@@ -117,7 +117,7 @@ function CopyTextButton({
 }: {
   value: string;
   label: string;
-  accent?: "pathao" | "steadfast";
+  accent?: "pathao" | "steadfast" | undefined;
 }) {
   const [copied, setCopied] = useState(false);
   return (
