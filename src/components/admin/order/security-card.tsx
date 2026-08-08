@@ -306,15 +306,22 @@ export function FulfillmentCard({
     onError: (e: Error) => toast.error(e.message),
   });
 
-  const consignmentUrl = consignmentId
-    ? `https://merchant.pathao.com/courier/orders/${consignmentId}`
-    : null;
-  const publicTrackingUrl =
-    isPathao && consignmentId
+  const consignmentUrl = !consignmentId
+    ? null
+    : isPathao
+      ? `https://merchant.pathao.com/courier/orders/${consignmentId}`
+      : isCarrybee
+        ? `https://merchant.carrybee.com/businesses/20521/orders/${encodeURIComponent(consignmentId)}`
+        : null;
+  const publicTrackingUrl = !consignmentId
+    ? null
+    : isPathao
       ? `https://merchant.pathao.com/tracking?consignment_id=${encodeURIComponent(consignmentId)}${
           customerPhone ? `&phone=${encodeURIComponent(customerPhone)}` : ""
         }`
-      : null;
+      : isCarrybee
+        ? `https://carrybee.com/tracking?consignment_id=${encodeURIComponent(consignmentId)}`
+        : null;
 
 
   return (
@@ -484,13 +491,20 @@ export function FulfillmentCard({
                   Consignment
                 </p>
                 <div className="mt-1 flex items-center gap-2">
-                  {isPathao && consignmentUrl ? (
+                  {consignmentUrl ? (
                     <a
                       href={consignmentUrl}
                       target="_blank"
                       rel="noreferrer"
-                      title="Open in Pathao merchant panel"
-                      className="truncate font-mono text-lg font-extrabold tracking-tight text-black underline-offset-4 transition hover:text-[#E32227] hover:underline"
+                      title={
+                        isPathao
+                          ? "Open in Pathao merchant panel"
+                          : "Open in CarryBee merchant panel"
+                      }
+                      className={cn(
+                        "truncate font-mono text-lg font-extrabold tracking-tight text-black underline-offset-4 transition hover:underline",
+                        isPathao ? "hover:text-[#E32227]" : "hover:text-[#B8860B]",
+                      )}
                     >
                       {consignmentId}
                     </a>
@@ -507,7 +521,12 @@ export function FulfillmentCard({
                       href={publicTrackingUrl}
                       target="_blank"
                       rel="noreferrer"
-                      className="inline-flex items-center gap-1.5 rounded-md border border-[#E32227]/30 bg-[#E32227]/5 px-2.5 py-1.5 text-xs font-semibold text-[#E32227] transition hover:bg-[#E32227]/10 active:scale-95"
+                      className={cn(
+                        "inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-xs font-semibold transition active:scale-95",
+                        isPathao
+                          ? "border-[#E32227]/30 bg-[#E32227]/5 text-[#E32227] hover:bg-[#E32227]/10"
+                          : "border-[#F5C518]/60 bg-[#F5C518]/10 text-[#8a6d00] hover:bg-[#F5C518]/20",
+                      )}
                     >
                       <ExternalLink className="size-3.5" />
                       Open tracking link
@@ -531,6 +550,7 @@ export function FulfillmentCard({
                   )}
                 >
                   <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-orange-700">
+
                     Return ID
                   </p>
                   <div className="mt-1 flex items-center gap-2">
