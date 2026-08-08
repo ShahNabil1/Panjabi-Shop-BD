@@ -88,6 +88,8 @@ export function CheckoutForm({
   onVariantChange?: (id: string) => void;
 }) {
   const { lang } = useLang();
+  const confirmDialog = useConfirm();
+
   const navigate = useNavigate();
   const submit = useServerFn(placeOrder);
   const { clear } = useCart();
