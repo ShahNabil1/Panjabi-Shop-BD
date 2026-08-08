@@ -1,10 +1,14 @@
+import { useEffect, useState } from "react";
 import { useRouterState } from "@tanstack/react-router";
 
 /** Thin top progress bar shown while a navigation is in flight. */
 export function RoutePending() {
+  const [mounted, setMounted] = useState(false);
   const isLoading = useRouterState({ select: (s) => s.status === "pending" || s.isLoading });
 
-  if (!isLoading) return null;
+  useEffect(() => setMounted(true), []);
+
+  if (!mounted || !isLoading) return null;
 
   return (
     <div className="pointer-events-none fixed inset-x-0 top-0 z-[200]">
