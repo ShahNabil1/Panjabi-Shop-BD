@@ -265,9 +265,12 @@ function AdminLayout() {
 
               <div
                 className={cn(
-                  "grid transition-[grid-template-rows,opacity] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
-                  open ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0",
+                  "grid transition-[grid-template-rows,opacity,filter] duration-[600ms] ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none",
+                  open
+                    ? "grid-rows-[1fr] opacity-100 blur-0"
+                    : "grid-rows-[0fr] opacity-0 blur-[2px]",
                 )}
+              
               >
                 <div className="overflow-hidden">
                   <ul className={cn("space-y-1.5", collapsed ? "pt-0" : "pt-1.5")}>
