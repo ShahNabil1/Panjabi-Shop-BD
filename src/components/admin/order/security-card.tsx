@@ -328,7 +328,9 @@ export function FulfillmentCard({
         }`
       : isCarrybee
         ? `https://merchant.carrybee.com/order-track/${encodeURIComponent(consignmentId)}`
-        : null;
+        : isSteadfast
+          ? `https://steadfast.com.bd/user/consignment/${encodeURIComponent(consignmentId)}`
+          : null;
 
 
   return (
