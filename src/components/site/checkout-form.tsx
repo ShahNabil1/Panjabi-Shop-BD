@@ -1,6 +1,7 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { Trash2 } from "lucide-react";
 
 import { useCart, type CartItem } from "@/lib/cart-context";
 import { useLang } from "@/lib/language-context";
@@ -451,9 +452,10 @@ export function CheckoutForm({
                         <button
                           type="button"
                           onClick={() => onRemove(i.key)}
-                          className="text-xs font-semibold text-muted-foreground underline-offset-4 hover:text-destructive hover:underline"
+                          aria-label={tr(lang, "remove")}
+                          className="grid h-8 w-8 shrink-0 cursor-pointer place-items-center rounded-full border border-border bg-card text-muted-foreground transition-all duration-200 hover:scale-110 hover:border-destructive hover:text-destructive hover:shadow-sm active:scale-95"
                         >
-                          {tr(lang, "remove")}
+                          <Trash2 className="h-4 w-4" />
                         </button>
                       ) : null}
                     </div>

@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { Trash2 } from "lucide-react";
 
 import { useCart } from "@/lib/cart-context";
 import { useLang } from "@/lib/language-context";
@@ -193,9 +194,10 @@ export function CartDrawer() {
                       <button
                         type="button"
                         onClick={() => remove(item.key)}
-                        className="text-xs font-semibold text-muted-foreground underline-offset-4 hover:text-destructive hover:underline"
+                        aria-label={tr(lang, "remove")}
+                        className="grid h-8 w-8 shrink-0 cursor-pointer place-items-center rounded-full border border-border bg-card text-muted-foreground transition-all duration-200 hover:scale-110 hover:border-destructive hover:text-destructive hover:shadow-sm active:scale-95"
                       >
-                        {tr(lang, "remove")}
+                        <Trash2 className="h-4 w-4" />
                       </button>
                     </div>
                   </div>
@@ -204,9 +206,9 @@ export function CartDrawer() {
             </ul>
 
             <footer className="border-t border-border bg-card px-4 py-4">
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">{tr(lang, "subtotal")}</span>
-                <span className="text-base font-bold tabular-nums text-primary">
+              <div className="flex items-center justify-between">
+                <span className="text-base font-bold text-foreground">Subtotal</span>
+                <span className="text-xl font-bold tabular-nums text-primary">
                   {formatPrice(lang, subtotal)}
                 </span>
               </div>
@@ -221,7 +223,7 @@ export function CartDrawer() {
               <button
                 type="button"
                 onClick={closeCart}
-                className="mt-2 w-full px-5 py-2 text-center text-sm font-semibold text-muted-foreground transition-colors hover:text-primary"
+                className="mt-2 w-full rounded-sm border border-border bg-background px-5 py-2.5 text-center text-sm font-semibold text-foreground transition-all duration-200 hover:border-primary hover:text-primary hover:shadow-sm active:scale-[0.98]"
               >
                 {tr(lang, "continueShopping")}
               </button>
