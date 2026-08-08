@@ -66,8 +66,12 @@ async function call(
 const listOf = (body: Record<string, unknown>): Array<Record<string, unknown>> => {
   const d = body["data"];
   if (Array.isArray(d)) return d as Array<Record<string, unknown>>;
-  const inner = (d ?? {}) as Record<string, unknown>;
-  return Array.isArray(inner["data"]) ? (inner["data"] as Array<Record<string, unknown>>) : [];
+  const inner = (d ?? body) as Record<string, unknown>;
+  for (const key of ["orders", "results", "data", "items"]) {
+    const v = inner[key];
+    if (Array.isArray(v)) return v as Array<Record<string, unknown>>;
+  }
+  return [];
 };
 
 export type CarrybeeStore = { store_id: number; store_name: string };
