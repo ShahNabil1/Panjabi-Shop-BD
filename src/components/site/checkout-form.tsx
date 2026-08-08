@@ -488,14 +488,10 @@ export function CheckoutForm({
                           onClick={() => {
                             void (async () => {
                               const ok = await confirmDialog({
-                                title: pick(
-                                  lang,
-                                  "প্রোডাক্টটি সরিয়ে ফেলবেন?",
-                                  "Remove this product?",
-                                ),
+                                title: "Remove this product?",
                                 description: pick(lang, i.nameBn, i.nameEn),
-                                confirmLabel: pick(lang, "ডিলিট করুন", "Delete"),
-                                cancelLabel: pick(lang, "বাতিল", "Cancel"),
+                                confirmLabel: "Delete",
+                                cancelLabel: "Cancel",
                                 tone: "danger",
                               });
                               if (ok) onRemove(i.key);
