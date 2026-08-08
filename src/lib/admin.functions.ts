@@ -715,7 +715,7 @@ export const adminSearchProducts = createServerFn({ method: "POST" })
         `id, kind, name_bn, name_en, sku, price, stock,
          product_images(url, sort_order),
          product_variants(id, value_bn, value_en, group_name_bn, group_name_en, sku, price_delta, stock, is_active),
-         combo_items(id, quantity, label_bn, label_en, products!combo_items_item_id_fkey(
+         combo_items!combo_items_combo_id_fkey(id, quantity, label_bn, label_en, products!combo_items_item_id_fkey(
            id, name_bn, name_en, product_variants(id, value_bn, value_en, group_name_bn, group_name_en, sku, is_active)
          ))`,
       )
