@@ -32,16 +32,26 @@ export const Route = createFileRoute("/api/public/courier/$provider")({
         const db = createPublicServerClient();
 
         const pathaoHeaders = { "X-Pathao-Merchant-Webhook-Integration-Secret": PATHAO_INTEGRATION_SECRET };
-        const respond = (body: unknown, status: number) =>
-          provider === "pathao"
-            ? Response.json(body, { status: status === 200 ? 202 : status, headers: pathaoHeaders })
-            : Response.json(body, { status });
+        // CarryBee's webhook validator requires a 202 plus this fixed header on
+        // every response, otherwise "Add Webhook" fails with a 401 mismatch.
+        const carrybeeHeaders = { "X-CB-Webhook-Integration-Header": "40489fe0-9386-4fc9-8e92-2b2fcb9d451c" };
+        const respond = (body: unknown, status: number) => {
+          if (provider === "pathao") {
+            return Response.json(body, { status: status === 200 ? 202 : status, headers: pathaoHeaders });
+          }
+          if (provider === "carrybee") {
+            return Response.json(body, { status: 202, headers: carrybeeHeaders });
+          }
+          return Response.json(body, { status });
+        };
 
         const url = new URL(request.url);
         const supplied =
           request.headers.get("x-pathao-signature") ??
           request.headers.get("steadfast-secret-key") ??
           request.headers.get("x-webhook-secret") ??
+          request.headers.get("x-cb-webhook-secret") ??
+          request.headers.get("x-carrybee-signature") ??
           url.searchParams.get("secret") ??
           "";
 
@@ -52,6 +62,7 @@ export const Route = createFileRoute("/api/public/courier/$provider")({
         if (check !== "ok") {
           return respond({ status: 401, message: "Invalid webhook secret" }, 401);
         }
+
 
         let payload: Record<string, unknown>;
         try {
