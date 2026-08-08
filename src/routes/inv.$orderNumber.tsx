@@ -174,7 +174,7 @@ function InvoicePage() {
                   href={trackingUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="mt-1 inline-block rounded-sm border-2 border-primary px-3 py-1.5 text-xs font-bold text-primary"
+                  className="mt-1 inline-block rounded-sm border-2 border-primary px-3 py-1.5 text-xs font-bold text-primary transition-colors duration-200 ease-out hover:bg-primary hover:text-primary-foreground"
                 >
                   Track parcel →
                 </a>
