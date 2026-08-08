@@ -60,7 +60,7 @@ function SearchBox({ onDone }: { onDone?: () => void }) {
       />
       <button
         type="submit"
-        className="shrink-0 rounded-sm bg-primary px-3 py-1 text-xs font-semibold text-primary-foreground"
+        className="shrink-0 rounded-sm bg-primary px-3 py-1 text-xs font-semibold text-primary-foreground transition-all duration-200 hover:scale-105 hover:shadow-md active:scale-95"
       >
         {tr(lang, "search")}
       </button>
