@@ -161,7 +161,7 @@ function ProductPage() {
   const name = pick(lang, product.nameBn, product.nameEn);
   const off = discountPercent(product.price, product.compareAtPrice);
   const short = pick(lang, product.shortBn, product.shortEn);
-  const badge = pick(lang, product.badgeBn, product.badgeEn);
+  const badge = badgeLabel(product.badgeBn, product.badgeEn);
 
   const groups = new Map<string, typeof variants>();
   for (const v of variants) {
@@ -251,7 +251,7 @@ function ProductPage() {
           <div className="min-w-0">
             {badge ? (
               <span className="inline-block rounded-sm bg-primary/10 px-2.5 py-1 text-xs font-semibold uppercase text-primary">
-                {product.badgeEn || badge}
+                {badge}
               </span>
             ) : null}
             <h1 className="mt-2 text-2xl font-bold leading-snug tracking-tight sm:text-3xl">

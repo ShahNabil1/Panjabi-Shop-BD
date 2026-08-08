@@ -52,7 +52,7 @@ export function ProductThumb({
 export function ProductCard({ product }: { product: ProductCardData }) {
   const { lang } = useLang();
   const name = pick(lang, product.nameBn, product.nameEn);
-  const badge = pick(lang, product.badgeBn, product.badgeEn);
+  const badge = badgeLabel(product.badgeBn, product.badgeEn);
   const off = discountPercent(product.price, product.compareAtPrice);
   const soldOut = product.stock <= 0;
 
