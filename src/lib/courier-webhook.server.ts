@@ -57,8 +57,10 @@ export function parseCourierPayload(provider: DeliveryProvider, payload: Payload
       message:
         str(payload["reason"]) ??
         (Array.isArray(causes) ? causes.map((c) => String(c)).join(", ") : str(causes)) ??
-        [str(payload["agent_name"]), str(payload["agent_phone"])].filter(Boolean).join(" · ') ") ??
-        null,
+        ([str(payload["agent_name"]), str(payload["agent_phone"])]
+          .filter(Boolean)
+          .join(" · ") || null),
+
     };
   }
   // Steadfast shares a flat delivery-status shape.
