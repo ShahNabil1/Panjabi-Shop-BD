@@ -49,11 +49,29 @@ export function parseCourierPayload(provider: DeliveryProvider, payload: Payload
   }
   if (provider === "carrybee") {
     const causes = payload["causes"];
+    // CarryBee is inconsistent about key names between its docs, the test
+    // ping and live events, so every known alias is accepted here.
     return {
-      event: str(payload["event"]),
-      consignmentId: str(payload["consignment_id"]),
-      merchantOrderId: str(payload["merchant_order_id"]),
-      rawStatus: str(payload["event"]) ?? str(payload["status"]) ?? "",
+      event: str(payload["event"]) ?? str(payload["event_type"]) ?? str(payload["type"]),
+      consignmentId:
+        str(payload["consignment_id"]) ??
+        str(payload["consignmentId"]) ??
+        str(payload["tracking_id"]) ??
+        str(payload["tracking_code"]) ??
+        str(payload["order_id"]),
+      merchantOrderId:
+        str(payload["merchant_order_id"]) ??
+        str(payload["merchantOrderId"]) ??
+        str(payload["merchant_order_no"]) ??
+        str(payload["invoice"]) ??
+        str(payload["reference"]),
+      rawStatus:
+        str(payload["event"]) ??
+        str(payload["event_type"]) ??
+        str(payload["status"]) ??
+        str(payload["order_status"]) ??
+        str(payload["order_status_slug"]) ??
+        "",
       message:
         str(payload["reason"]) ??
         (Array.isArray(causes) ? causes.map((c) => String(c)).join(", ") : str(causes)) ??
@@ -63,6 +81,7 @@ export function parseCourierPayload(provider: DeliveryProvider, payload: Payload
 
     };
   }
+
   // Steadfast shares a flat delivery-status shape.
 
   return {
