@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Banknote, Check, Copy, ExternalLink, Fingerprint, Globe, History, NotebookPen, Phone, Shield, ShieldCheck, ShieldX, Truck, RefreshCw } from "lucide-react";
+import { Ban, Banknote, Check, Copy, ExternalLink, Fingerprint, Globe, History, MapPin, NotebookPen, Phone, Shield, ShieldCheck, ShieldX, Truck, RefreshCw } from "lucide-react";
 
 import type { BlockKind } from "@/lib/admin-schema";
 import { adminAddOrderNote, adminSetBlocked } from "@/lib/order-admin.functions";
