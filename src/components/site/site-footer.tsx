@@ -49,23 +49,6 @@ export function SiteFooter() {
         </div>
 
         <div>
-          <h2 className="text-sm font-semibold">{tr(lang, "categories")}</h2>
-          <ul className="mt-3 space-y-2">
-            {categories.map((c) => (
-              <li key={c.id}>
-                <Link
-                  to="/c/$category"
-                  params={{ category: c.slug }}
-                  className="text-sm text-muted-foreground transition-colors hover:text-primary"
-                >
-                  {pick(lang, c.name_bn, c.name_en)}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        <div>
           <h2 className="text-sm font-semibold">About Upoharkabbo</h2>
           <ul className="mt-3 space-y-2">
             <li>
