@@ -33,7 +33,7 @@ export function SiteFooter() {
             <span className="inline-block h-2 w-2 rounded-full bg-primary animate-pulse" />
             Follow us on
           </p>
-          <div className="mt-2 flex flex-wrap items-center gap-4">
+          <div className="mt-3 flex flex-wrap items-center gap-3">
             {SOCIAL_LINKS.map(({ key, href, label, icon: Icon, colorClass }) => (
               <a
                 key={key}
@@ -42,11 +42,11 @@ export function SiteFooter() {
                 rel={href.startsWith("http") ? "noopener noreferrer" : undefined}
                 aria-label={label}
                 className={cn(
-                  "flex items-center justify-center p-1 transition-transform hover:scale-110",
+                  "flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary transition-all hover:scale-110 hover:bg-primary hover:text-primary-foreground",
                   colorClass,
                 )}
               >
-                <Icon className="h-6 w-6" />
+                <Icon className="h-5 w-5" />
               </a>
             ))}
           </div>
