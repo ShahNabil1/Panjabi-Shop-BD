@@ -184,7 +184,7 @@ function CostOfDelivery({ orderId, partner }: { orderId: string; partner: "patha
       <dl className="mt-2 space-y-1.5">
         {cost.data.lines.map((line) => (
           <div key={line.label} className="flex items-center justify-between gap-3 text-xs">
-            <dt className="text-muted-foreground">{line.label}</dt>
+            <dt className="font-bold text-foreground">{line.label}</dt>
             <dd
               className={cn(
                 "font-semibold tabular-nums",
