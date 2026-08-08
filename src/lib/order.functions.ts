@@ -470,3 +470,19 @@ export const captureIncompleteOrder = createServerFn({ method: "POST" })
 
     return { ok: true as const, deduplicated: false };
   });
+
+/** Short receipt lookup — order number + last 4 digits of the customer phone. */
+export const getOrderSummaryShort = createServerFn({ method: "GET" })
+  .inputValidator((input: unknown) => shortLookupSchema.parse(input))
+  .handler(async ({ data }): Promise<OrderSummary | null> => {
+    const { createPublicServerClient } = await import("./supabase-public");
+    const { mapReceipt } = await import("./order-receipt");
+    const db = createPublicServerClient();
+    const { data: raw } = await (
+      db.rpc as unknown as (
+        fn: string,
+        args: Record<string, string>,
+      ) => Promise<{ data: unknown }>
+    )("order_receipt_short", { _order_number: data.orderNumber, _p: data.p });
+    return mapReceipt(raw as never) as OrderSummary | null;
+  });
