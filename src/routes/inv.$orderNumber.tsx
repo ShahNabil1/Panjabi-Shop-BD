@@ -123,9 +123,9 @@ function InvoicePage() {
             ) : null}
           </div>
           <div className="text-right font-en">
-            <p className="text-lg font-extrabold uppercase tracking-wide">Invoice</p>
-            <p className="mt-1 text-xl font-extrabold text-primary">{data.orderNumber}</p>
-            <p className="text-sm font-semibold text-foreground/70">
+            <p className="text-base font-bold uppercase tracking-wide">Invoice</p>
+            <p className="mt-1 text-lg font-bold text-primary">{data.orderNumber}</p>
+            <p className="text-xs font-medium text-foreground/70">
               {new Date(data.createdAt).toLocaleString("en-GB", {
                 day: "2-digit",
                 month: "short",
@@ -134,7 +134,7 @@ function InvoicePage() {
                 minute: "2-digit",
               })}
             </p>
-            <p className="text-sm font-semibold text-foreground/70">Payment: Cash on Delivery</p>
+            <p className="text-xs font-medium text-foreground/70">Payment: Cash on Delivery</p>
           </div>
         </header>
 
