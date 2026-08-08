@@ -117,7 +117,8 @@ function PromotionsPage() {
   }
 
   const filteredProducts = useMemo(() => {
-    const list = products.data ?? [];
+    // Sub-products (combo components) are internal-only — never promotable.
+    const list = (products.data ?? []).filter((p) => p.kind !== "component");
     const q = productQuery.trim().toLowerCase();
     if (!q) return list;
     return list.filter((p) =>
