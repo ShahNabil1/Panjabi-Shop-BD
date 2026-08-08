@@ -178,7 +178,7 @@ export const adminSaveDeliveryPartner = createServerFn({ method: "POST" })
     if (missing.length) throw new Error(`Missing required field(s): ${missing.join(", ")}`);
 
     const check = await runCheck(data.provider, creds);
-    if (!check.ok && data.provider !== "carrybee") throw new Error(check.message);
+    if (!check.ok) throw new Error(check.message);
 
     const secret =
       existing?.webhook_secret ??
