@@ -70,11 +70,6 @@ export function SiteFooter() {
                 {tr(lang, "offers")}
               </Link>
             </li>
-            <li>
-              <Link to="/contact" className="text-sm text-muted-foreground hover:text-primary">
-                {tr(lang, "contact")}
-              </Link>
-            </li>
           </ul>
         </div>
 
