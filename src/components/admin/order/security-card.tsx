@@ -181,7 +181,17 @@ function CostOfDelivery({
       </div>
     );
   }
-  if (!cost.data?.ok) return null;
+  if (!cost.data?.ok) {
+    // Steadfast has no cost API: tell the admin where to add the rate card.
+    if (partner === "steadfast" && cost.data?.message) {
+      return (
+        <div className={cn("rounded-lg border bg-white px-3 py-2.5 text-xs text-muted-foreground", shell)}>
+          {cost.data.message}
+        </div>
+      );
+    }
+    return null;
+  }
 
   return (
     <div className={cn("rounded-lg border bg-white px-3 py-3", shell)}>

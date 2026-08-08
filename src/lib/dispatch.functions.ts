@@ -218,6 +218,24 @@ export const adminRefreshCourierStatus = createServerFn({ method: "POST" })
           },
           order.courier_consignment_id,
         );
+        // Steadfast reports no charges, so the cost comes from the saved rate card.
+        const { steadfastCostBreakdown } = await import("./dispatch.server");
+        const { data: money } = await db
+          .from("orders")
+          .select("city, district, division, total, advance_amount")
+          .eq("id", data.orderId)
+          .maybeSingle();
+        const m = money as {
+          city: string | null;
+          district: string | null;
+          division: string | null;
+          total: number | null;
+          advance_amount: number | null;
+        } | null;
+        if (m) {
+          const cod = Math.max(0, Math.round(Number(m.total ?? 0) - Number(m.advance_amount ?? 0)));
+          liveFee = steadfastCostBreakdown(partner.config, m, cod)?.total ?? null;
+        }
       } else if (provider === "pathao") {
         const { pathaoToken, pathaoOrderInfo } = await import("./pathao.server");
         const creds = {
