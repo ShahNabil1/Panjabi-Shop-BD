@@ -9,18 +9,18 @@ export const SOCIAL_LINKS = [
     colorClass: "text-emerald-600 hover:text-emerald-700",
   },
   {
-    key: "whatsapp",
-    href: "https://wa.me/8801338125069",
-    label: "WhatsApp",
-    icon: WhatsAppIcon,
-    colorClass: "text-[#25D366] hover:text-[#128C7E]",
-  },
-  {
     key: "facebook",
     href: "https://www.facebook.com/upoharkabbo",
     label: "Facebook",
     icon: FacebookIcon,
     colorClass: "text-[#1877F2] hover:text-[#0d65d9]",
+  },
+  {
+    key: "whatsapp",
+    href: "https://wa.me/8801338125069",
+    label: "WhatsApp",
+    icon: WhatsAppIcon,
+    colorClass: "text-[#25D366] hover:text-[#128C7E]",
   },
   {
     key: "instagram",
