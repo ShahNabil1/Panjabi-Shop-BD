@@ -91,6 +91,7 @@ function CreateOrderPage() {
 
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  const [historyOpen, setHistoryOpen] = useState(false);
   const [address, setAddress] = useState("");
   const [division, setDivision] = useState("");
   const [district, setDistrict] = useState("");
@@ -306,6 +307,8 @@ function CreateOrderPage() {
         title="Create Order"
         description="Place a manual order on behalf of a customer."
       />
+
+      <CustomerOrdersDialog phone={phone.trim()} open={historyOpen} onOpenChange={setHistoryOpen} />
 
       <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_320px]">
         <div className="space-y-5">
