@@ -6,7 +6,13 @@ import { fetchSitemapData } from "@/lib/catalog.server";
 
 import { SITE_URL as BASE_URL } from "@/lib/site";
 
-type Entry = { path: string; changefreq?: string; priority?: string };
+type Entry = { path: string; changefreq?: string; priority?: string; lastmod?: string };
+
+const iso = (v?: string | null) => {
+  if (!v) return undefined;
+  const d = new Date(v);
+  return Number.isNaN(d.getTime()) ? undefined : d.toISOString();
+};
 
 export const Route = createFileRoute("/sitemap.xml")({
   server: {
