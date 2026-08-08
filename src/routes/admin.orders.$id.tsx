@@ -315,7 +315,11 @@ function AdminOrderDetail() {
       <Panel className="space-y-4">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <h1 className="font-mono text-xl font-bold tracking-tight">{order.order_number}</h1>
+            <CopyBadge
+              value={order.order_number}
+              className="bg-transparent px-0 py-0 font-mono text-xl font-bold tracking-tight text-foreground hover:bg-transparent"
+            />
+
             <p className="mt-1 text-xs text-muted-foreground">
               {new Date(order.created_at).toLocaleString("en-US", {
                 timeZone: "Asia/Dhaka",
