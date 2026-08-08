@@ -2,10 +2,12 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 
 import { phoneLast4 } from "@/lib/order-receipt";
 
-const searchSchema = z.object({
-  phone: z.string().catch(""),
-  print: z.coerce.string().catch(""),
-});
+function searchSchema(input: Record<string, unknown>) {
+  return {
+    phone: input["phone"] == null ? "" : String(input["phone"]),
+    print: input["print"] == null ? "" : String(input["print"]),
+  };
+}
 
 /** Legacy invoice URL — permanently forwards to the short /inv link. */
 export const Route = createFileRoute("/invoice/$orderNumber")({
