@@ -119,15 +119,15 @@ export function SiteFooter() {
               </li>
             ) : null}
             <li className="pt-2">
-              <span className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-3 py-2 text-sm font-bold text-primary-foreground shadow-sm">
-                <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-primary-foreground/20 text-xs">✓</span>
-                সম্পূর্ণ ক্যাশ অন ডেলিভারি
+              <span className="flex w-full flex-col items-center justify-center gap-1.5 rounded-lg bg-primary px-2 py-2 text-center text-xs font-bold text-primary-foreground shadow-sm sm:flex-row sm:gap-2 sm:px-3 sm:text-sm">
+                <span className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary-foreground/20 text-xs">✓</span>
+                <span>সম্পূর্ণ ক্যাশ অন ডেলিভারি</span>
               </span>
             </li>
             <li className="pt-1">
-              <span className="inline-flex w-full items-center justify-center gap-2 rounded-lg border-2 border-primary bg-primary/5 px-3 py-2 text-sm font-bold text-primary">
-                <span className="animate-pulse">🚚</span>
-                সারা বাংলাদেশে ফ্রী ডেলিভারি
+              <span className="flex w-full flex-col items-center justify-center gap-1.5 rounded-lg border-2 border-primary bg-primary/5 px-2 py-2 text-center text-xs font-bold text-primary sm:flex-row sm:gap-2 sm:px-3 sm:text-sm">
+                <span className="shrink-0 animate-pulse text-base sm:text-sm">🚚</span>
+                <span>সারা বাংলাদেশে ফ্রী ডেলিভারি</span>
               </span>
             </li>
           </ul>
