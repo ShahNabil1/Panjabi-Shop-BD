@@ -395,26 +395,43 @@ export function CheckoutForm({
       <div className={cn("grid gap-8 px-4 pt-7 sm:px-7", compact ? "pb-5" : "pb-7 sm:pb-9")}>
         {/* Your products */}
         <section>
-          <div className="flex items-center justify-between gap-3">
-            <h3 className="text-lg font-extrabold">{pick(lang, "আপনার প্রোডাক্ট", "Your Products")}</h3>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <h3 className="font-en text-xl font-extrabold tracking-tight sm:text-2xl">Your Products</h3>
             {allowAddMore ? (
               <Link
                 to="/"
-                className="text-xs font-semibold text-primary underline-offset-4 hover:underline"
+                className="font-en group inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-primary to-pink-500 px-5 py-2.5 text-sm font-extrabold text-primary-foreground shadow-md transition-all duration-300 hover:scale-[1.03] hover:shadow-lg active:scale-95 sm:text-base"
               >
-                + {tr(lang, "addMoreProducts")}
+                <Plus className="h-4 w-4 transition-transform duration-300 group-hover:rotate-90" />
+                Add Product
               </Link>
             ) : null}
           </div>
 
           <div className="mt-4 overflow-hidden rounded-xl border border-border">
-            <div className="flex items-center justify-between gap-3 bg-secondary/60 px-3 py-2.5 text-xs font-bold uppercase tracking-wide text-muted-foreground sm:px-4">
-              <span>{pick(lang, "প্রোডাক্ট", "Product")}</span>
+            <div className="font-en flex items-center justify-between gap-3 bg-secondary/60 px-3 py-3 text-sm font-extrabold uppercase tracking-wide text-foreground sm:px-4 sm:text-base">
+              <span>Product</span>
               <div className="flex items-center gap-4 sm:gap-5">
-                <span className="text-center">{pick(lang, "পরিমাণ", "Quantity")}</span>
-                <span className="text-right">{pick(lang, "দাম", "Price")}</span>
+                <span className="text-center">Quantity</span>
+                <span className="text-right">Price</span>
               </div>
             </div>
+
+            {items.length === 0 ? (
+              <div className="grid place-items-center gap-3 px-4 py-10 text-center">
+                <p className="font-en text-base font-bold text-muted-foreground">
+                  No products in your order
+                </p>
+                <Link
+                  to="/"
+                  className="font-en group inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-primary to-pink-500 px-6 py-3 text-base font-extrabold text-primary-foreground shadow-md transition-all duration-300 hover:scale-[1.03] hover:shadow-lg active:scale-95"
+                >
+                  <Plus className="h-5 w-5 transition-transform duration-300 group-hover:rotate-90" />
+                  Add Product
+                </Link>
+              </div>
+            ) : null}
+
 
             <ul className="divide-y divide-border">
               {items.map((i) => (
