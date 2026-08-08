@@ -18,7 +18,6 @@ export function QuantityStepper({
   max: number;
   className?: string;
 }) {
-  const { lang } = useLang();
   const limit = max > 0 ? max : 99;
   return (
     <div
@@ -36,8 +35,8 @@ export function QuantityStepper({
       >
         −
       </button>
-      <span className="flex h-full w-12 items-center justify-center text-center text-sm font-semibold tabular-nums transition-all duration-150">
-        {formatNumber(lang, value)}
+      <span className="font-en flex h-full w-12 items-center justify-center text-center text-sm font-semibold tabular-nums transition-all duration-150">
+        {formatNumber("en", value)}
       </span>
       <button
         type="button"
@@ -94,7 +93,7 @@ export function AddToCartBar({
       <button
         type="button"
         onClick={() => addItem()}
-        className="min-w-36 flex-1 rounded-sm border border-primary px-5 py-3 text-sm font-semibold text-primary transition-colors hover:bg-primary/5"
+        className="font-en min-w-36 flex-1 rounded-sm border border-primary px-5 py-3 text-sm font-semibold text-primary transition-colors hover:bg-primary/5"
       >
         {tr(lang, "addToCart")}
       </button>
@@ -104,7 +103,7 @@ export function AddToCartBar({
           addItem(false);
           void navigate({ to: "/checkout" });
         }}
-        className="min-w-36 flex-1 rounded-sm bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
+        className="font-en min-w-36 flex-1 rounded-sm bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
       >
         {tr(lang, "buyNow")}
       </button>
