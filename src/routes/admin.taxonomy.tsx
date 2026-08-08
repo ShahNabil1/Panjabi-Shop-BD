@@ -3,7 +3,7 @@ import { useConfirm } from "@/components/ui/confirm-dialog";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
-import { FolderTree, Layers, Pencil, Trash2, X } from "lucide-react";
+import { Eye, EyeOff, FolderTree, Layers, Pencil, Trash2, X } from "lucide-react";
 
 import {
   adminDeleteCategory,
@@ -11,6 +11,7 @@ import {
   adminSaveCategory,
   adminSaveSubcategory,
   adminTaxonomy,
+  adminToggleCategoryActive,
 } from "@/lib/admin.functions";
 import type { CategoryInput, SubcategoryInput } from "@/lib/admin-schema";
 import {
