@@ -9,6 +9,8 @@ import { paymentFilters, type OrderBucket, type OrderStatus, type PaymentFilter 
 import { EmptyState, Panel, StatusPill, statusLabels } from "@/components/admin/kit";
 import { BrandLoader } from "@/components/admin/brand-loader";
 import { PhoneActions } from "@/components/admin/phone-actions";
+import { CopyBadge } from "@/components/admin/copy-badge";
+import { RatioBadge } from "@/components/admin/ratio-badge";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { courierCachedRatios } from "@/lib/courier.functions";
@@ -18,7 +20,7 @@ import {
   courierStatusTone,
   type CourierStatus,
 } from "@/lib/delivery-shared";
-import { CourierStatusBar, ratioTone } from "@/components/admin/courier-status";
+import { CourierStatusBar } from "@/components/admin/courier-status";
 import { CourierApiStatusBar } from "@/components/admin/courier-api-status";
 import { CourierBadge } from "@/components/admin/courier-logo";
 import { cn } from "@/lib/utils";
@@ -317,20 +319,11 @@ export function OrdersBoard({
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="text-[15px] font-bold text-foreground">{o.customer_name}</span>
                     <StatusPill status={o.status} />
-                    <span className="rounded-md bg-muted px-1.5 py-0.5 font-mono text-xs text-muted-foreground">
-                      {o.order_number}
-                    </span>
+                    <CopyBadge value={o.order_number} />
                     <PhoneActions phone={o.customer_phone} size="sm" />
 
-                    {ratios?.[o.customer_phone] !== undefined ? (
-                      <span
-                        className={cn(
-                          "rounded-full px-2 py-0.5 text-xs font-bold ring-1 tabular-nums",
-                          ratioTone(ratios[o.customer_phone] as number),
-                        )}
-                      >
-                        {ratios[o.customer_phone]}%
-                      </span>
+                    {ratios?.[o.customer_phone] ? (
+                      <RatioBadge data={ratios[o.customer_phone]!} />
                     ) : null}
                     {(o as { delivery_partner?: string | null }).delivery_partner ? (
                       <CourierBadge
