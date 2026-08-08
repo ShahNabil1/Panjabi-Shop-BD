@@ -89,6 +89,15 @@ function slugify(input: string) {
     .slice(0, 80);
 }
 
+function slugifyInput(input: string) {
+  return input
+    .toLowerCase()
+    .replace(/[^a-z0-9\u0980-\u09FF-]+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-+/, "")
+    .slice(0, 80);
+}
+
 function pick(bn: string | null | undefined, en: string | null | undefined) {
   return (bn && bn.trim().length > 0 ? bn : en) ?? "";
 }
@@ -303,7 +312,8 @@ export function ProductEditor({ id, kind }: { id: string; kind: ProductKind }) {
             <TextField
               label="Slug"
               value={draft.slug}
-              onChange={(v) => set("slug", slugify(v))}
+              onChange={(v) => set("slug", slugifyInput(v))}
+              onBlur={() => set("slug", slugify(draft.slug))}
               hint="URL: /p/your-slug"
             />
           )}
