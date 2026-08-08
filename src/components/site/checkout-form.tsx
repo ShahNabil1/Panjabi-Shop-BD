@@ -468,7 +468,23 @@ export function CheckoutForm({
                       {onRemove ? (
                         <button
                           type="button"
-                          onClick={() => onRemove(i.key)}
+                          onClick={() => {
+                            void (async () => {
+                              const ok = await confirmDialog({
+                                title: pick(
+                                  lang,
+                                  "প্রোডাক্টটি সরিয়ে ফেলবেন?",
+                                  "Remove this product?",
+                                ),
+                                description: pick(lang, i.nameBn, i.nameEn),
+                                confirmLabel: pick(lang, "ডিলিট করুন", "Delete"),
+                                cancelLabel: pick(lang, "বাতিল", "Cancel"),
+                                tone: "danger",
+                              });
+                              if (ok) onRemove(i.key);
+                            })();
+                          }}
+
                           aria-label={tr(lang, "remove")}
                           className="grid h-8 w-8 shrink-0 cursor-pointer place-items-center rounded-full border border-border bg-card text-muted-foreground transition-all duration-200 hover:scale-110 hover:border-destructive hover:text-destructive hover:shadow-sm active:scale-95"
                         >
