@@ -55,7 +55,11 @@ type CartContextValue = {
 const CartContext = createContext<CartContextValue | null>(null);
 
 function itemKey(productId: string, variantId: string | null, comboSelections: ComboSelection[] = []) {
-  const comboKey = comboSelections.map((selection) => selection.variantId).sort().join("+");
+  const comboKey = comboSelections
+    .map((selection) => selection.variantId)
+    .filter((id): id is string => Boolean(id))
+    .sort()
+    .join("+");
   return `${productId}::${variantId ?? "base"}${comboKey ? `::${comboKey}` : ""}`;
 }
 
