@@ -67,12 +67,18 @@ const listOf = (body: Record<string, unknown>): Array<Record<string, unknown>> =
   const d = body["data"];
   if (Array.isArray(d)) return d as Array<Record<string, unknown>>;
   const inner = (d ?? body) as Record<string, unknown>;
-  for (const key of ["orders", "results", "data", "items"]) {
+  for (const key of ["stores", "orders", "cities", "zones", "areas", "results", "data", "items"]) {
     const v = inner[key];
     if (Array.isArray(v)) return v as Array<Record<string, unknown>>;
+    // One more level for paginated shapes like { stores: { data: [...] } }.
+    if (v && typeof v === "object") {
+      const nested = (v as Record<string, unknown>)["data"];
+      if (Array.isArray(nested)) return nested as Array<Record<string, unknown>>;
+    }
   }
   return [];
 };
+
 
 export type CarrybeeStore = { store_id: number; store_name: string };
 
