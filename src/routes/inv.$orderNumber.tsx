@@ -10,8 +10,8 @@ import { orderStatusLabel } from "@/lib/order-receipt";
 import { formatPrice } from "@/lib/i18n";
 
 const searchSchema = z.object({
-  p: z.string().catch(""),
-  print: z.string().catch(""),
+  p: z.coerce.string().catch(""),
+  print: z.coerce.string().catch(""),
 });
 
 export const Route = createFileRoute("/inv/$orderNumber")({

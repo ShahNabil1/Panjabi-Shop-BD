@@ -5,7 +5,7 @@ import { phoneLast4 } from "@/lib/order-receipt";
 
 const searchSchema = z.object({
   phone: z.string().catch(""),
-  print: z.string().catch(""),
+  print: z.coerce.string().catch(""),
 });
 
 /** Legacy invoice URL — permanently forwards to the short /inv link. */
