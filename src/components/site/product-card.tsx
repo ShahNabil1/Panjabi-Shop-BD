@@ -1,5 +1,9 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
+import { ShoppingBag, Zap } from "lucide-react";
+
+import { useCart } from "@/lib/cart-context";
+
 
 import { useLang } from "@/lib/language-context";
 import { badgeLabel, discountPercent, formatNumber, formatPrice, pick, toBnDigits, tr } from "@/lib/i18n";
@@ -51,39 +55,81 @@ export function ProductThumb({
 
 export function ProductCard({ product }: { product: ProductCardData }) {
   const { lang } = useLang();
+  const navigate = useNavigate();
+  const { add, openCart } = useCart();
   const name = pick(lang, product.nameBn, product.nameEn);
   const badge = badgeLabel(product.badgeBn, product.badgeEn);
   const off = discountPercent(product.price, product.compareAtPrice);
   const soldOut = product.stock <= 0;
 
+  const addItem = () => {
+    add({
+      productId: product.id,
+      slug: product.slug,
+      nameBn: product.nameBn,
+      nameEn: product.nameEn,
+      image: product.image,
+      price: product.price,
+      quantity: 1,
+      stock: product.stock,
+      sku: product.sku,
+      variantId: null,
+      variantLabelBn: null,
+      variantLabelEn: null,
+      comboSelections: [],
+    });
+  };
+
+  const onAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (soldOut) return;
+    addItem();
+    openCart("cart");
+  };
+
+  const onBuyNow = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (soldOut) return;
+    addItem();
+    void navigate({ to: "/checkout" });
+  };
+
   return (
     <Link
       to="/p/$product"
       params={{ product: product.slug }}
-      className="group flex flex-col overflow-hidden rounded-lg border border-border bg-card transition-shadow duration-200 hover:shadow-[var(--shadow-lift)]"
+      className={cn(
+        "group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card",
+        "transition-all duration-300 ease-out will-change-transform",
+        "hover:-translate-y-1.5 hover:border-primary/40 hover:shadow-[0_18px_40px_-18px_rgba(255,51,102,0.45)]",
+      )}
     >
       <div className="relative aspect-4/5 overflow-hidden bg-secondary">
         <ProductThumb
           src={product.image}
           alt={pick(lang, product.imageAltBn, product.imageAltEn) || name}
           label={name}
-          className="transition-transform duration-500 group-hover:scale-[1.04]"
+          className="transition-transform duration-700 ease-out group-hover:scale-[1.07]"
         />
+        {/* soft brand glow on hover */}
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-primary/25 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
         <div className="absolute left-0 top-3 flex flex-col gap-1">
           {badge ? (
-            <span className="bg-primary px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-primary-foreground">
+            <span className="rounded-r-full bg-primary px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-primary-foreground shadow-sm">
               {badge}
             </span>
           ) : null}
           {off > 0 ? (
-            <span className="bg-foreground px-2.5 py-1 text-[11px] font-semibold text-background">
+            <span className="rounded-r-full bg-foreground px-3 py-1 text-[11px] font-semibold text-background shadow-sm">
               {lang === "bn" ? `${off}% ছাড়` : `${off}% off`}
             </span>
           ) : null}
         </div>
         {soldOut ? (
-          <div className="absolute inset-0 flex items-center justify-center bg-background/70">
-            <span className="rounded-sm border border-border bg-card px-3 py-1.5 text-xs font-semibold">
+          <div className="absolute inset-0 flex items-center justify-center bg-background/70 backdrop-blur-[1px]">
+            <span className="rounded-full border border-border bg-card px-3 py-1.5 text-xs font-semibold">
               {tr(lang, "outOfStock")}
             </span>
           </div>
@@ -91,7 +137,7 @@ export function ProductCard({ product }: { product: ProductCardData }) {
       </div>
 
       <div className="flex min-w-0 flex-1 flex-col gap-1.5 p-3.5 text-center sm:text-left">
-        <h3 className="line-clamp-2 text-[15px] font-semibold leading-snug text-card-foreground">
+        <h3 className="line-clamp-2 text-[15px] font-semibold leading-snug text-card-foreground transition-colors duration-200 group-hover:text-primary">
           {name}
         </h3>
         {product.reviewCount > 0 ? (
@@ -110,10 +156,40 @@ export function ProductCard({ product }: { product: ProductCardData }) {
             </span>
           ) : null}
         </div>
+
+        <div className="mt-3 flex flex-col gap-2">
+          <button
+            type="button"
+            onClick={onAddToCart}
+            disabled={soldOut}
+            className={cn(
+              "inline-flex w-full items-center justify-center gap-1.5 rounded-xl border border-primary/60 bg-primary/5 px-3 py-2 text-[13px] font-semibold text-primary",
+              "transition-all duration-200 ease-out hover:bg-primary hover:text-primary-foreground hover:shadow-[0_8px_20px_-10px_rgba(255,51,102,0.8)] active:scale-[0.97]",
+              "disabled:pointer-events-none disabled:opacity-50",
+            )}
+          >
+            <ShoppingBag className="size-4" />
+            {lang === "bn" ? "কার্টে যোগ করুন" : "Add to Cart"}
+          </button>
+          <button
+            type="button"
+            onClick={onBuyNow}
+            disabled={soldOut}
+            className={cn(
+              "inline-flex w-full items-center justify-center gap-1.5 rounded-xl bg-primary px-3 py-2 text-[13px] font-bold text-primary-foreground shadow-sm",
+              "transition-all duration-200 ease-out hover:brightness-110 hover:shadow-[0_10px_24px_-10px_rgba(255,51,102,0.9)] active:scale-[0.97]",
+              "disabled:pointer-events-none disabled:opacity-50",
+            )}
+          >
+            <Zap className="size-4" />
+            {lang === "bn" ? "এখনই কিনুন" : "Buy Now"}
+          </button>
+        </div>
       </div>
     </Link>
   );
 }
+
 
 export function ProductGrid({ products }: { products: ProductCardData[] }) {
   const { lang } = useLang();
