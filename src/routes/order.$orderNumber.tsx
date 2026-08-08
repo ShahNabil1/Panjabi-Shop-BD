@@ -7,6 +7,7 @@ import { useLang } from "@/lib/language-context";
 import { formatNumber, formatPrice, tr } from "@/lib/i18n";
 import { getOrderSummary } from "@/lib/order.functions";
 import { Section } from "@/components/site/ui";
+import { pageTitle } from "@/lib/site";
 
 const searchSchema = z.object({ phone: z.string().catch("") });
 
