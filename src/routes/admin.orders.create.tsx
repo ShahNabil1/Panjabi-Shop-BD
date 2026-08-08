@@ -319,7 +319,7 @@ function CreateOrderPage() {
     district &&
     upazila &&
     lines.length > 0 &&
-    (preOrder || !scheduleOn || scheduledFor.length > 0) &&
+    (mode !== "manual" || preOrder || !scheduleOn || scheduledFor.length > 0) &&
     !create.isPending;
 
   return (
