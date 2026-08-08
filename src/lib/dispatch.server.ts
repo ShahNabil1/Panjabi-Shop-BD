@@ -255,7 +255,7 @@ export async function dispatchBulkOrdersToCarrybee(
   orderIds: string[],
   actor: string,
 ): Promise<DispatchResult[]> {
-  const { carrybeeCreateOrder } = await import("./carrybee.server");
+  const { carrybeeCreateOrder, carrybeeCreateBulkOrders } = await import("./carrybee.server");
   const { logActivity } = await import("./admin.server");
 
   const orders: { row: OrderRow; items: Awaited<ReturnType<typeof loadItems>> }[] = [];
