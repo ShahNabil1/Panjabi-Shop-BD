@@ -164,6 +164,8 @@ export function ItemsCard({
   locked?: boolean;
 }) {
   const qc = useQueryClient();
+  const lightbox = useLightbox();
+  const openImage = (src: string, alt?: string) => lightbox.open([{ src, alt }], 0);
   const [items, setItems] = useState<EditableItem[]>(initialItems);
   const [adding, setAdding] = useState(false);
   const [query, setQuery] = useState("");
