@@ -395,7 +395,7 @@ function PartnerCard({
         </label>
         <Textarea
           rows={3}
-          maxLength={500}
+          maxLength={noteMax}
           aria-invalid={noteError ? true : undefined}
           className={`rounded-xl ${noteError ? "border-destructive focus-visible:ring-destructive/40" : ""}`}
           placeholder="e.g. Please call before delivery. Fragile item — handle with care."
@@ -407,7 +407,7 @@ function PartnerCard({
           <p className="text-[11px] font-medium text-destructive">{noteError}</p>
         ) : null}
         <p className="text-[11px] text-muted-foreground">
-          {noteTemplate.length}/500 · Applied automatically to the order's delivery note when this
+          {noteTemplate.length}/{noteMax} · Applied automatically to the order's delivery note when this
           courier is chosen. Turning the delivery-note checkbox off clears it again.
         </p>
       </div>
