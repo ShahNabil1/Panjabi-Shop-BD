@@ -34,7 +34,7 @@ export function SiteFooter() {
             Follow us on
           </p>
           <div className="mt-3 flex flex-wrap items-center gap-3">
-            {SOCIAL_LINKS.map(({ key, href, label, icon: Icon, colorClass }) => (
+            {SOCIAL_LINKS.filter(({ key }) => key !== "phone").map(({ key, href, label, icon: Icon, colorClass }) => (
               <a
                 key={key}
                 href={href}
