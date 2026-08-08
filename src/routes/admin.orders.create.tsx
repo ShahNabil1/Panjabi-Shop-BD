@@ -46,16 +46,16 @@ function Collapse({
   gap = 20,
 }: {
   open: boolean;
-  children: React.ReactNode;
+  children: ReactNode;
   /** kept for call-site compatibility; "" means no extra vertical rhythm */
   gapClass?: string;
   gap?: number;
 }) {
-  const innerRef = React.useRef<HTMLDivElement | null>(null);
-  const [height, setHeight] = React.useState(0);
+  const innerRef = useRef<HTMLDivElement | null>(null);
+  const [height, setHeight] = useState(0);
   const gapPx = gapClass === "" ? 0 : gap;
 
-  React.useLayoutEffect(() => {
+  useLayoutEffect(() => {
     const el = innerRef.current;
     if (!el) return;
     const measure = () => setHeight(el.offsetHeight);
