@@ -18,7 +18,6 @@ export function QuantityStepper({
   max: number;
   className?: string;
 }) {
-  const { lang } = useLang();
   const limit = max > 0 ? max : 99;
   return (
     <div
