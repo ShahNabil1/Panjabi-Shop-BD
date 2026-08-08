@@ -61,28 +61,73 @@ export const adminProcessRtsChunk = createServerFn({ method: "POST" })
   .handler(async ({ data, context }): Promise<{ results: RtsItemResult[] }> => {
     const db = await requireAdmin(context.supabase, context.userId);
     const { actorName } = await import("./admin.server");
-    const { dispatchOrder } = await import("./dispatch.server");
+    const { dispatchOrder, dispatchBulkOrdersToCarrybee, providerKey } = await import(
+      "./dispatch.server"
+    );
     const who = await actorName(db, context.userId);
 
-    const results: RtsItemResult[] = [];
-    for (const orderId of data.orderIds) {
-      const res = await dispatchOrder(db, orderId, who);
-      results.push({
-        orderId,
+    /** Decide whether this chunk can be sent as one CarryBee bulk call. */
+    const { data: orderRows } = await db
+      .from("orders")
+      .select("id, delivery_partner, courier_consignment_id, source")
+      .in("id", data.orderIds);
+    const orderMeta = (orderRows ?? []) as Array<{
+      id: string;
+      delivery_partner: string | null;
+      courier_consignment_id: string | null;
+      source: string | null;
+    }>;
+
+    const allCarrybee =
+      orderMeta.length === data.orderIds.length &&
+      orderMeta.every(
+        (o) =>
+          providerKey(o.delivery_partner) === "carrybee" &&
+          !o.courier_consignment_id &&
+          (o.source ?? "").toLowerCase() !== "exchange",
+      );
+
+    let results: RtsItemResult[] = [];
+
+    if (allCarrybee) {
+      results = (await dispatchBulkOrdersToCarrybee(db, data.orderIds, who)).map((res) => ({
+        orderId: res.orderId,
         orderNumber: res.orderNumber,
         ok: res.ok,
         consignmentId: res.consignmentId,
         message: res.message,
-      });
-      await db
-        .from("courier_bulk_job_items")
-        .update({
-          status: res.ok ? "success" : "failed",
+      }));
+      for (const res of results) {
+        await db
+          .from("courier_bulk_job_items")
+          .update({
+            status: res.ok ? "success" : "failed",
+            message: res.message,
+            consignment_id: res.consignmentId,
+          })
+          .eq("job_id", data.jobId)
+          .eq("order_id", res.orderId);
+      }
+    } else {
+      for (const orderId of data.orderIds) {
+        const res = await dispatchOrder(db, orderId, who);
+        results.push({
+          orderId,
+          orderNumber: res.orderNumber,
+          ok: res.ok,
+          consignmentId: res.consignmentId,
           message: res.message,
-          consignment_id: res.consignmentId,
-        })
-        .eq("job_id", data.jobId)
-        .eq("order_id", orderId);
+        });
+        await db
+          .from("courier_bulk_job_items")
+          .update({
+            status: res.ok ? "success" : "failed",
+            message: res.message,
+            consignment_id: res.consignmentId,
+          })
+          .eq("job_id", data.jobId)
+          .eq("order_id", orderId);
+      }
     }
 
     const { data: counts } = await db

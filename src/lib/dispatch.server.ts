@@ -246,6 +246,195 @@ export async function buildCarrybeePayload(
 }
 
 /**
+ * Bulk-dispatch many orders to CarryBee in one `orders-bulk` call.
+ * Skips already-sent orders and exchange orders (those need a source consignment).
+ * Returns per-order results in the same shape as dispatchOrder.
+ */
+export async function dispatchBulkOrdersToCarrybee(
+  db: Db,
+  orderIds: string[],
+  actor: string,
+): Promise<DispatchResult[]> {
+  const { carrybeeCreateBulkOrders } = await import("./carrybee.server");
+  const { logActivity } = await import("./admin.server");
+
+  const orders: { row: OrderRow; items: Awaited<ReturnType<typeof loadItems>> }[] = [];
+  const skipped: DispatchResult[] = [];
+
+  for (const orderId of orderIds) {
+    try {
+      const order = await loadOrder(db, orderId);
+      const base = { orderId, orderNumber: order.order_number };
+
+      if (order.courier_consignment_id) {
+        skipped.push({
+          ...base,
+          ok: true,
+          provider: providerKey(order.delivery_partner),
+          consignmentId: order.courier_consignment_id,
+          message: "Already sent to courier",
+        });
+        continue;
+      }
+
+      const provider = providerKey(order.delivery_partner);
+      if (provider !== "carrybee") {
+        skipped.push({
+          ...base,
+          ok: false,
+          provider,
+          consignmentId: null,
+          message: "Not a CarryBee order",
+        });
+        continue;
+      }
+
+      if ((order.source ?? "").toLowerCase() === "exchange") {
+        skipped.push({
+          ...base,
+          ok: false,
+          provider: "carrybee",
+          consignmentId: null,
+          message: "Exchange orders must be sent individually",
+        });
+        continue;
+      }
+
+      const items = await loadItems(db, orderId);
+      orders.push({ row: order, items });
+    } catch (error) {
+      skipped.push({
+        orderId,
+        orderNumber: "—",
+        ok: false,
+        provider: "carrybee",
+        consignmentId: null,
+        message: (error as Error).message,
+      });
+    }
+  }
+
+  if (!orders.length) return skipped;
+
+  const partner = await loadPartner(db, "carrybee");
+  const creds = carrybeeCreds(partner);
+
+  const payloads = await Promise.all(
+    orders.map(({ row, items }) => buildCarrybeePayload(db, row, items, partner)),
+  );
+
+  let results: { results: import("./carrybee.server").CarrybeeOrderResult[]; raw: Record<string, unknown> };
+  try {
+    results = await carrybeeCreateBulkOrders(creds, payloads);
+  } catch (error) {
+    const message = (error as Error).message;
+    for (const { row } of orders) {
+      await logActivity(db, row.id, "courier", `Bulk CarryBee dispatch failed — ${message}`, {
+        actor,
+        meta: { provider: "carrybee" },
+      });
+    }
+    return [
+      ...skipped,
+      ...orders.map(({ row }) => ({
+        orderId: row.id,
+        orderNumber: row.order_number,
+        ok: false,
+        provider: "carrybee" as const,
+        consignmentId: null,
+        message,
+      })),
+    ];
+  }
+
+  const created = results.results;
+  const out: DispatchResult[] = [];
+
+  for (let i = 0; i < orders.length; i++) {
+    const { row } = orders[i]!;
+    const base = { orderId: row.id, orderNumber: row.order_number };
+    const res = created[i];
+
+    if (!res || !res.consignmentId) {
+      const message = res?.status ? `CarryBee returned status ${res.status}` : "No consignment returned";
+      await logActivity(db, row.id, "courier", `Bulk CarryBee dispatch failed — ${message}`, {
+        actor,
+        meta: { provider: "carrybee" },
+      });
+      out.push({
+        ...base,
+        ok: false,
+        provider: "carrybee",
+        consignmentId: null,
+        message,
+      });
+      continue;
+    }
+
+    const status = normaliseCourierStatus("carrybee", res.status);
+
+    await db.from("order_consignments").delete().eq("order_id", row.id).eq("provider", "carrybee");
+    const { error: consignmentError } = await db.from("order_consignments").insert({
+      order_id: row.id,
+      provider: "carrybee",
+      consignment_id: res.consignmentId,
+      tracking_code: null,
+      merchant_order_id: row.order_number,
+      status,
+      status_message: res.status,
+      delivery_fee: null,
+      cod_amount: codAmount(row),
+      raw: JSON.parse(JSON.stringify(res.raw)) as never,
+    });
+    if (consignmentError) {
+      await logActivity(db, row.id, "courier", `Bulk CarryBee dispatch failed — ${consignmentError.message}`, {
+        actor,
+        meta: { provider: "carrybee" },
+      });
+      out.push({
+        ...base,
+        ok: false,
+        provider: "carrybee",
+        consignmentId: res.consignmentId,
+        message: consignmentError.message,
+      });
+      continue;
+    }
+
+    await db
+      .from("orders")
+      .update({
+        status: "rts",
+        courier_provider: "carrybee",
+        courier_consignment_id: res.consignmentId,
+        courier_tracking_code: null,
+        courier_status: status,
+        courier_sent_at: new Date().toISOString(),
+        fulfillment_status: "rts",
+      })
+      .eq("id", row.id);
+
+    await logActivity(
+      db,
+      row.id,
+      "courier",
+      `${actor} sent the order to CarryBee (bulk) · consignment ${res.consignmentId}`,
+      { actor, meta: { provider: "carrybee", consignmentId: res.consignmentId } },
+    );
+
+    out.push({
+      ...base,
+      ok: true,
+      provider: "carrybee",
+      consignmentId: res.consignmentId,
+      message: `Consignment ${res.consignmentId}`,
+    });
+  }
+
+  return [...skipped, ...out];
+}
+
+/**
  * Exchange orders must reference the customer's previous CarryBee parcel that
  * was actually delivered — CarryBee creates the exchange against it.
  */
