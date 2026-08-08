@@ -867,64 +867,67 @@ function CreateOrderPage() {
               </label>
 
 
-              {mode === "approved" ? (
-                <>
-                  <label className="block">
-                    <Label>Delivery partner</Label>
-                    <select
-                      className={input}
-                      value={deliveryPartner}
-                      onChange={(e) => applyPartner(e.target.value)}
-                      disabled={activePartners.isLoading}
-                    >
-                      <option value="">Not selected</option>
-                      {partnerOptions.map((p) => (
-                        <option key={p.provider} value={providerLabels[p.provider]}>
-                          {providerLabels[p.provider]}
-                          {p.isDefault ? " (default)" : ""}
-                        </option>
-                      ))}
-                    </select>
-                    {!activePartners.isLoading && partnerOptions.length === 0 ? (
-                      <span className="mt-1 block text-xs font-semibold text-muted-foreground">
-                        No delivery partner is enabled yet — add one in Settings → Delivery.
-                      </span>
-                    ) : null}
-                  </label>
-
-                  <div className="sm:col-span-2">
-                    <label className="flex cursor-pointer items-center gap-2 text-sm font-semibold">
-                      <input
-                        type="checkbox"
-                        className="size-4 accent-primary"
-                        checked={deliveryNoteOn}
-                        onChange={(e) => {
-                          const on = e.target.checked;
-                          setDeliveryNoteOn(on);
-                          if (!on) setDeliveryNote("");
-                          else {
-                            const match = partnerOptions.find(
-                              (p) => providerLabels[p.provider] === deliveryPartner,
-                            );
-                            setDeliveryNote(match?.noteTemplate ?? "");
-                          }
-                        }}
-                      />
-                      Add delivery note
+              <div className="sm:col-span-2">
+                <Collapse open={mode === "approved"} gapClass="-mb-3">
+                  <div className="grid gap-3">
+                    <label className="block">
+                      <Label>Delivery partner</Label>
+                      <select
+                        className={input}
+                        value={deliveryPartner}
+                        onChange={(e) => applyPartner(e.target.value)}
+                        disabled={activePartners.isLoading}
+                      >
+                        <option value="">Not selected</option>
+                        {partnerOptions.map((p) => (
+                          <option key={p.provider} value={providerLabels[p.provider]}>
+                            {providerLabels[p.provider]}
+                            {p.isDefault ? " (default)" : ""}
+                          </option>
+                        ))}
+                      </select>
+                      {!activePartners.isLoading && partnerOptions.length === 0 ? (
+                        <span className="mt-1 block text-xs font-semibold text-muted-foreground">
+                          No delivery partner is enabled yet — add one in Settings → Delivery.
+                        </span>
+                      ) : null}
                     </label>
-                    {deliveryNoteOn ? (
-                      <textarea
-                        rows={3}
-                        maxLength={500}
-                        className={cn(input, "mt-2 h-auto py-2")}
-                        placeholder="Sent to the courier as special instruction"
-                        value={deliveryNote}
-                        onChange={(e) => setDeliveryNote(e.target.value)}
-                      />
-                    ) : null}
+
+                    <div>
+                      <label className="flex cursor-pointer items-center gap-2 text-sm font-semibold">
+                        <input
+                          type="checkbox"
+                          className="size-4 accent-primary"
+                          checked={deliveryNoteOn}
+                          onChange={(e) => {
+                            const on = e.target.checked;
+                            setDeliveryNoteOn(on);
+                            if (!on) setDeliveryNote("");
+                            else {
+                              const match = partnerOptions.find(
+                                (p) => providerLabels[p.provider] === deliveryPartner,
+                              );
+                              setDeliveryNote(match?.noteTemplate ?? "");
+                            }
+                          }}
+                        />
+                        Add delivery note
+                      </label>
+                      <Collapse open={deliveryNoteOn} gapClass="">
+                        <textarea
+                          rows={3}
+                          maxLength={500}
+                          className={cn(input, "mt-2 h-auto py-2")}
+                          placeholder="Sent to the courier as special instruction"
+                          value={deliveryNote}
+                          onChange={(e) => setDeliveryNote(e.target.value)}
+                        />
+                      </Collapse>
+                    </div>
                   </div>
-                </>
-              ) : null}
+                </Collapse>
+              </div>
+
             </div>
 
             <Button
