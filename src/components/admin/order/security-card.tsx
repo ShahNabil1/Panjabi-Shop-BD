@@ -306,15 +306,22 @@ export function FulfillmentCard({
     onError: (e: Error) => toast.error(e.message),
   });
 
-  const consignmentUrl = consignmentId
-    ? `https://merchant.pathao.com/courier/orders/${consignmentId}`
-    : null;
-  const publicTrackingUrl =
-    isPathao && consignmentId
+  const consignmentUrl = !consignmentId
+    ? null
+    : isPathao
+      ? `https://merchant.pathao.com/courier/orders/${consignmentId}`
+      : isCarrybee
+        ? `https://merchant.carrybee.com/businesses/20521/orders/${encodeURIComponent(consignmentId)}`
+        : null;
+  const publicTrackingUrl = !consignmentId
+    ? null
+    : isPathao
       ? `https://merchant.pathao.com/tracking?consignment_id=${encodeURIComponent(consignmentId)}${
           customerPhone ? `&phone=${encodeURIComponent(customerPhone)}` : ""
         }`
-      : null;
+      : isCarrybee
+        ? `https://carrybee.com/tracking?consignment_id=${encodeURIComponent(consignmentId)}`
+        : null;
 
 
   return (
