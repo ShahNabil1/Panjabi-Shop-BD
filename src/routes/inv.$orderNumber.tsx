@@ -98,7 +98,7 @@ function InvoicePage() {
       </div>
 
       <article className="rounded-sm border border-border bg-card p-8 print:border-0 print:p-0">
-        <header className="flex flex-wrap items-start justify-between gap-4 border-b border-border pb-5">
+        <header className="flex flex-wrap items-start justify-between gap-4 border-b-2 border-border pb-5">
           <div>
             <img
               src={logoMark}
@@ -106,19 +106,19 @@ function InvoicePage() {
               className="h-16 w-auto object-contain"
             />
             {site.contact.address ? (
-              <p className="mt-2 text-xs text-muted-foreground">{site.contact.address}</p>
+              <p className="mt-2 text-sm font-semibold text-foreground/80">{site.contact.address}</p>
             ) : null}
             {site.contact.phone ? (
-              <p className="text-xs text-muted-foreground font-en">{site.contact.phone}</p>
+              <p className="text-sm font-semibold text-foreground/80 font-en">{site.contact.phone}</p>
             ) : null}
             {site.contact.email ? (
-              <p className="text-xs text-muted-foreground font-en">{site.contact.email}</p>
+              <p className="text-sm font-semibold text-foreground/80 font-en">{site.contact.email}</p>
             ) : null}
           </div>
           <div className="text-right font-en">
-            <p className="text-sm font-bold uppercase tracking-wide">Invoice</p>
-            <p className="mt-1 text-sm font-bold text-primary">{data.orderNumber}</p>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-lg font-extrabold uppercase tracking-wide">Invoice</p>
+            <p className="mt-1 text-xl font-extrabold text-primary">{data.orderNumber}</p>
+            <p className="text-sm font-semibold text-foreground/70">
               {new Date(data.createdAt).toLocaleString("en-GB", {
                 day: "2-digit",
                 month: "short",
@@ -127,58 +127,92 @@ function InvoicePage() {
                 minute: "2-digit",
               })}
             </p>
-            <p className="text-xs text-muted-foreground">Payment: Cash on Delivery</p>
+            <p className="text-sm font-semibold text-foreground/70">Payment: Cash on Delivery</p>
           </div>
         </header>
 
         <section className="mt-5 grid gap-4 font-en sm:grid-cols-2">
           <div>
-            <h2 className="text-xs font-bold uppercase text-muted-foreground">Customer</h2>
-            <p className="mt-1 text-sm font-semibold">{data.customerName}</p>
-            <p className="text-sm">{data.customerPhone}</p>
-            <p className="text-sm">
+            <h2 className="text-sm font-extrabold uppercase tracking-wide text-muted-foreground">
+              Customer
+            </h2>
+            <p className="mt-1 text-lg font-extrabold">{data.customerName}</p>
+            <p className="text-base font-bold">{data.customerPhone}</p>
+            <p className="text-base font-semibold">
               {data.addressLine}, {data.city}
             </p>
           </div>
           <div className="sm:text-right">
-            <h2 className="text-xs font-bold uppercase text-muted-foreground">Status</h2>
-            <p className="mt-1 text-sm font-semibold">{orderStatusLabel(data.status)}</p>
+            <h2 className="text-sm font-extrabold uppercase tracking-wide text-muted-foreground">
+              Status
+            </h2>
+            <p className="mt-1 text-lg font-extrabold">{orderStatusLabel(data.status)}</p>
+            {trackingUrl ? (
+              <div className="mt-2">
+                <p className="text-sm font-bold text-foreground/70">
+                  {courierLabel(data.courierProvider)} ·{" "}
+                  {data.courierTrackingCode || data.courierConsignmentId}
+                </p>
+                <a
+                  href={trackingUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="mt-1 inline-block rounded-sm border-2 border-primary px-3 py-1.5 text-sm font-extrabold text-primary"
+                >
+                  Track parcel →
+                </a>
+              </div>
+            ) : null}
           </div>
         </section>
 
-        <table className="mt-6 w-full border-collapse font-en text-sm">
+        <table className="mt-6 w-full border-collapse font-en text-base">
           <thead>
-            <tr className="border-y border-border text-left">
-              <th className="py-2 font-semibold">Item</th>
-              <th className="py-2 text-center font-semibold">Qty</th>
-              <th className="py-2 text-right font-semibold">Rate</th>
-              <th className="py-2 text-right font-semibold">Amount</th>
+            <tr className="border-y-2 border-border text-left">
+              <th className="py-2.5 text-base font-extrabold">Item</th>
+              <th className="py-2.5 text-center text-base font-extrabold">Qty</th>
+              <th className="py-2.5 text-right text-base font-extrabold">Rate</th>
+              <th className="py-2.5 text-right text-base font-extrabold">Amount</th>
             </tr>
           </thead>
           <tbody>
             {data.items.map((item, index) => (
-              <tr key={index} className="border-b border-border/60">
-                <td className="py-2">
-                  {item.name}
-                  {item.variantLabel ? (
-                    <span className="text-muted-foreground"> · {item.variantLabel}</span>
-                  ) : null}
-                  {item.comboSelections.length > 0 ? (
-                    <ul className="mt-1 space-y-0.5 text-xs text-muted-foreground">
-                      {item.comboSelections.map((selection, selectionIndex) => (
-                        <li key={selectionIndex}>
-                          {selection.itemNameEn} — {selection.variantLabelEn}
-                          {selection.quantity > 1 ? ` × ${selection.quantity}` : ""}
-                        </li>
-                      ))}
-                    </ul>
-                  ) : null}
+              <tr key={index} className="border-b border-border/60 align-top">
+                <td className="py-3">
+                  <div className="flex items-start gap-3">
+                    {item.imageUrl ? (
+                      <img
+                        src={item.imageUrl}
+                        alt={item.name}
+                        loading="lazy"
+                        className="h-16 w-16 shrink-0 rounded-sm border border-border object-cover"
+                      />
+                    ) : null}
+                    <div>
+                      <p className="text-base font-extrabold leading-snug">{item.name}</p>
+                      {item.variantLabel ? (
+                        <p className="text-sm font-bold text-foreground/70">{item.variantLabel}</p>
+                      ) : null}
+                      {item.comboSelections.length > 0 ? (
+                        <ul className="mt-1 space-y-0.5 text-sm font-semibold text-foreground/70">
+                          {item.comboSelections.map((selection, selectionIndex) => (
+                            <li key={selectionIndex}>
+                              {selection.itemNameEn} — {selection.variantLabelEn}
+                              {selection.quantity > 1 ? ` × ${selection.quantity}` : ""}
+                            </li>
+                          ))}
+                        </ul>
+                      ) : null}
+                    </div>
+                  </div>
                 </td>
-                <td className="py-2 text-center tabular-nums">{item.quantity}</td>
-                <td className="py-2 text-right tabular-nums">
+                <td className="py-3 text-center text-base font-extrabold tabular-nums">
+                  {item.quantity}
+                </td>
+                <td className="py-3 text-right text-base font-bold tabular-nums">
                   {formatPrice("en", item.unitPrice)}
                 </td>
-                <td className="py-2 text-right tabular-nums">
+                <td className="py-3 text-right text-base font-extrabold tabular-nums">
                   {formatPrice("en", item.lineTotal)}
                 </td>
               </tr>
@@ -187,28 +221,29 @@ function InvoicePage() {
         </table>
 
         <div className="mt-4 flex justify-end font-en">
-          <dl className="w-full max-w-xs space-y-1.5 text-sm">
+          <dl className="w-full max-w-xs space-y-1.5 text-base font-bold">
             <div className="flex justify-between">
-              <dt className="text-muted-foreground">Subtotal</dt>
+              <dt className="text-foreground/70">Subtotal</dt>
               <dd className="tabular-nums">{formatPrice("en", data.subtotal)}</dd>
             </div>
             <div className="flex justify-between">
-              <dt className="text-muted-foreground">Delivery charge</dt>
+              <dt className="text-foreground/70">Delivery charge</dt>
               <dd className="tabular-nums">{formatPrice("en", data.deliveryCharge)}</dd>
             </div>
             {data.discount > 0 ? (
               <div className="flex justify-between">
-                <dt className="text-muted-foreground">Discount</dt>
+                <dt className="text-foreground/70">Discount</dt>
                 <dd className="tabular-nums">− {formatPrice("en", data.discount)}</dd>
               </div>
             ) : null}
-            <div className="flex justify-between border-t border-border pt-2 text-base font-bold">
+            <div className="flex justify-between border-t-2 border-border pt-2 text-xl font-extrabold">
               <dt>Total</dt>
               <dd className="tabular-nums text-primary">{formatPrice("en", data.total)}</dd>
             </div>
           </dl>
         </div>
       </article>
+
     </div>
   );
 }
