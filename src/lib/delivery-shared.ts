@@ -167,8 +167,54 @@ export function normaliseCourierStatus(provider: DeliveryProvider, raw: string):
     return map[key] ?? "unknown";
   }
 
+  if (provider === "carrybee") {
+    // CarryBee webhook events arrive as "order.at-the-sorting-hub" etc.
+    const key = s.replace(/^order_/, "");
+    const map: Record<string, CourierStatus> = {
+      // → RTS
+      created: "pending",
+      updated: "pending",
+      pickup_requested: "pending",
+      assigned_for_pickup: "pending",
+      // → Pending again (creation rejected, fix the order and resend)
+      create_failed: "failed",
+      failed: "failed",
+      // → Shipped
+      picked: "picked",
+      at_the_sorting_hub: "in_transit",
+      on_the_way_to_central_warehouse: "in_transit",
+      at_central_warehouse: "in_transit",
+      in_transit: "in_transit",
+      received_at_last_mile_hub: "in_transit",
+      assigned_for_delivery: "in_transit",
+      // → Courier Hold
+      pickup_failed: "hold",
+      delivery_on_hold: "hold",
+      delivery_failed: "hold",
+      // → Cancelled
+      pickup_cancelled: "cancelled",
+      cancelled: "cancelled",
+      // → Returned (CarryBee has no awaiting-return step for us)
+      returned: "returned",
+      returned_at_sorting: "returned",
+      returned_in_transit: "returned",
+      returned_to_merchant: "returned",
+      // → Partial delivered (money collected, payout still pending)
+      partial_delivery: "partial_delivered",
+      paid_return: "partial_delivered",
+      // → Delivered
+      delivered: "delivered",
+      // → Exchange
+      exchange: "exchange",
+      // Money settlement only — flips the payment view to Paid.
+      paid: "paid_invoice",
+    };
+    return map[key] ?? "unknown";
+  }
+
   return genericStatus(s);
 }
+
 
 
 function genericStatus(s: string): CourierStatus {
