@@ -14,6 +14,7 @@ type Folder =
   | "promotions"
   | "landing"
   | "site"
+  | "popup"
   | "hero";
 
 async function uploadOne(file: File, folder: Folder): Promise<string> {
