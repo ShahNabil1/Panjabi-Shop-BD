@@ -177,12 +177,14 @@ function PartnerCard({
     JSON.stringify(values) !== savedSnapshot ||
     noteTemplate !== savedTemplate;
 
+  const noteMax = provider === "carrybee" ? 255 : 500;
+
   const noteError = (() => {
     const value = noteTemplate;
     if (!value) return null;
     if (!value.trim()) return "Note template can't be only spaces.";
     if (value.trim().length < 3) return "Note template must be at least 3 characters.";
-    if (value.length > 500) return "Note template must be 500 characters or fewer.";
+    if (value.length > noteMax) return `Note template must be ${noteMax} characters or fewer.`;
     if (/[<>]/.test(value)) return "Note template can't contain < or > characters.";
     if (/(https?:\/\/|www\.)/i.test(value)) return "Links aren't allowed in the delivery note.";
     return null;
@@ -393,7 +395,7 @@ function PartnerCard({
         </label>
         <Textarea
           rows={3}
-          maxLength={500}
+          maxLength={noteMax}
           aria-invalid={noteError ? true : undefined}
           className={`rounded-xl ${noteError ? "border-destructive focus-visible:ring-destructive/40" : ""}`}
           placeholder="e.g. Please call before delivery. Fragile item — handle with care."
@@ -405,7 +407,7 @@ function PartnerCard({
           <p className="text-[11px] font-medium text-destructive">{noteError}</p>
         ) : null}
         <p className="text-[11px] text-muted-foreground">
-          {noteTemplate.length}/500 · Applied automatically to the order's delivery note when this
+          {noteTemplate.length}/{noteMax} · Applied automatically to the order's delivery note when this
           courier is chosen. Turning the delivery-note checkbox off clears it again.
         </p>
       </div>
