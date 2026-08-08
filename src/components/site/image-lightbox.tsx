@@ -1,5 +1,5 @@
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 import { cn } from "@/lib/utils";
@@ -14,19 +14,20 @@ export function useLightbox() {
   const [images, setImages] = useState<LightboxImage[]>([]);
   const [startIndex, setStartIndex] = useState(0);
 
-  const open = (imgs: LightboxImage[], index = 0) => {
+  const open = useCallback((imgs: LightboxImage[], index = 0) => {
     setImages(imgs);
     setStartIndex(index);
     setIsOpen(true);
-  };
+  }, []);
 
-  const close = () => setIsOpen(false);
+  const close = useCallback(() => setIsOpen(false), []);
 
   return useMemo(
     () => ({ isOpen, images, startIndex, open, close }),
-    [isOpen, images, startIndex],
+    [isOpen, images, startIndex, open, close],
   );
 }
+
 
 export function ImageLightbox({
   images,
