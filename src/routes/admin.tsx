@@ -164,6 +164,9 @@ function AdminLayout() {
     queryKey: ["is-admin", session?.user.id ?? null],
     queryFn: () => checkIsAdmin(),
     enabled: Boolean(session),
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
+    retry: 1,
   });
 
   if (loading || !session || isAdmin.isLoading) {
