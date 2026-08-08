@@ -110,7 +110,7 @@
     radial-gradient(70rem 38rem at 8% -10%, color-mix(in oklab, var(--primary) 6%, transparent), transparent 58%),
     radial-gradient(56rem 32rem at 95% 2%, color-mix(in oklab, var(--accent) 9%, transparent), transparent 60%),
     radial-gradient(60rem 34rem at 50% 112%, color-mix(in oklab, var(--primary) 4%, transparent), transparent 62%),
-    radial-gradient(34rem 20rem at 50% 42%, color-mix(in oklab, oklch(0.98 0.008 90) 72%, transparent), transparent 68%);
+    radial-gradient(34rem 20rem at 50% 42%, color-mix(in oklab, oklch(0.985 0.006 12) 72%, transparent), transparent 68%);
   background-attachment: fixed;
 }
 
@@ -177,8 +177,8 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 
-  --shadow-card: 0 1px 2px oklch(0.25 0.03 40 / 0.06), 0 8px 24px -16px oklch(0.25 0.03 40 / 0.25);
-  --shadow-lift: 0 2px 4px oklch(0.25 0.03 40 / 0.08), 0 18px 40px -22px oklch(0.25 0.03 40 / 0.4);
+  --shadow-card: 0 1px 2px oklch(0.24 0.02 15 / 0.06), 0 8px 24px -16px oklch(0.24 0.02 15 / 0.25);
+  --shadow-lift: 0 2px 4px oklch(0.24 0.02 15 / 0.08), 0 18px 40px -22px oklch(0.24 0.02 15 / 0.4);
 }
 
 :root {
