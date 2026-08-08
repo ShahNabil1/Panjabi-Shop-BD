@@ -234,6 +234,7 @@ function LandingPage() {
                 src={img.url}
                 alt={pick(lang, img.alt_bn, img.alt_en) || headline}
                 label={product.nameEn}
+                onClick={() => lightbox.open(galleryImages, i)}
               />
             </div>
           ))}
