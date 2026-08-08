@@ -49,6 +49,8 @@ const COURIERS: Record<
     src: steadfastAsset.url,
     chip: "bg-white text-[#37A184] ring-[#37A184]/30",
     ring: "ring-[#37A184]/25 bg-white",
+    watermarkClass:
+      "w-[72%] max-w-[460px] self-start justify-self-center pt-5 opacity-[0.16] -rotate-6",
   },
 };
 
