@@ -177,13 +177,16 @@ function CreateOrderPage() {
     // Prefer the stored structured location columns; fall back to parsing the address line.
     const hasStructured = last.division && last.district && last.upazila;
     if (hasStructured) {
-      const dv = BD_DIVISIONS.find((d) => d.bn === last.division);
+      const div = last.division!;
+      const dist = last.district!;
+      const upa = last.upazila!;
+      const dv = BD_DIVISIONS.find((d) => d.bn === div);
       if (dv) {
         setDivision(dv.bn);
-        const ds = dv.districts.find((d) => d.bn === last.district);
+        const ds = dv.districts.find((d) => d.bn === dist);
         if (ds) {
           setDistrict(ds.bn);
-          if (ds.upazilas.some((u) => u.bn === last.upazila)) setUpazila(last.upazila);
+          if (ds.upazilas.some((u) => u.bn === upa)) setUpazila(upa);
         }
       }
       setAddress(last.address_line);
