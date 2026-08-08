@@ -668,9 +668,9 @@ export function CheckoutForm({
         {/* Shipping */}
         <section>
           <h3 className="font-en text-lg font-extrabold sm:text-xl">Shipping</h3>
-          <div className="mt-3 flex items-center justify-between gap-3 rounded-xl border border-border px-4 py-3 text-sm">
-            <span className="font-en font-bold">Delivery Charge</span>
-            <span className="font-en text-base font-extrabold tabular-nums">
+          <div className="mt-3 flex items-center justify-between gap-3 rounded-xl border-2 border-primary bg-primary/5 px-4 py-3 text-sm shadow-sm">
+            <span className="font-en font-bold text-primary">Delivery Charge</span>
+            <span className="font-en text-base font-extrabold tabular-nums text-primary">
               {delivery === 0 ? "Free" : formatPrice(lang, delivery)}
             </span>
           </div>
