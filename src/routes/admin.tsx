@@ -221,10 +221,21 @@ function AdminLayout() {
   }
 
   const isActive = matches;
-  const toggleSection = (title: string) =>
+  const toggleSection = (title: string, el?: HTMLElement | null) => {
+    const opening = !openSections.includes(title);
     setOpenSections((prev) =>
       prev.includes(title) ? prev.filter((t) => t !== title) : [...prev, title],
     );
+    if (!opening || !el) return;
+    // Reveal the newly expanded items — otherwise the last sections stay
+    // below the scroll fold and feel unreachable. The panel grows for ~600ms,
+    // so nudge the scroll a few times while it settles.
+    for (const delay of [200, 450, 700]) {
+      globalThis.setTimeout(() => {
+        el.scrollIntoView({ behavior: "smooth", block: "end" });
+      }, delay);
+    }
+  };
 
   const sidebar = (
     <div className="relative flex h-full flex-col">
@@ -259,12 +270,12 @@ function AdminLayout() {
         </Link>
       </div>
 
-      <nav className="relative flex-1 space-y-3 overflow-y-auto px-4 py-5">
+      <nav className="relative flex-1 space-y-3 overflow-y-auto px-4 pb-8 pt-5">
         {sections.map((section) => {
           const open = collapsed || openSections.includes(section.title);
           const hasActive = section.items.some(isActive);
           return (
-            <div key={section.title}>
+            <div key={section.title} data-section={section.title}>
               <div
                 className={cn(
                   "grid transition-[grid-template-rows,opacity] duration-[600ms] ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none",
@@ -274,7 +285,9 @@ function AdminLayout() {
                 <div className="overflow-hidden">
                   <button
                     type="button"
-                    onClick={() => toggleSection(section.title)}
+                    onClick={(e) =>
+                      toggleSection(section.title, e.currentTarget.closest("div[data-section]"))
+                    }
                     aria-expanded={open}
                     tabIndex={collapsed ? -1 : 0}
                     className={cn(
