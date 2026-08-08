@@ -225,6 +225,8 @@
   --sidebar-accent-foreground: oklch(0.33 0.02 14);
   --sidebar-border: oklch(0.918 0.008 12);
   --sidebar-ring: oklch(0.646 0.229 13);
+
+  --footer: #e9ecef;
 }
 
 
