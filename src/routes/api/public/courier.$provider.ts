@@ -71,7 +71,10 @@ export const Route = createFileRoute("/api/public/courier/$provider")({
         // endpoint, so a strict check silently dropped every real callback.
         // For CarryBee we accept and record the event regardless, and only note
         // whether the header matched. Other couriers stay strict.
-        if (provider !== "carrybee") {
+        // Steadfast's live callbacks carry no secret header at all (its panel
+        // only takes a URL), so a strict check dropped every real event. Like
+        // CarryBee we record them and flag whether the secret matched.
+        if (provider !== "carrybee" && provider !== "steadfast") {
           if (check === "unconfigured") {
             return respond({ status: 403, message: "Provider not configured" }, 403);
           }
@@ -87,7 +90,7 @@ export const Route = createFileRoute("/api/public/courier/$provider")({
           return respond({ status: 400, message: "Invalid JSON body" }, 400);
         }
 
-        if (provider === "carrybee" && check !== "ok") {
+        if ((provider === "carrybee" || provider === "steadfast") && check !== "ok") {
           payload = { ...payload, _unverified_header: supplied || "(none)" };
         }
 

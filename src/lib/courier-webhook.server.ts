@@ -86,13 +86,27 @@ export function parseCourierPayload(provider: DeliveryProvider, payload: Payload
 
   // Steadfast shares a flat delivery-status shape.
 
+  // Steadfast posts two shapes: `delivery_status` updates and `tracking_update`
+  // pings, with the parcel id sometimes under `tracking_code`/`trackingCode`.
   return {
-    event: str(payload["notification_type"]) ?? "delivery_status",
-    consignmentId: str(payload["consignment_id"]),
-    merchantOrderId: str(payload["invoice"]) ?? str(payload["merchant_order_id"]),
+    event: str(payload["notification_type"]) ?? str(payload["event"]) ?? "delivery_status",
+    consignmentId:
+      str(payload["consignment_id"]) ??
+      str(payload["consignmentId"]) ??
+      str(payload["tracking_code"]) ??
+      str(payload["trackingCode"]),
+    merchantOrderId:
+      str(payload["invoice"]) ??
+      str(payload["merchant_order_id"]) ??
+      str(payload["merchantOrderId"]),
     rawStatus:
-      str(payload["delivery_status"]) ?? str(payload["status"]) ?? str(payload["order_status"]) ?? "",
-    message: str(payload["note"]) ?? str(payload["reason"]),
+      str(payload["delivery_status"]) ??
+      str(payload["status"]) ??
+      str(payload["order_status"]) ??
+      str(payload["tracking_message"]) ??
+      "",
+    message:
+      str(payload["note"]) ?? str(payload["reason"]) ?? str(payload["tracking_message"]),
   };
 }
 
