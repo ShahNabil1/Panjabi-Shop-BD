@@ -136,6 +136,16 @@ function InvoicePage() {
                   {item.variantLabel ? (
                     <span className="text-muted-foreground"> · {item.variantLabel}</span>
                   ) : null}
+                  {item.comboSelections.length > 0 ? (
+                    <ul className="mt-1 space-y-0.5 text-xs text-muted-foreground">
+                      {item.comboSelections.map((selection, selectionIndex) => (
+                        <li key={selectionIndex}>
+                          {selection.itemNameBn} — {selection.variantLabelBn}
+                          {selection.quantity > 1 ? ` × ${selection.quantity}` : ""}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : null}
                 </td>
                 <td className="py-2 text-center tabular-nums">{item.quantity}</td>
                 <td className="py-2 text-right tabular-nums">
