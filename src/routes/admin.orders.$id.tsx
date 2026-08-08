@@ -14,6 +14,7 @@ import {
   adminReleaseOrder,
 } from "@/lib/presence.functions";
 import { useOrderPresence } from "@/lib/use-order-presence";
+import { useOrderRealtime } from "@/lib/use-order-realtime";
 import { useAuth } from "@/lib/auth-context";
 import { adminOrderWorkspace } from "@/lib/order-admin.functions";
 import { webOrderStatuses, type OrderStatus } from "@/lib/admin-schema";
@@ -129,6 +130,7 @@ function AdminOrderDetail() {
   const id = ((data?.order as { id?: string } | undefined)?.id ?? "") as string;
 
   // ---- Live presence: claim the order, heartbeat, release, react to takeovers ----
+  useOrderRealtime(id || undefined);
   const presence = useOrderPresence(id ? [id] : []);
   const held = id ? presence[id] : undefined;
   const [blockedBy, setBlockedBy] = useState<string | null>(null);
