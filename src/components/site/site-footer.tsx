@@ -17,14 +17,21 @@ export function SiteFooter() {
       <div className="mx-auto grid w-full max-w-6xl justify-items-center gap-8 px-4 py-10 text-center sm:grid-cols-2 sm:justify-items-stretch sm:text-left lg:grid-cols-4">
         <div className="w-full min-w-0">
           <div className="flex items-center justify-center sm:justify-start">
-            <img
-              src={logoMark}
-              alt={brand}
-              loading="lazy"
-              width={1040}
-              height={375}
-              className="h-16 w-auto shrink-0 object-contain sm:h-20"
-            />
+            <button
+              type="button"
+              onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+              aria-label="Scroll to top"
+              className="p-0"
+            >
+              <img
+                src={logoMark}
+                alt={brand}
+                loading="lazy"
+                width={1040}
+                height={375}
+                className="h-16 w-auto shrink-0 cursor-pointer object-contain sm:h-20"
+              />
+            </button>
           </div>
 
 
