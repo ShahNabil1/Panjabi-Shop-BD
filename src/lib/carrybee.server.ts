@@ -80,16 +80,27 @@ const listOf = (body: Record<string, unknown>): Array<Record<string, unknown>> =
 };
 
 
-export type CarrybeeStore = { store_id: number; store_name: string };
+export type CarrybeeStore = {
+  /** CarryBee returns store ids as strings — never coerce to a number. */
+  store_id: string;
+  store_name: string;
+  is_default_pickup: boolean;
+};
 
 /** GET /api/v2/stores — also doubles as the connection check. */
 export async function carrybeeStores(creds: CarrybeeCreds): Promise<CarrybeeStore[]> {
   const body = await call(creds, "/api/v2/stores", { method: "GET" });
-  return listOf(body).map((r) => ({
-    store_id: Number(r["id"] ?? r["store_id"] ?? 0),
+  const rows = listOf(body).map((r) => ({
+    store_id: String(r["id"] ?? r["store_id"] ?? ""),
     store_name: String(r["name"] ?? r["store_name"] ?? "Store"),
+    is_default_pickup: r["is_default_pickup_store"] === true,
   }));
+  // Default pickup store first, so dispatch picks it automatically.
+  return rows
+    .filter((s) => s.store_id)
+    .sort((a, b) => Number(b.is_default_pickup) - Number(a.is_default_pickup));
 }
+
 
 /** Live credential check. */
 export async function carrybeeCheck(creds: CarrybeeCreds) {
