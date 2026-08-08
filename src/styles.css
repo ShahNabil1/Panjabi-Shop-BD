@@ -289,6 +289,8 @@
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
     overflow-x: hidden;
+    /* Reserve the scrollbar track so opening a dropdown/dialog cannot shift the layout */
+    scrollbar-gutter: stable;
   }
 
   body {
@@ -300,6 +302,14 @@
     overflow-x: hidden;
     max-width: 100%;
   }
+
+  /* Radix scroll-lock compensates for the scrollbar with inline padding;
+     with a stable gutter that compensation is what causes the jump. */
+  body[data-scroll-locked] {
+    padding-right: 0 !important;
+    margin-right: 0 !important;
+  }
+
 
   img,
   svg,
