@@ -8,9 +8,9 @@ import {
 } from "./supabase-public";
 
 const CATEGORY_SELECT =
-  "id, slug, name_bn, name_en, description_bn, description_en, image_url, meta_title, meta_description, sort_order";
+  "id, slug, name_bn, name_en, description_bn, description_en, image_url, meta_title, meta_description, sort_order, is_active";
 const SUBCATEGORY_SELECT =
-  "id, category_id, slug, name_bn, name_en, description_bn, description_en, image_url, meta_title, meta_description, sort_order";
+  "id, category_id, slug, name_bn, name_en, description_bn, description_en, image_url, meta_title, meta_description, sort_order, is_active";
 
 function cards(rows: unknown): ProductCard[] {
   return ((rows ?? []) as RawProductCard[]).map(toProductCard);
