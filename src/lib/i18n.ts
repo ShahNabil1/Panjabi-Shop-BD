@@ -76,7 +76,7 @@ export const t = {
     bn: "পেইজটি লোড করা যায়নি। আবার চেষ্টা করুন।",
     en: "This page could not load. Please try again.",
   },
-  cart: { bn: "কার্ট", en: "Cart" },
+  cart: { bn: "আপনার কার্ট", en: "Your Cart" },
   close: { bn: "বন্ধ করুন", en: "Close" },
   addToCart: { bn: "Add To Cart", en: "Add to cart" },
   buyNow: { bn: "Buy Now", en: "Buy now" },
