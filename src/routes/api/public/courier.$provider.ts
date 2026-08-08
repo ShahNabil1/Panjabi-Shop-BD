@@ -4,7 +4,8 @@
  * Steadfast  → secret sent as `Steadfast-Secret-Key` header (or `?secret=`).
  * Pathao     → secret sent as `X-PATHAO-Signature`; response must echo the
  *              fixed integration secret header with a 202 status.
- * Carrybee   → generic; secret via `X-Webhook-Secret` header or `?secret=`.
+ * Carrybee   → integration secret via `X-CB-Webhook-Integration-Header`;
+ *              response echoes the same header and always acknowledges with 202.
  */
 
 import { createFileRoute } from "@tanstack/react-router";
@@ -34,7 +35,8 @@ export const Route = createFileRoute("/api/public/courier/$provider")({
         const pathaoHeaders = { "X-Pathao-Merchant-Webhook-Integration-Secret": PATHAO_INTEGRATION_SECRET };
         // CarryBee's webhook validator requires a 202 plus this fixed header on
         // every response, otherwise "Add Webhook" fails with a 401 mismatch.
-        const carrybeeHeaders = { "X-CB-Webhook-Integration-Header": "40489fe0-9386-4fc9-8e92-2b2fcb9d451c" };
+        const carrybeeIntegrationSecret = "40489fe0-9386-4fc9-8e92-2b2fcb9d451c";
+        const carrybeeHeaders = { "X-CB-Webhook-Integration-Header": carrybeeIntegrationSecret };
         const respond = (body: unknown, status: number) => {
           if (provider === "pathao") {
             return Response.json(body, { status: status === 200 ? 202 : status, headers: pathaoHeaders });
@@ -51,11 +53,18 @@ export const Route = createFileRoute("/api/public/courier/$provider")({
           request.headers.get("steadfast-secret-key") ??
           request.headers.get("x-webhook-secret") ??
           request.headers.get("x-cb-webhook-secret") ??
+          request.headers.get("x-cb-webhook-integration-header") ??
           request.headers.get("x-carrybee-signature") ??
           url.searchParams.get("secret") ??
           "";
 
-        const check = await verifyWebhookSecret(db, provider, supplied);
+        // CarryBee authenticates callbacks with the integration header it first
+        // asked the endpoint to echo. Other couriers use the generated secret
+        // saved in Delivery Settings.
+        const check =
+          provider === "carrybee" && supplied === carrybeeIntegrationSecret
+            ? "ok"
+            : await verifyWebhookSecret(db, provider, supplied);
         if (check === "unconfigured") {
           return respond({ status: 403, message: "Provider not configured" }, 403);
         }

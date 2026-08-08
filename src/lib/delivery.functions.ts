@@ -336,7 +336,7 @@ export const adminTestCourierWebhook = createServerFn({ method: "POST" })
         ? "X-PATHAO-Signature"
         : data.provider === "steadfast"
           ? "Steadfast-Secret-Key"
-          : "X-Webhook-Secret";
+          : "X-CB-Webhook-Integration-Header";
 
     // Pathao's own integration probe: exact body, and it demands 202 + echoed header.
     const payload =
@@ -368,6 +368,13 @@ export const adminTestCourierWebhook = createServerFn({ method: "POST" })
         if (!statusOk) note = `Pathao requires HTTP 202 — endpoint returned ${res.status}. `;
         else if (!headerOk)
           note = "Missing/incorrect X-Pathao-Merchant-Webhook-Integration-Secret response header. ";
+      } else if (data.provider === "carrybee") {
+        const echoed = res.headers.get("x-cb-webhook-integration-header") ?? "";
+        const statusOk = res.status === 202;
+        const headerOk = echoed === secret;
+        ok = statusOk && headerOk;
+        if (!statusOk) note = `CarryBee requires HTTP 202 — endpoint returned ${res.status}. `;
+        else if (!headerOk) note = "Missing/incorrect X-CB-Webhook-Integration-Header response header. ";
       }
 
       return {
