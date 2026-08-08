@@ -67,11 +67,11 @@ export const adminProcessRtsChunk = createServerFn({ method: "POST" })
     const who = await actorName(db, context.userId);
 
     /** Decide whether this chunk can be sent as one CarryBee bulk call. */
-    const { data: rows } = await db
+    const { data: orderRows } = await db
       .from("orders")
       .select("id, delivery_partner, courier_consignment_id, source")
       .in("id", data.orderIds);
-    const orderMeta = (rows ?? []) as Array<{
+    const orderMeta = (orderRows ?? []) as Array<{
       id: string;
       delivery_partner: string | null;
       courier_consignment_id: string | null;
