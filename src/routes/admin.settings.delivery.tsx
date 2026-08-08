@@ -95,35 +95,34 @@ function DeliverySettings() {
         description="Connect courier accounts, verify credentials live and copy the webhook URL."
       />
 
-      <Panel className="flex flex-wrap items-end gap-3">
-        <div className="space-y-1.5">
-          <label className="text-xs font-semibold text-muted-foreground">Add delivery partner</label>
-          <select
-            value={adding}
-            onChange={(e) => setAdding(e.target.value as DeliveryProvider | "")}
-            className="h-10 w-56 rounded-xl border border-border bg-background px-3 text-sm font-medium outline-none transition focus:border-primary/50"
+      {available.length > 0 ? (
+        <Panel className="flex flex-wrap items-end gap-3">
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold text-muted-foreground">Add delivery partner</label>
+            <select
+              value={adding}
+              onChange={(e) => setAdding(e.target.value as DeliveryProvider | "")}
+              className="h-10 w-56 rounded-xl border border-border bg-background px-3 text-sm font-medium outline-none transition focus:border-primary/50"
+            >
+              <option value="">Select a partner…</option>
+              {available.map((p) => (
+                <option key={p} value={p}>
+                  {providerLabels[p]}
+                </option>
+              ))}
+            </select>
+          </div>
+          <Button
+            type="button"
+            disabled={!adding}
+            onClick={() => toast.info(`Fill in ${providerLabels[adding as DeliveryProvider]} details below, then save.`)}
+            className="active:scale-95"
           >
-            <option value="">Select a partner…</option>
-            {available.map((p) => (
-              <option key={p} value={p}>
-                {providerLabels[p]}
-              </option>
-            ))}
-          </select>
-        </div>
-        <Button
-          type="button"
-          disabled={!adding}
-          onClick={() => toast.info(`Fill in ${providerLabels[adding as DeliveryProvider]} details below, then save.`)}
-          className="active:scale-95"
-        >
-          <Plus className="size-4" />
-          Add
-        </Button>
-        {available.length === 0 ? (
-          <p className="text-xs text-muted-foreground">All partners are already added.</p>
-        ) : null}
-      </Panel>
+            <Plus className="size-4" />
+            Add
+          </Button>
+        </Panel>
+      ) : null}
 
       {isLoading ? (
         <BrandLoader size="md" className="py-10" />
