@@ -16,7 +16,9 @@ export const Route = createFileRoute("/invoice/$orderNumber")({
     throw redirect({
       to: "/inv/$orderNumber",
       params: { orderNumber: params.orderNumber },
-      search: { p: phoneLast4(search.phone), print: search.print },
+      search: search.print
+        ? { p: phoneLast4(search.phone), print: search.print }
+        : { p: phoneLast4(search.phone) },
       replace: true,
     });
   },

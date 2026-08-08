@@ -8,11 +8,15 @@ import { getOrderSummaryShort } from "@/lib/order.functions";
 import { orderStatusLabel } from "@/lib/order-receipt";
 import { formatPrice } from "@/lib/i18n";
 
-function searchSchema(input: Record<string, unknown>) {
-  return {
+function searchSchema(input: Record<string, unknown>): {
+  p: string | number;
+  print?: string | number;
+} {
+  const out: { p: string | number; print?: string | number } = {
     p: (input["p"] ?? "") as string | number,
-    print: (input["print"] ?? "") as string | number,
   };
+  if (input["print"] != null) out.print = input["print"] as string | number;
+  return out;
 }
 
 export const Route = createFileRoute("/inv/$orderNumber")({
