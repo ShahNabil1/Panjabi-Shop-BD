@@ -93,12 +93,15 @@ async function runCheck(provider: DeliveryProvider, creds: Record<string, string
       });
       return { ok: res.ok, message: res.message, extra: { stores: res.stores } };
     }
-    // Carrybee: API documentation pending — credentials are stored only.
-    return {
-      ok: false,
-      message: "Carrybee API documentation is pending — credentials saved but not verified.",
-      extra: {},
-    };
+    // Carrybee: List Stores doubles as the live connection check.
+    const { carrybeeCheck } = await import("./carrybee.server");
+    const res = await carrybeeCheck({
+      client_id: creds["client_id"]!,
+      client_secret: creds["client_secret"]!,
+      client_context: creds["client_context"]!,
+    });
+    return { ok: res.ok, message: res.message, extra: { stores: res.stores } };
+
   } catch (error) {
     return { ok: false, message: (error as Error).message, extra: {} };
   }
