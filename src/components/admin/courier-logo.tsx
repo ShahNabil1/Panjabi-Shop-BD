@@ -1,7 +1,7 @@
 import { Truck } from "lucide-react";
 
 import pathaoAsset from "@/assets/pathao.png.asset.json";
-import carrybeeAsset from "@/assets/carrybee-mark.png.asset.json";
+import carrybeeAsset from "@/assets/carrybee-mark-onlight.png.asset.json";
 import steadfastAsset from "@/assets/steadfast.jpg.asset.json";
 import { cn } from "@/lib/utils";
 
@@ -9,7 +9,7 @@ type CourierKey = "pathao" | "carrybee" | "steadfast";
 
 const COURIERS: Record<
   CourierKey,
-  { label: string; src: string; chip: string; ring: string; markClass?: string; watermarkClass?: string }
+  { label: string; src: string; chip: string; ring: string; markClass?: string; watermarkClass?: string; hideLabel?: boolean; badgeClass?: string }
 > = {
   pathao: {
     label: "Pathao",
@@ -20,10 +20,12 @@ const COURIERS: Record<
   carrybee: {
     label: "CarryBee",
     src: carrybeeAsset.url,
-    chip: "bg-[#111111] text-[#FFCC00] ring-[#FFCC00]/40",
-    ring: "ring-[#FFCC00]/40 bg-[#111111]",
-    markClass: "scale-[1.25] p-0",
-    watermarkClass: "opacity-[0.10] mix-blend-normal",
+    chip: "bg-white text-[#111111] ring-[#FFCB05]/60",
+    ring: "ring-[#FFCB05]/60 bg-white",
+    markClass: "scale-[1.3] p-0",
+    watermarkClass: "opacity-[0.14]",
+    hideLabel: true,
+    badgeClass: "px-2 py-1",
   },
   steadfast: {
     label: "Steadfast",
@@ -96,6 +98,7 @@ export function CourierBadge({
       className={cn(
         "inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-bold uppercase tracking-wide shadow-sm ring-1",
         c.chip,
+        c.badgeClass,
         className,
       )}
     >
@@ -103,9 +106,12 @@ export function CourierBadge({
         src={c.src}
         alt=""
         aria-hidden
-        className={cn("h-4 w-4 rounded-full object-contain", c.markClass && "w-6 rounded-none")}
+        className={cn(
+          "h-4 w-4 rounded-full object-contain",
+          c.hideLabel && "h-3.5 w-auto max-w-[68px] rounded-none",
+        )}
       />
-      {c.label}
+      {c.hideLabel ? <span className="sr-only">{c.label}</span> : c.label}
     </span>
   );
 }
