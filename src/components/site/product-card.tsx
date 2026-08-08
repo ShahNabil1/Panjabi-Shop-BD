@@ -1,5 +1,9 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
+import { ShoppingBag, Zap } from "lucide-react";
+
+import { useCart } from "@/lib/cart-context";
+
 
 import { useLang } from "@/lib/language-context";
 import { badgeLabel, discountPercent, formatNumber, formatPrice, pick, toBnDigits, tr } from "@/lib/i18n";
