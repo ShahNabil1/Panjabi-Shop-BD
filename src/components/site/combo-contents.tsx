@@ -1,3 +1,5 @@
+import { Maximize2, ZoomIn } from "lucide-react";
+
 import type { ComboContentItem } from "@/lib/types";
 import { useLang } from "@/lib/language-context";
 import { formatNumber, pick } from "@/lib/i18n";
