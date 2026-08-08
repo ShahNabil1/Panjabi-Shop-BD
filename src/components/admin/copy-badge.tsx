@@ -23,7 +23,7 @@ export function CopyBadge({
       }}
       title="Click to copy"
       className={cn(
-        "rounded-md bg-muted px-1.5 py-0.5 font-mono text-xs text-muted-foreground transition-colors hover:bg-muted/70 hover:text-foreground active:scale-[0.98]",
+        "rounded-md bg-emerald-100 px-1.5 py-0.5 font-mono text-xs text-emerald-700 transition-colors hover:bg-emerald-200 hover:text-emerald-800 active:scale-[0.98] dark:bg-emerald-900/60 dark:text-emerald-100 dark:hover:bg-emerald-800/60",
         className,
       )}
     >
