@@ -11,7 +11,6 @@ import { cn } from "@/lib/utils";
 export function SiteFooter() {
   const { lang } = useLang();
   const { brand, contact } = useSiteData();
-  const year = new Date().getFullYear();
 
   return (
     <footer className="mt-16 border-t border-border bg-footer">
