@@ -291,9 +291,16 @@
     scroll-behavior: smooth;
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
-    overflow-x: hidden;
-    /* Reserve the scrollbar track so opening a dropdown/dialog cannot shift the layout */
-    scrollbar-gutter: stable;
+    overflow-x: clip;
+  }
+
+  /* Reserve the scrollbar track only where a classic scrollbar actually exists
+     (desktop). On touch/small screens a stable gutter steals ~15px and makes the
+     whole page look shifted and clipped on the right. */
+  @media (min-width: 1024px) and (pointer: fine) {
+    html {
+      scrollbar-gutter: stable;
+    }
   }
 
   body {
@@ -303,9 +310,11 @@
     font-weight: 500;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
-    overflow-x: hidden;
+    overflow-x: clip;
+    width: 100%;
     max-width: 100%;
   }
+
 
   /* Radix scroll-lock compensates for the scrollbar with inline padding;
      with a stable gutter that compensation is what causes the jump. */
