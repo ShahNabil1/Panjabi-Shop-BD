@@ -1,9 +1,10 @@
 import { Link, Outlet, createFileRoute, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   BadgePercent,
   Boxes,
+  ChevronDown,
   ChevronLeft,
   Database,
   ExternalLink,
