@@ -822,9 +822,9 @@ export function CheckoutForm({
               <dt className="font-en font-bold text-foreground">Subtotal</dt>
               <dd className="font-en text-base font-extrabold tabular-nums">{formatPrice(lang, subtotal)}</dd>
             </div>
-            <div className="flex justify-between">
-              <dt className="font-en font-bold text-foreground">Delivery Charge</dt>
-              <dd className="font-en text-base font-extrabold tabular-nums">
+            <div className="flex items-center justify-between rounded-xl border-2 border-primary bg-primary/5 px-3 py-2 shadow-sm">
+              <dt className="font-en font-bold text-primary">Delivery Charge</dt>
+              <dd className="font-en text-base font-extrabold tabular-nums text-primary">
                 {delivery === 0 ? "Free" : formatPrice(lang, delivery)}
               </dd>
             </div>
