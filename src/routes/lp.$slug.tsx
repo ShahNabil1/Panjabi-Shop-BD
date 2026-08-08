@@ -59,7 +59,7 @@ export const Route = createFileRoute("/lp/$slug")({
     const ogTitle = seo.ogTitle || title;
     const ogDescription = seo.ogDescription || description;
     const image = landing.ogImageUrl ?? images[0]?.url ?? null;
-    const url = seo.canonicalUrl || `https://upoharkabbo.lovable.app/lp/${params.slug}`;
+    const url = seo.canonicalUrl || `${SITE_URL}/lp/${params.slug}`;
 
     return {
       meta: [
