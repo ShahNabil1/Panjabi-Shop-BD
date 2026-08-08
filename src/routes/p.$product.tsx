@@ -4,7 +4,7 @@ import { useState } from "react";
 import { getProductPage } from "@/lib/catalog.functions";
 import type { ProductPageData } from "@/lib/types";
 import { useLang } from "@/lib/language-context";
-import { discountPercent, formatPrice, pick, tr, formatNumber, toBnDigits } from "@/lib/i18n";
+import { badgeLabel, discountPercent, formatPrice, pick, tr, formatNumber, toBnDigits } from "@/lib/i18n";
 import { ProductGrid, ProductThumb } from "@/components/site/product-card";
 import { NotFoundView } from "@/components/site/not-found-view";
 import { absoluteUrl } from "@/lib/site";
