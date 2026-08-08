@@ -2,6 +2,7 @@ import { Truck } from "lucide-react";
 
 import pathaoAsset from "@/assets/pathao.png.asset.json";
 import carrybeeAsset from "@/assets/carrybee-mark.png.asset.json";
+import carrybeeLightAsset from "@/assets/carrybee-mark-onlight.png.asset.json";
 import carrybeeIconAsset from "@/assets/carrybee-icon.jpg.asset.json";
 import steadfastAsset from "@/assets/steadfast.jpg.asset.json";
 import { cn } from "@/lib/utils";
@@ -19,6 +20,7 @@ const COURIERS: Record<
     hideLabel?: boolean;
     badgeClass?: string;
     iconSrc?: string;
+    watermarkSrc?: string;
     logoClass?: string;
   }
 > = {
@@ -34,6 +36,7 @@ const COURIERS: Record<
     chip: "bg-[#111111] text-white ring-[#FFCB05]/50",
     ring: "ring-[#FFCB05]/50 bg-[#FFCB05]",
     iconSrc: carrybeeIconAsset.url,
+    watermarkSrc: carrybeeLightAsset.url,
     markClass: "size-full object-cover p-0",
     watermarkClass: "w-[92%] max-w-[560px] -rotate-[18deg] opacity-[0.22] mix-blend-normal",
     hideLabel: true,
@@ -149,7 +152,7 @@ export function CourierWatermark({
       )}
     >
       <img
-        src={c.src}
+        src={c.watermarkSrc ?? c.src}
         alt=""
         className={cn(
           "w-[65%] max-w-[420px] object-contain opacity-[0.06] mix-blend-multiply",
