@@ -29,7 +29,9 @@ export type EditableItem = {
     variantLabelBn: string;
     variantLabelEn: string;
     sku: string | null;
+    image?: string | null;
   }>;
+
 };
 
 const money = (n: number) => `৳ ${Number(n || 0).toLocaleString("en-US")}`;
