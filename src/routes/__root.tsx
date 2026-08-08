@@ -23,6 +23,7 @@ import { CartProvider } from "../lib/cart-context";
 import { CartDrawer } from "@/components/site/cart-drawer";
 import { AuthProvider } from "../lib/auth-context";
 import { Toaster } from "../components/ui/sonner";
+import { ConfirmProvider } from "@/components/ui/confirm-dialog";
 import { SITE_URL } from "../lib/site";
 import { useDigitNormalizer } from "../lib/use-digit-normalizer";
 import { RoutePending } from "../components/site/route-pending";
@@ -199,6 +200,7 @@ function RootComponent() {
       <LanguageProvider initialLang={lang}>
         <AuthProvider>
           <CartProvider>
+            <ConfirmProvider>
             <RoutePending />
             <Chrome brand={brand}>
               {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
@@ -206,6 +208,7 @@ function RootComponent() {
             </Chrome>
             <CartDrawer />
             <Toaster position="top-center" richColors closeButton />
+            </ConfirmProvider>
           </CartProvider>
 
         </AuthProvider>
