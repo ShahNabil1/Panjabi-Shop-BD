@@ -61,7 +61,7 @@ export const adminOrderWorkspace = createServerFn({ method: "POST" })
     }
 
 
-    const [notes, sms, blocked, activity] = await Promise.all([
+    const [notes, sms, blocked, activity, redemption] = await Promise.all([
       db
         .from("order_notes")
         .select("*")
@@ -87,7 +87,24 @@ export const adminOrderWorkspace = createServerFn({ method: "POST" })
         .eq("order_id", orderId)
         .order("created_at", { ascending: false })
         .limit(200),
+      db
+        .from("coupon_redemptions")
+        .select("discount_amount, coupons(code, name)")
+        .eq("order_id", orderId)
+        .order("redeemed_at", { ascending: false })
+        .limit(1),
     ]);
+
+    const redeemed = ((redemption.data ?? [])[0] ?? null) as
+      | { discount_amount: number; coupons: { code: string; name: string } | null }
+      | null;
+    const coupon = redeemed?.coupons
+      ? {
+          code: redeemed.coupons.code,
+          name: redeemed.coupons.name,
+          amount: Number(redeemed.discount_amount ?? 0),
+        }
+      : null;
 
     // Attach product/sub-product thumbnails and fall back to the catalogue SKU
     // so the items card can show images for combo children too.
@@ -137,6 +154,7 @@ export const adminOrderWorkspace = createServerFn({ method: "POST" })
         ...(order as object),
         order_items: itemsWithMedia,
         order_activity: activity.data ?? [],
+        coupon,
       },
       notes: notes.data ?? [],
       sms: sms.data ?? [],

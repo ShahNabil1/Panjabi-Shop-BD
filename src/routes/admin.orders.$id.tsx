@@ -672,6 +672,7 @@ function AdminOrderDetail() {
         locked={dispatchLocked}
         deliveryCharge={Number(order.delivery_charge ?? 0)}
         discount={Number(order.discount ?? 0)}
+        couponCode={order.coupon?.code ?? null}
         advanceAmount={Number(order.advance_amount ?? 0)}
         advanceMethod={order.advance_method ?? null}
         initialItems={(order.order_items ?? []).map((i) => ({

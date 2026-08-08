@@ -152,6 +152,7 @@ export function ItemsCard({
   initialItems,
   deliveryCharge,
   discount: initialDiscount,
+  couponCode = null,
   advanceAmount: initialAdvance,
   advanceMethod: initialAdvanceMethod,
   locked = false,
@@ -502,7 +503,14 @@ export function ItemsCard({
         </div>
         {discount > 0 ? (
           <div className="flex justify-end gap-3 text-emerald-600">
-            <dt>Discount:</dt>
+            <dt>
+              Discount:
+              {couponCode ? (
+                <span className="ml-1.5 rounded border border-emerald-500/40 bg-emerald-500/10 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide">
+                  {couponCode}
+                </span>
+              ) : null}
+            </dt>
             <dd className="w-28 text-right font-semibold tabular-nums">-{money(discount)}</dd>
           </div>
         ) : null}
