@@ -72,7 +72,7 @@ function OrderReceipt() {
                     {item.comboSelections.length > 0 ? (
                       <ul className="mt-1 space-y-0.5 pl-3 text-xs text-muted-foreground">
                         {item.comboSelections.map((selection, selectionIndex) => (
-                          <li key={selectionIndex}>{selection.itemNameBn} · {selection.variantLabelBn}</li>
+                          <li key={selectionIndex}>{selection.itemNameBn}{selection.variantLabelBn ? ` · ${selection.variantLabelBn}` : ""}</li>
                         ))}
                       </ul>
                     ) : null}
