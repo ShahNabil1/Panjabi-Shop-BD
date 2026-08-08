@@ -1,5 +1,5 @@
 /** Canonical public origin of the storefront. Used by sitemap/catalog feeds and JSON-LD. */
-export const SITE_URL = "https://upoharkabbo.lovable.app";
+export const SITE_URL = "https://upoharkabbo.com";
 
 export function absoluteUrl(path: string): string {
   if (/^https?:\/\//i.test(path)) return path;

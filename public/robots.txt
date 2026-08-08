@@ -39,4 +39,4 @@ Disallow: /order/
 Disallow: /invoice/
 Disallow: /search
 
-Sitemap: https://upoharkabbo.lovable.app/sitemap.xml
+Sitemap: https://upoharkabbo.com/sitemap.xml
