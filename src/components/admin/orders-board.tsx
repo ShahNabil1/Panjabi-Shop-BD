@@ -182,6 +182,22 @@ export function OrdersBoard({
   const isPaymentView = (paymentFilters as readonly string[]).includes(status);
   const search = urlSearch.q ?? "";
   const setSearch = (q: string) => setBoardSearch({ q, page: 1 });
+  /**
+   * The input is local + debounced: typing stays instant while the URL and the
+   * network request only update once the user pauses (300ms).
+   */
+  const [searchInput, setSearchInput] = useState(search);
+  const [inputFocused, setInputFocused] = useState(false);
+  useEffect(() => {
+    if (!inputFocused) setSearchInput(search);
+  }, [search, inputFocused]);
+  useEffect(() => {
+    if (searchInput === search) return;
+    const t = setTimeout(() => setSearch(searchInput.trim()), 300);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchInput]);
+
   const page = Math.max(1, Number(urlSearch.page) || 1);
   const setPage = (next: number | ((prev: number) => number)) =>
     setBoardSearch({ page: typeof next === "function" ? next(page) : next });
@@ -198,9 +214,12 @@ export function OrdersBoard({
     localStorage.setItem(PAGE_SIZE_KEY, String(pageSize));
   }, [pageSize]);
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isFetching } = useQuery({
     enabled: !isSearchBoard || search.trim().length > 0,
+    placeholderData: (prev) => prev,
+    staleTime: 15 * 1000,
     queryKey: ["admin", "orders", bucket, status, search],
+
     queryFn: () =>
       adminListOrders({
         data: {
@@ -304,16 +323,26 @@ export function OrdersBoard({
         <div className={cn("relative flex-1", isSearchBoard ? "min-w-[260px]" : "max-w-xs min-w-[200px]")}>
           <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            onFocus={() => setInputFocused(true)}
+            onBlur={() => setInputFocused(false)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") setSearch(searchInput.trim());
+              if (e.key === "Escape") setSearchInput("");
+            }}
             autoFocus={isSearchBoard}
             placeholder={
               isSearchBoard
                 ? "Invoice, phone, customer name, courier tracking or consignment ID"
                 : "Order number, name or phone"
             }
-            className="rounded-xl border-border/80 bg-background/70 pl-9"
+            className="rounded-xl border-border/80 bg-background/70 pl-9 pr-9"
           />
+          {isFetching && searchInput ? (
+            <Loader2 className="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 animate-spin text-muted-foreground" />
+          ) : null}
+
         </div>
         <div className={cn("flex flex-wrap gap-1.5", isSearchBoard && "hidden")}>
           {tabs.map((s) => (
