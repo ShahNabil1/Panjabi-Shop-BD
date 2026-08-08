@@ -70,6 +70,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         },
         { title: `${brand} — গিফট কম্বো ও উপহার সামগ্রী` },
         {
+          name: "description",
+          content:
+            "উপহারকাব্য থেকে গিফট কম্বো, উপহার সামগ্রী ও বিশেষ অনুষ্ঠানের কালেকশন কিনুন। সারা দেশে ক্যাশ অন ডেলিভারি উপভোগ করুন।",
+        },
+        {
           name: "google-site-verification",
           content: "cXRYWCzWKgQUOaUz8mLsw-P1yraw7rQ-hXbzFZHI3-g",
         },
