@@ -32,6 +32,41 @@ export const Route = createFileRoute("/admin/orders/create")({
 const input =
   "w-full rounded-xl border border-border bg-background px-3 py-2.5 text-sm text-foreground outline-none transition-colors focus:border-primary";
 
+/**
+ * Height-animated container: keeps children mounted and collapses them with a
+ * grid-rows transition so switching modes never causes a layout jump.
+ * `gapClass` cancels the parent's vertical rhythm while collapsed.
+ */
+function Collapse({
+  open,
+  children,
+  gapClass = "-mb-5",
+}: {
+  open: boolean;
+  children: React.ReactNode;
+  gapClass?: string;
+}) {
+  return (
+    <div
+      aria-hidden={!open}
+      className={cn(
+        "grid transition-all duration-[420ms] ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none",
+        open ? "grid-rows-[1fr] opacity-100 blur-0" : cn("grid-rows-[0fr] opacity-0 blur-[2px]", gapClass),
+      )}
+    >
+      <div
+        className={cn(
+          "min-h-0 overflow-hidden transition-transform duration-[420ms] ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none",
+          open ? "translate-y-0 scale-100" : "-translate-y-1 scale-[0.98]",
+        )}
+      >
+        {!open ? <div className="pointer-events-none">{children}</div> : children}
+      </div>
+    </div>
+  );
+}
+
+
 type Line = {
   key: string;
   productId: string;
@@ -696,52 +731,55 @@ function CreateOrderPage() {
             ))}
           </div>
 
-          {mode === "manual" ? (
-          <div className="grid min-w-0 grid-cols-2 gap-2">
-            <label className="grid min-w-0 cursor-pointer grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 shadow-sm">
-              <span className="truncate text-xs font-semibold text-foreground">Pre-Order</span>
-              <Switch
-                checked={preOrder}
-                className="shrink-0"
-                onCheckedChange={(v) => {
-                  setPreOrder(v);
-                  if (v) {
-                    setScheduleOn(false);
-                    setScheduledFor("");
-                  }
-                }}
-              />
-            </label>
+          <Collapse open={mode === "manual"}>
+            <div className="grid min-w-0 grid-cols-2 gap-2">
+              <label className="grid min-w-0 cursor-pointer grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 shadow-sm">
+                <span className="truncate text-xs font-semibold text-foreground">Pre-Order</span>
+                <Switch
+                  checked={preOrder}
+                  className="shrink-0"
+                  onCheckedChange={(v) => {
+                    setPreOrder(v);
+                    if (v) {
+                      setScheduleOn(false);
+                      setScheduledFor("");
+                    }
+                  }}
+                />
+              </label>
 
-            <label
-              className={cn(
-                "grid min-w-0 cursor-pointer grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 shadow-sm",
-                preOrder && "pointer-events-none opacity-50",
-              )}
-            >
-              <span className="truncate text-xs font-semibold text-foreground">Schedule</span>
-              <Switch
-                checked={scheduleOn}
-                disabled={preOrder}
-                className="shrink-0"
-                onCheckedChange={(v) => {
-                  setScheduleOn(v);
-                  if (!v) setScheduledFor("");
-                }}
-              />
-            </label>
+              <label
+                className={cn(
+                  "grid min-w-0 cursor-pointer grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 shadow-sm transition-opacity duration-300",
+                  preOrder && "pointer-events-none opacity-50",
+                )}
+              >
+                <span className="truncate text-xs font-semibold text-foreground">Schedule</span>
+                <Switch
+                  checked={scheduleOn}
+                  disabled={preOrder}
+                  className="shrink-0"
+                  onCheckedChange={(v) => {
+                    setScheduleOn(v);
+                    if (!v) setScheduledFor("");
+                  }}
+                />
+              </label>
 
-            {scheduleOn && !preOrder ? (
-              <input
-                type="date"
-                min={new Date().toISOString().slice(0, 10)}
-                className={cn(input, "col-span-2")}
-                value={scheduledFor}
-                onChange={(e) => setScheduledFor(e.target.value)}
-              />
-            ) : null}
-          </div>
-          ) : null}
+              <div className="col-span-2">
+                <Collapse open={scheduleOn && !preOrder} gapClass="">
+                  <input
+                    type="date"
+                    min={new Date().toISOString().slice(0, 10)}
+                    className={cn(input, "mt-2 w-full")}
+                    value={scheduledFor}
+                    onChange={(e) => setScheduledFor(e.target.value)}
+                  />
+                </Collapse>
+              </div>
+            </div>
+          </Collapse>
+
 
           <Panel>
             <h2 className="text-sm font-bold">Payment</h2>
@@ -829,64 +867,67 @@ function CreateOrderPage() {
               </label>
 
 
-              {mode === "approved" ? (
-                <>
-                  <label className="block">
-                    <Label>Delivery partner</Label>
-                    <select
-                      className={input}
-                      value={deliveryPartner}
-                      onChange={(e) => applyPartner(e.target.value)}
-                      disabled={activePartners.isLoading}
-                    >
-                      <option value="">Not selected</option>
-                      {partnerOptions.map((p) => (
-                        <option key={p.provider} value={providerLabels[p.provider]}>
-                          {providerLabels[p.provider]}
-                          {p.isDefault ? " (default)" : ""}
-                        </option>
-                      ))}
-                    </select>
-                    {!activePartners.isLoading && partnerOptions.length === 0 ? (
-                      <span className="mt-1 block text-xs font-semibold text-muted-foreground">
-                        No delivery partner is enabled yet — add one in Settings → Delivery.
-                      </span>
-                    ) : null}
-                  </label>
-
-                  <div className="sm:col-span-2">
-                    <label className="flex cursor-pointer items-center gap-2 text-sm font-semibold">
-                      <input
-                        type="checkbox"
-                        className="size-4 accent-primary"
-                        checked={deliveryNoteOn}
-                        onChange={(e) => {
-                          const on = e.target.checked;
-                          setDeliveryNoteOn(on);
-                          if (!on) setDeliveryNote("");
-                          else {
-                            const match = partnerOptions.find(
-                              (p) => providerLabels[p.provider] === deliveryPartner,
-                            );
-                            setDeliveryNote(match?.noteTemplate ?? "");
-                          }
-                        }}
-                      />
-                      Add delivery note
+              <div className="sm:col-span-2">
+                <Collapse open={mode === "approved"} gapClass="-mb-3">
+                  <div className="grid gap-3">
+                    <label className="block">
+                      <Label>Delivery partner</Label>
+                      <select
+                        className={input}
+                        value={deliveryPartner}
+                        onChange={(e) => applyPartner(e.target.value)}
+                        disabled={activePartners.isLoading}
+                      >
+                        <option value="">Not selected</option>
+                        {partnerOptions.map((p) => (
+                          <option key={p.provider} value={providerLabels[p.provider]}>
+                            {providerLabels[p.provider]}
+                            {p.isDefault ? " (default)" : ""}
+                          </option>
+                        ))}
+                      </select>
+                      {!activePartners.isLoading && partnerOptions.length === 0 ? (
+                        <span className="mt-1 block text-xs font-semibold text-muted-foreground">
+                          No delivery partner is enabled yet — add one in Settings → Delivery.
+                        </span>
+                      ) : null}
                     </label>
-                    {deliveryNoteOn ? (
-                      <textarea
-                        rows={3}
-                        maxLength={500}
-                        className={cn(input, "mt-2 h-auto py-2")}
-                        placeholder="Sent to the courier as special instruction"
-                        value={deliveryNote}
-                        onChange={(e) => setDeliveryNote(e.target.value)}
-                      />
-                    ) : null}
+
+                    <div>
+                      <label className="flex cursor-pointer items-center gap-2 text-sm font-semibold">
+                        <input
+                          type="checkbox"
+                          className="size-4 accent-primary"
+                          checked={deliveryNoteOn}
+                          onChange={(e) => {
+                            const on = e.target.checked;
+                            setDeliveryNoteOn(on);
+                            if (!on) setDeliveryNote("");
+                            else {
+                              const match = partnerOptions.find(
+                                (p) => providerLabels[p.provider] === deliveryPartner,
+                              );
+                              setDeliveryNote(match?.noteTemplate ?? "");
+                            }
+                          }}
+                        />
+                        Add delivery note
+                      </label>
+                      <Collapse open={deliveryNoteOn} gapClass="">
+                        <textarea
+                          rows={3}
+                          maxLength={500}
+                          className={cn(input, "mt-2 h-auto py-2")}
+                          placeholder="Sent to the courier as special instruction"
+                          value={deliveryNote}
+                          onChange={(e) => setDeliveryNote(e.target.value)}
+                        />
+                      </Collapse>
+                    </div>
                   </div>
-                </>
-              ) : null}
+                </Collapse>
+              </div>
+
             </div>
 
             <Button
