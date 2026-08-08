@@ -435,20 +435,19 @@ function AdminOrderDetail() {
               </button>
             ) : null}
             <Button
-              asChild
               size="sm"
+              onClick={() => setInvoiceOpen(true)}
               className="border-0 bg-gradient-to-r from-indigo-500 via-violet-500 to-fuchsia-500 text-white shadow-md shadow-indigo-500/20 transition-all hover:brightness-110 hover:shadow-lg hover:shadow-indigo-500/30 active:scale-95"
             >
-              <Link
-                to="/invoice/$orderNumber"
-                params={{ orderNumber: order.order_number }}
-                search={{ phone: order.customer_phone }}
-                target="_blank"
-              >
-                <FileText className="size-4" />
-                Invoice
-              </Link>
+              <FileText className="size-4" />
+              Invoice
             </Button>
+            <InvoiceActionsDialog
+              open={invoiceOpen}
+              onOpenChange={setInvoiceOpen}
+              orderNumber={order.order_number}
+              phone={order.customer_phone}
+            />
           </div>
         </div>
 
