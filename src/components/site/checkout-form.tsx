@@ -147,7 +147,7 @@ export function CheckoutForm({
       if (placedRef.current) return;
       if (!/^01[3-9]\d{8}$/.test(s.phone.trim())) return;
       if (!s.items.length) return;
-      const key = `${s.phone.trim()}|${s.items.map((i) => `${i.productId}:${i.variantId ?? ""}:${i.quantity}`).join(",")}|${s.name}|${s.address}`;
+      const key = `${s.phone.trim()}|${s.items.map((i) => `${i.productId}:${i.variantId ?? ""}:${i.comboSelections.map((selection) => selection.variantId).join("+")}:${i.quantity}`).join(",")}|${s.name}|${s.address}`;
       if (capturedRef.current === key) return;
       capturedRef.current = key;
       void captureIncompleteOrder({
@@ -164,6 +164,10 @@ export function CheckoutForm({
             productId: i.productId,
             variantId: i.variantId,
             quantity: i.quantity,
+            comboSelections: i.comboSelections.map((selection) => ({
+              itemId: selection.itemId,
+              variantId: selection.variantId,
+            })),
           })),
         },
       }).catch(() => undefined);
@@ -320,6 +324,10 @@ export function CheckoutForm({
             productId: i.productId,
             variantId: i.variantId,
             quantity: i.quantity,
+            comboSelections: i.comboSelections.map((selection) => ({
+              itemId: selection.itemId,
+              variantId: selection.variantId,
+            })),
           })),
         },
       });
@@ -399,6 +407,21 @@ export function CheckoutForm({
                   <p className="text-[15px] font-bold leading-snug">
                     {pick(lang, i.nameBn, i.nameEn)}
                   </p>
+                  {i.variantLabelBn ? (
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      {pick(lang, i.variantLabelBn, i.variantLabelEn)}
+                    </p>
+                  ) : null}
+                  {i.comboSelections.length > 0 ? (
+                    <ul className="mt-2 grid gap-1 rounded-lg bg-secondary/50 px-3 py-2 text-xs">
+                      {i.comboSelections.map((selection) => (
+                        <li key={`${selection.itemId}-${selection.variantId}`} className="flex gap-1">
+                          <span className="font-semibold">{pick(lang, selection.itemNameBn, selection.itemNameEn)}:</span>
+                          <span className="text-muted-foreground">{pick(lang, selection.variantLabelBn, selection.variantLabelEn)}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : null}
 
                   <div className="mt-2.5 flex items-center justify-between gap-3">
                     <div className="flex items-center gap-3">

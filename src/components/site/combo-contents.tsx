@@ -2,7 +2,15 @@ import type { ComboContentItem } from "@/lib/types";
 import { useLang } from "@/lib/language-context";
 import { formatNumber, pick } from "@/lib/i18n";
 
-export function ComboContents({ items }: { items: ComboContentItem[] }) {
+export function ComboContents({
+  items,
+  selected,
+  onSelect,
+}: {
+  items: ComboContentItem[];
+  selected?: Record<string, string>;
+  onSelect?: (itemId: string, variantId: string) => void;
+}) {
   const { lang } = useLang();
   if (items.length === 0) return null;
 
@@ -57,10 +65,30 @@ export function ComboContents({ items }: { items: ComboContentItem[] }) {
                     {lang === "bn" ? "ফ্রি" : "Free"}
                   </span>
                 ) : null}
-                {item.variantLabels.length > 0 ? (
-                  <span className="truncate">{item.variantLabels.join(" · ")}</span>
-                ) : null}
               </p>
+              {item.variants.length > 0 ? (
+                <div className="mt-2">
+                  <p className="mb-1 text-xs font-semibold text-foreground">
+                    {pick(lang, item.variants[0]?.groupNameBn, item.variants[0]?.groupNameEn)}
+                  </p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {item.variants.map((variant) => (
+                      <button
+                        key={variant.id}
+                        type="button"
+                        onClick={() => onSelect?.(item.id, variant.id)}
+                        className={`rounded-md border px-2.5 py-1 text-xs font-bold transition-colors ${
+                          selected?.[item.id] === variant.id
+                            ? "border-primary bg-primary text-primary-foreground"
+                            : "border-border bg-background hover:border-primary"
+                        }`}
+                      >
+                        {pick(lang, variant.valueBn, variant.valueEn)}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
             </div>
           </li>
         ))}

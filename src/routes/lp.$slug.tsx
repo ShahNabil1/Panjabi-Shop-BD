@@ -139,6 +139,7 @@ function LandingPage() {
         variantLabelEn: activeVariant
           ? `${activeVariant.group_name_en}: ${activeVariant.value_en}`
           : null,
+        comboSelections: [],
       },
     ],
     [product, images, activeVariant, unitPrice, qty, stock],

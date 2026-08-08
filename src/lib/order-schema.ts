@@ -7,6 +7,10 @@ export const orderLineSchema = z.object({
   productId: z.string().uuid(),
   variantId: z.string().uuid().nullable().default(null),
   quantity: z.number().int().min(1).max(99),
+  comboSelections: z.array(z.object({
+    itemId: z.string().uuid(),
+    variantId: z.string().uuid(),
+  })).max(50).default([]),
 });
 
 export const placeOrderSchema = z.object({

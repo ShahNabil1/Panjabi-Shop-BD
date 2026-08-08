@@ -17,6 +17,18 @@ export type CartItem = {
   variantId: string | null;
   variantLabelBn: string | null;
   variantLabelEn: string | null;
+  comboSelections: ComboSelection[];
+};
+
+export type ComboSelection = {
+  itemId: string;
+  itemNameBn: string;
+  itemNameEn: string;
+  quantity: number;
+  variantId: string;
+  variantLabelBn: string;
+  variantLabelEn: string;
+  sku: string | null;
 };
 
 export type NewCartItem = Omit<CartItem, "key">;
@@ -41,8 +53,9 @@ type CartContextValue = {
 
 const CartContext = createContext<CartContextValue | null>(null);
 
-function itemKey(productId: string, variantId: string | null) {
-  return `${productId}::${variantId ?? "base"}`;
+function itemKey(productId: string, variantId: string | null, comboSelections: ComboSelection[] = []) {
+  const comboKey = comboSelections.map((selection) => selection.variantId).sort().join("+");
+  return `${productId}::${variantId ?? "base"}${comboKey ? `::${comboKey}` : ""}`;
 }
 
 function isCartItem(value: unknown): value is CartItem {
@@ -65,7 +78,8 @@ function readStorage(): CartItem[] {
     if (!Array.isArray(parsed)) return [];
     return parsed.filter(isCartItem).map((item) => ({
       ...item,
-      key: item.key || itemKey(item.productId, item.variantId ?? null),
+      comboSelections: Array.isArray(item.comboSelections) ? item.comboSelections : [],
+      key: item.key || itemKey(item.productId, item.variantId ?? null, item.comboSelections ?? []),
       quantity: Math.max(1, Math.min(99, Math.round(item.quantity))),
     }));
   } catch {
@@ -94,7 +108,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, [items, ready]);
 
   const add = useCallback((incoming: NewCartItem) => {
-    const key = itemKey(incoming.productId, incoming.variantId);
+    const key = itemKey(incoming.productId, incoming.variantId, incoming.comboSelections);
     setItems((prev) => {
       const existing = prev.find((i) => i.key === key);
       if (existing) {
