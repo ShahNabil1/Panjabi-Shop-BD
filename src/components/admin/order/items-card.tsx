@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
+import { ImageLightbox, useLightbox } from "@/components/site/image-lightbox";
 
 export type EditableItem = {
   productId: string | null;
