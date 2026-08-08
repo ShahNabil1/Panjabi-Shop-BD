@@ -100,8 +100,7 @@ export function ProductCard({ product }: { product: ProductCardData }) {
     e.preventDefault();
     e.stopPropagation();
     if (soldOut) return;
-    addItem();
-    void navigate({ to: "/checkout" });
+    void addItem().then(() => navigate({ to: "/checkout" }));
   };
 
   return (

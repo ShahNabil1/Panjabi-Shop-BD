@@ -170,11 +170,16 @@ export function CheckoutForm({
           productId: i.productId,
           variantId: i.variantId,
           quantity: i.quantity,
-          comboSelections: i.comboSelections.map((selection) => ({
-            itemId: selection.itemId,
-            variantId: selection.variantId,
-            quantity: selection.quantity,
-          })),
+          // Only variant picks are sent; the server re-expands the full combo.
+          comboSelections: i.comboSelections.flatMap((selection) =>
+            selection.variantId
+              ? [{
+                  itemId: selection.itemId,
+                  variantId: selection.variantId,
+                  quantity: selection.quantity,
+                }]
+              : [],
+          ),
         })),
       },
     }).catch(() => undefined);
@@ -343,11 +348,15 @@ export function CheckoutForm({
             productId: i.productId,
             variantId: i.variantId,
             quantity: i.quantity,
-            comboSelections: i.comboSelections.map((selection) => ({
-              itemId: selection.itemId,
-              variantId: selection.variantId,
-              quantity: selection.quantity,
-            })),
+            comboSelections: i.comboSelections.flatMap((selection) =>
+              selection.variantId
+                ? [{
+                    itemId: selection.itemId,
+                    variantId: selection.variantId,
+                    quantity: selection.quantity,
+                  }]
+                : [],
+            ),
           })),
         },
       });
