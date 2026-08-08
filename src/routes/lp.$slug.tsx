@@ -51,7 +51,7 @@ export const Route = createFileRoute("/lp/$slug")({
     }
     const { landing, product, images } = loaderData;
     const seo = landing.seo;
-    const title = landing.metaTitle || landing.headlineBn || product.nameBn;
+    const title = landing.metaTitle || pageTitle(landing.headlineBn || product.nameBn);
     const description =
       landing.metaDescription ||
       product.shortBn ||
