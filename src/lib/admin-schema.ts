@@ -125,6 +125,8 @@ export const orderSources = [
   "Upsell",
   "Cross Sell",
   "Phone Call",
+  "Exchange",
+
   "Other",
 ] as const;
 
