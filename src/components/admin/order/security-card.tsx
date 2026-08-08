@@ -81,7 +81,7 @@ const dt = (value: string) =>
   });
 
 /** Small copy-to-clipboard control that flips to a tick for a moment. */
-function CopyButton({ value, accent }: { value: string; accent?: boolean }) {
+function CopyButton({ value, accent }: { value: string; accent?: "pathao" | "steadfast" | undefined }) {
   const [copied, setCopied] = useState(false);
   return (
     <button
@@ -98,9 +98,11 @@ function CopyButton({ value, accent }: { value: string; accent?: boolean }) {
         "grid size-7 shrink-0 place-items-center rounded-md border transition active:scale-90",
         copied
           ? "border-emerald-300 bg-emerald-50 text-emerald-600"
-          : accent
+          : accent === "pathao"
             ? "border-[#E32227]/30 text-[#E32227] hover:bg-[#E32227]/10"
-            : "border-border text-muted-foreground hover:bg-muted",
+            : accent === "steadfast"
+              ? "border-[#37A184]/40 text-[#37A184] hover:bg-[#37A184]/10"
+              : "border-border text-muted-foreground hover:bg-muted",
       )}
     >
       {copied ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}
@@ -115,7 +117,7 @@ function CopyTextButton({
 }: {
   value: string;
   label: string;
-  accent?: boolean;
+  accent?: "pathao" | "steadfast" | undefined;
 }) {
   const [copied, setCopied] = useState(false);
   return (
@@ -131,9 +133,11 @@ function CopyTextButton({
         "inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-xs font-semibold transition active:scale-95",
         copied
           ? "border-emerald-300 bg-emerald-50 text-emerald-700"
-          : accent
+          : accent === "pathao"
             ? "border-[#E32227]/30 text-[#E32227] hover:bg-[#E32227]/10"
-            : "border-border text-muted-foreground hover:bg-muted",
+            : accent === "steadfast"
+              ? "border-[#37A184]/40 text-[#37A184] hover:bg-[#37A184]/10"
+              : "border-border text-muted-foreground hover:bg-muted",
       )}
     >
       {copied ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}
@@ -280,6 +284,7 @@ export function FulfillmentCard({
   const normalised = (courierStatus ?? "unknown") as CourierStatus;
   const isPathao = (partner ?? "").toLowerCase() === "pathao";
   const isCarrybee = (partner ?? "").toLowerCase() === "carrybee";
+  const isSteadfast = (partner ?? "").toLowerCase() === "steadfast";
   const canCancelCarrybee =
     isCarrybee &&
     !!consignmentId &&
@@ -327,7 +332,9 @@ export function FulfillmentCard({
         }`
       : isCarrybee
         ? `https://merchant.carrybee.com/order-track/${encodeURIComponent(consignmentId)}`
-        : null;
+        : isSteadfast
+          ? `https://steadfast.com.bd/user/consignment/${encodeURIComponent(consignmentId)}`
+          : null;
 
 
   return (
@@ -501,7 +508,11 @@ export function FulfillmentCard({
               <div
                 className={cn(
                   "rounded-lg border px-3 py-2.5",
-                  isPathao ? "border-[#E32227]/25 bg-white" : "border-border/70 bg-background",
+                  isPathao
+                    ? "border-[#E32227]/25 bg-white"
+                    : isSteadfast
+                      ? "border-[#37A184]/25 bg-[#37A184]/5"
+                      : "border-border/70 bg-background",
                 )}
               >
                 <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
@@ -516,11 +527,17 @@ export function FulfillmentCard({
                       title={
                         isPathao
                           ? "Open in Pathao merchant panel"
-                          : "Open in CarryBee merchant panel"
+                          : isCarrybee
+                            ? "Open in CarryBee merchant panel"
+                            : "Open tracking"
                       }
                       className={cn(
                         "truncate font-mono text-lg font-extrabold tracking-tight text-black underline-offset-4 transition hover:underline",
-                        isPathao ? "hover:text-[#E32227]" : "hover:text-[#B8860B]",
+                        isPathao
+                          ? "hover:text-[#E32227]"
+                          : isSteadfast
+                            ? "hover:text-[#37A184]"
+                            : "hover:text-[#B8860B]",
                       )}
                     >
                       {consignmentId}
@@ -530,7 +547,10 @@ export function FulfillmentCard({
                       {consignmentId}
                     </span>
                   )}
-                  <CopyButton value={consignmentId} accent={isPathao} />
+                  <CopyButton
+                    value={consignmentId}
+                    accent={isPathao ? "pathao" : isSteadfast ? "steadfast" : undefined}
+                  />
                 </div>
                 {publicTrackingUrl ? (
                   <div className="mt-2.5 flex flex-wrap items-center gap-2">
@@ -542,7 +562,9 @@ export function FulfillmentCard({
                         "inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-xs font-semibold transition active:scale-95",
                         isPathao
                           ? "border-[#E32227]/30 bg-[#E32227]/5 text-[#E32227] hover:bg-[#E32227]/10"
-                          : "border-[#F5C518]/60 bg-[#F5C518]/10 text-[#8a6d00] hover:bg-[#F5C518]/20",
+                          : isSteadfast
+                            ? "border-[#37A184]/40 bg-[#37A184]/10 text-[#37A184] hover:bg-[#37A184]/20"
+                            : "border-[#F5C518]/60 bg-[#F5C518]/10 text-[#8a6d00] hover:bg-[#F5C518]/20",
                       )}
                     >
                       <ExternalLink className="size-3.5" />
@@ -551,7 +573,7 @@ export function FulfillmentCard({
                     <CopyTextButton
                       value={publicTrackingUrl}
                       label="Copy tracking link"
-                      accent={isPathao}
+                      accent={isPathao ? "pathao" : isSteadfast ? "steadfast" : undefined}
                     />
                   </div>
                 ) : null}
@@ -586,7 +608,10 @@ export function FulfillmentCard({
                         {returnConsignmentId}
                       </span>
                     )}
-                    <CopyButton value={returnConsignmentId} accent={isPathao} />
+                    <CopyButton
+                      value={returnConsignmentId}
+                      accent={isPathao ? "pathao" : undefined}
+                    />
                   </div>
                 </div>
               ) : null}
