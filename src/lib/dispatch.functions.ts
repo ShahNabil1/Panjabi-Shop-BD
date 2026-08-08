@@ -184,8 +184,16 @@ export const adminRefreshCourierStatus = createServerFn({ method: "POST" })
         raw = (d["order_status"] as string) ?? "unknown";
         liveFee = pathaoFeeFromInfo(d);
       } else {
-        return { ok: false, message: "Live status sync is not available for this courier" };
+        const { carrybeeOrderDetails, carrybeeFeeFromDetails } = await import("./carrybee.server");
+        const { carrybeeCreds } = await import("./dispatch.server");
+        const d = await carrybeeOrderDetails(
+          carrybeeCreds(partner),
+          order.courier_consignment_id,
+        );
+        raw = String(d["transfer_status"] ?? d["order_status"] ?? d["status"] ?? "unknown");
+        liveFee = carrybeeFeeFromDetails(d);
       }
+
 
       const refreshedStatus = normaliseCourierStatus(provider, raw);
       // Pathao's order-info endpoint can remain `Pending` even after a newer
