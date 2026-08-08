@@ -698,7 +698,7 @@ export function FulfillmentCard({
 
 
               <dl className="grid gap-1 text-xs text-muted-foreground">
-                {null}
+                
                 {sentAt ? (
                   <div className="flex gap-2">
                     <dt className="font-semibold">Sent</dt>
