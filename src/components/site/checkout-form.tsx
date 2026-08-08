@@ -432,14 +432,14 @@ export function CheckoutForm({
 
             {items.length === 0 ? (
               <div className="grid place-items-center gap-3 px-4 py-10 text-center">
-                <p className="font-en text-base font-bold text-muted-foreground">
+                <p className="font-en text-sm font-bold text-muted-foreground">
                   No products in your order
                 </p>
                 <Link
                   to="/"
-                  className="font-en group inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-primary to-pink-500 px-6 py-3 text-base font-extrabold text-primary-foreground shadow-md transition-all duration-300 hover:scale-[1.03] hover:shadow-lg active:scale-95"
+                  className="font-en group inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-primary to-pink-500 px-5 py-2.5 text-sm font-extrabold text-primary-foreground shadow-md transition-all duration-300 hover:scale-[1.03] hover:shadow-lg active:scale-95"
                 >
-                  <Plus className="h-5 w-5 transition-transform duration-300 group-hover:rotate-90" />
+                  <Plus className="h-4 w-4 transition-transform duration-300 group-hover:rotate-90" />
                   Add Product
                 </Link>
               </div>
