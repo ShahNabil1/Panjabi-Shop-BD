@@ -365,7 +365,7 @@ function AdminLayout() {
       {/* Desktop sidebar */}
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-40 hidden bg-[#0a0a0a] shadow-2xl shadow-black/40 transition-[width] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] lg:block",
+          "fixed inset-y-0 left-0 z-40 hidden bg-[#0a0a0a] shadow-2xl shadow-black/40 transition-[width] duration-[600ms] ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none lg:block",
           collapsed ? "w-20" : "w-72",
         )}
       >
@@ -404,7 +404,7 @@ function AdminLayout() {
       />
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-50 w-80 bg-[#0a0a0a] text-slate-100 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] lg:hidden",
+          "fixed inset-y-0 left-0 z-50 w-80 bg-[#0a0a0a] text-slate-100 transition-transform duration-[600ms] ease-[cubic-bezier(0.16,1,0.3,1)] lg:hidden",
           mobileOpen ? "translate-x-0" : "-translate-x-full",
         )}
       >
@@ -420,12 +420,12 @@ function AdminLayout() {
 
       <div
         className={cn(
-          "transition-[padding] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
+          "transition-[padding] duration-[600ms] ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none",
           collapsed ? "lg:pl-20" : "lg:pl-72",
         )}
       >
         {/* Quick section switcher — same links as the active sidebar section */}
-        {topItems.length > 1 ? (
+        {true ? (
           <div className="sticky top-0 z-20 border-b border-border bg-card/85 backdrop-blur-md">
             <div className="mx-auto flex w-full max-w-6xl items-center gap-2 overflow-x-auto px-4 py-2.5 lg:px-10">
               {topItems.map((item) => {
@@ -451,7 +451,7 @@ function AdminLayout() {
           </div>
         ) : null}
 
-        <main key={pathname} className="admin-fade mx-auto w-full max-w-6xl space-y-6 px-4 py-6 lg:px-10 lg:py-10">
+        <main key={pathname} className="admin-page mx-auto w-full max-w-6xl space-y-6 px-4 py-6 lg:px-10 lg:py-10">
           <Outlet />
         </main>
       </div>
