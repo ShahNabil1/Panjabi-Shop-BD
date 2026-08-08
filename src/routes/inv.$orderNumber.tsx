@@ -153,11 +153,6 @@ function InvoicePage() {
                 {[data.upazila, data.district, data.division].filter(Boolean).join(", ")}
               </p>
             ) : null}
-            {data.note ? (
-              <p className="mt-1 text-sm font-medium text-foreground/80">
-                <span className="font-bold">Note:</span> {data.note}
-              </p>
-            ) : null}
           </div>
           <div className="sm:text-right">
             <h2 className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
@@ -182,6 +177,13 @@ function InvoicePage() {
             ) : null}
           </div>
         </section>
+
+        {data.note ? (
+          <div className="mt-5 rounded-sm border-l-4 border-primary bg-primary/10 p-3">
+            <p className="text-sm font-bold text-primary">Customer Note</p>
+            <p className="mt-0.5 text-sm font-semibold text-foreground">{data.note}</p>
+          </div>
+        ) : null}
 
         <table className="mt-6 w-full border-collapse font-en text-base">
           <thead>
