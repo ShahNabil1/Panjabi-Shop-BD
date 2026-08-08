@@ -323,16 +323,26 @@ export function OrdersBoard({
         <div className={cn("relative flex-1", isSearchBoard ? "min-w-[260px]" : "max-w-xs min-w-[200px]")}>
           <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            onFocus={() => setInputFocused(true)}
+            onBlur={() => setInputFocused(false)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") setSearch(searchInput.trim());
+              if (e.key === "Escape") setSearchInput("");
+            }}
             autoFocus={isSearchBoard}
             placeholder={
               isSearchBoard
                 ? "Invoice, phone, customer name, courier tracking or consignment ID"
                 : "Order number, name or phone"
             }
-            className="rounded-xl border-border/80 bg-background/70 pl-9"
+            className="rounded-xl border-border/80 bg-background/70 pl-9 pr-9"
           />
+          {isFetching && searchInput ? (
+            <Loader2 className="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 animate-spin text-muted-foreground" />
+          ) : null}
+
         </div>
         <div className={cn("flex flex-wrap gap-1.5", isSearchBoard && "hidden")}>
           {tabs.map((s) => (
