@@ -89,12 +89,60 @@ export const adminOrderWorkspace = createServerFn({ method: "POST" })
         .limit(200),
     ]);
 
+    // Attach product/sub-product thumbnails and fall back to the catalogue SKU
+    // so the items card can show images for combo children too.
+    type RawSelection = Record<string, unknown>;
+    type RawItem = Record<string, unknown> & { combo_selections?: RawSelection[] | null };
+    const rawItems = ((o["order_items"] as RawItem[] | null) ?? []).slice();
+    const catalogIds = new Set<string>();
+    for (const it of rawItems) {
+      if (typeof it["product_id"] === "string") catalogIds.add(it["product_id"] as string);
+      for (const sel of it.combo_selections ?? []) {
+        if (typeof sel["item_id"] === "string") catalogIds.add(sel["item_id"] as string);
+      }
+    }
+    const catalog = catalogIds.size
+      ? ((
+          await db
+            .from("products")
+            .select("id, sku, product_images(url, sort_order)")
+            .in("id", [...catalogIds])
+        ).data ?? [])
+      : [];
+    const meta = new Map<string, { image: string | null; sku: string | null }>();
+    for (const row of catalog as Array<{
+      id: string;
+      sku: string | null;
+      product_images: Array<{ url: string; sort_order: number | null }> | null;
+    }>) {
+      const first = [...(row.product_images ?? [])].sort(
+        (a, b) => Number(a.sort_order ?? 0) - Number(b.sort_order ?? 0),
+      )[0];
+      meta.set(row.id, { image: first?.url ?? null, sku: row.sku });
+    }
+    const itemsWithMedia = rawItems.map((it) => {
+      const own = typeof it["product_id"] === "string" ? meta.get(it["product_id"] as string) : undefined;
+      return {
+        ...it,
+        image: own?.image ?? null,
+        combo_selections: (it.combo_selections ?? []).map((sel) => {
+          const child = typeof sel["item_id"] === "string" ? meta.get(sel["item_id"] as string) : undefined;
+          return { ...sel, image: child?.image ?? null, sku: sel["sku"] ?? child?.sku ?? null };
+        }),
+      };
+    });
+
     return {
-      order: { ...(order as object), order_activity: activity.data ?? [] },
+      order: {
+        ...(order as object),
+        order_items: itemsWithMedia,
+        order_activity: activity.data ?? [],
+      },
       notes: notes.data ?? [],
       sms: sms.data ?? [],
       blocked: (blocked.data ?? []) as Array<{ kind: string; value: string }>,
     };
+
   });
 
 /** Update the full customer & delivery block of an order. */
