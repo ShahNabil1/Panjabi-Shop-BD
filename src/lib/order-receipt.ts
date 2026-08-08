@@ -9,6 +9,10 @@ export type ReceiptRaw = {
   address_line: string;
   city: string;
   delivery_area: string | null;
+  upazila?: string | null;
+  district?: string | null;
+  division?: string | null;
+  note?: string | null;
   subtotal: number;
   delivery_charge: number;
   discount: number;
@@ -46,6 +50,10 @@ export function mapReceipt(order: ReceiptRaw) {
     addressLine: order.address_line,
     city: order.city,
     deliveryArea: order.delivery_area,
+    upazila: order.upazila ?? null,
+    district: order.district ?? null,
+    division: order.division ?? null,
+    note: order.note ?? null,
     subtotal: Number(order.subtotal),
     deliveryCharge: Number(order.delivery_charge),
     discount: Number(order.discount),

@@ -20,6 +20,10 @@ export type OrderSummary = {
   addressLine: string;
   city: string;
   deliveryArea: string | null;
+  upazila?: string | null;
+  district?: string | null;
+  division?: string | null;
+  note?: string | null;
   subtotal: number;
   deliveryCharge: number;
   discount: number;

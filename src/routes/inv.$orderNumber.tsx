@@ -143,11 +143,21 @@ function InvoicePage() {
             <h2 className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
               Customer
             </h2>
-            <p className="mt-1 text-base font-bold">{data.customerName}</p>
+            <p className="mt-1 text-sm font-semibold">{data.customerName}</p>
             <p className="text-sm font-semibold">{data.customerPhone}</p>
             <p className="text-sm font-medium">
               {data.addressLine}, {data.city}
             </p>
+            {[data.upazila, data.district, data.division].filter(Boolean).length ? (
+              <p className="text-sm font-medium">
+                {[data.upazila, data.district, data.division].filter(Boolean).join(", ")}
+              </p>
+            ) : null}
+            {data.note ? (
+              <p className="mt-1 text-sm font-medium text-foreground/80">
+                <span className="font-bold">Note:</span> {data.note}
+              </p>
+            ) : null}
           </div>
           <div className="sm:text-right">
             <h2 className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
