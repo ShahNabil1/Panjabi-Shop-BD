@@ -111,6 +111,7 @@ function CreateOrderPage() {
   const [deliveryPartner, setDeliveryPartner] = useState<string>("");
   const [deliveryNoteOn, setDeliveryNoteOn] = useState(true);
   const [deliveryNote, setDeliveryNote] = useState("");
+  const [mode, setMode] = useState<"manual" | "approved">("manual");
   const [preOrder, setPreOrder] = useState(false);
   const [scheduleOn, setScheduleOn] = useState(false);
   const [scheduledFor, setScheduledFor] = useState("");
