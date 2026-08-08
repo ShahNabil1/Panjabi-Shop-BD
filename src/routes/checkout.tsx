@@ -4,6 +4,7 @@ import { useCart } from "@/lib/cart-context";
 import { getDeliveryRates } from "@/lib/order.functions";
 import { CheckoutForm } from "@/components/site/checkout-form";
 import { Section } from "@/components/site/ui";
+import { SITE_URL } from "@/lib/site";
 
 export const Route = createFileRoute("/checkout")({
   loader: async () => {
@@ -32,9 +33,9 @@ export const Route = createFileRoute("/checkout")({
       { name: "robots", content: "noindex" },
       { property: "og:title", content: "চেকআউট | উপহারকাব্য" },
       { property: "og:description", content: "ক্যাশ অন ডেলিভারিতে অর্ডার সম্পন্ন করুন।" },
-      { property: "og:url", content: "https://upoharkabbo.lovable.app/checkout" },
+      { property: "og:url", content: `${SITE_URL}/checkout` },
     ],
-    links: [{ rel: "canonical", href: "https://upoharkabbo.lovable.app/checkout" }],
+    links: [{ rel: "canonical", href: `${SITE_URL}/checkout` }],
   }),
 });
 

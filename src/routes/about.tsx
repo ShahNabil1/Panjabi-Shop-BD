@@ -4,6 +4,7 @@ import { useLang } from "@/lib/language-context";
 import { tr } from "@/lib/i18n";
 import { useSiteData } from "@/components/site/site-header";
 import { Breadcrumbs, Prose, Section } from "@/components/site/ui";
+import { SITE_URL } from "@/lib/site";
 
 export const Route = createFileRoute("/about")({
   head: () => ({
@@ -16,9 +17,9 @@ export const Route = createFileRoute("/about")({
       },
       { property: "og:title", content: "আমাদের কথা | About — উপহারকাব্য" },
       { property: "og:description", content: "উপহার সাজানোর কাজটা আমরা কবিতার মতো করে করি।" },
-      { property: "og:url", content: "https://upoharkabbo.lovable.app/about" },
+      { property: "og:url", content: `${SITE_URL}/about` },
     ],
-    links: [{ rel: "canonical", href: "https://upoharkabbo.lovable.app/about" }],
+    links: [{ rel: "canonical", href: `${SITE_URL}/about` }],
   }),
   component: AboutPage,
 });

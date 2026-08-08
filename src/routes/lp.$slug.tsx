@@ -18,7 +18,7 @@ import type { CartItem } from "@/lib/cart-context";
 import { cn } from "@/lib/utils";
 import logoMark from "@/assets/upoharkabbo-logo.png";
 import { ImageLightbox, useLightbox } from "@/components/site/image-lightbox";
-import { pageTitle } from "@/lib/site";
+import { pageTitle, SITE_URL } from "@/lib/site";
 
 async function retryNetworkRequest<T>(request: () => Promise<T>): Promise<T> {
   const delays = [150, 400];
@@ -59,7 +59,7 @@ export const Route = createFileRoute("/lp/$slug")({
     const ogTitle = seo.ogTitle || title;
     const ogDescription = seo.ogDescription || description;
     const image = landing.ogImageUrl ?? images[0]?.url ?? null;
-    const url = seo.canonicalUrl || `https://upoharkabbo.lovable.app/lp/${params.slug}`;
+    const url = seo.canonicalUrl || `${SITE_URL}/lp/${params.slug}`;
 
     return {
       meta: [
