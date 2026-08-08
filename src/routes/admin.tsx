@@ -20,6 +20,7 @@ import {
   PlusCircle,
 
   Rocket,
+  Search as SearchIcon,
   Settings,
   Truck,
   ShoppingCart,
