@@ -13,6 +13,7 @@ import { CheckoutForm } from "@/components/site/checkout-form";
 
 import { Prose } from "@/components/site/ui";
 import { SpecShowcase } from "@/components/site/spec-showcase";
+import { ComboContents } from "@/components/site/combo-contents";
 import type { CartItem } from "@/lib/cart-context";
 import { cn } from "@/lib/utils";
 import logoMark from "@/assets/upoharkabbo-logo.png";
@@ -107,12 +108,15 @@ export const Route = createFileRoute("/lp/$slug")({
 
 function LandingPage() {
   const { lang } = useLang();
-  const { landing, product, images, variants, rates } = Route.useLoaderData() as LandingPageData & {
+  const { landing, product, images, variants, comboItems, rates } = Route.useLoaderData() as LandingPageData & {
     rates: { inside_dhaka: number; outside_dhaka: number; freeAbove: number; freeAll?: boolean };
   };
 
   const [variantId, setVariantId] = useState<string | null>(variants[0]?.id ?? null);
   const [qty, setQty] = useState(1);
+  const [comboSelected, setComboSelected] = useState<Record<string, string>>(() =>
+    Object.fromEntries(comboItems.flatMap((item) => item.variants[0] ? [[item.id, item.variants[0].id]] : [])),
+  );
 
   const activeVariant = variants.find((v) => v.id === variantId) ?? null;
   const unitPrice = product.price + Number(activeVariant?.price_delta ?? 0);
@@ -139,10 +143,22 @@ function LandingPage() {
         variantLabelEn: activeVariant
           ? `${activeVariant.group_name_en}: ${activeVariant.value_en}`
           : null,
-        comboSelections: [],
+        comboSelections: comboItems.flatMap((comboItem) => {
+          const comboVariant = comboItem.variants.find((option) => option.id === comboSelected[comboItem.id]);
+          return comboVariant ? [{
+            itemId: comboItem.itemId,
+            itemNameBn: comboItem.nameBn,
+            itemNameEn: comboItem.nameEn,
+            quantity: comboItem.quantity,
+            variantId: comboVariant.id,
+            variantLabelBn: `${comboVariant.groupNameBn}: ${comboVariant.valueBn}`,
+            variantLabelEn: `${comboVariant.groupNameEn}: ${comboVariant.valueEn}`,
+            sku: comboVariant.sku,
+          }] : [];
+        }),
       },
     ],
-    [product, images, activeVariant, unitPrice, qty, stock],
+    [product, images, activeVariant, unitPrice, qty, stock, comboItems, comboSelected],
   );
 
   const landingFaqs = (product.faq ?? []).map((f, i) => ({
@@ -270,6 +286,14 @@ function LandingPage() {
           <Prose text={description} className="mt-3" />
         </section>
       ) : null}
+
+      <ComboContents
+        items={comboItems}
+        selected={comboSelected}
+        onSelect={(itemId, selectedVariantId) =>
+          setComboSelected((current) => ({ ...current, [itemId]: selectedVariantId }))
+        }
+      />
 
       {product.specs.length > 0 ? (
         <SpecShowcase
