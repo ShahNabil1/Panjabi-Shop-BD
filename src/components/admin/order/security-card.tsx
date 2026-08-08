@@ -491,13 +491,20 @@ export function FulfillmentCard({
                   Consignment
                 </p>
                 <div className="mt-1 flex items-center gap-2">
-                  {isPathao && consignmentUrl ? (
+                  {consignmentUrl ? (
                     <a
                       href={consignmentUrl}
                       target="_blank"
                       rel="noreferrer"
-                      title="Open in Pathao merchant panel"
-                      className="truncate font-mono text-lg font-extrabold tracking-tight text-black underline-offset-4 transition hover:text-[#E32227] hover:underline"
+                      title={
+                        isPathao
+                          ? "Open in Pathao merchant panel"
+                          : "Open in CarryBee merchant panel"
+                      }
+                      className={cn(
+                        "truncate font-mono text-lg font-extrabold tracking-tight text-black underline-offset-4 transition hover:underline",
+                        isPathao ? "hover:text-[#E32227]" : "hover:text-[#B8860B]",
+                      )}
                     >
                       {consignmentId}
                     </a>
@@ -514,7 +521,12 @@ export function FulfillmentCard({
                       href={publicTrackingUrl}
                       target="_blank"
                       rel="noreferrer"
-                      className="inline-flex items-center gap-1.5 rounded-md border border-[#E32227]/30 bg-[#E32227]/5 px-2.5 py-1.5 text-xs font-semibold text-[#E32227] transition hover:bg-[#E32227]/10 active:scale-95"
+                      className={cn(
+                        "inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-xs font-semibold transition active:scale-95",
+                        isPathao
+                          ? "border-[#E32227]/30 bg-[#E32227]/5 text-[#E32227] hover:bg-[#E32227]/10"
+                          : "border-[#F5C518]/60 bg-[#F5C518]/10 text-[#8a6d00] hover:bg-[#F5C518]/20",
+                      )}
                     >
                       <ExternalLink className="size-3.5" />
                       Open tracking link
@@ -528,15 +540,6 @@ export function FulfillmentCard({
                 ) : null}
               </div>
 
-              {returnConsignmentId ? (
-                <div
-                  className={cn(
-                    "rounded-lg border px-3 py-2.5",
-                    isPathao
-                      ? "border-orange-300/60 bg-orange-50/70"
-                      : "border-border/70 bg-background",
-                  )}
-                >
                   <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-orange-700">
                     Return ID
                   </p>
