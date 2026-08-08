@@ -259,9 +259,8 @@ export function CheckoutForm({
     }
     if (!COUPON_CODE_RE.test(code)) {
       setCoupon(null);
-      setCouponError(
-        lang === "bn" ? "কুপনটি ভ্যালিড না" : "This coupon is not valid",
-      );
+      setCouponError("This coupon is not valid");
+
       lastCheckedCouponRef.current = code;
       return;
     }
@@ -285,7 +284,7 @@ export function CheckoutForm({
       }
     } catch {
       setCoupon(null);
-      setCouponError(lang === "bn" ? "কুপন যাচাই করা যায়নি" : "Could not verify the coupon");
+      setCouponError("Could not verify the coupon");
     } finally {
       setCouponPending(false);
       lastCheckedCouponRef.current = code;
@@ -800,11 +799,10 @@ export function CheckoutForm({
                 ) : null}
                 {appliedCode ? (
                   <p className="mt-2 text-xs font-semibold text-emerald-600 animate-fade-in">
-                    {lang === "bn"
-                      ? `কুপন ${appliedCode} প্রয়োগ হয়েছে`
-                      : `Coupon ${appliedCode} applied`}
+                    {`Coupon ${appliedCode} applied`}
                   </p>
                 ) : null}
+
               </div>
             </div>
           </div>
