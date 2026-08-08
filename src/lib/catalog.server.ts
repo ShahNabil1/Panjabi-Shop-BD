@@ -22,8 +22,8 @@ export async function fetchHome() {
   const [settingsRes, categoriesRes, subcategoriesRes, promoRes, featuredRes, faqRes] =
     await Promise.all([
       db.from("site_settings").select("key, value"),
-      db.from("categories").select(CATEGORY_SELECT).order("sort_order"),
-      db.from("subcategories").select(SUBCATEGORY_SELECT).order("sort_order"),
+      db.from("categories").select(CATEGORY_SELECT).eq("is_active", true).order("sort_order"),
+      db.from("subcategories").select(SUBCATEGORY_SELECT).eq("is_active", true).order("sort_order"),
       db
         .from("promotions")
         .select(
