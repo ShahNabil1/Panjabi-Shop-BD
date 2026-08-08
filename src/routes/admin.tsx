@@ -179,8 +179,8 @@ function AdminLayout() {
       return () => window.cancelIdleCallback(idleId);
     }
 
-    const timeoutId = window.setTimeout(preloadRoutes, 250);
-    return () => window.clearTimeout(timeoutId);
+    const timeoutId = globalThis.setTimeout(preloadRoutes, 250);
+    return () => globalThis.clearTimeout(timeoutId);
   }, [router, session]);
 
   const isAdmin = useQuery({
