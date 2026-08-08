@@ -280,6 +280,7 @@ export function FulfillmentCard({
   const normalised = (courierStatus ?? "unknown") as CourierStatus;
   const isPathao = (partner ?? "").toLowerCase() === "pathao";
   const isCarrybee = (partner ?? "").toLowerCase() === "carrybee";
+  const isSteadfast = (partner ?? "").toLowerCase() === "steadfast";
   const canCancelCarrybee =
     isCarrybee &&
     !!consignmentId &&
