@@ -325,6 +325,12 @@ export function CustomerCard({
           ) : null}
         </div>
       )}
+
+      <CustomerOrdersDialog
+        phone={phoneForHistory}
+        open={historyOpen}
+        onOpenChange={setHistoryOpen}
+      />
     </Panel>
   );
 }
