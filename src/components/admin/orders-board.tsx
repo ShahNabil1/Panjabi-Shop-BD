@@ -119,10 +119,38 @@ export function OrdersBoard({
    */
   const tabs: readonly string[] =
     bucket === "list" ? [...statuses, ...paymentFilters] : statuses;
-  const [status, setStatus] = useState<string>(tabs[0]!);
+  /**
+   * Board state lives in the URL so that returning from an order detail page
+   * (back button or "Back to orders") restores the exact tab / search / page.
+   */
+  const boardRoute = bucket === "list" ? "/admin/orders/list" : "/admin/orders";
+  const urlSearch = useSearch({ strict: false }) as {
+    tab?: string;
+    q?: string;
+    page?: number;
+  };
+  const boardNavigate = useNavigate();
+  const setBoardSearch = (patch: { tab?: string; q?: string; page?: number }) => {
+    void boardNavigate({
+      to: boardRoute,
+      search: (prev: Record<string, unknown>) => {
+        const next = { ...prev, ...patch } as Record<string, unknown>;
+        if (!next["q"]) delete next["q"];
+        if (!next["page"] || Number(next["page"]) <= 1) delete next["page"];
+        return next;
+      },
+      replace: true,
+    });
+  };
+
+  const status = urlSearch.tab && tabs.includes(urlSearch.tab) ? urlSearch.tab : tabs[0]!;
+  const setStatus = (s: string) => setBoardSearch({ tab: s, page: 1 });
   const isPaymentView = (paymentFilters as readonly string[]).includes(status);
-  const [search, setSearch] = useState("");
-  const [page, setPage] = useState(1);
+  const search = urlSearch.q ?? "";
+  const setSearch = (q: string) => setBoardSearch({ q, page: 1 });
+  const page = Math.max(1, Number(urlSearch.page) || 1);
+  const setPage = (next: number | ((prev: number) => number)) =>
+    setBoardSearch({ page: typeof next === "function" ? next(page) : next });
   const PAGE_SIZE_KEY = "admin.orders.pageSize";
   const [pageSize, setPageSize] = useState(20);
 
@@ -135,10 +163,6 @@ export function OrdersBoard({
   useEffect(() => {
     localStorage.setItem(PAGE_SIZE_KEY, String(pageSize));
   }, [pageSize]);
-
-  useEffect(() => {
-    setPage(1);
-  }, [status, search, pageSize]);
 
   const { data, isLoading } = useQuery({
     queryKey: ["admin", "orders", bucket, status, search],
