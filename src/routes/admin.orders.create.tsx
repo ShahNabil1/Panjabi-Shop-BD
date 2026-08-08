@@ -149,7 +149,7 @@ function money(n: number) {
   return `৳ ${n.toLocaleString("en-US")}`;
 }
 
-function Label({ children }: { children: React.ReactNode }) {
+function Label({ children }: { children: ReactNode }) {
   return <span className="mb-1.5 block text-sm font-semibold text-foreground">{children}</span>;
 }
 
