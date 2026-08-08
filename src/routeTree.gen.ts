@@ -39,6 +39,7 @@ import { Route as AdminOrdersIndexRouteImport } from './routes/admin.orders.inde
 import { Route as AdminOrdersIdRouteImport } from './routes/admin.orders.$id'
 import { Route as AdminOrdersCreateRouteImport } from './routes/admin.orders.create'
 import { Route as AdminOrdersListRouteImport } from './routes/admin.orders.list'
+import { Route as AdminOrdersSearchRouteImport } from './routes/admin.orders.search'
 import { Route as AdminProductsIndexRouteImport } from './routes/admin.products.index'
 import { Route as AdminProductsIdRouteImport } from './routes/admin.products.$id'
 import { Route as AdminSettingsIndexRouteImport } from './routes/admin.settings.index'
@@ -203,6 +204,11 @@ const AdminOrdersListRoute = AdminOrdersListRouteImport.update({
   path: '/orders/list',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminOrdersSearchRoute = AdminOrdersSearchRouteImport.update({
+  id: '/orders/search',
+  path: '/orders/search',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminProductsIndexRoute = AdminProductsIndexRouteImport.update({
   id: '/products/',
   path: '/products/',
@@ -302,6 +308,7 @@ export interface FileRoutesByFullPath {
   '/admin/orders/$id': typeof AdminOrdersIdRoute
   '/admin/orders/create': typeof AdminOrdersCreateRoute
   '/admin/orders/list': typeof AdminOrdersListRoute
+  '/admin/orders/search': typeof AdminOrdersSearchRoute
   '/admin/products/$id': typeof AdminProductsIdRoute
   '/admin/settings/delivery': typeof AdminSettingsDeliveryRoute
   '/admin/settings/retention': typeof AdminSettingsRetentionRoute
@@ -346,6 +353,7 @@ export interface FileRoutesByTo {
   '/admin/orders/$id': typeof AdminOrdersIdRoute
   '/admin/orders/create': typeof AdminOrdersCreateRoute
   '/admin/orders/list': typeof AdminOrdersListRoute
+  '/admin/orders/search': typeof AdminOrdersSearchRoute
   '/admin/products/$id': typeof AdminProductsIdRoute
   '/admin/settings/delivery': typeof AdminSettingsDeliveryRoute
   '/admin/settings/retention': typeof AdminSettingsRetentionRoute
@@ -392,6 +400,7 @@ export interface FileRoutesById {
   '/admin/orders/$id': typeof AdminOrdersIdRoute
   '/admin/orders/create': typeof AdminOrdersCreateRoute
   '/admin/orders/list': typeof AdminOrdersListRoute
+  '/admin/orders/search': typeof AdminOrdersSearchRoute
   '/admin/products/$id': typeof AdminProductsIdRoute
   '/admin/settings/delivery': typeof AdminSettingsDeliveryRoute
   '/admin/settings/retention': typeof AdminSettingsRetentionRoute
@@ -439,6 +448,7 @@ export interface FileRouteTypes {
     | '/admin/orders/$id'
     | '/admin/orders/create'
     | '/admin/orders/list'
+    | '/admin/orders/search'
     | '/admin/products/$id'
     | '/admin/settings/delivery'
     | '/admin/settings/retention'
@@ -483,6 +493,7 @@ export interface FileRouteTypes {
     | '/admin/orders/$id'
     | '/admin/orders/create'
     | '/admin/orders/list'
+    | '/admin/orders/search'
     | '/admin/products/$id'
     | '/admin/settings/delivery'
     | '/admin/settings/retention'
@@ -528,6 +539,7 @@ export interface FileRouteTypes {
     | '/admin/orders/$id'
     | '/admin/orders/create'
     | '/admin/orders/list'
+    | '/admin/orders/search'
     | '/admin/products/$id'
     | '/admin/settings/delivery'
     | '/admin/settings/retention'
@@ -783,6 +795,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminOrdersListRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/orders/search': {
+      id: '/admin/orders/search'
+      path: '/orders/search'
+      fullPath: '/admin/orders/search'
+      preLoaderRoute: typeof AdminOrdersSearchRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/products/': {
       id: '/admin/products/'
       path: '/products'
@@ -888,6 +907,7 @@ interface AdminRouteChildren {
   AdminOrdersIdRoute: typeof AdminOrdersIdRoute
   AdminOrdersCreateRoute: typeof AdminOrdersCreateRoute
   AdminOrdersListRoute: typeof AdminOrdersListRoute
+  AdminOrdersSearchRoute: typeof AdminOrdersSearchRoute
   AdminProductsIdRoute: typeof AdminProductsIdRoute
   AdminSettingsDeliveryRoute: typeof AdminSettingsDeliveryRoute
   AdminSettingsRetentionRoute: typeof AdminSettingsRetentionRoute
@@ -911,6 +931,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminOrdersIdRoute: AdminOrdersIdRoute,
   AdminOrdersCreateRoute: AdminOrdersCreateRoute,
   AdminOrdersListRoute: AdminOrdersListRoute,
+  AdminOrdersSearchRoute: AdminOrdersSearchRoute,
   AdminProductsIdRoute: AdminProductsIdRoute,
   AdminSettingsDeliveryRoute: AdminSettingsDeliveryRoute,
   AdminSettingsRetentionRoute: AdminSettingsRetentionRoute,

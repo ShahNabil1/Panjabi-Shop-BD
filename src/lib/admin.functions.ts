@@ -96,13 +96,31 @@ export const adminListOrders = createServerFn({ method: "POST" })
       .limit(200);
     if (data.payment) q = q.in("status", [...payableStatuses]);
     else if (data.status) q = q.eq("status", data.status);
-    else if (data.bucket)
-      q = q.in("status", [...(data.bucket === "web" ? webOrderStatuses : listOrderStatuses)]);
+    else if (data.bucket === "web") q = q.in("status", [...webOrderStatuses]);
+    else if (data.bucket === "list") q = q.in("status", [...listOrderStatuses]);
+    // bucket "search" searches every order regardless of status.
     if (data.search) {
       const s = data.search.replace(/[%,]/g, "");
-      q = q.or(
-        `order_number.ilike.%${s}%,customer_name.ilike.%${s}%,customer_phone.ilike.%${s}%`,
-      );
+      const filters = [
+        `order_number.ilike.%${s}%`,
+        `customer_name.ilike.%${s}%`,
+        `customer_phone.ilike.%${s}%`,
+        `alt_phone.ilike.%${s}%`,
+        `courier_consignment_id.ilike.%${s}%`,
+      ];
+      if (data.bucket === "search") {
+        // Tracking / consignment codes live on the consignment rows too.
+        const { data: hits } = await db
+          .from("order_consignments")
+          .select("order_id")
+          .or(`consignment_id.ilike.%${s}%,tracking_code.ilike.%${s}%`)
+          .limit(200);
+        const ids = [...new Set(((hits ?? []) as Array<{ order_id: string | null }>)
+          .map((h) => h.order_id)
+          .filter((v): v is string => Boolean(v)))];
+        if (ids.length) filters.push(`id.in.(${ids.join(",")})`);
+      }
+      q = q.or(filters.join(","));
     }
     const rows = unwrap(await q);
     if (!data.payment) return rows;

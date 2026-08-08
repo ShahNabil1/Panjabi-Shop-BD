@@ -143,13 +143,19 @@ export function OrdersBoard({
    * they slice delivered / partial-delivered parcels by whether Pathao has
    * already paid the money out (an `order.paid` invoice webhook arrived).
    */
+  const isSearchBoard = bucket === "search";
   const tabs: readonly string[] =
     bucket === "list" ? [...statuses, ...paymentFilters] : statuses;
   /**
    * Board state lives in the URL so that returning from an order detail page
    * (back button or "Back to orders") restores the exact tab / search / page.
    */
-  const boardRoute = bucket === "list" ? "/admin/orders/list" : "/admin/orders";
+  const boardRoute =
+    bucket === "list"
+      ? "/admin/orders/list"
+      : bucket === "search"
+        ? "/admin/orders/search"
+        : "/admin/orders";
   const urlSearch = useSearch({ strict: false }) as {
     tab?: string;
     q?: string;
@@ -169,7 +175,9 @@ export function OrdersBoard({
     });
   };
 
-  const status = urlSearch.tab && tabs.includes(urlSearch.tab) ? urlSearch.tab : tabs[0]!;
+  const status = isSearchBoard
+    ? ""
+    : urlSearch.tab && tabs.includes(urlSearch.tab) ? urlSearch.tab : tabs[0]!;
   const setStatus = (s: string) => setBoardSearch({ tab: s, page: 1 });
   const isPaymentView = (paymentFilters as readonly string[]).includes(status);
   const search = urlSearch.q ?? "";
@@ -191,6 +199,7 @@ export function OrdersBoard({
   }, [pageSize]);
 
   const { data, isLoading } = useQuery({
+    enabled: !isSearchBoard || search.trim().length > 0,
     queryKey: ["admin", "orders", bucket, status, search],
     queryFn: () =>
       adminListOrders({
@@ -284,24 +293,29 @@ export function OrdersBoard({
     <div className="space-y-5">
       {bucket === "list" ? (
         <CourierApiStatusBar />
-      ) : (
+      ) : bucket === "web" ? (
         <div className="flex justify-end">
           <CourierStatusBar />
         </div>
-      )}
+      ) : null}
 
 
       <div className="admin-rise flex flex-wrap items-center gap-3 rounded-2xl border border-border/70 bg-card p-3">
-        <div className="relative max-w-xs flex-1 min-w-[200px]">
+        <div className={cn("relative flex-1", isSearchBoard ? "min-w-[260px]" : "max-w-xs min-w-[200px]")}>
           <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Order number, name or phone"
+            autoFocus={isSearchBoard}
+            placeholder={
+              isSearchBoard
+                ? "Invoice, phone, customer name, courier tracking or consignment ID"
+                : "Order number, name or phone"
+            }
             className="rounded-xl border-border/80 bg-background/70 pl-9"
           />
         </div>
-        <div className="flex flex-wrap gap-1.5">
+        <div className={cn("flex flex-wrap gap-1.5", isSearchBoard && "hidden")}>
           {tabs.map((s) => (
             <button
               key={s}
@@ -344,7 +358,11 @@ export function OrdersBoard({
       ) : null}
 
       <Panel className="p-0">
-        {isLoading ? (
+        {isSearchBoard && search.trim().length === 0 ? (
+          <div className="p-4">
+            <EmptyState title="Start typing to search every order" />
+          </div>
+        ) : isLoading ? (
           <BrandLoader size="md" className="py-8" />
         ) : total === 0 ? (
           <div className="p-4">
@@ -495,6 +513,7 @@ export function OrdersBoard({
                         params={{ id: (o.order_number || o.id).toLowerCase() }}
                         search={{
                           ...(bucket === "list" ? { from: "list" as const } : {}),
+                          ...(bucket === "search" ? { from: "search" as const } : {}),
                           ...(status ? { tab: status } : {}),
                           ...(search ? { q: search } : {}),
                           ...(current > 1 ? { page: current } : {}),
@@ -611,6 +630,7 @@ export function OrdersBoard({
                     search: {
                       takeover: 1 as const,
                       ...(bucket === "list" ? { from: "list" as const } : {}),
+                      ...(bucket === "search" ? { from: "search" as const } : {}),
                     },
                   });
               }}

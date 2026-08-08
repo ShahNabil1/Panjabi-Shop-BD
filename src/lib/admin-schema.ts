@@ -61,7 +61,7 @@ export type PaymentFilter = (typeof paymentFilters)[number];
 export const payableStatuses = ["delivered", "partial_delivered"] as const;
 
 
-export const orderBuckets = ["web", "list"] as const;
+export const orderBuckets = ["web", "list", "search"] as const;
 export type OrderBucket = (typeof orderBuckets)[number];
 
 
