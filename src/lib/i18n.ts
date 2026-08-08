@@ -138,7 +138,7 @@ export const t = {
     en: "We could not place the order. Please check the details and try again.",
   },
   invalidForm: { bn: "সব ঘর সঠিকভাবে পূরণ করুন।", en: "Please fill every field correctly." },
-  orderNow2: { bn: "নিচে অর্ডার করুন", en: "Order below" },
+  
   tryAgain: { bn: "আবার চেষ্টা করুন", en: "Try again" },
 } as const;
 
