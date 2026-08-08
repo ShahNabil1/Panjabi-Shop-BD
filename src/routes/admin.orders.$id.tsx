@@ -84,6 +84,7 @@ type OrderItemRow = {
   sku: string | null;
   unit_price: number | string;
   quantity: number;
+  image?: string | null;
   combo_selections?: Array<{
     item_id?: string;
     item_name_bn?: string;
@@ -93,7 +94,9 @@ type OrderItemRow = {
     variant_label_bn?: string;
     variant_label_en?: string;
     sku?: string | null;
+    image?: string | null;
   }>;
+
 };
 
 function AdminOrderDetail() {
