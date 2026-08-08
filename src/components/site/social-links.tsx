@@ -34,7 +34,7 @@ export const SOCIAL_LINKS = [
     href: "https://www.tiktok.com/@upoharkabbo3",
     label: "TikTok",
     icon: TikTokIcon,
-    colorClass: "text-[#000000] hover:text-[#ff0050]",
+    colorClass: "text-[#000000] hover:text-white",
   },
 ];
 
