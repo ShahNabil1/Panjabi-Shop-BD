@@ -135,17 +135,20 @@ export function SiteFooter() {
       </div>
 
       <div className="bg-primary py-3">
-        <p className="mx-auto max-w-6xl px-4 text-center text-xs font-medium text-primary-foreground">
-          © 2026 Upoharkabbo. All Rights Reserved. Design & Developed By{" "}
-          <a
-            href="https://shahnabil.com/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="font-semibold underline underline-offset-2 transition-opacity hover:opacity-80"
-          >
-            Shahriar Nabil
-          </a>
-        </p>
+        <div className="mx-auto max-w-6xl space-y-1 px-4 text-xs font-medium text-primary-foreground">
+          <p className="text-left">© 2026 Upoharkabbo. All Rights Reserved.</p>
+          <p className="text-center">
+            Design & Developed By{" "}
+            <a
+              href="https://shahnabil.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-semibold underline underline-offset-2 transition-opacity hover:opacity-80"
+            >
+              Shahriar Nabil
+            </a>
+          </p>
+        </div>
       </div>
     </footer>
   );
