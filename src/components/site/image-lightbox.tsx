@@ -173,17 +173,19 @@ export function ImageLightbox({
         className="relative max-h-[85vh] w-full max-w-5xl px-12"
         onClick={(e) => e.stopPropagation()}
       >
-        <img
-          key={current.src}
-          src={current.src}
-          alt={current.alt || ""}
-          onClick={toggleZoom}
-          className={cn(
-            "mx-auto max-h-[85vh] w-auto max-w-full rounded-lg object-contain shadow-2xl transition-transform duration-300",
-            isZoomed ? "cursor-zoom-out" : "cursor-zoom-in",
-          )}
-          style={{ transform: `scale(${scale})` }}
-        />
+        {current ? (
+          <img
+            key={current.src}
+            src={current.src}
+            alt={current.alt || ""}
+            onClick={toggleZoom}
+            className={cn(
+              "mx-auto max-h-[85vh] w-auto max-w-full rounded-lg object-contain shadow-2xl transition-transform duration-300",
+              isZoomed ? "cursor-zoom-out" : "cursor-zoom-in",
+            )}
+            style={{ transform: `scale(${scale})` }}
+          />
+        ) : null}
       </div>
 
       {images.length > 1 ? (
