@@ -409,10 +409,38 @@ function AdminLayout() {
           collapsed ? "lg:pl-20" : "lg:pl-72",
         )}
       >
-        <main key={pathname} className="admin-rise mx-auto w-full max-w-6xl space-y-6 px-4 py-6 lg:px-10 lg:py-10">
+        {/* Quick section switcher — same links as the active sidebar section */}
+        {topItems.length > 1 ? (
+          <div className="sticky top-0 z-20 border-b border-border bg-card/85 backdrop-blur-md">
+            <div className="mx-auto flex w-full max-w-6xl items-center gap-2 overflow-x-auto px-4 py-2.5 lg:px-10">
+              {topItems.map((item) => {
+                const active = isActive(item);
+                return (
+                  <Link
+                    key={item.to}
+                    to={item.to as "/admin"}
+                    preload="intent"
+                    className={cn(
+                      "inline-flex shrink-0 items-center gap-2 rounded-full px-3.5 py-1.5 text-sm font-semibold transition-all duration-200",
+                      active
+                        ? "bg-primary text-primary-foreground shadow-sm"
+                        : "text-muted-foreground hover:bg-accent hover:text-foreground",
+                    )}
+                  >
+                    <item.icon className="size-4" />
+                    {item.label}
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        ) : null}
+
+        <main key={pathname} className="admin-fade mx-auto w-full max-w-6xl space-y-6 px-4 py-6 lg:px-10 lg:py-10">
           <Outlet />
         </main>
       </div>
+
     </div>
   );
 }
