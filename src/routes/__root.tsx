@@ -171,6 +171,7 @@ function Chrome({ children, brand }: { children: ReactNode; brand: string }) {
   const bare = pathname.startsWith("/admin") || pathname.startsWith("/auth");
   const isLanding = pathname.startsWith("/lp");
   const bareOnMobile = pathname.startsWith("/invoice") || pathname.startsWith("/inv/");
+  const isCheckout = pathname === "/checkout";
 
   if (bare) {
     return <div className="min-h-screen">{children}</div>;

@@ -8,7 +8,7 @@ import logoMark from "@/assets/upoharkabbo-logo.png";
 import { SOCIAL_LINKS } from "./social-links";
 import { cn } from "@/lib/utils";
 
-export function SiteFooter() {
+export function SiteFooter({ minimalOnMobile }: { minimalOnMobile?: boolean }) {
   const { lang } = useLang();
   const { brand, contact } = useSiteData();
 
