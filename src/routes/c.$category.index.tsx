@@ -20,7 +20,7 @@ export const Route = createFileRoute("/c/$category/")({
       return { meta: [{ title: "পাওয়া যায়নি" }, { name: "robots", content: "noindex" }] };
     }
     const c = loaderData.category;
-    const title = c.meta_title || `${c.name_bn} | ${c.name_en}`;
+    const title = c.meta_title || pageTitle(c.name_bn);
     const description =
       c.meta_description ||
       c.description_bn ||
