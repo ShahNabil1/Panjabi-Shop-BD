@@ -23,6 +23,7 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import { normalizePhoneInput } from "@/lib/phone";
+import { CustomerOrdersDialog } from "@/components/admin/customer-orders-dialog";
 
 export const Route = createFileRoute("/admin/orders/create")({
   component: CreateOrderPage,
@@ -338,7 +339,14 @@ function CreateOrderPage() {
                 </div>
                 {lookup.data ? (
                   <span className="mt-1 block text-xs font-semibold text-primary">
-                    Returning customer · {lookup.data.orderCount} previous order(s)
+                    Returning customer ·{" "}
+                    <button
+                      type="button"
+                      onClick={() => setHistoryOpen(true)}
+                      className="underline decoration-dotted underline-offset-2 transition-opacity hover:opacity-80"
+                    >
+                      {lookup.data.orderCount} previous order(s)
+                    </button>
                   </span>
                 ) : null}
               </label>
