@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Ban, Banknote, Check, Copy, ExternalLink, Fingerprint, Globe, History, MapPin, NotebookPen, Phone, Shield, ShieldCheck, ShieldX, Truck, RefreshCw } from "lucide-react";
 
@@ -265,11 +265,17 @@ export function FulfillmentCard({
     onError: (e: Error) => toast.error(e.message),
   });
 
-  const events = useQuery({
+  const PAGE = 5;
+  const events = useInfiniteQuery({
     queryKey: ["admin", "courier-webhook-events", orderId],
-    queryFn: () => adminOrderWebhookEvents({ data: { orderId } }),
+    initialPageParam: 0,
+    queryFn: ({ pageParam }) =>
+      adminOrderWebhookEvents({ data: { orderId, limit: PAGE, offset: pageParam as number } }),
+    getNextPageParam: (lastPage, allPages) =>
+      lastPage.length < PAGE ? undefined : allPages.length * PAGE,
     enabled: historyOpen,
   });
+  const eventList = (events.data?.pages ?? []).flat();
 
   const normalised = (courierStatus ?? "unknown") as CourierStatus;
   const isPathao = (partner ?? "").toLowerCase() === "pathao";
@@ -378,13 +384,13 @@ export function FulfillmentCard({
             <div className="-mx-1 flex-1 overflow-y-auto px-1">
               {events.isLoading ? (
                 <p className="py-6 text-center text-sm text-muted-foreground">Loading…</p>
-              ) : (events.data ?? []).length === 0 ? (
+              ) : eventList.length === 0 ? (
                 <p className="py-6 text-center text-sm text-muted-foreground">
                   No webhook events received for this order yet.
                 </p>
               ) : (
                 <ol className="relative space-y-3 border-l border-border/70 pl-4">
-                  {(events.data ?? []).map((ev) => (
+                  {eventList.map((ev) => (
                     <li key={ev.id} className="relative">
                       <span className="absolute -left-[21px] top-2 size-2.5 rounded-full bg-primary ring-4 ring-background" />
                       <div className="rounded-xl border border-border/70 bg-background/60 p-3">
@@ -419,6 +425,17 @@ export function FulfillmentCard({
                   ))}
                 </ol>
               )}
+              {events.hasNextPage ? (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="mt-3 w-full"
+                  disabled={events.isFetchingNextPage}
+                  onClick={() => void events.fetchNextPage()}
+                >
+                  {events.isFetchingNextPage ? "Loading…" : "View more"}
+                </Button>
+              ) : null}
             </div>
           </DialogContent>
         </Dialog>
