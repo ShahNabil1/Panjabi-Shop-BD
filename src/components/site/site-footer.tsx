@@ -77,6 +77,27 @@ export function SiteFooter() {
           </ul>
         </div>
 
+        <div>
+          <h2 className="text-sm font-semibold">Legal</h2>
+          <ul className="mt-3 space-y-2">
+            <li>
+              <span className="cursor-default text-sm text-muted-foreground">
+                Privacy Policy
+              </span>
+            </li>
+            <li>
+              <span className="cursor-default text-sm text-muted-foreground">
+                Terms & Conditions
+              </span>
+            </li>
+            <li>
+              <span className="cursor-default text-sm text-muted-foreground">
+                Return Policy
+              </span>
+            </li>
+          </ul>
+        </div>
+
         <div className="min-w-0">
           <h2 className="text-sm font-semibold">{tr(lang, "contact")}</h2>
           <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
