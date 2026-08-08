@@ -6,6 +6,7 @@ import { useLang } from "@/lib/language-context";
 import { formatNumber, tr } from "@/lib/i18n";
 import { ProductGrid } from "@/components/site/product-card";
 import { Breadcrumbs, Section } from "@/components/site/ui";
+import { pageTitle } from "@/lib/site";
 
 export const Route = createFileRoute("/search")({
   validateSearch: (search: Record<string, unknown>) => ({
