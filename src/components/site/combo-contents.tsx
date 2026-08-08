@@ -44,23 +44,34 @@ export function ComboContents({
             key={item.id}
             className="group flex items-center gap-3 rounded-xl border border-border bg-card p-3 transition-shadow duration-300 hover:shadow-[var(--shadow-lift)]"
           >
-            <div
-              className="relative size-16 shrink-0 overflow-hidden rounded-lg bg-secondary"
+            <button
+              type="button"
+              disabled={!item.image}
+              aria-label={`View ${pick(lang, item.nameBn, item.nameEn)}`}
+              className="relative size-16 shrink-0 overflow-hidden rounded-lg bg-secondary disabled:cursor-default"
               onClick={() => item.image && lightbox.open(galleryImages, galleryImages.findIndex((img) => img.src === item.image))}
             >
               {item.image ? (
-                <img
-                  src={item.image}
-                  alt={pick(lang, item.nameBn, item.nameEn)}
-                  loading="lazy"
-                  className="size-full cursor-zoom-in object-cover transition-transform duration-500 group-hover:scale-105"
-                />
+                <>
+                  <img
+                    src={item.image}
+                    alt={pick(lang, item.nameBn, item.nameEn)}
+                    loading="lazy"
+                    className="size-full cursor-zoom-in object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                  <span className="pointer-events-none absolute inset-0 flex items-center justify-center bg-foreground/25 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                    <Maximize2 className="size-5 text-background drop-shadow" strokeWidth={2.5} />
+                  </span>
+                  <span className="pointer-events-none absolute bottom-1 right-1 flex size-5 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-sm ring-1 ring-background/70 transition-opacity duration-300 group-hover:opacity-0">
+                    <ZoomIn className="size-3.5" strokeWidth={2.5} />
+                  </span>
+                </>
               ) : (
                 <div className="flex size-full items-center justify-center text-sm font-bold text-muted-foreground/60">
                   {formatNumber(lang, i + 1)}
                 </div>
               )}
-            </div>
+            </button>
             <div className="min-w-0 flex-1">
               <p className="text-[15px] font-semibold leading-snug">
                 {pick(lang, item.nameBn, item.nameEn)}
