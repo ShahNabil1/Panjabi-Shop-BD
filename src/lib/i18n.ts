@@ -39,12 +39,12 @@ export function discountPercent(
 }
 
 export const t = {
-  home: { bn: "হোম", en: "Home" },
+  home: { bn: "Home", en: "Home" },
   categories: { bn: "ক্যাটাগরি", en: "Categories" },
-  offers: { bn: "অফার", en: "Offers" },
-  faq: { bn: "প্রশ্নোত্তর", en: "FAQ" },
-  about: { bn: "আমাদের কথা", en: "About" },
-  contact: { bn: "যোগাযোগ", en: "Contact" },
+  offers: { bn: "Offers", en: "Offers" },
+  faq: { bn: "FAQ", en: "FAQ" },
+  about: { bn: "About", en: "About" },
+  contact: { bn: "Contact", en: "Contact" },
   search: { bn: "খুঁজুন", en: "Search" },
   searchPlaceholder: { bn: "পণ্যের নাম লিখুন...", en: "Search products..." },
   shopNow: { bn: "কেনাকাটা করুন", en: "Shop now" },
@@ -146,4 +146,25 @@ export type Dict = typeof t;
 
 export function tr(lang: Lang, key: keyof Dict) {
   return t[key][lang];
+}
+
+const BADGE_EN: Record<string, string> = {
+  "বেস্ট সেলার": "BEST SELLER",
+  "বেস্টসেলার": "BEST SELLER",
+  "নতুন": "NEW",
+  "নিউ": "NEW",
+  "সীমিত সময়": "LIMITED TIME",
+  "সীমিত স্টক": "LIMITED STOCK",
+  "জনপ্রিয়": "POPULAR",
+  "হট": "HOT",
+  "ছাড়": "SALE",
+  "সেল": "SALE",
+};
+
+export function badgeLabel(bn?: string | null, en?: string | null): string {
+  const raw = (en || "").trim();
+  if (raw) return raw.toUpperCase();
+  const b = (bn || "").trim();
+  if (!b) return "";
+  return (BADGE_EN[b] || b).toUpperCase();
 }
