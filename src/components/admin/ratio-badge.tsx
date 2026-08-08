@@ -24,7 +24,7 @@ function Line({
   ratio,
 }: {
   label: string;
-  dot?: string;
+  dot?: string | undefined;
   total: number;
   success: number;
   cancelled: number;
