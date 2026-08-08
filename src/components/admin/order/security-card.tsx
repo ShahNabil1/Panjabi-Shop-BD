@@ -625,7 +625,9 @@ export function FulfillmentCard({
                 </div>
               ) : null}
 
-              {isPathao ? <PathaoCostOfDelivery orderId={orderId} /> : null}
+              {isPathao || isCarrybee ? (
+                <CostOfDelivery orderId={orderId} partner={isPathao ? "pathao" : "carrybee"} />
+              ) : null}
 
 
 
