@@ -179,8 +179,11 @@ export function CartDrawer() {
                     {item.comboSelections.length > 0 ? (
                       <ul className="mt-1.5 space-y-0.5 text-xs text-muted-foreground">
                         {item.comboSelections.map((selection) => (
-                          <li key={`${selection.itemId}-${selection.variantId}`}>
-                            {pick(lang, selection.itemNameBn, selection.itemNameEn)} · {pick(lang, selection.variantLabelBn, selection.variantLabelEn)}
+                          <li key={`${selection.itemId}-${selection.variantId ?? "base"}`}>
+                            {pick(lang, selection.itemNameBn, selection.itemNameEn)} ·{" "}
+                            {selection.variantLabelBn || selection.variantLabelEn
+                              ? pick(lang, selection.variantLabelBn ?? "", selection.variantLabelEn ?? "")
+                              : `Qty ${selection.quantity}`}
                           </li>
                         ))}
                       </ul>

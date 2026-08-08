@@ -170,11 +170,16 @@ export function CheckoutForm({
           productId: i.productId,
           variantId: i.variantId,
           quantity: i.quantity,
-          comboSelections: i.comboSelections.map((selection) => ({
-            itemId: selection.itemId,
-            variantId: selection.variantId,
-            quantity: selection.quantity,
-          })),
+          // Only variant picks are sent; the server re-expands the full combo.
+          comboSelections: i.comboSelections.flatMap((selection) =>
+            selection.variantId
+              ? [{
+                  itemId: selection.itemId,
+                  variantId: selection.variantId,
+                  quantity: selection.quantity,
+                }]
+              : [],
+          ),
         })),
       },
     }).catch(() => undefined);
@@ -343,11 +348,15 @@ export function CheckoutForm({
             productId: i.productId,
             variantId: i.variantId,
             quantity: i.quantity,
-            comboSelections: i.comboSelections.map((selection) => ({
-              itemId: selection.itemId,
-              variantId: selection.variantId,
-              quantity: selection.quantity,
-            })),
+            comboSelections: i.comboSelections.flatMap((selection) =>
+              selection.variantId
+                ? [{
+                    itemId: selection.itemId,
+                    variantId: selection.variantId,
+                    quantity: selection.quantity,
+                  }]
+                : [],
+            ),
           })),
         },
       });
@@ -452,9 +461,13 @@ export function CheckoutForm({
                   {i.comboSelections.length > 0 ? (
                     <ul className="mt-2 grid gap-1 rounded-lg bg-secondary/50 px-3 py-2 text-xs">
                       {i.comboSelections.map((selection) => (
-                        <li key={`${selection.itemId}-${selection.variantId}`} className="flex gap-1">
+                        <li key={`${selection.itemId}-${selection.variantId ?? "base"}`} className="flex gap-1">
                           <span className="font-semibold">{pick(lang, selection.itemNameBn, selection.itemNameEn)}:</span>
-                          <span className="text-muted-foreground">{pick(lang, selection.variantLabelBn, selection.variantLabelEn)}</span>
+                          <span className="text-muted-foreground">
+                            {selection.variantLabelBn || selection.variantLabelEn
+                              ? pick(lang, selection.variantLabelBn ?? "", selection.variantLabelEn ?? "")
+                              : `Qty ${selection.quantity}`}
+                          </span>
                         </li>
                       ))}
                     </ul>

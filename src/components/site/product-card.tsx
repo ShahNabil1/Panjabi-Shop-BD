@@ -3,6 +3,7 @@ import { useState } from "react";
 import { ShoppingBag, Zap } from "lucide-react";
 
 import { useCart } from "@/lib/cart-context";
+import { getComboSelections } from "@/lib/catalog.functions";
 
 
 import { useLang } from "@/lib/language-context";
@@ -62,7 +63,15 @@ export function ProductCard({ product }: { product: ProductCardData }) {
   const off = discountPercent(product.price, product.compareAtPrice);
   const soldOut = product.stock <= 0;
 
-  const addItem = () => {
+  // Cards don't carry combo contents, so fetch the full package list before
+  // adding — otherwise combos added from listings reach checkout item-less.
+  const addItem = async () => {
+    let comboSelections: Awaited<ReturnType<typeof getComboSelections>> = [];
+    try {
+      comboSelections = await getComboSelections({ data: { productId: product.id } });
+    } catch {
+      comboSelections = [];
+    }
     add({
       productId: product.id,
       slug: product.slug,
@@ -76,7 +85,7 @@ export function ProductCard({ product }: { product: ProductCardData }) {
       variantId: null,
       variantLabelBn: null,
       variantLabelEn: null,
-      comboSelections: [],
+      comboSelections,
     });
   };
 
@@ -84,16 +93,14 @@ export function ProductCard({ product }: { product: ProductCardData }) {
     e.preventDefault();
     e.stopPropagation();
     if (soldOut) return;
-    addItem();
-    openCart("cart");
+    void addItem().then(() => openCart("cart"));
   };
 
   const onBuyNow = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     if (soldOut) return;
-    addItem();
-    void navigate({ to: "/checkout" });
+    void addItem().then(() => navigate({ to: "/checkout" }));
   };
 
   return (

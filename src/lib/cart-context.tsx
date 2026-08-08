@@ -25,9 +25,10 @@ export type ComboSelection = {
   itemNameBn: string;
   itemNameEn: string;
   quantity: number;
-  variantId: string;
-  variantLabelBn: string;
-  variantLabelEn: string;
+  /** null when the child item has no variants — it still ships in the box. */
+  variantId: string | null;
+  variantLabelBn: string | null;
+  variantLabelEn: string | null;
   sku: string | null;
 };
 
@@ -54,7 +55,11 @@ type CartContextValue = {
 const CartContext = createContext<CartContextValue | null>(null);
 
 function itemKey(productId: string, variantId: string | null, comboSelections: ComboSelection[] = []) {
-  const comboKey = comboSelections.map((selection) => selection.variantId).sort().join("+");
+  const comboKey = comboSelections
+    .map((selection) => selection.variantId)
+    .filter((id): id is string => Boolean(id))
+    .sort()
+    .join("+");
   return `${productId}::${variantId ?? "base"}${comboKey ? `::${comboKey}` : ""}`;
 }
 

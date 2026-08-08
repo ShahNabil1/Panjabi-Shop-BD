@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 
 import {
   fetchCategoryPage,
+  fetchComboSelections,
   fetchFaqs,
   fetchHome,
   fetchLandingPage,
@@ -51,3 +52,7 @@ export const getLayoutData = createServerFn({ method: "GET" }).handler(async () 
 export const getLandingPage = createServerFn({ method: "GET" })
   .inputValidator((data: { slug: string }) => ({ slug: String(data.slug) }))
   .handler(async ({ data }) => fetchLandingPage(data.slug));
+
+export const getComboSelections = createServerFn({ method: "GET" })
+  .inputValidator((data: { productId: string }) => ({ productId: String(data.productId) }))
+  .handler(async ({ data }) => fetchComboSelections(data.productId));
