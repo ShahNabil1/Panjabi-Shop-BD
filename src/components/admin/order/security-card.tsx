@@ -145,15 +145,19 @@ function CopyTextButton({
 const bdt = (n: number) =>
   `৳${Number(n).toLocaleString("en-US", { maximumFractionDigits: 2 })}`;
 
-function PathaoCostOfDelivery({ orderId }: { orderId: string }) {
+function CostOfDelivery({ orderId, partner }: { orderId: string; partner: "pathao" | "carrybee" }) {
   const cost = useQuery({
-    queryKey: ["admin", "pathao-cost", orderId],
+    queryKey: ["admin", "courier-cost", orderId],
     queryFn: () => adminPathaoDeliveryCost({ data: { orderId } }),
   });
 
+  const shell =
+    partner === "pathao" ? "border-[#E32227]/25" : "border-[#F5C518]/50";
+  const negative = partner === "pathao" ? "text-[#E32227]" : "text-amber-700";
+
   if (cost.isLoading) {
     return (
-      <div className="rounded-lg border border-[#E32227]/25 bg-white px-3 py-2.5 text-xs text-muted-foreground">
+      <div className={cn("rounded-lg border bg-white px-3 py-2.5 text-xs text-muted-foreground", shell)}>
         Loading cost of delivery…
       </div>
     );
@@ -161,9 +165,9 @@ function PathaoCostOfDelivery({ orderId }: { orderId: string }) {
   if (!cost.data?.ok) return null;
 
   return (
-    <div className="rounded-lg border border-[#E32227]/25 bg-white px-3 py-3">
+    <div className={cn("rounded-lg border bg-white px-3 py-3", shell)}>
       <div className="flex items-center gap-2">
-        <CourierMark partner="pathao" className="size-6" />
+        <CourierMark partner={partner} className="size-6" />
         <p className="text-sm font-bold text-foreground">Cost of Delivery</p>
 
         <span
@@ -184,11 +188,7 @@ function PathaoCostOfDelivery({ orderId }: { orderId: string }) {
             <dd
               className={cn(
                 "font-semibold tabular-nums",
-                line.negative && line.amount > 0
-                  ? "text-[#E32227]"
-                  : line.negative
-                    ? "text-[#E32227]"
-                    : "text-foreground",
+                line.negative ? negative : "text-foreground",
               )}
             >
               {line.negative ? "- " : ""}
@@ -204,6 +204,7 @@ function PathaoCostOfDelivery({ orderId }: { orderId: string }) {
     </div>
   );
 }
+
 
 
 /** Fulfillment placeholder — courier booking becomes functional in a later phase. */
