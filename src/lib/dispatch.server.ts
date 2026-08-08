@@ -323,40 +323,42 @@ export async function dispatchBulkOrdersToCarrybee(
     orders.map(({ row, items }) => buildCarrybeePayload(db, row, items, partner)),
   );
 
-  let results: { results: import("./carrybee.server").CarrybeeOrderResult[]; raw: Record<string, unknown> };
-  try {
-    results = await carrybeeCreateBulkOrders(creds, payloads);
-  } catch (error) {
-    const message = (error as Error).message;
-    for (const { row } of orders) {
-      await logActivity(db, row.id, "courier", `Bulk CarryBee dispatch failed — ${message}`, {
-        actor,
-        meta: { provider: "carrybee" },
-      });
-    }
-    return [
-      ...skipped,
-      ...orders.map(({ row }) => ({
-        orderId: row.id,
-        orderNumber: row.order_number,
-        ok: false,
-        provider: "carrybee" as const,
-        consignmentId: null,
-        message,
-      })),
-    ];
+  // CarryBee's `orders-bulk` response does not reliably echo consignment ids
+  // back per order, so we create each parcel through the single-order endpoint
+  // in small concurrent chunks. Same throughput, but every order gets a real
+  // consignment id or a real error message.
+  const created: Array<
+    | { ok: true; res: import("./carrybee.server").CarrybeeOrderResult }
+    | { ok: false; message: string }
+  > = [];
+  const CHUNK = 4;
+  for (let i = 0; i < payloads.length; i += CHUNK) {
+    const slice = payloads.slice(i, i + CHUNK);
+    const settled = await Promise.all(
+      slice.map(async (payload) => {
+        try {
+          const res = await carrybeeCreateOrder(creds, payload);
+          if (!res.consignmentId) {
+            return { ok: false as const, message: "CarryBee did not return a consignment id" };
+          }
+          return { ok: true as const, res };
+        } catch (error) {
+          return { ok: false as const, message: (error as Error).message };
+        }
+      }),
+    );
+    created.push(...settled);
   }
 
-  const created = results.results;
   const out: DispatchResult[] = [];
 
   for (let i = 0; i < orders.length; i++) {
     const { row } = orders[i]!;
     const base = { orderId: row.id, orderNumber: row.order_number };
-    const res = created[i];
+    const entry = created[i];
 
-    if (!res || !res.consignmentId) {
-      const message = res?.status ? `CarryBee returned status ${res.status}` : "No consignment returned";
+    if (!entry || !entry.ok) {
+      const message = entry && !entry.ok ? entry.message : "No consignment returned";
       await logActivity(db, row.id, "courier", `Bulk CarryBee dispatch failed — ${message}`, {
         actor,
         meta: { provider: "carrybee" },
@@ -370,6 +372,9 @@ export async function dispatchBulkOrdersToCarrybee(
       });
       continue;
     }
+
+    const res = entry.res;
+
 
     const status = normaliseCourierStatus("carrybee", res.status);
 
