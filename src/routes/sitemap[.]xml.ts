@@ -6,7 +6,7 @@ import { fetchSitemapData } from "@/lib/catalog.server";
 
 import { SITE_URL as BASE_URL } from "@/lib/site";
 
-type Entry = { path: string; changefreq?: string; priority?: string; lastmod?: string };
+type Entry = { path: string; changefreq?: string; priority?: string; lastmod?: string | undefined };
 
 const iso = (v?: string | null) => {
   if (!v) return undefined;
