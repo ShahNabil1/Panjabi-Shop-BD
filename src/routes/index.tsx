@@ -45,8 +45,9 @@ function HomePage() {
         <HeroSlider slides={slides} />
       ) : (
         <section className="border-b border-border bg-surface">
-          <div className="mx-auto flex max-w-6xl flex-col items-start gap-4 px-4 py-12 sm:py-16">
+          <div className="mx-auto flex max-w-6xl flex-col items-center gap-4 px-4 py-12 text-center sm:items-start sm:py-16 sm:text-left">
             <h1 className="text-2xl font-bold tracking-tight sm:text-4xl">
+
               {lang === "bn" ? (
                 <>
                   উপহার হোক <span className="text-primary">একটা কবিতার মতো</span>
