@@ -52,6 +52,9 @@ export function DeliveryNoteCard({
   const qc = useQueryClient();
   const [enabled, setEnabled] = useState(Boolean(initial));
   const [note, setNote] = useState(initial);
+  // CarryBee caps the special instruction at 255 characters.
+  const limit = (partner ?? "").toLowerCase().replace(/\s+/g, "") === "carrybee" ? 255 : 500;
+
 
   const save = useMutation({
     mutationFn: (value?: string) =>
