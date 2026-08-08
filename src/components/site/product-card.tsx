@@ -169,7 +169,7 @@ export function ProductCard({ product }: { product: ProductCardData }) {
             )}
           >
             <ShoppingBag className="size-4" />
-            {lang === "bn" ? "কার্টে যোগ করুন" : "Add to Cart"}
+            Add to Cart
           </button>
           <button
             type="button"
@@ -182,7 +182,7 @@ export function ProductCard({ product }: { product: ProductCardData }) {
             )}
           >
             <Zap className="size-4" />
-            {lang === "bn" ? "এখনই কিনুন" : "Buy Now"}
+            Buy Now
           </button>
         </div>
       </div>
