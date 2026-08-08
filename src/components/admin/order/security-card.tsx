@@ -311,7 +311,7 @@ export function FulfillmentCard({
     : isPathao
       ? `https://merchant.pathao.com/courier/orders/${consignmentId}`
       : isCarrybee
-        ? `https://merchant.carrybee.com/businesses/20521/orders/${encodeURIComponent(consignmentId)}`
+        ? `https://merchant.carrybee.com/order-track/${encodeURIComponent(consignmentId)}`
         : null;
   const publicTrackingUrl = !consignmentId
     ? null
@@ -320,7 +320,7 @@ export function FulfillmentCard({
           customerPhone ? `&phone=${encodeURIComponent(customerPhone)}` : ""
         }`
       : isCarrybee
-        ? `https://carrybee.com/tracking?consignment_id=${encodeURIComponent(consignmentId)}`
+        ? `https://merchant.carrybee.com/order-track/${encodeURIComponent(consignmentId)}`
         : null;
 
 
