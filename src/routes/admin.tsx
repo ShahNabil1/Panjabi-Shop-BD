@@ -1,9 +1,10 @@
 import { Link, Outlet, createFileRoute, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   BadgePercent,
   Boxes,
+  ChevronDown,
   ChevronLeft,
   Database,
   ExternalLink,
@@ -106,15 +107,50 @@ function AdminLayout() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [openSections, setOpenSections] = useState<string[]>(() =>
+    sections.map((s) => s.title),
+  );
+
+  const matches = (item: NavItem) =>
+    item.exact ? pathname === item.to : pathname.startsWith(item.to);
+
+  const activeSection = useMemo(
+    () => sections.find((s) => s.items.some(matches))?.title ?? sections[0]!.title,
+    [pathname],
+  );
+
+  const topItems = useMemo(
+    () => sections.find((s) => s.title === activeSection)?.items ?? [],
+    [activeSection],
+  );
 
   useEffect(() => {
     const saved = localStorage.getItem("admin-sidebar-collapsed");
     if (saved === "1") setCollapsed(true);
+    const savedSections = localStorage.getItem("admin-sidebar-sections");
+    if (savedSections) {
+      try {
+        const parsed = JSON.parse(savedSections) as string[];
+        if (Array.isArray(parsed)) setOpenSections(parsed);
+      } catch {
+        /* ignore */
+      }
+    }
   }, []);
 
   useEffect(() => {
     localStorage.setItem("admin-sidebar-collapsed", collapsed ? "1" : "0");
   }, [collapsed]);
+
+  useEffect(() => {
+    localStorage.setItem("admin-sidebar-sections", JSON.stringify(openSections));
+  }, [openSections]);
+
+  // Always reveal the section that contains the current page.
+  useEffect(() => {
+    setOpenSections((prev) => (prev.includes(activeSection) ? prev : [...prev, activeSection]));
+  }, [activeSection]);
+
 
   useEffect(() => {
     setMobileOpen(false);
@@ -158,8 +194,11 @@ function AdminLayout() {
     );
   }
 
-  const isActive = (item: NavItem) =>
-    item.exact ? pathname === item.to : pathname.startsWith(item.to);
+  const isActive = matches;
+  const toggleSection = (title: string) =>
+    setOpenSections((prev) =>
+      prev.includes(title) ? prev.filter((t) => t !== title) : [...prev, title],
+    );
 
   const sidebar = (
     <div className="relative flex h-full flex-col">
@@ -194,55 +233,85 @@ function AdminLayout() {
         </Link>
       </div>
 
-      <nav className="relative flex-1 space-y-6 overflow-y-auto px-4 py-5">
-        {sections.map((section) => (
-          <div key={section.title}>
-            {!collapsed && (
-              <p className="px-2 pb-2 text-[11px] font-bold uppercase tracking-[0.16em] text-slate-400">
-                {section.title}
-              </p>
-            )}
+      <nav className="relative flex-1 space-y-3 overflow-y-auto px-4 py-5">
+        {sections.map((section) => {
+          const open = collapsed || openSections.includes(section.title);
+          const hasActive = section.items.some(isActive);
+          return (
+            <div key={section.title}>
+              {!collapsed && (
+                <button
+                  type="button"
+                  onClick={() => toggleSection(section.title)}
+                  aria-expanded={open}
+                  className={cn(
+                    "flex w-full items-center justify-between gap-2 rounded-lg px-2 py-1.5 text-[11px] font-bold uppercase tracking-[0.16em] transition-colors",
+                    hasActive ? "text-slate-200" : "text-slate-400",
+                    "hover:bg-white/5 hover:text-white",
+                  )}
+                >
+                  <span className="truncate">{section.title}</span>
+                  <ChevronDown
+                    className={cn(
+                      "size-3.5 shrink-0 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
+                      open ? "rotate-0" : "-rotate-90",
+                    )}
+                  />
+                </button>
+              )}
 
-            <ul className="space-y-1.5">
-              {section.items.map((item) => {
-                const active = isActive(item);
-                return (
-                  <li key={item.to}>
-                    <Link
-                      to={item.to as "/admin"}
-                      title={item.label}
-                      className={cn(
-                        "group relative flex items-center gap-3.5 overflow-hidden rounded-xl px-3 py-3 text-[0.95rem] font-semibold tracking-tight transition-all duration-200",
-                        collapsed && "justify-center px-0",
-                        active
-                          ? "bg-white/10 text-white shadow-lg shadow-black/30 ring-1 ring-inset ring-white/15 backdrop-blur-xl"
-                          : "text-slate-300 hover:bg-white/5 hover:text-white",
-                      )}
-                    >
-                      {active && !collapsed && (
-                        <span className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-full bg-gradient-to-b from-violet-400 to-fuchsia-400" />
-                      )}
-                      <item.icon
-                        className={cn(
-                          "size-[19px] shrink-0 transition-colors",
-                          active ? "text-white" : "text-slate-400 group-hover:text-white",
-                        )}
-                      />
-                      <span
-                        className={cn(
-                          "min-w-0 truncate whitespace-nowrap transition-all duration-200",
-                          collapsed ? "w-0 opacity-0" : "w-auto opacity-100",
-                        )}
-                      >
-                        {item.label}
-                      </span>
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-        ))}
+              <div
+                className={cn(
+                  "grid transition-[grid-template-rows,opacity] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
+                  open ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0",
+                )}
+              >
+                <div className="overflow-hidden">
+                  <ul className={cn("space-y-1.5", collapsed ? "pt-0" : "pt-1.5")}>
+                    {section.items.map((item) => {
+                      const active = isActive(item);
+                      return (
+                        <li key={item.to}>
+                          <Link
+                            to={item.to as "/admin"}
+                            title={item.label}
+                            preload="intent"
+                            tabIndex={open ? 0 : -1}
+                            className={cn(
+                              "group relative flex items-center gap-3.5 overflow-hidden rounded-xl px-3 py-3 text-[0.95rem] font-semibold tracking-tight transition-all duration-200",
+                              collapsed && "justify-center px-0",
+                              active
+                                ? "bg-white/10 text-white shadow-lg shadow-black/30 ring-1 ring-inset ring-white/15 backdrop-blur-xl"
+                                : "text-slate-300 hover:bg-white/5 hover:text-white",
+                            )}
+                          >
+                            {active && !collapsed && (
+                              <span className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-full bg-gradient-to-b from-violet-400 to-fuchsia-400" />
+                            )}
+                            <item.icon
+                              className={cn(
+                                "size-[19px] shrink-0 transition-colors",
+                                active ? "text-white" : "text-slate-400 group-hover:text-white",
+                              )}
+                            />
+                            <span
+                              className={cn(
+                                "min-w-0 truncate whitespace-nowrap transition-all duration-200",
+                                collapsed ? "w-0 opacity-0" : "w-auto opacity-100",
+                              )}
+                            >
+                              {item.label}
+                            </span>
+                          </Link>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              </div>
+            </div>
+          );
+        })}
       </nav>
 
       <div className="relative space-y-1.5 border-t border-white/10 px-4 py-4">
@@ -340,10 +409,38 @@ function AdminLayout() {
           collapsed ? "lg:pl-20" : "lg:pl-72",
         )}
       >
-        <main key={pathname} className="admin-rise mx-auto w-full max-w-6xl space-y-6 px-4 py-6 lg:px-10 lg:py-10">
+        {/* Quick section switcher — same links as the active sidebar section */}
+        {topItems.length > 1 ? (
+          <div className="sticky top-0 z-20 border-b border-border bg-card/85 backdrop-blur-md">
+            <div className="mx-auto flex w-full max-w-6xl items-center gap-2 overflow-x-auto px-4 py-2.5 lg:px-10">
+              {topItems.map((item) => {
+                const active = isActive(item);
+                return (
+                  <Link
+                    key={item.to}
+                    to={item.to as "/admin"}
+                    preload="intent"
+                    className={cn(
+                      "inline-flex shrink-0 items-center gap-2 rounded-full px-3.5 py-1.5 text-sm font-semibold transition-all duration-200",
+                      active
+                        ? "bg-primary text-primary-foreground shadow-sm"
+                        : "text-muted-foreground hover:bg-accent hover:text-foreground",
+                    )}
+                  >
+                    <item.icon className="size-4" />
+                    {item.label}
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        ) : null}
+
+        <main key={pathname} className="admin-fade mx-auto w-full max-w-6xl space-y-6 px-4 py-6 lg:px-10 lg:py-10">
           <Outlet />
         </main>
       </div>
+
     </div>
   );
 }
