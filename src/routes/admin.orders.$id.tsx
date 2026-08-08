@@ -174,14 +174,23 @@ function AdminOrderDetail() {
   const [courier, setCourier] = useState("");
   const defaultPartnerApplied = useRef(false);
 
-  // Pre-select the courier marked as default in Settings → Delivery.
+  const savedPartner =
+    (data?.order as { delivery_partner?: string | null } | undefined)?.delivery_partner ?? "";
+
+  // Pre-select the order's saved courier, else the one marked default in Settings → Delivery.
   useEffect(() => {
-    if (defaultPartnerApplied.current || courier || activePartners.length === 0) return;
+    if (defaultPartnerApplied.current || courier) return;
+    if (savedPartner) {
+      defaultPartnerApplied.current = true;
+      setCourier(savedPartner);
+      return;
+    }
+    if (activePartners.length === 0) return;
     const fallback = activePartners.find((p) => p.is_default);
     if (!fallback) return;
     defaultPartnerApplied.current = true;
     setCourier(providerLabels[fallback.provider]);
-  }, [activePartners, courier]);
+  }, [activePartners, courier, savedPartner]);
 
   const courierTemplate =
     activePartners.find((p) => providerLabels[p.provider] === courier)?.note_template ?? "";
