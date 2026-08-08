@@ -14,6 +14,7 @@ const uploadInput = z.object({
     "promotions",
     "landing",
     "site",
+    "popup",
     "hero",
   ]),
   fileName: z.string().min(1).max(120),
