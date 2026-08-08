@@ -65,13 +65,20 @@ export const Route = createFileRoute("/api/public/courier/$provider")({
           provider === "carrybee" && supplied === CARRYBEE_INTEGRATION_SECRET
             ? "ok"
             : await verifyWebhookSecret(db, provider, supplied);
-        if (check === "unconfigured") {
-          return respond({ status: 403, message: "Provider not configured" }, 403);
-        }
-        if (check !== "ok") {
-          return respond({ status: 401, message: "Invalid webhook secret" }, 401);
-        }
 
+        // CarryBee's live events (order.created / pickup-requested / cancelled)
+        // do NOT carry the integration header it uses while registering the
+        // endpoint, so a strict check silently dropped every real callback.
+        // For CarryBee we accept and record the event regardless, and only note
+        // whether the header matched. Other couriers stay strict.
+        if (provider !== "carrybee") {
+          if (check === "unconfigured") {
+            return respond({ status: 403, message: "Provider not configured" }, 403);
+          }
+          if (check !== "ok") {
+            return respond({ status: 401, message: "Invalid webhook secret" }, 401);
+          }
+        }
 
         let payload: Record<string, unknown>;
         try {
@@ -80,9 +87,14 @@ export const Route = createFileRoute("/api/public/courier/$provider")({
           return respond({ status: 400, message: "Invalid JSON body" }, 400);
         }
 
+        if (provider === "carrybee" && check !== "ok") {
+          payload = { ...payload, _unverified_header: supplied || "(none)" };
+        }
+
         const result = await processCourierWebhook(db, provider, payload);
         // Always 200/202 once authenticated so couriers stop retrying.
         return respond({ status: 200, message: result.message }, 200);
+
       },
     },
   },
