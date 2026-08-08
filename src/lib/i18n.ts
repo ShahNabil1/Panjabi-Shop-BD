@@ -45,7 +45,7 @@ export const t = {
   faq: { bn: "FAQ", en: "FAQ" },
   about: { bn: "About", en: "About" },
   contact: { bn: "Contact", en: "Contact" },
-  search: { bn: "খুঁজুন", en: "Search" },
+  search: { bn: "Search", en: "Search" },
   searchPlaceholder: { bn: "পণ্যের নাম লিখুন...", en: "Search products..." },
   shopNow: { bn: "কেনাকাটা করুন", en: "Shop now" },
   viewAll: { bn: "সব দেখুন", en: "View all" },
