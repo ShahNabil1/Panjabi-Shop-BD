@@ -244,3 +244,34 @@ export function carrybeeFeeFromDetails(d: Record<string, unknown>): number | nul
   if (d["delivery_fee"] == null && d["cod_fee"] == null) return null;
   return num("delivery_fee") + num("cod_fee");
 }
+
+/**
+ * POST /api/v2/orders/{consignment_id}/cancel
+ * Only possible while the parcel has not been picked up yet.
+ */
+export async function carrybeeCancelOrder(
+  creds: CarrybeeCreds,
+  consignmentId: string,
+  reason: string,
+): Promise<Record<string, unknown>> {
+  return call(creds, `/api/v2/orders/${encodeURIComponent(consignmentId)}/cancel`, {
+    method: "POST",
+    body: JSON.stringify({ cancellation_reason: reason.slice(0, 199) }),
+  });
+}
+
+/**
+ * POST /api/v2/orders/{consignment_id}/exchange — creates an exchange parcel
+ * against a previously delivered consignment. Returns an `EX…` consignment id.
+ */
+export async function carrybeeCreateExchange(
+  creds: CarrybeeCreds,
+  consignmentId: string,
+  input: Partial<CarrybeeOrderInput>,
+): Promise<CarrybeeOrderResult> {
+  const body = await call(creds, `/api/v2/orders/${encodeURIComponent(consignmentId)}/exchange`, {
+    method: "POST",
+    body: JSON.stringify(input),
+  });
+  return readOrder(body);
+}
