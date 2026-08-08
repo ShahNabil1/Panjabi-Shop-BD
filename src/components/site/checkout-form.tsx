@@ -659,27 +659,26 @@ export function CheckoutForm({
 
         {/* Shipping */}
         <section>
-          <h3 className="text-lg font-extrabold">{pick(lang, "শিপিং", "Shipping")}</h3>
-          <div className="mt-3 flex items-center justify-between gap-3 rounded-xl border border-border px-4 py-3.5 text-sm">
-            <span className="text-muted-foreground">{tr(lang, "deliveryCharge")}</span>
-            <span className="font-bold tabular-nums">
-              {delivery === 0 ? tr(lang, "free") : formatPrice(lang, delivery)}
+          <h3 className="font-en text-xl font-extrabold sm:text-2xl">Shipping</h3>
+          <div className="mt-3 flex items-center justify-between gap-3 rounded-xl border border-border px-4 py-3.5 text-base">
+            <span className="font-en font-bold">Delivery Charge</span>
+            <span className="font-en text-lg font-extrabold tabular-nums">
+              {delivery === 0 ? "Free" : formatPrice(lang, delivery)}
             </span>
           </div>
         </section>
 
         {/* Your order */}
         <section>
-          <h3 className="text-lg font-extrabold text-primary">
-            {pick(lang, "আপনার অর্ডার", "Your order")}
-          </h3>
+          <h3 className="font-en text-xl font-extrabold text-primary sm:text-2xl">Your Order</h3>
 
-          <div className="mt-3 grid gap-2 border-b border-dashed border-border pb-3 text-xs font-bold uppercase tracking-wide text-muted-foreground">
-            <div className="flex justify-between">
-              <span>{pick(lang, "প্রোডাক্ট", "Product")}</span>
-              <span>{tr(lang, "subtotal")}</span>
+          <div className="mt-3 grid gap-2 border-b border-dashed border-border pb-3 text-sm font-extrabold uppercase tracking-wide text-foreground sm:text-base">
+            <div className="font-en flex justify-between">
+              <span>Product</span>
+              <span>Subtotal</span>
             </div>
           </div>
+
 
           <ul className="divide-y divide-dashed divide-border">
             {items.map((i) => (
