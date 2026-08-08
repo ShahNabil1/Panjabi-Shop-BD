@@ -519,6 +519,12 @@ export function ItemsCard({
         </div>
       </dl>
 
+      <ImageLightbox
+        images={lightbox.images}
+        startIndex={lightbox.startIndex}
+        isOpen={lightbox.isOpen}
+        onClose={lightbox.close}
+      />
     </Panel>
   );
 }
