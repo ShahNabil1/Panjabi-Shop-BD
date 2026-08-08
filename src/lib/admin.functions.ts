@@ -734,7 +734,9 @@ export const adminLookupCustomer = createServerFn({ method: "POST" })
     const db = await requireAdmin(context.supabase, context.userId);
     const { data: rows } = await db
       .from("orders")
-      .select("customer_name, customer_phone, address_line, city, note, source, created_at")
+      .select(
+        "customer_name, customer_phone, address_line, city, division, district, upazila, note, source, created_at",
+      )
       .eq("customer_phone", data.phone)
       .order("created_at", { ascending: false })
       .limit(1);
