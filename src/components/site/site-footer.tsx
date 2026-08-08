@@ -28,8 +28,10 @@ export function SiteFooter() {
           </div>
 
 
-          <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{tagline}</p>
-          <div className="mt-4 flex flex-wrap items-center gap-4">
+          <p className="mt-3 text-sm font-medium leading-relaxed text-foreground">
+            Follow us on
+          </p>
+          <div className="mt-2 flex flex-wrap items-center gap-4">
             {SOCIAL_LINKS.map(({ key, href, label, icon: Icon, colorClass }) => (
               <a
                 key={key}
