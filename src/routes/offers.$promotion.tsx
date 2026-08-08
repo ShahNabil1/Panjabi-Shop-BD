@@ -20,7 +20,7 @@ export const Route = createFileRoute("/offers/$promotion")({
       return { meta: [{ title: "অফারটি পাওয়া যায়নি" }, { name: "robots", content: "noindex" }] };
     }
     const p = loaderData.promotion;
-    const title = p.metaTitle || `${p.titleBn} | ${p.titleEn}`;
+    const title = p.metaTitle || pageTitle(p.titleBn);
     const description = p.metaDescription || p.subtitleBn || `${p.titleBn} — সীমিত সময়ের অফার।`;
     const url = `/offers/${params.promotion}`;
     return {
