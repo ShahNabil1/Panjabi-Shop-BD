@@ -25,6 +25,8 @@ import { AuthProvider } from "../lib/auth-context";
 import { Toaster } from "../components/ui/sonner";
 import { SITE_URL } from "../lib/site";
 import { useDigitNormalizer } from "../lib/use-digit-normalizer";
+import { RoutePending } from "../components/site/route-pending";
+
 
 function str(value: unknown, fallback: string) {
   return typeof value === "string" && value.trim() ? value : fallback;
@@ -197,6 +199,7 @@ function RootComponent() {
       <LanguageProvider initialLang={lang}>
         <AuthProvider>
           <CartProvider>
+            <RoutePending />
             <Chrome brand={brand}>
               {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
               <Outlet />
@@ -204,6 +207,7 @@ function RootComponent() {
             <CartDrawer />
             <Toaster position="top-center" richColors closeButton />
           </CartProvider>
+
         </AuthProvider>
       </LanguageProvider>
     </QueryClientProvider>
