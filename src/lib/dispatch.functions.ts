@@ -317,7 +317,15 @@ export type CourierWebhookEvent = {
 /** Full A→Z webhook event history for one order (newest first). */
 export const adminOrderWebhookEvents = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => z.object({ orderId: z.string().uuid() }).parse(input))
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        orderId: z.string().uuid(),
+        limit: z.number().int().min(1).max(50).optional(),
+        offset: z.number().int().min(0).optional(),
+      })
+      .parse(input),
+  )
   .handler(async ({ data, context }): Promise<CourierWebhookEvent[]> => {
     const db = await requireAdmin(context.supabase, context.userId);
     const { normaliseCourierStatus } = await import("./delivery-shared");
