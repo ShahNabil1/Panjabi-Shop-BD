@@ -114,24 +114,47 @@ export function carrybeeCreds(partner: PartnerRow) {
 }
 
 /**
- * Builds one CarryBee order payload from a stored order.
- * Shared by single dispatch and the bulk endpoint so both stay identical.
+ * Resolves a stored order's address to CarryBee city/zone/area ids.
+ * `/api/v2/address-details` is tried first (CarryBee's own resolver); if it
+ * cannot help we fall back to matching the district/upazila name lists.
  */
-export async function buildCarrybeePayload(
-  db: Db,
-  order: OrderRow,
-  items: Array<{ product_name: string; variant_label: string | null; quantity: number; product_id: string | null }>,
+export async function resolveCarrybeeLocation(
+  order: Pick<OrderRow, "address_line" | "division" | "district" | "upazila" | "city">,
   partner: PartnerRow,
-) {
-  const { carrybeeStores, carrybeeCities, carrybeeZones, carrybeeAreas } = await import(
+): Promise<{
+  cityId: number;
+  zoneId: number;
+  areaId?: number;
+  cityName: string;
+  zoneName: string;
+  source: "address-details" | "name-match";
+}> {
+  const { carrybeeCities, carrybeeZones, carrybeeAreas, carrybeeAddressDetails } = await import(
     "./carrybee.server"
   );
   const creds = carrybeeCreds(partner);
+  const address = fullAddress(order as OrderRow);
 
-  const saved = (partner.config["stores"] ?? []) as Array<{ store_id: number }>;
-  const storeId = saved[0]?.store_id ?? (await carrybeeStores(creds))[0]?.store_id;
-  if (!storeId) throw new Error("No CarryBee store found for this merchant account");
+  // 1) CarryBee's own address resolver.
+  if (address.trim().length >= 10) {
+    try {
+      const hit = await carrybeeAddressDetails(creds, address);
+      if (hit.cityId && hit.zoneId) {
+        return {
+          cityId: hit.cityId,
+          zoneId: hit.zoneId,
+          ...(hit.areaId ? { areaId: hit.areaId } : {}),
+          cityName: hit.cityName ?? String(hit.cityId),
+          zoneName: hit.zoneName ?? String(hit.zoneId),
+          source: "address-details",
+        };
+      }
+    } catch {
+      // fall through to name matching
+    }
+  }
 
+  // 2) Name matching against the city / zone / area lists.
   const cities = await carrybeeCities(creds);
   const city =
     pickPlace(cities, "name", order.district, DISTRICT_EN) ??
@@ -142,18 +165,18 @@ export async function buildCarrybeePayload(
       `CarryBee city not found for "${order.district ?? order.city}" — check the district on this order`,
     );
   const cityId = Number(city["id"] ?? city["city_id"]);
+  const cityName = String(city["name"] ?? city["city_name"] ?? cityId);
 
   const zones = await carrybeeZones(creds, cityId);
   const zone =
     pickPlace(zones, "name", order.upazila, UPAZILA_EN) ??
     pickPlace(zones, "zone_name", order.upazila, UPAZILA_EN) ??
     pickPlace(zones, "name", order.city, UPAZILA_EN) ??
-    pickByName(zones, "name", `${String(city["name"] ?? city["city_name"] ?? "")} Sadar`);
+    pickByName(zones, "name", `${cityName} Sadar`);
   if (!zone)
-    throw new Error(
-      `CarryBee zone not found for "${order.upazila ?? order.city}" under ${String(city["name"] ?? "")}`,
-    );
+    throw new Error(`CarryBee zone not found for "${order.upazila ?? order.city}" under ${cityName}`);
   const zoneId = Number(zone["id"] ?? zone["zone_id"]);
+  const zoneName = String(zone["name"] ?? zone["zone_name"] ?? zoneId);
 
   // Area is optional: match it against the free-text address when we can.
   let areaId: number | undefined;
@@ -168,6 +191,28 @@ export async function buildCarrybeePayload(
   } catch {
     areaId = undefined;
   }
+
+  return { cityId, zoneId, ...(areaId ? { areaId } : {}), cityName, zoneName, source: "name-match" };
+}
+
+/**
+ * Builds one CarryBee order payload from a stored order.
+ * Shared by single dispatch and the bulk endpoint so both stay identical.
+ */
+export async function buildCarrybeePayload(
+  db: Db,
+  order: OrderRow,
+  items: Array<{ product_name: string; variant_label: string | null; quantity: number; product_id: string | null }>,
+  partner: PartnerRow,
+) {
+  const { carrybeeStores } = await import("./carrybee.server");
+  const creds = carrybeeCreds(partner);
+
+  const saved = (partner.config["stores"] ?? []) as Array<{ store_id: number }>;
+  const storeId = saved[0]?.store_id ?? (await carrybeeStores(creds))[0]?.store_id;
+  if (!storeId) throw new Error("No CarryBee store found for this merchant account");
+
+  const place = await resolveCarrybeeLocation(order, partner);
 
   const combo = await hasCombo(db, items);
   const quantity = combo ? 1 : totalLot(items);
@@ -185,18 +230,42 @@ export async function buildCarrybeePayload(
     recipient_phone: order.customer_phone,
     ...(order.alt_phone ? { recipient_secendary_phone: order.alt_phone } : {}),
     recipient_address: fullAddress(order),
-    city_id: cityId,
-    zone_id: zoneId,
-    ...(areaId ? { area_id: areaId } : {}),
+    city_id: place.cityId,
+    zone_id: place.zoneId,
+    ...(place.areaId ? { area_id: place.areaId } : {}),
     ...(instruction ? { special_instruction: instruction } : {}),
     product_description: itemSummary(items).slice(0, 255),
     item_weight: weight,
     item_quantity: quantity,
     collectable_amount: codAmount(order),
+    // Gift parcels always ship closed — the customer pays before opening.
+    is_closed_box: true,
     // Manual exchange orders go out flagged so CarryBee collects the old parcel.
     ...((order.source ?? "").toLowerCase() === "exchange" ? { is_exchange: true } : {}),
   };
 }
+
+/**
+ * Exchange orders must reference the customer's previous CarryBee parcel that
+ * was actually delivered — CarryBee creates the exchange against it.
+ */
+export async function findExchangeSourceConsignment(
+  db: Db,
+  order: OrderRow,
+): Promise<string | null> {
+  const { data } = await db
+    .from("orders")
+    .select("id, courier_consignment_id, courier_provider, status, customer_phone, created_at")
+    .eq("customer_phone", order.customer_phone)
+    .eq("courier_provider", "carrybee")
+    .eq("status", "delivered")
+    .neq("id", order.id)
+    .order("created_at", { ascending: false })
+    .limit(1);
+  const row = (data ?? [])[0] as { courier_consignment_id?: string | null } | undefined;
+  return row?.courier_consignment_id ?? null;
+}
+
 
 
 
