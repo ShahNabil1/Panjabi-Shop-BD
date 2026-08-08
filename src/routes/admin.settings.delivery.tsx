@@ -243,10 +243,14 @@ function PartnerCard({
   };
 
   const save = async () => {
+    if (noteError) {
+      toast.error(noteError);
+      return;
+    }
     setSaving(true);
     try {
       const res = await adminSaveDeliveryPartner({
-        data: { provider, enabled, credentials: values, noteTemplate, config: {} },
+        data: { provider, enabled, credentials: values, noteTemplate: noteTemplate.trim(), config: {} },
       });
       setResult({ ok: true, message: res.message });
       setSavedSnapshot(JSON.stringify(values));
