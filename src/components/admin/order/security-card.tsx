@@ -428,9 +428,25 @@ export function FulfillmentCard({
           </p>
 
           <div className="mt-2 flex flex-wrap items-center gap-2">
-            <span className="inline-flex rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-semibold text-indigo-800 ring-1 ring-indigo-200">
-              {status === "pending" ? "Pending" : status.toUpperCase()}
-            </span>
+            {(() => {
+              // A terminal order state (cancelled / returned / lost) overrides the
+              // internal fulfillment flag, which stays "pending" when nothing shipped.
+              const terminal = ["cancelled", "returned", "lost_damaged"].includes(orderStatus);
+              const shown = terminal ? orderStatus.replace("_", " ") : status;
+              return (
+                <span
+                  className={cn(
+                    "inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold ring-1",
+                    terminal
+                      ? "bg-rose-50 text-rose-800 ring-rose-200"
+                      : "bg-indigo-50 text-indigo-800 ring-indigo-200",
+                  )}
+                >
+                  {shown === "pending" ? "Pending" : shown.toUpperCase()}
+                </span>
+              );
+            })()}
+
             {partner ? <CourierBadge partner={partner} /> : null}
 
             {courierStatus ? (
