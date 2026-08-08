@@ -40,19 +40,36 @@ export function Section({
   action,
   children,
   className,
+  centerTitle,
+  titleClassName,
 }: {
   title?: string | undefined;
   description?: string | undefined;
   action?: ReactNode | undefined;
   children: ReactNode;
   className?: string | undefined;
+  centerTitle?: boolean | undefined;
+  titleClassName?: string | undefined;
 }) {
   return (
     <section className={cn("mx-auto w-full max-w-6xl px-4 py-8 sm:py-10", className)}>
       {title ? (
-        <div className="mb-5 grid grid-cols-1 items-end justify-items-center gap-3 text-center sm:grid-cols-[minmax(0,1fr)_auto] sm:justify-items-stretch sm:text-left">
-          <div className="min-w-0 max-w-full">
-            <h2 className="text-xl font-bold tracking-tight sm:text-2xl">{title}</h2>
+        <div
+          className={cn(
+            "mb-5 grid grid-cols-1 items-end justify-items-center gap-3 text-center",
+            !centerTitle &&
+              "sm:grid-cols-[minmax(0,1fr)_auto] sm:justify-items-stretch sm:text-left",
+          )}
+        >
+          <div className={cn("min-w-0 max-w-full", centerTitle && "mx-auto")}>
+            <h2
+              className={cn(
+                "text-xl font-bold tracking-tight sm:text-2xl",
+                titleClassName,
+              )}
+            >
+              {title}
+            </h2>
             {description ? (
               <p className="mt-1 text-sm text-muted-foreground">{description}</p>
             ) : null}
