@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 
 import { useLang } from "@/lib/language-context";
-import { pick, tr } from "@/lib/i18n";
+import { tr } from "@/lib/i18n";
 import { useSiteData } from "./site-header";
 import logoMark from "@/assets/upoharkabbo-logo.png";
 import { SOCIAL_LINKS } from "./social-links";
@@ -9,12 +9,12 @@ import { cn } from "@/lib/utils";
 
 export function SiteFooter() {
   const { lang } = useLang();
-  const { categories, brand, tagline, contact } = useSiteData();
+  const { brand, tagline, contact } = useSiteData();
   const year = new Date().getFullYear();
 
   return (
     <footer className="mt-16 border-t border-border bg-footer">
-      <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 sm:grid-cols-2 lg:grid-cols-3">
         <div className="min-w-0">
           <div className="flex items-center">
             <img
@@ -46,23 +46,6 @@ export function SiteFooter() {
               </a>
             ))}
           </div>
-        </div>
-
-        <div>
-          <h2 className="text-sm font-semibold">{tr(lang, "categories")}</h2>
-          <ul className="mt-3 space-y-2">
-            {categories.map((c) => (
-              <li key={c.id}>
-                <Link
-                  to="/c/$category"
-                  params={{ category: c.slug }}
-                  className="text-sm text-muted-foreground transition-colors hover:text-primary"
-                >
-                  {pick(lang, c.name_bn, c.name_en)}
-                </Link>
-              </li>
-            ))}
-          </ul>
         </div>
 
         <div>
