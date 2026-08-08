@@ -111,6 +111,7 @@ function CreateOrderPage() {
   const [deliveryPartner, setDeliveryPartner] = useState<string>("");
   const [deliveryNoteOn, setDeliveryNoteOn] = useState(true);
   const [deliveryNote, setDeliveryNote] = useState("");
+  const [mode, setMode] = useState<"manual" | "approved">("manual");
   const [preOrder, setPreOrder] = useState(false);
   const [scheduleOn, setScheduleOn] = useState(false);
   const [scheduledFor, setScheduledFor] = useState("");
@@ -281,11 +282,13 @@ function CreateOrderPage() {
           advanceAmount,
           advanceMethod: advanceAmount > 0 ? advanceMethod : null,
           source,
-          deliveryPartner: deliveryPartner === "" ? null : deliveryPartner,
-          deliveryNote: deliveryNoteOn ? deliveryNote.trim() : "",
-          preOrder,
+          mode,
+          deliveryPartner:
+            mode === "approved" && deliveryPartner !== "" ? deliveryPartner : null,
+          deliveryNote: mode === "approved" && deliveryNoteOn ? deliveryNote.trim() : "",
+          preOrder: mode === "manual" ? preOrder : false,
           scheduledFor:
-            !preOrder && scheduleOn && scheduledFor
+            mode === "manual" && !preOrder && scheduleOn && scheduledFor
               ? new Date(`${scheduledFor}T00:00:00`).toISOString()
               : null,
           items: lines.map((l) => ({
@@ -316,7 +319,7 @@ function CreateOrderPage() {
     district &&
     upazila &&
     lines.length > 0 &&
-    (preOrder || !scheduleOn || scheduledFor.length > 0) &&
+    (mode !== "manual" || preOrder || !scheduleOn || scheduledFor.length > 0) &&
     !create.isPending;
 
   return (
@@ -660,6 +663,26 @@ function CreateOrderPage() {
         </div>
 
         <div className="space-y-5">
+          {/* Creation mode: Manual → Web Orders/Processing, Approved → Order List/Pending. */}
+          <div className="grid grid-cols-2 gap-1 rounded-xl border border-border bg-muted/40 p-1 shadow-sm">
+            {(["manual", "approved"] as const).map((m) => (
+              <button
+                key={m}
+                type="button"
+                onClick={() => setMode(m)}
+                className={cn(
+                  "rounded-lg px-3 py-2 text-xs font-bold capitalize transition-all duration-200",
+                  mode === m
+                    ? "bg-card text-foreground shadow"
+                    : "text-muted-foreground hover:text-foreground",
+                )}
+              >
+                {m}
+              </button>
+            ))}
+          </div>
+
+          {mode === "manual" ? (
           <div className="grid min-w-0 grid-cols-2 gap-2">
             <label className="grid min-w-0 cursor-pointer grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 shadow-sm">
               <span className="truncate text-xs font-semibold text-foreground">Pre-Order</span>
@@ -704,6 +727,7 @@ function CreateOrderPage() {
               />
             ) : null}
           </div>
+          ) : null}
 
           <Panel>
             <h2 className="text-sm font-bold">Payment</h2>
@@ -791,60 +815,64 @@ function CreateOrderPage() {
               </label>
 
 
-              <label className="block">
-                <Label>Delivery partner</Label>
-                <select
-                  className={input}
-                  value={deliveryPartner}
-                  onChange={(e) => applyPartner(e.target.value)}
-                  disabled={activePartners.isLoading}
-                >
-                  <option value="">Not selected</option>
-                  {partnerOptions.map((p) => (
-                    <option key={p.provider} value={providerLabels[p.provider]}>
-                      {providerLabels[p.provider]}
-                      {p.isDefault ? " (default)" : ""}
-                    </option>
-                  ))}
-                </select>
-                {!activePartners.isLoading && partnerOptions.length === 0 ? (
-                  <span className="mt-1 block text-xs font-semibold text-muted-foreground">
-                    No delivery partner is enabled yet — add one in Settings → Delivery.
-                  </span>
-                ) : null}
-              </label>
+              {mode === "approved" ? (
+                <>
+                  <label className="block">
+                    <Label>Delivery partner</Label>
+                    <select
+                      className={input}
+                      value={deliveryPartner}
+                      onChange={(e) => applyPartner(e.target.value)}
+                      disabled={activePartners.isLoading}
+                    >
+                      <option value="">Not selected</option>
+                      {partnerOptions.map((p) => (
+                        <option key={p.provider} value={providerLabels[p.provider]}>
+                          {providerLabels[p.provider]}
+                          {p.isDefault ? " (default)" : ""}
+                        </option>
+                      ))}
+                    </select>
+                    {!activePartners.isLoading && partnerOptions.length === 0 ? (
+                      <span className="mt-1 block text-xs font-semibold text-muted-foreground">
+                        No delivery partner is enabled yet — add one in Settings → Delivery.
+                      </span>
+                    ) : null}
+                  </label>
 
-              <div className="sm:col-span-2">
-                <label className="flex cursor-pointer items-center gap-2 text-sm font-semibold">
-                  <input
-                    type="checkbox"
-                    className="size-4 accent-primary"
-                    checked={deliveryNoteOn}
-                    onChange={(e) => {
-                      const on = e.target.checked;
-                      setDeliveryNoteOn(on);
-                      if (!on) setDeliveryNote("");
-                      else {
-                        const match = partnerOptions.find(
-                          (p) => providerLabels[p.provider] === deliveryPartner,
-                        );
-                        setDeliveryNote(match?.noteTemplate ?? "");
-                      }
-                    }}
-                  />
-                  Add delivery note
-                </label>
-                {deliveryNoteOn ? (
-                  <textarea
-                    rows={3}
-                    maxLength={500}
-                    className={cn(input, "mt-2 h-auto py-2")}
-                    placeholder="Sent to the courier as special instruction"
-                    value={deliveryNote}
-                    onChange={(e) => setDeliveryNote(e.target.value)}
-                  />
-                ) : null}
-              </div>
+                  <div className="sm:col-span-2">
+                    <label className="flex cursor-pointer items-center gap-2 text-sm font-semibold">
+                      <input
+                        type="checkbox"
+                        className="size-4 accent-primary"
+                        checked={deliveryNoteOn}
+                        onChange={(e) => {
+                          const on = e.target.checked;
+                          setDeliveryNoteOn(on);
+                          if (!on) setDeliveryNote("");
+                          else {
+                            const match = partnerOptions.find(
+                              (p) => providerLabels[p.provider] === deliveryPartner,
+                            );
+                            setDeliveryNote(match?.noteTemplate ?? "");
+                          }
+                        }}
+                      />
+                      Add delivery note
+                    </label>
+                    {deliveryNoteOn ? (
+                      <textarea
+                        rows={3}
+                        maxLength={500}
+                        className={cn(input, "mt-2 h-auto py-2")}
+                        placeholder="Sent to the courier as special instruction"
+                        value={deliveryNote}
+                        onChange={(e) => setDeliveryNote(e.target.value)}
+                      />
+                    ) : null}
+                  </div>
+                </>
+              ) : null}
             </div>
 
             <Button
@@ -856,11 +884,13 @@ function CreateOrderPage() {
               {create.isPending ? "Creating…" : "Create order"}
             </Button>
             <p className="mt-2 text-center text-xs text-muted-foreground">
-              {preOrder
-                ? "This order will be created with the Pre-Order status."
-                : scheduleOn && scheduledFor
-                  ? "This order will stay in Scheduled Order and move to Processing automatically on the chosen date."
-                  : "New orders are created with the Pending status."}
+              {mode === "approved"
+                ? "Approved orders go straight to Order List → Pending."
+                : preOrder
+                  ? "This order will be created with the Pre-Order status."
+                  : scheduleOn && scheduledFor
+                    ? "This order will stay in Scheduled Order and move to Processing automatically on the chosen date."
+                    : "Manual orders go to Web Orders → Processing."}
             </p>
           </Panel>
         </div>

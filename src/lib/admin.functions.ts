@@ -858,15 +858,22 @@ export const adminCreateOrder = createServerFn({ method: "POST" })
         total,
         advance_amount: data.advanceAmount,
         advance_method: data.advanceAmount > 0 ? data.advanceMethod : null,
-        delivery_partner: data.deliveryPartner,
-        delivery_note: data.deliveryNote || null,
+        // Manual orders are managed later in Processing, so no courier yet.
+        delivery_partner: data.mode === "manual" ? null : data.deliveryPartner,
+        delivery_note: data.mode === "manual" ? null : data.deliveryNote || null,
         payment_method: data.advanceAmount > 0 ? "partial_advance" : "cod",
-        status: data.preOrder
-          ? "pre_order"
-          : data.scheduledFor
-            ? "scheduled_order"
+        status:
+          data.mode === "manual"
+            ? data.preOrder
+              ? "pre_order"
+              : data.scheduledFor
+                ? "scheduled_order"
+                : "processing"
             : "pending",
-        scheduled_for: !data.preOrder && data.scheduledFor ? data.scheduledFor : null,
+        scheduled_for:
+          data.mode === "manual" && !data.preOrder && data.scheduledFor
+            ? data.scheduledFor
+            : null,
         source: data.source,
       })
       .select("id, order_number")

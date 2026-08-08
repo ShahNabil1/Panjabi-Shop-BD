@@ -162,6 +162,12 @@ export const adminCreateOrderSchema = z.object({
   advanceAmount: z.number().min(0).default(0),
   advanceMethod: z.enum(advanceMethods).nullable().default(null),
   source: z.enum(orderSources).default("Direct"),
+  /**
+   * Creation mode. `manual` drops the order into Web Orders → Processing so it
+   * can be managed later; `approved` sends it straight to Order List → Pending
+   * with a courier and delivery note already attached.
+   */
+  mode: z.enum(["manual", "approved"]).default("approved"),
   deliveryPartner: z.string().trim().min(2).max(40).nullable().default(null),
   deliveryNote: z.string().trim().max(500).optional().default(""),
   /** Creates the order directly in the Pre-Order status. */
