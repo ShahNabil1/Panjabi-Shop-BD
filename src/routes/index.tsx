@@ -56,8 +56,7 @@ function HomePage() {
       ) : (
         <section className="border-b border-border bg-surface">
           <div className="mx-auto flex max-w-6xl flex-col items-center gap-4 px-4 py-12 text-center sm:items-start sm:py-16 sm:text-left">
-            <h1 className="text-2xl font-bold tracking-tight sm:text-4xl">
-
+            <h2 className="text-2xl font-bold tracking-tight sm:text-4xl">
               {lang === "bn" ? (
                 <>
                   উপহার হোক <span className="text-primary">একটা কবিতার মতো</span>
@@ -67,7 +66,7 @@ function HomePage() {
                   Let every gift read <span className="text-primary">like a poem</span>
                 </>
               )}
-            </h1>
+            </h2>
             <div className="flex flex-wrap justify-center gap-3 sm:justify-start">
               {data.categories[0] ? (
                 <Link
