@@ -26,7 +26,7 @@ export type EditableItem = {
     itemNameBn: string;
     itemNameEn: string;
     quantity: number;
-    variantId: string;
+    variantId: string | null;
     variantLabelBn: string;
     variantLabelEn: string;
     sku: string | null;
