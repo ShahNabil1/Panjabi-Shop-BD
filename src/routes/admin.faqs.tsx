@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useConfirm } from "@/components/ui/confirm-dialog";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -44,6 +45,7 @@ function toFaqDraft(f: any): FaqInput {
 
 function FaqsAdmin() {
   const qc = useQueryClient();
+  const confirmDialog = useConfirm();
   const [draft, setDraft] = useState<FaqInput>(emptyFaq());
   const [openId, setOpenId] = useState<string | null>(null);
   const { data } = useQuery({ queryKey: ["admin", "faqs"], queryFn: () => adminListFaqs() });
@@ -156,7 +158,10 @@ function FaqsAdmin() {
                           variant="ghost"
                           onClick={(e) => {
                             e.stopPropagation();
-                            if (confirm("Delete this FAQ?")) remove.mutate(f.id);
+                            void confirmDialog({
+                              title: "Delete this FAQ?",
+                              description: "This question will be removed from the website.",
+                            }).then((ok) => ok && remove.mutate(f.id));
                           }}
                         >
                           <Trash2 className="size-3.5" />

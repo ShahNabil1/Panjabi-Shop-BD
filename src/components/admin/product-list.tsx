@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import { useConfirm } from "@/components/ui/confirm-dialog";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -60,6 +61,7 @@ export function ProductList({
   newLabel: string;
 }) {
   const qc = useQueryClient();
+  const confirmDialog = useConfirm();
   const [term, setTerm] = useState("");
   const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ["admin", "products", kind],
@@ -193,7 +195,10 @@ export function ProductList({
                       className="rounded-xl text-muted-foreground hover:text-destructive"
                       loading={remove.isPending}
                       onClick={() => {
-                        if (confirm("Delete this item?")) remove.mutate(p.id);
+                        void confirmDialog({
+                          title: "Delete this item?",
+                          description: "It will be removed from the storefront.",
+                        }).then((ok) => ok && remove.mutate(p.id));
                       }}
                     >
                       <Trash2 className="size-4" />

@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useConfirm } from "@/components/ui/confirm-dialog";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -79,6 +80,7 @@ function moveItem<T>(list: T[], from: number, to: number): T[] {
 
 function LandingPagesAdmin() {
   const qc = useQueryClient();
+  const confirmDialog = useConfirm();
   const [draft, setDraft] = useState<LandingPageInput>(emptyLanding());
 
   const pages = useQuery({
@@ -383,7 +385,10 @@ function LandingPagesAdmin() {
                     size="sm"
                     variant="ghost"
                     onClick={() => {
-                      if (confirm("Delete this page?")) remove.mutate(p.id);
+                      void confirmDialog({
+                        title: "Delete this landing page?",
+                        description: "The page URL will stop working immediately.",
+                      }).then((ok) => ok && remove.mutate(p.id));
                     }}
                   >
                     <Trash2 className="h-4 w-4" />

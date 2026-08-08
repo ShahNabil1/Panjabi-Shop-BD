@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useConfirm } from "@/components/ui/confirm-dialog";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -80,6 +81,7 @@ function toSubcategoryDraft(s: any): SubcategoryInput {
 
 function TaxonomyPage() {
   const qc = useQueryClient();
+  const confirmDialog = useConfirm();
   const { data, isLoading } = useQuery({
     queryKey: ["admin", "taxonomy"],
     queryFn: () => adminTaxonomy(),
@@ -242,7 +244,10 @@ function TaxonomyPage() {
                       size="sm"
                       variant="ghost"
                       onClick={() => {
-                        if (confirm("Delete this category?")) delCat.mutate(c.id);
+                        void confirmDialog({
+                          title: "Delete this category?",
+                          description: "Products under it will lose this category.",
+                        }).then((ok) => ok && delCat.mutate(c.id));
                       }}
                     >
                       <Trash2 className="size-3.5" />
@@ -362,7 +367,10 @@ function TaxonomyPage() {
                         size="sm"
                         variant="ghost"
                         onClick={() => {
-                          if (confirm("Delete this subcategory?")) delSub.mutate(s.id);
+                          void confirmDialog({
+                            title: "Delete this subcategory?",
+                            description: "Products under it will lose this subcategory.",
+                          }).then((ok) => ok && delSub.mutate(s.id));
                         }}
                       >
                         <Trash2 className="size-3.5" />

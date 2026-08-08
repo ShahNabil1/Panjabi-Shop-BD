@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useConfirm } from "@/components/ui/confirm-dialog";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
@@ -95,6 +96,7 @@ const inputClass =
 
 function CouponsPage() {
   const qc = useQueryClient();
+  const confirmDialog = useConfirm();
   const [q, setQ] = useState("");
   const [filter, setFilter] = useState<"all" | "active" | "inactive" | "deleted">("all");
   const [editing, setEditing] = useState<Draft | null>(null);
@@ -338,8 +340,10 @@ function CouponsPage() {
                             <IconAction
                               title="Delete"
                               onClick={() => {
-                                if (window.confirm(`Delete coupon ${r.code}? It can be restored later.`))
-                                  remove.mutate(r.id);
+                                void confirmDialog({
+                                  title: `Delete coupon ${r.code}?`,
+                                  description: "It can be restored later from the Deleted filter.",
+                                }).then((ok) => ok && remove.mutate(r.id));
                               }}
                               busy={remove.isPending && remove.variables === r.id}
                               className="text-destructive hover:bg-destructive/10 active:bg-destructive active:text-white"
