@@ -10,8 +10,8 @@ import { formatPrice } from "@/lib/i18n";
 
 function searchSchema(input: Record<string, unknown>) {
   return {
-    p: input["p"] == null ? "" : String(input["p"]),
-    print: input["print"] == null ? "" : String(input["print"]),
+    p: (input["p"] ?? "") as string | number,
+    print: (input["print"] ?? "") as string | number,
   };
 }
 
@@ -36,7 +36,9 @@ type SiteData = {
 
 function InvoicePage() {
   const { orderNumber } = Route.useParams();
-  const { p, print } = Route.useSearch();
+  const search = Route.useSearch();
+  const p = String(search.p ?? "");
+  const print = String(search.print ?? "");
   const site = useLoaderData({ from: "__root__" }) as SiteData;
   const fetchSummary = useServerFn(getOrderSummaryShort);
 
