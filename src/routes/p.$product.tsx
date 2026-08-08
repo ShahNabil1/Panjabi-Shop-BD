@@ -276,14 +276,10 @@ function ProductPage() {
                 </span>
               ) : null}
               {product.brand ? (
-                <span>
-                  {tr(lang, "brand")}: {product.brand}
-                </span>
+                <span className="font-en">Brand: {product.brand}</span>
               ) : null}
               {product.sku ? (
-                <span className="font-en">
-                  {tr(lang, "sku")}: {product.sku}
-                </span>
+                <span className="font-en">SKU: {product.sku}</span>
               ) : null}
             </div>
 
@@ -307,11 +303,11 @@ function ProductPage() {
 
             <p
               className={cn(
-                "mt-2 text-sm font-medium",
+                "mt-2 font-en text-sm font-medium",
                 product.stock > 0 ? "text-success" : "text-destructive",
               )}
             >
-              {product.stock > 0 ? tr(lang, "inStock") : tr(lang, "outOfStock")}
+              {product.stock > 0 ? "In Stock" : "Out of Stock"}
             </p>
 
             {groups.size > 0 ? (
@@ -416,15 +412,15 @@ function ProductPage() {
         } />
 
         {description ? (
-          <div className="mt-10 max-w-3xl">
-            <h2 className="text-lg font-bold">{tr(lang, "description")}</h2>
+          <div className="mx-auto mt-10 max-w-3xl">
+            <h2 className="text-center text-lg font-bold">{tr(lang, "description")}</h2>
             <Prose text={description} className="mt-3" />
           </div>
         ) : null}
 
         {product.specs.length > 0 ? (
-          <div className="mt-10 max-w-3xl">
-            <h2 className="text-lg font-bold">{tr(lang, "specs")}</h2>
+          <div className="mx-auto mt-10 max-w-3xl">
+            <h2 className="text-center text-lg font-bold">{tr(lang, "specs")}</h2>
             <dl className="mt-3 divide-y divide-border overflow-hidden rounded-lg border border-border bg-card">
               {product.specs.map((spec, i) => (
                 <div key={i} className="grid grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)] gap-3 px-4 py-3">
@@ -441,8 +437,8 @@ function ProductPage() {
         ) : null}
 
         {productFaqs.length > 0 ? (
-          <div className="mt-10 max-w-3xl">
-            <h2 className="text-lg font-bold">{tr(lang, "productFaq")}</h2>
+          <div className="mx-auto mt-10 max-w-3xl">
+            <h2 className="text-center text-lg font-bold">{tr(lang, "productFaq")}</h2>
             <FaqList items={productFaqs} className="mt-3" />
           </div>
         ) : null}
