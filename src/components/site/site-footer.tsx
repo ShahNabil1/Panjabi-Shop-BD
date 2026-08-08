@@ -4,6 +4,8 @@ import { useLang } from "@/lib/language-context";
 import { pick, tr } from "@/lib/i18n";
 import { useSiteData } from "./site-header";
 import logoMark from "@/assets/upoharkabbo-logo.png";
+import { SOCIAL_LINKS } from "./social-links";
+import { cn } from "@/lib/utils";
 
 export function SiteFooter() {
   const { lang } = useLang();
@@ -27,6 +29,23 @@ export function SiteFooter() {
 
 
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{tagline}</p>
+          <div className="mt-4 flex flex-wrap items-center gap-4">
+            {SOCIAL_LINKS.map(({ key, href, label, icon: Icon, colorClass }) => (
+              <a
+                key={key}
+                href={href}
+                target={href.startsWith("http") ? "_blank" : undefined}
+                rel={href.startsWith("http") ? "noopener noreferrer" : undefined}
+                aria-label={label}
+                className={cn(
+                  "flex items-center justify-center p-1 transition-transform hover:scale-110",
+                  colorClass,
+                )}
+              >
+                <Icon className="h-6 w-6" />
+              </a>
+            ))}
+          </div>
         </div>
 
         <div>
