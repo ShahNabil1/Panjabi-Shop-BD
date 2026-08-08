@@ -409,20 +409,20 @@ export function CheckoutForm({
         {/* Your products */}
         <section>
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <h3 className="font-en text-xl font-extrabold tracking-tight sm:text-2xl">Your Products</h3>
+            <h3 className="font-en text-lg font-extrabold tracking-tight sm:text-xl">Your Products</h3>
             {allowAddMore ? (
               <Link
                 to="/"
-                className="font-en group inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-primary to-pink-500 px-5 py-2.5 text-sm font-extrabold text-primary-foreground shadow-md transition-all duration-300 hover:scale-[1.03] hover:shadow-lg active:scale-95 sm:text-base"
+                className="font-en group inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-primary to-pink-500 px-4 py-2 text-xs font-extrabold text-primary-foreground shadow-md transition-all duration-300 hover:scale-[1.03] hover:shadow-lg active:scale-95 sm:text-sm"
               >
-                <Plus className="h-4 w-4 transition-transform duration-300 group-hover:rotate-90" />
+                <Plus className="h-3.5 w-3.5 transition-transform duration-300 group-hover:rotate-90" />
                 Add Product
               </Link>
             ) : null}
           </div>
 
           <div className="mt-4 overflow-hidden rounded-xl border border-border">
-            <div className="font-en flex items-center justify-between gap-3 bg-secondary/60 px-3 py-3 text-sm font-extrabold uppercase tracking-wide text-foreground sm:px-4 sm:text-base">
+            <div className="font-en flex items-center justify-between gap-3 bg-secondary/60 px-3 py-2.5 text-xs font-extrabold uppercase tracking-wide text-foreground sm:px-4 sm:text-sm">
               <span>Product</span>
               <div className="flex items-center gap-4 sm:gap-5">
                 <span className="text-center">Quantity</span>
@@ -432,14 +432,14 @@ export function CheckoutForm({
 
             {items.length === 0 ? (
               <div className="grid place-items-center gap-3 px-4 py-10 text-center">
-                <p className="font-en text-base font-bold text-muted-foreground">
+                <p className="font-en text-sm font-bold text-muted-foreground">
                   No products in your order
                 </p>
                 <Link
                   to="/"
-                  className="font-en group inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-primary to-pink-500 px-6 py-3 text-base font-extrabold text-primary-foreground shadow-md transition-all duration-300 hover:scale-[1.03] hover:shadow-lg active:scale-95"
+                  className="font-en group inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-primary to-pink-500 px-5 py-2.5 text-sm font-extrabold text-primary-foreground shadow-md transition-all duration-300 hover:scale-[1.03] hover:shadow-lg active:scale-95"
                 >
-                  <Plus className="h-5 w-5 transition-transform duration-300 group-hover:rotate-90" />
+                  <Plus className="h-4 w-4 transition-transform duration-300 group-hover:rotate-90" />
                   Add Product
                 </Link>
               </div>
@@ -671,10 +671,10 @@ export function CheckoutForm({
 
         {/* Shipping */}
         <section>
-          <h3 className="font-en text-xl font-extrabold sm:text-2xl">Shipping</h3>
-          <div className="mt-3 flex items-center justify-between gap-3 rounded-xl border border-border px-4 py-3.5 text-base">
+          <h3 className="font-en text-lg font-extrabold sm:text-xl">Shipping</h3>
+          <div className="mt-3 flex items-center justify-between gap-3 rounded-xl border border-border px-4 py-3 text-sm">
             <span className="font-en font-bold">Delivery Charge</span>
-            <span className="font-en text-lg font-extrabold tabular-nums">
+            <span className="font-en text-base font-extrabold tabular-nums">
               {delivery === 0 ? "Free" : formatPrice(lang, delivery)}
             </span>
           </div>
@@ -682,9 +682,9 @@ export function CheckoutForm({
 
         {/* Your order */}
         <section>
-          <h3 className="font-en text-xl font-extrabold text-primary sm:text-2xl">Your Order</h3>
+          <h3 className="font-en text-lg font-extrabold text-primary sm:text-xl">Your Order</h3>
 
-          <div className="mt-3 grid gap-2 border-b border-dashed border-border pb-3 text-sm font-extrabold uppercase tracking-wide text-foreground sm:text-base">
+          <div className="mt-3 grid gap-2 border-b border-dashed border-border pb-3 text-xs font-extrabold uppercase tracking-wide text-foreground sm:text-sm">
             <div className="font-en flex justify-between">
               <span>Product</span>
               <span>Subtotal</span>
@@ -821,14 +821,14 @@ export function CheckoutForm({
           </div>
 
 
-          <dl className="mt-4 grid gap-2 border-t border-dashed border-border pt-3 text-base">
+          <dl className="mt-4 grid gap-2 border-t border-dashed border-border pt-3 text-sm">
             <div className="flex justify-between">
               <dt className="font-en font-bold text-foreground">Subtotal</dt>
-              <dd className="font-en text-lg font-extrabold tabular-nums">{formatPrice(lang, subtotal)}</dd>
+              <dd className="font-en text-base font-extrabold tabular-nums">{formatPrice(lang, subtotal)}</dd>
             </div>
             <div className="flex justify-between">
               <dt className="font-en font-bold text-foreground">Delivery Charge</dt>
-              <dd className="font-en text-lg font-extrabold tabular-nums">
+              <dd className="font-en text-base font-extrabold tabular-nums">
                 {delivery === 0 ? "Free" : formatPrice(lang, delivery)}
               </dd>
             </div>
@@ -838,12 +838,12 @@ export function CheckoutForm({
                   Coupon Discount
                   {appliedCode ? <span className="font-en"> ({appliedCode})</span> : null}
                 </dt>
-                <dd className="font-en text-lg font-extrabold tabular-nums">− {formatPrice(lang, discount)}</dd>
+                <dd className="font-en text-base font-extrabold tabular-nums">− {formatPrice(lang, discount)}</dd>
               </div>
             ) : null}
             <div className="flex items-center justify-between border-t border-border pt-2.5">
-              <dt className="font-en text-lg font-extrabold sm:text-xl">Total</dt>
-              <dd className="font-en text-xl font-extrabold tabular-nums text-primary sm:text-2xl">{formatPrice(lang, total)}</dd>
+              <dt className="font-en text-base font-extrabold sm:text-lg">Total</dt>
+              <dd className="font-en text-lg font-extrabold tabular-nums text-primary sm:text-xl">{formatPrice(lang, total)}</dd>
             </div>
 
           </dl>
