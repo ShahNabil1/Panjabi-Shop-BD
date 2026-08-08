@@ -208,7 +208,7 @@ export async function buildCarrybeePayload(
   const { carrybeeStores } = await import("./carrybee.server");
   const creds = carrybeeCreds(partner);
 
-  const saved = (partner.config["stores"] ?? []) as Array<{ store_id: number }>;
+  const saved = (partner.config["stores"] ?? []) as Array<{ store_id: string | number }>;
   const storeId = saved[0]?.store_id ?? (await carrybeeStores(creds))[0]?.store_id;
   if (!storeId) throw new Error("No CarryBee store found for this merchant account");
 

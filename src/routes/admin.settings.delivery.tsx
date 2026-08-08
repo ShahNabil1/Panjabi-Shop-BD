@@ -184,6 +184,9 @@ function PartnerCard({
   const [result, setResult] = useState<{ ok: boolean; message: string } | null>(
     row ? { ok: row.connection_ok, message: row.connection_message ?? "" } : null,
   );
+  const [stores, setStores] = useState<{ store_id: string | number; store_name: string }[]>(
+    row?.stores ?? [],
+  );
   const [pinging, setPinging] = useState(false);
   const [ping, setPing] = useState<{ ok: boolean; status: number; body: string } | null>(null);
 
@@ -212,8 +215,12 @@ function PartnerCard({
     setTesting(true);
     try {
       const res = await adminTestDeliveryPartner({ data: { provider, credentials: values } });
-      setResult(res);
-      if (res.ok) toast.success(`${providerLabels[provider]}: ${res.message}`);
+      setResult({ ok: res.ok, message: res.message });
+      setStores(res.stores ?? []);
+      if (res.ok) {
+        onDone();
+        toast.success(`${providerLabels[provider]}: ${res.message}`);
+      }
       else toast.error(res.message);
     } catch (error) {
       const message = (error as Error).message;
@@ -483,10 +490,21 @@ function PartnerCard({
         </p>
       ) : null}
 
-      {row?.stores?.length ? (
-        <p className="text-xs text-muted-foreground">
-          Stores: {row.stores.map((s) => `${s.store_name} (#${s.store_id})`).join(", ")}
-        </p>
+      {stores.length ? (
+        <div className="flex flex-wrap items-center gap-1.5">
+          <span className="text-xs font-medium text-muted-foreground">Stores:</span>
+          {stores.map((s) => (
+            <span
+              key={String(s.store_id)}
+              className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-800"
+            >
+              {s.store_name}
+              <code className="rounded bg-emerald-100 px-1 py-0.5 text-[10px] text-emerald-700">
+                #{s.store_id}
+              </code>
+            </span>
+          ))}
+        </div>
       ) : null}
 
       <div className="flex flex-wrap items-center gap-2">

@@ -25,7 +25,7 @@ export type DeliveryPartnerRow = {
   enabled: boolean;
   /** Secret values are replaced with a mask; non-secret fields come back as-is. */
   credentials: Record<string, string>;
-  stores: { store_id: number; store_name: string }[];
+  stores: { store_id: string | number; store_name: string }[];
   connection_ok: boolean;
   connection_message: string | null;
   last_checked_at: string | null;
@@ -121,7 +121,7 @@ export const adminListDeliveryPartners = createServerFn({ method: "GET" })
         enabled: row.enabled,
         credentials: maskCreds(provider, creds),
         stores: (((row.config ?? {}) as Record<string, unknown>)["stores"] ??
-          []) as { store_id: number; store_name: string }[],
+          []) as { store_id: string | number; store_name: string }[],
         connection_ok: row.connection_ok,
         connection_message: row.connection_message,
         last_checked_at: row.last_checked_at,
@@ -154,7 +154,35 @@ export const adminTestDeliveryPartner = createServerFn({ method: "POST" })
       data.credentials,
     );
     const res = await runCheck(data.provider, creds);
-    return { ok: res.ok, message: res.message };
+    // Persist the freshly fetched store list so the settings page can show it
+    // right away, without waiting for a full save.
+    const stores = (res.extra as { stores?: unknown }).stores;
+    if (res.ok && Array.isArray(stores)) {
+      const { data: row } = await db
+        .from("delivery_partners")
+        .select("config")
+        .eq("provider", data.provider)
+        .maybeSingle();
+      if (row) {
+        await db
+          .from("delivery_partners")
+          .update({
+            config: { ...((row.config ?? {}) as Record<string, unknown>), stores } as never,
+            connection_ok: res.ok,
+            connection_message: res.message,
+            last_checked_at: new Date().toISOString(),
+          })
+          .eq("provider", data.provider);
+      }
+    }
+    return {
+      ok: res.ok,
+      message: res.message,
+      stores: (Array.isArray(stores) ? stores : []) as {
+        store_id: string | number;
+        store_name: string;
+      }[],
+    };
   });
 
 /** Saves a partner. The connection is verified first; a failed check blocks the save. */
