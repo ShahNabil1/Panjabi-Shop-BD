@@ -102,11 +102,17 @@ export function PromoPopup({ config }: { config: PromoPopup }) {
     body.style.width = "100%";
     html.style.overflow = "hidden";
     return () => {
+      const prevBehavior = html.style.scrollBehavior;
+      html.style.scrollBehavior = "auto";
       body.style.position = prev.position;
       body.style.top = prev.top;
       body.style.width = prev.width;
       html.style.overflow = "";
-      window.scrollTo({ top: y });
+      window.scrollTo(0, y);
+      // Restore smooth scrolling after the jump-free restore.
+      requestAnimationFrame(() => {
+        html.style.scrollBehavior = prevBehavior;
+      });
     };
   }, [open]);
 
