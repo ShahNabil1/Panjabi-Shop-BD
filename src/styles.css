@@ -7,7 +7,7 @@
 /*
  * Typography rule for this project:
  * - Bangla glyphs (U+0980–U+09FF) always render in SolaimanLipi.
- * - Everything else (Latin, digits, punctuation) renders in Times New Roman.
+ * - Everything else (Latin, digits, punctuation) renders in Montserrat.
  * This is enforced through unicode-range on the @font-face blocks, so a mixed
  * Bangla/English line automatically picks the right face per character.
  * Exceptions: use the .font-en / .font-bn utilities.
@@ -128,8 +128,8 @@
 
 
 @theme inline {
-  --font-sans: "SolaimanLipi", "Times New Roman", Times, serif;
-  --font-serif: "SolaimanLipi", "Times New Roman", Times, serif;
+  --font-sans: "SolaimanLipi", "Montserrat", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "SolaimanLipi", "Montserrat", ui-sans-serif, system-ui, sans-serif;
 
   --radius-sm: calc(var(--radius) - 3px);
   --radius-md: calc(var(--radius) - 1px);
@@ -272,7 +272,7 @@
 
 
 @utility font-en {
-  font-family: "Times New Roman", Times, serif;
+  font-family: "Montserrat", ui-sans-serif, system-ui, sans-serif;
 }
 
 @utility font-bn {
@@ -297,6 +297,7 @@
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-sans);
+    font-weight: 500;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     overflow-x: hidden;
