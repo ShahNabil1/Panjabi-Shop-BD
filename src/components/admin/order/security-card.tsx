@@ -265,11 +265,17 @@ export function FulfillmentCard({
     onError: (e: Error) => toast.error(e.message),
   });
 
-  const events = useQuery({
+  const PAGE = 5;
+  const events = useInfiniteQuery({
     queryKey: ["admin", "courier-webhook-events", orderId],
-    queryFn: () => adminOrderWebhookEvents({ data: { orderId } }),
+    initialPageParam: 0,
+    queryFn: ({ pageParam }) =>
+      adminOrderWebhookEvents({ data: { orderId, limit: PAGE, offset: pageParam as number } }),
+    getNextPageParam: (lastPage, allPages) =>
+      lastPage.length < PAGE ? undefined : allPages.length * PAGE,
     enabled: historyOpen,
   });
+  const eventList = (events.data?.pages ?? []).flat();
 
   const normalised = (courierStatus ?? "unknown") as CourierStatus;
   const isPathao = (partner ?? "").toLowerCase() === "pathao";
