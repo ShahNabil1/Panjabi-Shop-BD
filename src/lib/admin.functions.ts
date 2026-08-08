@@ -224,7 +224,7 @@ export const adminUpdateOrderStatus = createServerFn({ method: "POST" })
           order_no: orderNo,
           amount: String(Number(o["total"] ?? 0)),
           phone: String(o["customer_phone"] ?? ""),
-          receipt_url: orderNo ? `${SITE_URL}/invoice/${orderNo}` : "",
+          receipt_url: orderNo ? `${SITE_URL}/inv/${orderNo}?p=${String(o["customer_phone"] ?? "").replace(/\D/g, "").slice(-4)}` : "",
         });
         const result = await deliverSms(db, {
           orderId: data.id,

@@ -1,4 +1,11 @@
 import { SITE_URL } from "./site";
+import { phoneLast4 } from "./order-receipt";
+
+/** Short invoice link used in SMS: /inv/UK-03?p=6863 */
+export function receiptUrl(orderNo: string, phone: string | null | undefined) {
+  const code = phoneLast4(phone);
+  return orderNo && code ? `${SITE_URL}/inv/${orderNo}?p=${code}` : "";
+}
 
 /** Fills {{variables}} in an SMS template. Client-safe (no server-only imports). */
 export function renderSmsTemplate(template: string, vars: Record<string, string>): string {
@@ -18,6 +25,6 @@ export function orderSmsVars(order: {
     order_no: orderNo,
     amount: String(Number(order.total ?? 0)),
     phone: String(order.customer_phone ?? ""),
-    receipt_url: orderNo ? `${SITE_URL}/invoice/${orderNo}` : "",
+    receipt_url: receiptUrl(orderNo, order.customer_phone),
   };
 }

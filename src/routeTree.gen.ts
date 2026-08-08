@@ -27,6 +27,7 @@ import { Route as AdminFaqsRouteImport } from './routes/admin.faqs'
 import { Route as AdminLandingRouteImport } from './routes/admin.landing'
 import { Route as AdminPromotionsRouteImport } from './routes/admin.promotions'
 import { Route as AdminTaxonomyRouteImport } from './routes/admin.taxonomy'
+import { Route as InvOrderNumberRouteImport } from './routes/inv.$orderNumber'
 import { Route as InvoiceOrderNumberRouteImport } from './routes/invoice.$orderNumber'
 import { Route as LpSlugRouteImport } from './routes/lp.$slug'
 import { Route as OffersIndexRouteImport } from './routes/offers.index'
@@ -143,6 +144,11 @@ const AdminTaxonomyRoute = AdminTaxonomyRouteImport.update({
   id: '/taxonomy',
   path: '/taxonomy',
   getParentRoute: () => AdminRoute,
+} as any)
+const InvOrderNumberRoute = InvOrderNumberRouteImport.update({
+  id: '/inv/$orderNumber',
+  path: '/inv/$orderNumber',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const InvoiceOrderNumberRoute = InvoiceOrderNumberRouteImport.update({
   id: '/invoice/$orderNumber',
@@ -297,6 +303,7 @@ export interface FileRoutesByFullPath {
   '/admin/landing': typeof AdminLandingRoute
   '/admin/promotions': typeof AdminPromotionsRoute
   '/admin/taxonomy': typeof AdminTaxonomyRoute
+  '/inv/$orderNumber': typeof InvOrderNumberRoute
   '/invoice/$orderNumber': typeof InvoiceOrderNumberRoute
   '/lp/$slug': typeof LpSlugRoute
   '/offers/$promotion': typeof OffersPromotionRoute
@@ -342,6 +349,7 @@ export interface FileRoutesByTo {
   '/admin/landing': typeof AdminLandingRoute
   '/admin/promotions': typeof AdminPromotionsRoute
   '/admin/taxonomy': typeof AdminTaxonomyRoute
+  '/inv/$orderNumber': typeof InvOrderNumberRoute
   '/invoice/$orderNumber': typeof InvoiceOrderNumberRoute
   '/lp/$slug': typeof LpSlugRoute
   '/offers/$promotion': typeof OffersPromotionRoute
@@ -389,6 +397,7 @@ export interface FileRoutesById {
   '/admin/landing': typeof AdminLandingRoute
   '/admin/promotions': typeof AdminPromotionsRoute
   '/admin/taxonomy': typeof AdminTaxonomyRoute
+  '/inv/$orderNumber': typeof InvOrderNumberRoute
   '/invoice/$orderNumber': typeof InvoiceOrderNumberRoute
   '/lp/$slug': typeof LpSlugRoute
   '/offers/$promotion': typeof OffersPromotionRoute
@@ -437,6 +446,7 @@ export interface FileRouteTypes {
     | '/admin/landing'
     | '/admin/promotions'
     | '/admin/taxonomy'
+    | '/inv/$orderNumber'
     | '/invoice/$orderNumber'
     | '/lp/$slug'
     | '/offers/$promotion'
@@ -482,6 +492,7 @@ export interface FileRouteTypes {
     | '/admin/landing'
     | '/admin/promotions'
     | '/admin/taxonomy'
+    | '/inv/$orderNumber'
     | '/invoice/$orderNumber'
     | '/lp/$slug'
     | '/offers/$promotion'
@@ -528,6 +539,7 @@ export interface FileRouteTypes {
     | '/admin/landing'
     | '/admin/promotions'
     | '/admin/taxonomy'
+    | '/inv/$orderNumber'
     | '/invoice/$orderNumber'
     | '/lp/$slug'
     | '/offers/$promotion'
@@ -570,6 +582,7 @@ export interface RootRouteChildren {
   FaqRoute: typeof FaqRoute
   SearchRoute: typeof SearchRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  InvOrderNumberRoute: typeof InvOrderNumberRoute
   InvoiceOrderNumberRoute: typeof InvoiceOrderNumberRoute
   LpSlugRoute: typeof LpSlugRoute
   OffersPromotionRoute: typeof OffersPromotionRoute
@@ -710,6 +723,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/taxonomy'
       preLoaderRoute: typeof AdminTaxonomyRouteImport
       parentRoute: typeof AdminRoute
+    }
+    '/inv/$orderNumber': {
+      id: '/inv/$orderNumber'
+      path: '/inv/$orderNumber'
+      fullPath: '/inv/$orderNumber'
+      preLoaderRoute: typeof InvOrderNumberRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/invoice/$orderNumber': {
       id: '/invoice/$orderNumber'
@@ -959,6 +979,7 @@ const rootRouteChildren: RootRouteChildren = {
   FaqRoute: FaqRoute,
   SearchRoute: SearchRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  InvOrderNumberRoute: InvOrderNumberRoute,
   InvoiceOrderNumberRoute: InvoiceOrderNumberRoute,
   LpSlugRoute: LpSlugRoute,
   OffersPromotionRoute: OffersPromotionRoute,

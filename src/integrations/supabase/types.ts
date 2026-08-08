@@ -1558,6 +1558,10 @@ export type Database = {
         Args: { _order_number: string; _phone: string }
         Returns: Json
       }
+      order_receipt_short: {
+        Args: { _order_number: string; _p: string }
+        Returns: Json
+      }
       promote_scheduled_orders: { Args: never; Returns: Json }
       validate_coupon: {
         Args: {

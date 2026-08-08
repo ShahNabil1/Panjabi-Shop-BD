@@ -423,7 +423,7 @@ export const adminSendSms = createServerFn({ method: "POST" })
       order_no: orderNo,
       amount: String(Number(o["total"] ?? 0)),
       phone: String(o["customer_phone"] ?? data.phone),
-      receipt_url: orderNo ? `${SITE_URL}/invoice/${orderNo}` : "",
+      receipt_url: orderNo ? `${SITE_URL}/inv/${orderNo}?p=${String(o["customer_phone"] ?? data.phone).replace(/\D/g, "").slice(-4)}` : "",
     });
 
     const who = (profile?.full_name as string | null) ?? "Staff";

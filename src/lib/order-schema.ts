@@ -55,3 +55,9 @@ export const incompleteOrderSchema = z.object({
 });
 
 export type IncompleteOrderInput = z.infer<typeof incompleteOrderSchema>;
+
+/** Short invoice link lookup — order number + last 4 digits of the phone. */
+export const shortLookupSchema = z.object({
+  orderNumber: z.string().trim().min(3).max(40),
+  p: z.string().trim().min(4).max(6),
+});

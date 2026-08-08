@@ -116,9 +116,9 @@ function OrderReceipt() {
         <div className="mt-6 flex flex-wrap justify-center gap-3">
           {data ? (
             <Link
-              to="/invoice/$orderNumber"
+              to="/inv/$orderNumber"
               params={{ orderNumber }}
-              search={{ phone }}
+              search={{ p: phone.replace(/\D/g, "").slice(-4) }}
               className="inline-block rounded-sm bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
             >
               {tr(lang, "downloadInvoice")}
