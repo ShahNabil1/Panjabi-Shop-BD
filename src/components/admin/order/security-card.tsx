@@ -149,15 +149,30 @@ function CopyTextButton({
 const bdt = (n: number) =>
   `৳${Number(n).toLocaleString("en-US", { maximumFractionDigits: 2 })}`;
 
-function CostOfDelivery({ orderId, partner }: { orderId: string; partner: "pathao" | "carrybee" }) {
+function CostOfDelivery({
+  orderId,
+  partner,
+}: {
+  orderId: string;
+  partner: "pathao" | "carrybee" | "steadfast";
+}) {
   const cost = useQuery({
     queryKey: ["admin", "courier-cost", orderId],
     queryFn: () => adminPathaoDeliveryCost({ data: { orderId } }),
   });
 
   const shell =
-    partner === "pathao" ? "border-[#E32227]/25" : "border-[#F5C518]/50";
-  const negative = partner === "pathao" ? "text-[#E32227]" : "text-amber-700";
+    partner === "pathao"
+      ? "border-[#E32227]/25"
+      : partner === "steadfast"
+        ? "border-[#37A184]/40"
+        : "border-[#F5C518]/50";
+  const negative =
+    partner === "pathao"
+      ? "text-[#E32227]"
+      : partner === "steadfast"
+        ? "text-[#37A184]"
+        : "text-amber-700";
 
   if (cost.isLoading) {
     return (
@@ -166,7 +181,17 @@ function CostOfDelivery({ orderId, partner }: { orderId: string; partner: "patha
       </div>
     );
   }
-  if (!cost.data?.ok) return null;
+  if (!cost.data?.ok) {
+    // Steadfast has no cost API: tell the admin where to add the rate card.
+    if (partner === "steadfast" && cost.data?.message) {
+      return (
+        <div className={cn("rounded-lg border bg-white px-3 py-2.5 text-xs text-muted-foreground", shell)}>
+          {cost.data.message}
+        </div>
+      );
+    }
+    return null;
+  }
 
   return (
     <div className={cn("rounded-lg border bg-white px-3 py-3", shell)}>
@@ -691,8 +716,11 @@ export function FulfillmentCard({
                 </div>
               ) : null}
 
-              {isPathao || isCarrybee ? (
-                <CostOfDelivery orderId={orderId} partner={isPathao ? "pathao" : "carrybee"} />
+              {isPathao || isCarrybee || isSteadfast ? (
+                <CostOfDelivery
+                  orderId={orderId}
+                  partner={isPathao ? "pathao" : isCarrybee ? "carrybee" : "steadfast"}
+                />
               ) : null}
 
 
