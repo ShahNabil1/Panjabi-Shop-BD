@@ -118,6 +118,11 @@ function LandingPage() {
   const [comboSelected, setComboSelected] = useState<Record<string, string>>(() =>
     Object.fromEntries(comboItems.flatMap((item) => item.variants[0] ? [[item.id, item.variants[0].id]] : [])),
   );
+  const lightbox = useLightbox();
+  const galleryImages = images.map((img) => ({
+    src: img.url,
+    alt: pick(lang, img.alt_bn, img.alt_en) || pick(lang, product.nameBn, product.nameEn),
+  }));
 
   const activeVariant = variants.find((v) => v.id === variantId) ?? null;
   const unitPrice = product.price + Number(activeVariant?.price_delta ?? 0);
