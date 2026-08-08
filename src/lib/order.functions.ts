@@ -31,6 +31,7 @@ export type OrderSummary = {
   courierProvider?: string | null;
   courierConsignmentId?: string | null;
   courierTrackingCode?: string | null;
+  couponCode?: string | null;
   items: Array<{
     name: string;
     slug: string | null;

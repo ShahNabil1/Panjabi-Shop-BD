@@ -20,6 +20,7 @@ export type ReceiptRaw = {
   courier_provider?: string | null;
   courier_consignment_id?: string | null;
   courier_tracking_code?: string | null;
+  coupon_code?: string | null;
   items: Array<{
     product_name: string;
     product_slug: string | null;
@@ -57,6 +58,7 @@ export function mapReceipt(order: ReceiptRaw) {
     subtotal: Number(order.subtotal),
     deliveryCharge: Number(order.delivery_charge),
     discount: Number(order.discount),
+    couponCode: order.coupon_code ?? null,
     total: Number(order.total),
     courierProvider: order.courier_provider ?? null,
     courierConsignmentId: order.courier_consignment_id ?? null,

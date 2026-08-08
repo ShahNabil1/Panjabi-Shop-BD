@@ -299,6 +299,7 @@ function AdminOrderDetail() {
     courier_sent_at?: string | null;
     auto_sms_status: string;
     source: string;
+    coupon?: { code: string; name: string; amount: number } | null;
     order_items: OrderItemRow[];
     order_activity?: Array<{
       id: string;
@@ -672,6 +673,7 @@ function AdminOrderDetail() {
         locked={dispatchLocked}
         deliveryCharge={Number(order.delivery_charge ?? 0)}
         discount={Number(order.discount ?? 0)}
+        couponCode={order.coupon?.code ?? null}
         advanceAmount={Number(order.advance_amount ?? 0)}
         advanceMethod={order.advance_method ?? null}
         initialItems={(order.order_items ?? []).map((i) => ({
