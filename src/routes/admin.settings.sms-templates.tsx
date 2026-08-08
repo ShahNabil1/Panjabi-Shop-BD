@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useConfirm } from "@/components/ui/confirm-dialog";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -28,6 +29,7 @@ const AUTO_KEYS = new Set(["order_confirm"]);
 
 function SmsTemplatesAdmin() {
   const qc = useQueryClient();
+  const confirmDialog = useConfirm();
   const { data, isLoading } = useQuery({
     queryKey: ["admin", "sms-templates"],
     queryFn: () => adminListSmsTemplates(),
@@ -124,7 +126,11 @@ function SmsTemplatesAdmin() {
 
   async function remove() {
     if (!selected || selected.is_system) return;
-    if (!window.confirm(`Delete "${selected.name}"?`)) return;
+    const ok = await confirmDialog({
+      title: `Delete "${selected.name}"?`,
+      description: "This SMS template will be permanently removed.",
+    });
+    if (!ok) return;
     try {
       await adminDeleteSmsTemplate({ data: { id: selected.id } });
       toast.success("Template deleted");

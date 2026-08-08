@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useConfirm } from "@/components/ui/confirm-dialog";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -75,6 +76,7 @@ function emptyPromotion(): PromotionInput {
 
 function PromotionsPage() {
   const qc = useQueryClient();
+  const confirmDialog = useConfirm();
   const [draft, setDraft] = useState<PromotionInput>(emptyPromotion());
   const [productQuery, setProductQuery] = useState("");
 
@@ -333,7 +335,10 @@ function PromotionsPage() {
                     size="sm"
                     variant="ghost"
                     onClick={() => {
-                      if (confirm("Delete this promotion?")) remove.mutate(p.id);
+                      void confirmDialog({
+                        title: "Delete this promotion?",
+                        description: "The promotion and its offer page will no longer be visible.",
+                      }).then((ok) => ok && remove.mutate(p.id));
                     }}
                   >
                     <Trash2 className="h-4 w-4" />
