@@ -7,6 +7,7 @@ import logoMark from "@/assets/upoharkabbo-logo.png";
 import { getOrderSummaryShort } from "@/lib/order.functions";
 import { courierLabel, courierTrackingUrl, orderStatusLabel } from "@/lib/order-receipt";
 import { formatPrice } from "@/lib/i18n";
+import { pageTitle } from "@/lib/site";
 
 function searchSchema(input: Record<string, unknown>): {
   p: string | number;
