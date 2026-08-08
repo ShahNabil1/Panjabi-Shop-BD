@@ -100,24 +100,34 @@ export function SiteFooter() {
         </div>
 
         <div className="min-w-0">
-          <h2 className="text-sm font-semibold">{tr(lang, "contact")}</h2>
+          <h2 className="text-base font-bold text-primary">{tr(lang, "contact")}</h2>
           <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
             {contact.phone ? (
-              <li className="truncate">
+              <li className="flex items-center gap-2 truncate">
+                <Phone className="h-4 w-4 shrink-0 text-primary" />
                 <a href={`tel:${contact.phone}`} className="hover:text-primary">
                   {contact.phone}
                 </a>
               </li>
             ) : null}
             {contact.email ? (
-              <li className="truncate">
+              <li className="flex items-center gap-2 truncate">
+                <Mail className="h-4 w-4 shrink-0 text-primary" />
                 <a href={`mailto:${contact.email}`} className="font-en hover:text-primary">
                   {contact.email}
                 </a>
               </li>
             ) : null}
-            {contact.address ? <li>{contact.address}</li> : null}
-            <li className="pt-1 font-medium text-foreground">{tr(lang, "cod")}</li>
+            {contact.address ? (
+              <li className="flex items-start gap-2">
+                <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                <span>{contact.address}</span>
+              </li>
+            ) : null}
+            <li className="flex items-center gap-2 pt-1 font-medium text-foreground">
+              <span className="inline-block h-2 w-2 rounded-full bg-primary" />
+              {tr(lang, "cod")}
+            </li>
           </ul>
         </div>
       </div>
