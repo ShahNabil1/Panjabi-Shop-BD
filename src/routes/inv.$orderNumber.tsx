@@ -214,9 +214,11 @@ function InvoicePage() {
                         <ul className="mt-1 space-y-0.5 text-sm font-semibold text-foreground/70">
                           {item.comboSelections.map((selection, selectionIndex) => (
                             <li key={selectionIndex}>
-                              {selection.itemNameEn} — {selection.variantLabelEn}
+                              {selection.itemNameEn}
+                              {selection.variantLabelEn ? ` — ${selection.variantLabelEn}` : ""}
                               {selection.quantity > 1 ? ` × ${selection.quantity}` : ""}
                             </li>
+
                           ))}
                         </ul>
                       ) : null}
