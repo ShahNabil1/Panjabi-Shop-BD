@@ -390,8 +390,8 @@ function ProductPage() {
               <p className="text-sm font-semibold">{tr(lang, "cod")}</p>
               <p className="mt-1 text-sm text-muted-foreground">
                 {lang === "bn"
-                  ? "পণ্য হাতে পেয়ে টাকা পরিশোধ করুন। ঢাকার ভেতরে ২৪ ঘণ্টা, বাইরে ৪৮–৭২ ঘণ্টা।"
-                  : "Pay when the parcel reaches you. 24 hours inside Dhaka, 48–72 hours elsewhere."}
+                  ? "পণ্য হাতে পেয়ে টাকা পরিশোধ করুন। ঢাকার ভেতরে ১-২ দিন, বাইরে ২-৩ দিন।"
+                  : "Pay when the parcel reaches you. 1-2 days inside Dhaka, 2-3 days elsewhere."}
               </p>
             </div>
           </div>

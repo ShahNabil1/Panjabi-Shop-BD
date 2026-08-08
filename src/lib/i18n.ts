@@ -61,7 +61,7 @@ export const t = {
   sku: { bn: "এসকেইউ", en: "SKU" },
   brand: { bn: "ব্র্যান্ড", en: "Brand" },
   reviews: { bn: "রিভিউ", en: "reviews" },
-  cod: { bn: "ক্যাশ অন ডেলিভারি", en: "Cash on delivery" },
+  cod: { bn: "সম্পূর্ণ ক্যাশ অন ডেলিভারি ", en: "Full Cash on delivery" },
   allCategories: { bn: "সব ক্যাটাগরি", en: "All categories" },
   notFoundTitle: { bn: "পেইজটি পাওয়া যায়নি", en: "We couldn't find that page" },
   notFoundBody: {
