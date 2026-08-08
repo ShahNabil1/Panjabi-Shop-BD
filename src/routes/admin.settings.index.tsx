@@ -8,6 +8,7 @@ import { adminListSettings, adminSaveSetting } from "@/lib/admin.functions";
 import { AdminHeading, NumberField, Panel, TextField } from "@/components/admin/kit";
 import { ImageField } from "@/components/admin/image-upload";
 import { MAX_HERO_SLIDES, readHeroSlides, type HeroSlide } from "@/components/site/hero-slider";
+import { readPromoPopup, type PromoPopup } from "@/components/site/promo-popup";
 import { Button } from "@/components/ui/button";
 import { normalizeContactPhoneInput } from "@/lib/phone";
 
