@@ -171,7 +171,7 @@ function AdminLayout() {
 
       <div className="relative flex min-h-[7rem] items-center justify-center border-b border-white/10 px-4 py-6">
         <Link
-          to="/"
+          to="/admin"
           title="Upoharkabbo"
           className={cn("shrink-0 transition-all duration-300", collapsed ? "block" : "hidden")}
         >
@@ -182,7 +182,7 @@ function AdminLayout() {
           />
         </Link>
         <Link
-          to="/"
+          to="/admin"
           title="Upoharkabbo"
           className={cn("shrink-0 transition-all duration-300", collapsed ? "hidden" : "block")}
         >
