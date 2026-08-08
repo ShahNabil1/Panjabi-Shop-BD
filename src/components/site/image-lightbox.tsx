@@ -153,7 +153,7 @@ export function ImageLightbox({
             setIsZoomed(false);
           }}
           aria-label="Previous image"
-          className="absolute left-2 top-1/2 z-10 flex size-11 -translate-y-1/2 items-center justify-center rounded-full bg-card/90 text-foreground shadow-lg backdrop-blur transition-all hover:bg-primary hover:text-primary-foreground active:scale-95 disabled:opacity-30 sm:left-5"
+          className="absolute left-2 top-1/2 z-10 flex size-11 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-card/90 text-foreground shadow-lg backdrop-blur transition-all hover:bg-primary hover:text-primary-foreground active:scale-95 disabled:opacity-30 sm:left-5"
         >
           <ChevronLeft className="size-5" />
         </button>
