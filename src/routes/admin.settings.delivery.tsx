@@ -535,7 +535,7 @@ function PartnerCard({
         <Button
           type="button"
           onClick={save}
-          disabled={saving || !result?.ok || !isDirty}
+          disabled={saving || !result?.ok || !isDirty || !!noteError}
           className="bg-emerald-600 text-white hover:bg-emerald-700 active:scale-95 disabled:opacity-60"
         >
           {saving ? (
