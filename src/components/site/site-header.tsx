@@ -241,7 +241,7 @@ export function SiteHeader() {
       </div>
 
       {isLanding ? null : (
-        <div className="mx-auto max-w-6xl px-4 pb-3 lg:hidden">
+        <div className={cn("mx-auto max-w-6xl px-4 pb-3 lg:hidden", isCheckout && "hidden")}>
           <SearchBox />
         </div>
       )}
