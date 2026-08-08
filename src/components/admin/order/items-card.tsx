@@ -386,7 +386,10 @@ export function ItemsCard({
                       <span className="min-w-0 flex-1">
                         <span className="block truncate">
                           <span className="font-semibold">{selection.itemNameBn}</span>
-                          <span className="text-muted-foreground"> · {selection.variantLabelBn}</span>
+                          {selection.variantLabelBn ? (
+                            <span className="text-muted-foreground"> · {selection.variantLabelBn}</span>
+                          ) : null}
+
                           {selection.quantity > 1 ? (
                             <span className="text-muted-foreground"> × {selection.quantity}</span>
                           ) : null}
