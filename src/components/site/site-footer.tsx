@@ -14,9 +14,9 @@ export function SiteFooter() {
 
   return (
     <footer className="mt-16 border-t border-border bg-footer">
-      <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 text-center sm:grid-cols-2 sm:text-left lg:grid-cols-4">
         <div className="min-w-0">
-          <div className="flex items-center">
+          <div className="flex items-center justify-center sm:justify-start">
             <img
               src={logoMark}
               alt={brand}
@@ -32,7 +32,7 @@ export function SiteFooter() {
             <span className="inline-block h-2 w-2 rounded-full bg-primary animate-pulse" />
             Follow us on
           </p>
-          <div className="mt-3 flex flex-wrap items-center gap-3">
+          <div className="mt-3 flex flex-wrap items-center justify-center gap-3 sm:justify-start">
             {SOCIAL_LINKS.filter(({ key }) => key !== "phone").map(({ key, href, label, icon: Icon, colorClass }) => (
               <a
                 key={key}
@@ -97,7 +97,7 @@ export function SiteFooter() {
           <h2 className="text-base font-bold text-primary">{tr(lang, "contact")}</h2>
           <ul className="mt-3 space-y-2 text-sm text-foreground/80">
             {contact.phone ? (
-              <li className="flex items-center gap-2 truncate">
+              <li className="flex items-center justify-center gap-2 truncate sm:justify-start">
                 <Phone className="h-4 w-4 shrink-0 text-primary" />
                 <a href={`tel:${contact.phone}`} className="hover:text-primary">
                   {contact.phone}
@@ -105,7 +105,7 @@ export function SiteFooter() {
               </li>
             ) : null}
             {contact.email ? (
-              <li className="flex items-center gap-2 truncate">
+              <li className="flex items-center justify-center gap-2 truncate sm:justify-start">
                 <Mail className="h-4 w-4 shrink-0 text-primary" />
                 <a href={`mailto:${contact.email}`} className="font-en hover:text-primary">
                   {contact.email}
@@ -113,19 +113,19 @@ export function SiteFooter() {
               </li>
             ) : null}
             {contact.address ? (
-              <li className="flex items-start gap-2">
+              <li className="flex items-start justify-center gap-2 sm:justify-start">
                 <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
                 <span className="hover:text-primary">{contact.address}</span>
               </li>
             ) : null}
             <li className="pt-2">
-              <span className="flex w-full flex-row items-start justify-start gap-2 rounded-lg bg-primary px-3 py-2 text-left text-xs font-bold leading-tight text-primary-foreground shadow-sm sm:items-center sm:justify-center sm:text-center sm:text-sm">
+              <span className="flex w-full flex-row items-center justify-center gap-2 rounded-lg bg-primary px-3 py-2 text-center text-xs font-bold leading-tight text-primary-foreground shadow-sm sm:items-center sm:justify-center sm:text-center sm:text-sm">
                 <span className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary-foreground/20 text-xs">✓</span>
                 <span>সম্পূর্ণ ক্যাশ অন ডেলিভারি</span>
               </span>
             </li>
             <li className="pt-1">
-              <span className="flex w-full flex-row items-start justify-start gap-2 rounded-lg border-2 border-primary bg-primary/5 px-3 py-2 text-left text-xs font-bold leading-tight text-primary sm:items-center sm:justify-center sm:text-center sm:text-sm">
+              <span className="flex w-full flex-row items-center justify-center gap-2 rounded-lg border-2 border-primary bg-primary/5 px-3 py-2 text-center text-xs font-bold leading-tight text-primary sm:items-center sm:justify-center sm:text-center sm:text-sm">
                 <span className="shrink-0 animate-pulse text-base leading-none sm:text-sm">🚚</span>
                 <span>সারা বাংলাদেশে ফ্রী ডেলিভারি</span>
               </span>
