@@ -104,6 +104,12 @@ export function ComboContents({
           </li>
         ))}
       </ul>
+      <ImageLightbox
+        images={galleryImages}
+        startIndex={lightbox.startIndex}
+        isOpen={lightbox.isOpen}
+        onClose={lightbox.close}
+      />
     </section>
   );
 }
