@@ -27,7 +27,7 @@ export const Route = createFileRoute("/p/$product")({
     }
     const p = loaderData.product;
     const image = p.ogImageUrl ?? loaderData.images[0]?.url ?? null;
-    const title = p.metaTitle || `${p.nameBn} | ${p.nameEn}`;
+    const title = p.metaTitle || pageTitle(p.nameBn);
     const description =
       p.metaDescription ||
       p.shortBn ||
