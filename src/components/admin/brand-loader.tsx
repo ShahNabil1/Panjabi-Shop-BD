@@ -59,8 +59,9 @@ export function BrandLoader({
           <div className="flex w-full flex-col items-center gap-2">
             <div className="w-48 overflow-hidden rounded-full border border-border bg-muted p-1 shadow-inner sm:w-56">
               <div
-                className="loader-progress relative h-2.5 rounded-full bg-gradient-to-r from-primary via-accent to-primary shadow-[0_0_18px_rgba(238,42,123,0.55)]"
+                className="loader-progress relative h-2.5 rounded-full bg-gradient-to-r from-primary via-accent to-primary shadow-[0_0_18px_rgba(238,42,123,0.55)] transition-[width] duration-200 ease-out"
                 style={{ width: `${progress}%` }}
+
               >
                 <span className="absolute inset-y-0 right-0 w-1 bg-white/40" />
               </div>
