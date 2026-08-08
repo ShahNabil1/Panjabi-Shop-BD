@@ -1,7 +1,7 @@
 import { Truck } from "lucide-react";
 
 import pathaoAsset from "@/assets/pathao.png.asset.json";
-import carrybeeAsset from "@/assets/carrybee.jpg.asset.json";
+import carrybeeAsset from "@/assets/carrybee-mark.png.asset.json";
 import steadfastAsset from "@/assets/steadfast.jpg.asset.json";
 import { cn } from "@/lib/utils";
 
@@ -9,7 +9,7 @@ type CourierKey = "pathao" | "carrybee" | "steadfast";
 
 const COURIERS: Record<
   CourierKey,
-  { label: string; src: string; chip: string; ring: string }
+  { label: string; src: string; chip: string; ring: string; markClass?: string; watermarkClass?: string }
 > = {
   pathao: {
     label: "Pathao",
@@ -22,6 +22,8 @@ const COURIERS: Record<
     src: carrybeeAsset.url,
     chip: "bg-[#111111] text-[#FFCC00] ring-[#FFCC00]/40",
     ring: "ring-[#FFCC00]/40 bg-[#111111]",
+    markClass: "scale-[1.25] p-0",
+    watermarkClass: "opacity-[0.10] mix-blend-normal",
   },
   steadfast: {
     label: "Steadfast",
@@ -57,7 +59,11 @@ export function CourierMark({
         className,
       )}
     >
-      <img src={c.src} alt={`${c.label} logo`} className="size-full object-contain p-0.5" />
+      <img
+        src={c.src}
+        alt={`${c.label} logo`}
+        className={cn("size-full object-contain p-0.5", c.markClass)}
+      />
     </span>
   );
 }
@@ -93,7 +99,12 @@ export function CourierBadge({
         className,
       )}
     >
-      <img src={c.src} alt="" aria-hidden className="size-4 rounded-full object-contain" />
+      <img
+        src={c.src}
+        alt=""
+        aria-hidden
+        className={cn("h-4 w-4 rounded-full object-contain", c.markClass && "w-6 rounded-none")}
+      />
       {c.label}
     </span>
   );
@@ -120,7 +131,10 @@ export function CourierWatermark({
       <img
         src={c.src}
         alt=""
-        className="w-[65%] max-w-[420px] object-contain opacity-[0.06] mix-blend-multiply"
+        className={cn(
+          "w-[65%] max-w-[420px] object-contain opacity-[0.06] mix-blend-multiply",
+          c.watermarkClass,
+        )}
       />
     </span>
   );
