@@ -114,6 +114,55 @@ export async function carrybeeAreaSuggestion(creds: CarrybeeCreds, search: strin
   );
 }
 
+/**
+ * POST /api/v2/address-details — resolves a free-text address string into
+ * CarryBee city / zone (and sometimes area) identifiers. Query needs ≥10 chars.
+ */
+export type CarrybeeResolvedAddress = {
+  cityId: number | null;
+  cityName: string | null;
+  zoneId: number | null;
+  zoneName: string | null;
+  areaId: number | null;
+  areaName: string | null;
+  raw: Record<string, unknown>;
+};
+
+export async function carrybeeAddressDetails(
+  creds: CarrybeeCreds,
+  query: string,
+): Promise<CarrybeeResolvedAddress> {
+  const body = await call(creds, "/api/v2/address-details", {
+    method: "POST",
+    body: JSON.stringify({ query }),
+  });
+  const d0 = body["data"];
+  const d = (Array.isArray(d0) ? (d0[0] ?? {}) : (d0 ?? body)) as Record<string, unknown>;
+  const n = (...keys: string[]) => {
+    for (const k of keys) {
+      const v = d[k];
+      if (v != null && v !== "" && !Number.isNaN(Number(v))) return Number(v);
+    }
+    return null;
+  };
+  const s = (...keys: string[]) => {
+    for (const k of keys) {
+      const v = d[k];
+      if (typeof v === "string" && v.trim()) return v.trim();
+    }
+    return null;
+  };
+  return {
+    cityId: n("city_id", "cityId"),
+    cityName: s("city_name", "city"),
+    zoneId: n("zone_id", "zoneId"),
+    zoneName: s("zone_name", "zone"),
+    areaId: n("area_id", "areaId"),
+    areaName: s("area_name", "area"),
+    raw: d,
+  };
+}
+
 export type CarrybeeOrderInput = {
   store_id: number;
   merchant_order_id: string;
