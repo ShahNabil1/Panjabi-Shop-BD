@@ -9,6 +9,8 @@ import { paymentFilters, type OrderBucket, type OrderStatus, type PaymentFilter 
 import { EmptyState, Panel, StatusPill, statusLabels } from "@/components/admin/kit";
 import { BrandLoader } from "@/components/admin/brand-loader";
 import { PhoneActions } from "@/components/admin/phone-actions";
+import { CopyBadge } from "@/components/admin/copy-badge";
+import { RatioBadge } from "@/components/admin/ratio-badge";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { courierCachedRatios } from "@/lib/courier.functions";
