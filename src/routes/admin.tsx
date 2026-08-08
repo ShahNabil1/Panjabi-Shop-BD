@@ -41,10 +41,18 @@ export const Route = createFileRoute("/admin")({
   head: () => ({
     meta: [
       { title: "Admin Dashboard — Upoharkabbo" },
-      { name: "description", content: "Manage products, orders and content." },
+      {
+        name: "description",
+        content:
+          "Access the Upoharkabbo admin dashboard to manage products, categories, customer orders, and site content efficiently.",
+      },
       { name: "robots", content: "noindex, nofollow" },
       { property: "og:title", content: "Admin Dashboard — Upoharkabbo" },
-      { property: "og:description", content: "Store management panel." },
+      {
+        property: "og:description",
+        content:
+          "Access the Upoharkabbo admin dashboard to manage products, categories, customer orders, and site content efficiently.",
+      },
     ],
   }),
   component: AdminLayout,
