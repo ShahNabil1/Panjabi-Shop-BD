@@ -242,26 +242,35 @@ function AdminLayout() {
           const hasActive = section.items.some(isActive);
           return (
             <div key={section.title}>
-              {!collapsed && (
-                <button
-                  type="button"
-                  onClick={() => toggleSection(section.title)}
-                  aria-expanded={open}
-                  className={cn(
-                    "flex w-full items-center justify-between gap-2 rounded-lg px-2 py-1.5 text-[11px] font-bold uppercase tracking-[0.16em] transition-colors",
-                    hasActive ? "text-slate-200" : "text-slate-400",
-                    "hover:bg-white/5 hover:text-white",
-                  )}
-                >
-                  <span className="truncate">{section.title}</span>
-                  <ChevronDown
+              <div
+                className={cn(
+                  "grid transition-[grid-template-rows,opacity] duration-[600ms] ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none",
+                  collapsed ? "grid-rows-[0fr] opacity-0" : "grid-rows-[1fr] opacity-100",
+                )}
+              >
+                <div className="overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => toggleSection(section.title)}
+                    aria-expanded={open}
+                    tabIndex={collapsed ? -1 : 0}
                     className={cn(
-                      "size-3.5 shrink-0 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
-                      open ? "rotate-0" : "-rotate-90",
+                      "flex w-full items-center justify-between gap-2 rounded-lg px-2 py-1.5 text-[11px] font-bold uppercase tracking-[0.16em] transition-colors duration-300",
+                      hasActive ? "text-slate-200" : "text-slate-400",
+                      "hover:bg-white/5 hover:text-white",
                     )}
-                  />
-                </button>
-              )}
+                  >
+                    <span className="truncate">{section.title}</span>
+                    <ChevronDown
+                      className={cn(
+                        "size-3.5 shrink-0 transition-transform duration-[600ms] ease-[cubic-bezier(0.16,1,0.3,1)]",
+                        open ? "rotate-0" : "-rotate-90",
+                      )}
+                    />
+                  </button>
+                </div>
+              </div>
+
 
               <div
                 className={cn(
