@@ -4,7 +4,8 @@ import pathaoAsset from "@/assets/pathao.png.asset.json";
 import carrybeeAsset from "@/assets/carrybee-mark.png.asset.json";
 import carrybeeLightAsset from "@/assets/carrybee-mark-onlight.png.asset.json";
 import carrybeeIconAsset from "@/assets/carrybee-icon.jpg.asset.json";
-import steadfastAsset from "@/assets/steadfast.jpg.asset.json";
+import steadfastAsset from "@/assets/steadfast-logo.svg.asset.json";
+import steadfastIconAsset from "@/assets/steadfast-icon.webp.asset.json";
 import { cn } from "@/lib/utils";
 
 type CourierKey = "pathao" | "carrybee" | "steadfast";
