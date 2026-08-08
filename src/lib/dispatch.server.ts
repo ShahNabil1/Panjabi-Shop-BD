@@ -869,37 +869,3 @@ export function pathaoFeeFromInfo(d: Record<string, unknown>): number | null {
     num("promo_discount")
   );
 }
-
-/**
- * Steadfast never returns money figures through its API (no cost endpoint, and
- * webhooks carry only a status). So its "Cost of Delivery" is computed from the
- * rate card an admin saves in Delivery Settings:
- *   inside-Dhaka fee / outside-Dhaka fee + a COD percentage of the collected cash.
- */
-export function steadfastCostBreakdown(
-  config: Record<string, unknown>,
-  order: { city?: string | null; district?: string | null; division?: string | null },
-  codAmount: number,
-): { lines: { label: string; amount: number; negative?: boolean }[]; total: number } | null {
-  const rate = (key: string) => {
-    const v = config[key];
-    return v == null || v === "" || Number.isNaN(Number(v)) ? null : Number(v);
-  };
-  const inside = rate("price_inside");
-  const outside = rate("price_outside");
-  if (inside === null && outside === null) return null;
-
-  const where = `${order.district ?? ""} ${order.city ?? ""} ${order.division ?? ""}`.toLowerCase();
-  const isDhaka = where.includes("dhaka") || where.includes("ঢাকা");
-  const deliveryFee = (isDhaka ? inside : outside) ?? inside ?? outside ?? 0;
-  const codPercent = rate("cod_percent") ?? 0;
-  const codFee = Math.round(((codAmount * codPercent) / 100) * 100) / 100;
-
-  return {
-    lines: [
-      { label: `Delivery Fee (${isDhaka ? "Inside Dhaka" : "Outside Dhaka"})`, amount: deliveryFee },
-      { label: `COD Fee (${codPercent}%)`, amount: codFee },
-    ],
-    total: deliveryFee + codFee,
-  };
-}

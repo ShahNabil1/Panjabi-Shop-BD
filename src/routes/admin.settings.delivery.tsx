@@ -172,22 +172,9 @@ function PartnerCard({
   const [noteTemplate, setNoteTemplate] = useState(row?.note_template ?? "");
   const [savedTemplate, setSavedTemplate] = useState(row?.note_template ?? "");
   const [makingDefault, setMakingDefault] = useState(false);
-  // Steadfast returns no cost data through its API, so the delivery + COD
-  // charges are entered here and used for the cost breakdown on each order.
-  const [pricing, setPricing] = useState(() => ({
-    price_inside: row?.pricing?.price_inside ?? "",
-    price_outside: row?.pricing?.price_outside ?? "",
-    cod_percent: row?.pricing?.cod_percent ?? "",
-  }));
-  const [savedPricing, setSavedPricing] = useState(() => JSON.stringify({
-    price_inside: row?.pricing?.price_inside ?? "",
-    price_outside: row?.pricing?.price_outside ?? "",
-    cod_percent: row?.pricing?.cod_percent ?? "",
-  }));
   const isDirty =
     savedSnapshot === null ||
     JSON.stringify(values) !== savedSnapshot ||
-    JSON.stringify(pricing) !== savedPricing ||
     noteTemplate !== savedTemplate;
 
   const noteMax = provider === "carrybee" ? 255 : 500;
@@ -265,25 +252,11 @@ function PartnerCard({
     setSaving(true);
     try {
       const res = await adminSaveDeliveryPartner({
-        data: {
-          provider,
-          enabled,
-          credentials: values,
-          noteTemplate: noteTemplate.trim(),
-          config:
-            provider === "steadfast"
-              ? {
-                  price_inside: Number(pricing.price_inside) || 0,
-                  price_outside: Number(pricing.price_outside) || 0,
-                  cod_percent: Number(pricing.cod_percent) || 0,
-                }
-              : {},
-        },
+        data: { provider, enabled, credentials: values, noteTemplate: noteTemplate.trim(), config: {} },
       });
       setResult({ ok: true, message: res.message });
       setSavedSnapshot(JSON.stringify(values));
       setNoteTemplate(noteTemplate.trim()); setSavedTemplate(noteTemplate.trim());
-      setSavedPricing(JSON.stringify(pricing));
       toast.success(`${providerLabels[provider]} saved`);
       onDone();
     } catch (error) {
@@ -414,35 +387,6 @@ function PartnerCard({
           </div>
         ))}
       </div>
-
-      {provider === "steadfast" ? (
-        <div className="space-y-2 rounded-xl border border-border/70 bg-muted/30 p-3">
-          <p className="text-xs font-semibold text-muted-foreground">
-            Delivery charges — Steadfast sends no cost data through its API, so these rates build the
-            &ldquo;Cost of Delivery&rdquo; breakdown on every order.
-          </p>
-          <div className="grid gap-3 sm:grid-cols-3">
-            {([
-              { key: "price_inside" as const, label: "Inside Dhaka (৳)" },
-              { key: "price_outside" as const, label: "Outside Dhaka (৳)" },
-              { key: "cod_percent" as const, label: "COD charge (%)" },
-            ]).map((f) => (
-              <div key={f.key} className="space-y-1.5">
-                <label className="text-xs font-semibold text-muted-foreground">{f.label}</label>
-                <Input
-                  inputMode="decimal"
-                  value={pricing[f.key]}
-                  placeholder="0"
-                  onChange={(e) =>
-                    setPricing((p) => ({ ...p, [f.key]: e.target.value.replace(/[^0-9.]/g, "") }))
-                  }
-                  className="rounded-xl"
-                />
-              </div>
-            ))}
-          </div>
-        </div>
-      ) : null}
 
       <div className="space-y-1.5">
         <label className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground">

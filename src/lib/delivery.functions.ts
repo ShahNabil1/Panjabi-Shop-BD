@@ -36,8 +36,6 @@ export type DeliveryPartnerRow = {
   is_default: boolean;
   /** Delivery note text applied automatically when this partner is selected. */
   note_template: string;
-  /** Manual rate card (Steadfast only — it returns no cost data via API). */
-  pricing: { price_inside: string; price_outside: string; cod_percent: string };
 };
 
 function maskCreds(provider: DeliveryProvider, raw: Record<string, unknown>) {
@@ -130,15 +128,6 @@ export const adminListDeliveryPartners = createServerFn({ method: "GET" })
         webhook_secret: row.webhook_secret ?? null,
         is_default: row.is_default ?? false,
         note_template: row.note_template ?? "",
-        pricing: (() => {
-          const cfg = (row.config ?? {}) as Record<string, unknown>;
-          const val = (k: string) => (cfg[k] == null ? "" : String(cfg[k]));
-          return {
-            price_inside: val("price_inside"),
-            price_outside: val("price_outside"),
-            cod_percent: val("cod_percent"),
-          };
-        })(),
         configured: missingFields(provider, creds as Record<string, string>).length === 0,
       };
     });
