@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import { Phone, Mail, MapPin } from "lucide-react";
 
 import { useLang } from "@/lib/language-context";
 import { tr } from "@/lib/i18n";
