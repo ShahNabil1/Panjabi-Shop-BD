@@ -228,10 +228,13 @@ function AdminLayout() {
     );
     if (!opening || !el) return;
     // Reveal the newly expanded items — otherwise the last sections stay
-    // below the scroll fold and feel unreachable.
-    globalThis.setTimeout(() => {
-      el.scrollIntoView({ behavior: "smooth", block: "end" });
-    }, 420);
+    // below the scroll fold and feel unreachable. The panel grows for ~600ms,
+    // so nudge the scroll a few times while it settles.
+    for (const delay of [200, 450, 700]) {
+      globalThis.setTimeout(() => {
+        el.scrollIntoView({ behavior: "smooth", block: "end" });
+      }, delay);
+    }
   };
 
   const sidebar = (
