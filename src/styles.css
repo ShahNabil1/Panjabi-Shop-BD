@@ -507,23 +507,12 @@
   animation: admin-fade 0.22s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-/* Page-level transition: opacity/blur only (no transform) so route switches
-   never shift layout, plus a reserved min-height so the scrollbar stays put. */
-@keyframes admin-page-in {
-  from {
-    opacity: 0;
-    filter: blur(3px);
-  }
-  to {
-    opacity: 1;
-    filter: blur(0);
-  }
-}
-
+/* Keep the route viewport mounted and dimensionally stable. Route content is
+   prefetched by the admin shell, so it can swap immediately without a blur,
+   remount animation, or synthetic loading delay. */
 .admin-page {
   min-height: calc(100vh - 53px);
-  animation: admin-page-in 0.42s cubic-bezier(0.16, 1, 0.3, 1) both;
-  will-change: opacity, filter;
+  overflow-anchor: none;
 }
 
 /* Global admin smoothness: consistent easing for interactive surfaces. */
@@ -540,8 +529,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .admin-rise,
-  .admin-fade,
-  .admin-page {
+  .admin-fade {
     animation: none;
   }
 }

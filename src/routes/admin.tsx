@@ -1,4 +1,4 @@
-import { Link, Outlet, createFileRoute, useNavigate, useRouterState } from "@tanstack/react-router";
+import { Link, Outlet, createFileRoute, useNavigate, useRouter, useRouterState } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import {
@@ -104,6 +104,7 @@ const sections: Array<{ title: string; items: NavItem[] }> = [
 function AdminLayout() {
   const { session, loading, signOut } = useAuth();
   const navigate = useNavigate();
+  const router = useRouter();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -159,6 +160,28 @@ function AdminLayout() {
   useEffect(() => {
     if (!loading && !session) void navigate({ to: "/auth" });
   }, [loading, session, navigate]);
+
+  // Warm every admin route after the shell becomes idle. Navigation then only
+  // swaps the already-loaded route component instead of waiting for its chunk.
+  useEffect(() => {
+    if (!session) return;
+
+    const preloadRoutes = () => {
+      for (const section of sections) {
+        for (const item of section.items) {
+          void router.preloadRoute({ to: item.to as "/admin" });
+        }
+      }
+    };
+
+    if ("requestIdleCallback" in window) {
+      const idleId = window.requestIdleCallback(preloadRoutes, { timeout: 1200 });
+      return () => window.cancelIdleCallback(idleId);
+    }
+
+    const timeoutId = window.setTimeout(preloadRoutes, 250);
+    return () => window.clearTimeout(timeoutId);
+  }, [router, session]);
 
   const isAdmin = useQuery({
     queryKey: ["is-admin", session?.user.id ?? null],
@@ -450,7 +473,7 @@ function AdminLayout() {
         </div>
 
 
-        <main key={pathname} className="admin-page mx-auto w-full max-w-6xl space-y-6 px-4 py-6 lg:px-10 lg:py-10">
+        <main className="admin-page mx-auto w-full max-w-6xl space-y-6 px-4 py-6 lg:px-10 lg:py-10">
           <Outlet />
         </main>
       </div>
