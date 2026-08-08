@@ -182,6 +182,22 @@ export function OrdersBoard({
   const isPaymentView = (paymentFilters as readonly string[]).includes(status);
   const search = urlSearch.q ?? "";
   const setSearch = (q: string) => setBoardSearch({ q, page: 1 });
+  /**
+   * The input is local + debounced: typing stays instant while the URL and the
+   * network request only update once the user pauses (300ms).
+   */
+  const [searchInput, setSearchInput] = useState(search);
+  const [inputFocused, setInputFocused] = useState(false);
+  useEffect(() => {
+    if (!inputFocused) setSearchInput(search);
+  }, [search, inputFocused]);
+  useEffect(() => {
+    if (searchInput === search) return;
+    const t = setTimeout(() => setSearch(searchInput.trim()), 300);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchInput]);
+
   const page = Math.max(1, Number(urlSearch.page) || 1);
   const setPage = (next: number | ((prev: number) => number)) =>
     setBoardSearch({ page: typeof next === "function" ? next(page) : next });
