@@ -64,16 +64,18 @@ function HomePage() {
                 <Link
                   to="/c/$category"
                   params={{ category: data.categories[0].slug }}
-                  className="rounded-full bg-primary px-7 py-3 text-sm font-semibold text-primary-foreground shadow-[var(--shadow-card)] transition-opacity hover:opacity-90"
+                  className="group inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3 text-sm font-semibold text-primary-foreground shadow-[var(--shadow-card)] transition-all duration-200 hover:scale-105 hover:shadow-lg active:scale-95"
                 >
                   {tr(lang, "shopNow")}
+                  <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5" />
                 </Link>
               ) : null}
               <Link
                 to="/offers"
-                className="rounded-full border border-border bg-card px-7 py-3 text-sm font-semibold transition-colors hover:bg-secondary"
+                className="group inline-flex items-center gap-2 rounded-full border border-border bg-card px-7 py-3 text-sm font-semibold transition-all duration-200 hover:scale-105 hover:border-primary hover:bg-primary/5 hover:text-primary hover:shadow-md active:scale-95"
               >
                 {tr(lang, "offers")}
+                <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5" />
               </Link>
             </div>
           </div>
