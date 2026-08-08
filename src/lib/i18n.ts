@@ -149,6 +149,7 @@ export function tr(lang: Lang, key: keyof Dict) {
 }
 
 const BADGE_EN: Record<string, string> = {
+  "BEST SELLER": "BEST SELLER",
   "বেস্ট সেলার": "BEST SELLER",
   "বেস্টসেলার": "BEST SELLER",
   "নতুন": "NEW",
