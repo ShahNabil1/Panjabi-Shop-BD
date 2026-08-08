@@ -140,7 +140,7 @@ function HomePage() {
               <span className="h-1.5 w-1.5 rounded-full bg-primary" />
               Help Center
             </span>
-            <h2 className="mt-3 text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+            <h2 className="mt-3 text-2xl font-bold tracking-tight text-primary sm:text-3xl">
               Frequently asked questions
             </h2>
             <p className="mx-auto mt-2 max-w-xl text-sm text-muted-foreground">
