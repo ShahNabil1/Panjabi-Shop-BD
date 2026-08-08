@@ -214,6 +214,7 @@ export function FulfillmentCard({
   orderStatus,
   partner,
   courierStatus,
+  courierStatusRaw,
   consignmentId,
   returnConsignmentId,
   trackingCode,
@@ -230,6 +231,7 @@ export function FulfillmentCard({
   orderStatus: string;
   partner: string | null;
   courierStatus: string | null;
+  courierStatusRaw?: string | null;
   consignmentId: string | null;
   returnConsignmentId?: string | null;
   trackingCode: string | null;
@@ -449,7 +451,7 @@ export function FulfillmentCard({
 
             {partner ? <CourierBadge partner={partner} /> : null}
 
-            {courierStatus ? (
+            {courierStatus || courierStatusRaw ? (
               <span
                 className={cn(
                   "inline-flex rounded-full px-2.5 py-0.5 text-xs font-bold ring-1",
@@ -458,7 +460,13 @@ export function FulfillmentCard({
                     : courierStatusTone(normalised),
                 )}
               >
-                {courierStatusLabels[normalised] ?? courierStatus}
+                {/* Show the courier's own wording; our internal bucket is coarse
+                    and reads wrong ("Unknown" / "Pending") for Pathao events. */}
+                {courierStatusRaw
+                  ? humaniseEvent(courierStatusRaw)
+                  : normalised !== "unknown"
+                    ? (courierStatusLabels[normalised] ?? courierStatus)
+                    : humaniseEvent(courierStatus)}
               </span>
             ) : null}
           </div>
