@@ -35,6 +35,7 @@ function SettingsAdmin() {
   const [contact, setContact] = useState<Obj>({});
   const [delivery, setDelivery] = useState<Obj>({});
   const [slides, setSlides] = useState<HeroSlide[]>([]);
+  const [popup, setPopup] = useState<PromoPopup>(() => readPromoPopup(undefined));
 
   useEffect(() => {
     if (!data) return;
@@ -44,7 +45,9 @@ function SettingsAdmin() {
     setContact(find("contact"));
     setDelivery(find("delivery"));
     setSlides(readHeroSlides(find("hero") as never));
+    setPopup(readPromoPopup(find("popup") as never));
   }, [data]);
+
 
 
   const save = useMutation({
