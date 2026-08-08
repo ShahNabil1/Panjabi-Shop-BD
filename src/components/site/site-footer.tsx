@@ -124,9 +124,17 @@ export function SiteFooter() {
                 <span>{contact.address}</span>
               </li>
             ) : null}
-            <li className="flex items-center gap-2 pt-1 font-medium text-foreground">
-              <span className="inline-block h-2 w-2 rounded-full bg-primary" />
-              {tr(lang, "cod")}
+            <li className="pt-2">
+              <span className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-3 py-2 text-sm font-bold text-primary-foreground shadow-sm">
+                <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-primary-foreground/20 text-xs">✓</span>
+                সম্পূর্ণ ক্যাশ অন ডেলিভারি
+              </span>
+            </li>
+            <li className="pt-1">
+              <span className="inline-flex w-full items-center justify-center gap-2 rounded-lg border-2 border-primary bg-primary/5 px-3 py-2 text-sm font-bold text-primary">
+                <span className="animate-pulse">🚚</span>
+                সারা বাংলাদেশে ফ্রী ডেলিভারি
+              </span>
             </li>
           </ul>
         </div>
