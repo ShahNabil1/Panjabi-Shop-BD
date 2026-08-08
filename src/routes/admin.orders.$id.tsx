@@ -848,8 +848,75 @@ function InvoiceActionsDialog({
   orderNumber: string;
   phone: string;
 }) {
+  const [downloading, setDownloading] = useState(false);
   const path = `/invoice/${encodeURIComponent(orderNumber)}?phone=${encodeURIComponent(phone)}`;
   const url = typeof window === "undefined" ? path : `${window.location.origin}${path}`;
+
+  const downloadPdf = async () => {
+    if (downloading) return;
+    setDownloading(true);
+    const toastId = toast.loading("PDF তৈরি হচ্ছে…");
+    const frame = document.createElement("iframe");
+    frame.setAttribute("aria-hidden", "true");
+    frame.style.cssText =
+      "position:fixed;left:-10000px;top:0;width:900px;height:1400px;border:0;opacity:0;";
+    document.body.appendChild(frame);
+    try {
+      await new Promise<void>((resolve, reject) => {
+        frame.onload = () => resolve();
+        frame.onerror = () => reject(new Error("frame"));
+        frame.src = path;
+      });
+      const doc = frame.contentDocument;
+      if (!doc) throw new Error("no document");
+      const deadline = Date.now() + 15000;
+      let article: HTMLElement | null = null;
+      while (Date.now() < deadline) {
+        article = doc.querySelector("article");
+        if (article) break;
+        await new Promise((r) => setTimeout(r, 150));
+      }
+      if (!article) throw new Error("timeout");
+      if (doc.fonts?.ready) await doc.fonts.ready;
+      await new Promise((r) => setTimeout(r, 350));
+
+      const [{ default: html2canvas }, { jsPDF }] = await Promise.all([
+        import("html2canvas-pro"),
+        import("jspdf"),
+      ]);
+      const canvas = await html2canvas(article, {
+        scale: 2,
+        backgroundColor: "#ffffff",
+        useCORS: true,
+        windowWidth: 900,
+      });
+      const pdf = new jsPDF({ unit: "pt", format: "a4", compress: true });
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const margin = 24;
+      const imgWidth = pageWidth - margin * 2;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      const image = canvas.toDataURL("image/jpeg", 0.95);
+      let remaining = imgHeight;
+      let offset = 0;
+      while (remaining > 0) {
+        pdf.addImage(image, "JPEG", margin, margin - offset, imgWidth, imgHeight);
+        remaining -= pageHeight - margin * 2;
+        if (remaining > 0) {
+          offset += pageHeight - margin * 2;
+          pdf.addPage();
+        }
+      }
+      pdf.save(`Invoice-${orderNumber}.pdf`);
+      toast.success("PDF ডাউনলোড হয়েছে", { id: toastId });
+      onOpenChange(false);
+    } catch {
+      toast.error("PDF তৈরি করা যায়নি", { id: toastId });
+    } finally {
+      frame.remove();
+      setDownloading(false);
+    }
+  };
 
   const actions = [
     {
@@ -871,15 +938,12 @@ function InvoiceActionsDialog({
     },
     {
       key: "download",
-      label: "Download PDF",
-      hint: "সরাসরি PDF সেভ হবে",
+      label: downloading ? "Preparing PDF…" : "Download PDF",
+      hint: "সরাসরি PDF ডাউনলোড হবে",
       icon: Download,
       className:
         "border-emerald-200 bg-emerald-50 text-emerald-700 hover:border-emerald-300 hover:bg-emerald-100",
-      run: () => {
-        window.open(`${path}&print=1`, "_blank", "noopener,noreferrer");
-        onOpenChange(false);
-      },
+      run: downloadPdf,
     },
     {
       key: "visit",
@@ -901,17 +965,17 @@ function InvoiceActionsDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-base">
             <FileText className="size-4 text-indigo-500" />
-            ইনভয়েস — <span className="font-en">{orderNumber}</span>
+            <span className="font-en">Invoice — {orderNumber}</span>
           </DialogTitle>
-          <DialogDescription>কী করতে চান সেটি বেছে নিন।</DialogDescription>
         </DialogHeader>
         <div className="grid gap-2">
           {actions.map((action) => (
             <button
               key={action.key}
               type="button"
+              disabled={action.key === "download" && downloading}
               onClick={action.run}
-              className={`flex items-center gap-3 rounded-xl border px-4 py-3 text-left transition-all active:scale-[0.98] ${action.className}`}
+              className={`flex items-center gap-3 rounded-xl border px-4 py-3 text-left transition-all active:scale-[0.98] disabled:opacity-70 ${action.className}`}
             >
               <action.icon className="size-4 shrink-0" />
               <span className="flex-1">
@@ -921,9 +985,6 @@ function InvoiceActionsDialog({
             </button>
           ))}
         </div>
-        <p className="truncate rounded-lg bg-muted px-3 py-2 font-en text-[11px] text-muted-foreground">
-          {url}
-        </p>
       </DialogContent>
     </Dialog>
   );
