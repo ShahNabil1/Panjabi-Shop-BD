@@ -63,6 +63,7 @@ type OrderRow = {
   city: string | null;
   delivery_note: string | null;
   note: string | null;
+  source: string | null;
   total: number | string;
   advance_amount: number | string;
   delivery_partner: string | null;
@@ -73,7 +74,7 @@ async function loadOrder(db: Db, orderId: string) {
   const { data, error } = await db
     .from("orders")
     .select(
-      "id, order_number, customer_name, customer_phone, alt_phone, address_line, division, district, upazila, city, delivery_note, note, total, advance_amount, delivery_partner, courier_consignment_id",
+      "id, order_number, customer_name, customer_phone, alt_phone, address_line, division, district, upazila, city, delivery_note, note, source, total, advance_amount, delivery_partner, courier_consignment_id",
     )
     .eq("id", orderId)
     .maybeSingle();
@@ -85,14 +86,24 @@ async function loadOrder(db: Db, orderId: string) {
 async function loadItems(db: Db, orderId: string) {
   const { data } = await db
     .from("order_items")
-    .select("product_name, variant_label, quantity")
+    .select("product_name, variant_label, quantity, product_id")
     .eq("order_id", orderId);
   return (data ?? []) as Array<{
     product_name: string;
     variant_label: string | null;
     quantity: number;
+    product_id: string | null;
   }>;
 }
+
+/** True when any line on the order is a combo gift box (heavier parcel). */
+async function hasCombo(db: Db, items: Array<{ product_id: string | null }>) {
+  const ids = items.map((i) => i.product_id).filter((v): v is string => !!v);
+  if (!ids.length) return false;
+  const { data } = await db.from("products").select("kind").in("id", ids);
+  return (data ?? []).some((p) => (p as { kind?: string }).kind === "combo");
+}
+
 
 function fullAddress(o: OrderRow) {
   return [o.address_line, o.upazila, o.district, o.division || o.city]
