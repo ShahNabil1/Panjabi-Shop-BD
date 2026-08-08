@@ -51,6 +51,7 @@ import { Route as CCategoryIndexRouteImport } from './routes/c.$category.index'
 import { Route as CCategorySubcategoryRouteImport } from './routes/c.$category.$subcategory'
 import { Route as ApiPublicCourierProviderRouteImport } from './routes/api/public/courier.$provider'
 import { Route as ApiPublicHooksCleanupOldLogsRouteImport } from './routes/api/public/hooks/cleanup-old-logs'
+import { Route as ApiPublicHooksSteadfastPaymentsRouteImport } from './routes/api/public/hooks/steadfast-payments'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -265,6 +266,12 @@ const ApiPublicHooksCleanupOldLogsRoute =
     path: '/api/public/hooks/cleanup-old-logs',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksSteadfastPaymentsRoute =
+  ApiPublicHooksSteadfastPaymentsRouteImport.update({
+    id: '/api/public/hooks/steadfast-payments',
+    path: '/api/public/hooks/steadfast-payments',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -309,6 +316,7 @@ export interface FileRoutesByFullPath {
   '/c/$category/': typeof CCategoryIndexRoute
   '/api/public/courier/$provider': typeof ApiPublicCourierProviderRoute
   '/api/public/hooks/cleanup-old-logs': typeof ApiPublicHooksCleanupOldLogsRoute
+  '/api/public/hooks/steadfast-payments': typeof ApiPublicHooksSteadfastPaymentsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -352,6 +360,7 @@ export interface FileRoutesByTo {
   '/c/$category': typeof CCategoryIndexRoute
   '/api/public/courier/$provider': typeof ApiPublicCourierProviderRoute
   '/api/public/hooks/cleanup-old-logs': typeof ApiPublicHooksCleanupOldLogsRoute
+  '/api/public/hooks/steadfast-payments': typeof ApiPublicHooksSteadfastPaymentsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -397,6 +406,7 @@ export interface FileRoutesById {
   '/c/$category/': typeof CCategoryIndexRoute
   '/api/public/courier/$provider': typeof ApiPublicCourierProviderRoute
   '/api/public/hooks/cleanup-old-logs': typeof ApiPublicHooksCleanupOldLogsRoute
+  '/api/public/hooks/steadfast-payments': typeof ApiPublicHooksSteadfastPaymentsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -443,6 +453,7 @@ export interface FileRouteTypes {
     | '/c/$category/'
     | '/api/public/courier/$provider'
     | '/api/public/hooks/cleanup-old-logs'
+    | '/api/public/hooks/steadfast-payments'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -486,6 +497,7 @@ export interface FileRouteTypes {
     | '/c/$category'
     | '/api/public/courier/$provider'
     | '/api/public/hooks/cleanup-old-logs'
+    | '/api/public/hooks/steadfast-payments'
   id:
     | '__root__'
     | '/'
@@ -530,6 +542,7 @@ export interface FileRouteTypes {
     | '/c/$category/'
     | '/api/public/courier/$provider'
     | '/api/public/hooks/cleanup-old-logs'
+    | '/api/public/hooks/steadfast-payments'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -555,6 +568,7 @@ export interface RootRouteChildren {
   CCategoryIndexRoute: typeof CCategoryIndexRoute
   ApiPublicCourierProviderRoute: typeof ApiPublicCourierProviderRoute
   ApiPublicHooksCleanupOldLogsRoute: typeof ApiPublicHooksCleanupOldLogsRoute
+  ApiPublicHooksSteadfastPaymentsRoute: typeof ApiPublicHooksSteadfastPaymentsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -853,6 +867,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksCleanupOldLogsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/steadfast-payments': {
+      id: '/api/public/hooks/steadfast-payments'
+      path: '/api/public/hooks/steadfast-payments'
+      fullPath: '/api/public/hooks/steadfast-payments'
+      preLoaderRoute: typeof ApiPublicHooksSteadfastPaymentsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -927,17 +948,8 @@ const rootRouteChildren: RootRouteChildren = {
   CCategoryIndexRoute: CCategoryIndexRoute,
   ApiPublicCourierProviderRoute: ApiPublicCourierProviderRoute,
   ApiPublicHooksCleanupOldLogsRoute: ApiPublicHooksCleanupOldLogsRoute,
+  ApiPublicHooksSteadfastPaymentsRoute: ApiPublicHooksSteadfastPaymentsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

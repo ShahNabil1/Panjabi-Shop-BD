@@ -105,3 +105,20 @@ export async function steadfastCreateReturn(creds: SteadfastCreds, consignmentId
     body: JSON.stringify({ consignment_id: consignmentId }),
   });
 }
+
+/** 8. Get Payments — list of settled payout invoices. */
+export async function steadfastPayments(creds: SteadfastCreds, page = 1) {
+  const res = await call(creds, `/payments?page=${page}`, { method: "GET" });
+  const data = res["data"] ?? res["payments"] ?? [];
+  return Array.isArray(data) ? (data as Record<string, unknown>[]) : [];
+}
+
+/** 9. Get Single Payment with Consignments. */
+export async function steadfastPayment(creds: SteadfastCreds, paymentId: string) {
+  const res = await call(creds, `/payments/${encodeURIComponent(paymentId)}`, { method: "GET" });
+  const payment = (res["data"] ?? res["payment"] ?? res) as Record<string, unknown>;
+  const raw =
+    payment["consignments"] ?? payment["deliveries"] ?? payment["orders"] ?? res["consignments"];
+  const consignments = Array.isArray(raw) ? (raw as Record<string, unknown>[]) : [];
+  return { payment, consignments };
+}
