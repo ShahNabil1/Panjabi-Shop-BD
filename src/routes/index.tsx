@@ -40,9 +40,11 @@ function HomePage() {
   const { lang } = useLang();
   const data = Route.useLoaderData() as HomeData;
   const slides = readHeroSlides(data.settings["hero"]);
+  const popup = readPromoPopup(data.settings["popup"]);
 
   return (
     <>
+      <PromoPopup config={popup} />
       {slides.length > 0 ? (
         <HeroSlider slides={slides} />
       ) : (
