@@ -13,10 +13,14 @@ export type ReceiptRaw = {
   delivery_charge: number;
   discount: number;
   total: number;
+  courier_provider?: string | null;
+  courier_consignment_id?: string | null;
+  courier_tracking_code?: string | null;
   items: Array<{
     product_name: string;
     product_slug: string | null;
     variant_label: string | null;
+    image_url?: string | null;
     unit_price: number;
     quantity: number;
     line_total: number;
