@@ -3,7 +3,7 @@ import { useConfirm } from "@/components/ui/confirm-dialog";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
-import { FolderTree, Layers, Pencil, Trash2, X } from "lucide-react";
+import { Eye, EyeOff, FolderTree, Layers, Pencil, Trash2, X } from "lucide-react";
 
 import {
   adminDeleteCategory,
@@ -11,6 +11,7 @@ import {
   adminSaveCategory,
   adminSaveSubcategory,
   adminTaxonomy,
+  adminToggleCategoryActive,
 } from "@/lib/admin.functions";
 import type { CategoryInput, SubcategoryInput } from "@/lib/admin-schema";
 import {
@@ -25,6 +26,7 @@ import {
 import { BrandLoader } from "@/components/admin/brand-loader";
 import { ImageField } from "@/components/admin/image-upload";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import {
   Select,
   SelectContent,
@@ -104,6 +106,15 @@ function TaxonomyPage() {
     mutationFn: (id: string) => adminDeleteCategory({ data: { id } }),
     onSuccess: async () => {
       toast.success("Deleted");
+      await refresh();
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+  const toggleCat = useMutation({
+    mutationFn: ({ id, is_active }: { id: string; is_active: boolean }) =>
+      adminToggleCategoryActive({ data: { id, is_active } }),
+    onSuccess: async (_, vars) => {
+      toast.success(vars.is_active ? "Category page visible" : "Category page hidden");
       await refresh();
     },
     onError: (e: Error) => toast.error(e.message),
@@ -225,7 +236,10 @@ function TaxonomyPage() {
               {(data?.categories ?? []).map((c, i) => (
                 <li
                   key={c.id}
-                  className="admin-rise group flex items-center gap-2 px-4 py-3 text-sm transition-colors duration-300 hover:bg-primary/5"
+                  className={cn(
+                    "admin-rise group flex items-center gap-2 px-4 py-3 text-sm transition-colors duration-300 hover:bg-primary/5",
+                    !c.is_active && "bg-muted/40 text-muted-foreground",
+                  )}
                   style={{ animationDelay: `${i * 30}ms` }}
                 >
                   <div className="min-w-0 flex-1">
@@ -233,6 +247,25 @@ function TaxonomyPage() {
                     <p className="truncate text-xs text-muted-foreground">/c/{c.slug}</p>
                   </div>
                   <div className="flex items-center gap-1 opacity-70 transition-opacity duration-200 group-hover:opacity-100">
+                    <span
+                      className={cn(
+                        "rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide",
+                        c.is_active
+                          ? "bg-emerald-100 text-emerald-700"
+                          : "bg-amber-100 text-amber-700",
+                      )}
+                    >
+                      {c.is_active ? "Visible" : "Hidden"}
+                    </span>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      title={c.is_active ? "Hide page" : "Show page"}
+                      loading={toggleCat.isPending && toggleCat.variables?.id === c.id}
+                      onClick={() => toggleCat.mutate({ id: c.id, is_active: !c.is_active })}
+                    >
+                      {c.is_active ? <EyeOff className="size-3.5" /> : <Eye className="size-3.5" />}
+                    </Button>
                     <Button
                       size="sm"
                       variant="outline"

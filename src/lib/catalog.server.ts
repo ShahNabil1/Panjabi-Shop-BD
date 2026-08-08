@@ -8,9 +8,9 @@ import {
 } from "./supabase-public";
 
 const CATEGORY_SELECT =
-  "id, slug, name_bn, name_en, description_bn, description_en, image_url, meta_title, meta_description, sort_order";
+  "id, slug, name_bn, name_en, description_bn, description_en, image_url, meta_title, meta_description, sort_order, is_active";
 const SUBCATEGORY_SELECT =
-  "id, category_id, slug, name_bn, name_en, description_bn, description_en, image_url, meta_title, meta_description, sort_order";
+  "id, category_id, slug, name_bn, name_en, description_bn, description_en, image_url, meta_title, meta_description, sort_order, is_active";
 
 function cards(rows: unknown): ProductCard[] {
   return ((rows ?? []) as RawProductCard[]).map(toProductCard);
@@ -22,8 +22,8 @@ export async function fetchHome() {
   const [settingsRes, categoriesRes, subcategoriesRes, promoRes, featuredRes, faqRes] =
     await Promise.all([
       db.from("site_settings").select("key, value"),
-      db.from("categories").select(CATEGORY_SELECT).order("sort_order"),
-      db.from("subcategories").select(SUBCATEGORY_SELECT).order("sort_order"),
+      db.from("categories").select(CATEGORY_SELECT).eq("is_active", true).order("sort_order"),
+      db.from("subcategories").select(SUBCATEGORY_SELECT).eq("is_active", true).order("sort_order"),
       db
         .from("promotions")
         .select(
@@ -89,8 +89,8 @@ export async function fetchLayoutData() {
   const db = createPublicServerClient();
   const [settingsRes, categoriesRes, subcategoriesRes] = await Promise.all([
     db.from("site_settings").select("key, value"),
-    db.from("categories").select(CATEGORY_SELECT).order("sort_order"),
-    db.from("subcategories").select(SUBCATEGORY_SELECT).order("sort_order"),
+    db.from("categories").select(CATEGORY_SELECT).eq("is_active", true).order("sort_order"),
+    db.from("subcategories").select(SUBCATEGORY_SELECT).eq("is_active", true).order("sort_order"),
   ]);
 
   const settings: SettingsMap = {};
