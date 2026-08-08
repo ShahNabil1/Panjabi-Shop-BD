@@ -45,6 +45,7 @@ export const providerFields: Record<DeliveryProvider, CredentialField[]> = {
 export type CourierStatus =
   | "pending"
   | "in_review"
+  | "failed"
   | "picked"
   | "in_transit"
   | "delivered"
@@ -62,6 +63,7 @@ export type CourierStatus =
 export const courierStatusLabels: Record<CourierStatus, string> = {
   pending: "Pending",
   in_review: "In review",
+  failed: "Create failed",
   picked: "Picked up",
   in_transit: "In transit",
   delivered: "Delivered",
@@ -76,6 +78,7 @@ export const courierStatusLabels: Record<CourierStatus, string> = {
   paid_invoice: "Payment invoice",
   unknown: "Unknown",
 };
+
 
 /**
  * Order status each normalised courier status drives.
