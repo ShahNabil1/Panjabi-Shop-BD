@@ -76,7 +76,32 @@ function collectedAmount(order: unknown): number | null {
   return v === null || v === undefined ? null : Number(v);
 }
 
+/** Pathao and CarryBee settle COD money back to us; Steadfast does not report it. */
+function isPayoutCourier(order: unknown): boolean {
+  const o = order as {
+    delivery_partner?: string | null;
+    order_consignments?: Array<{ provider?: string | null }>;
+  };
+  const providers = [
+    o.delivery_partner,
+    ...(o.order_consignments ?? []).map((c) => c.provider),
+  ].filter(Boolean) as string[];
+  return providers.some((p) => p === "pathao" || p === "carrybee");
+}
+
+/** Money is only collectable once the parcel is delivered or partially delivered. */
+function isPayable(order: unknown): boolean {
+  const o = order as { status?: string | null; courier_status?: string | null };
+  return (
+    o.status === "delivered" ||
+    o.status === "partial_delivered" ||
+    o.courier_status === "delivered" ||
+    o.courier_status === "partial_delivered"
+  );
+}
+
 /** Courier payout (an `order.paid` invoice webhook) for this order, if received. */
+
 function courierPayout(order: unknown): { invoice: string | null } | null {
   const rows = (
     order as {
