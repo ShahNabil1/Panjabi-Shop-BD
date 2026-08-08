@@ -29,7 +29,12 @@ export const Route = createFileRoute("/sitemap.xml")({
         ];
 
         for (const c of data.categories) {
-          entries.push({ path: `/c/${c.slug}`, changefreq: "weekly", priority: "0.8" });
+          entries.push({
+            path: `/c/${c.slug}`,
+            changefreq: "weekly",
+            priority: "0.8",
+            lastmod: iso(c.updated_at),
+          });
         }
         for (const s of data.subcategories) {
           if (!s.categories?.slug) continue;
@@ -37,22 +42,39 @@ export const Route = createFileRoute("/sitemap.xml")({
             path: `/c/${s.categories.slug}/${s.slug}`,
             changefreq: "weekly",
             priority: "0.7",
+            lastmod: iso(s.updated_at),
           });
         }
         for (const p of data.products) {
-          entries.push({ path: `/p/${p.slug}`, changefreq: "weekly", priority: "0.9" });
+          entries.push({
+            path: `/p/${p.slug}`,
+            changefreq: "weekly",
+            priority: "0.9",
+            lastmod: iso(p.updated_at),
+          });
         }
         for (const p of data.promotions) {
-          entries.push({ path: `/offers/${p.slug}`, changefreq: "daily", priority: "0.7" });
+          entries.push({
+            path: `/offers/${p.slug}`,
+            changefreq: "daily",
+            priority: "0.7",
+            lastmod: iso(p.updated_at),
+          });
         }
         for (const l of data.landings) {
-          entries.push({ path: `/lp/${l.slug}`, changefreq: "weekly", priority: "0.6" });
+          entries.push({
+            path: `/lp/${l.slug}`,
+            changefreq: "weekly",
+            priority: "0.6",
+            lastmod: iso(l.updated_at),
+          });
         }
 
         const urls = entries.map((e) =>
           [
             "  <url>",
             `    <loc>${BASE_URL}${e.path}</loc>`,
+            e.lastmod ? `    <lastmod>${e.lastmod}</lastmod>` : null,
             e.changefreq ? `    <changefreq>${e.changefreq}</changefreq>` : null,
             e.priority ? `    <priority>${e.priority}</priority>` : null,
             "  </url>",
