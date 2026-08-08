@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { Trash2 } from "lucide-react";
 
 import { useCart } from "@/lib/cart-context";
 import { useLang } from "@/lib/language-context";
