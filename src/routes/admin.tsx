@@ -194,8 +194,11 @@ function AdminLayout() {
     );
   }
 
-  const isActive = (item: NavItem) =>
-    item.exact ? pathname === item.to : pathname.startsWith(item.to);
+  const isActive = matches;
+  const toggleSection = (title: string) =>
+    setOpenSections((prev) =>
+      prev.includes(title) ? prev.filter((t) => t !== title) : [...prev, title],
+    );
 
   const sidebar = (
     <div className="relative flex h-full flex-col">
