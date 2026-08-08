@@ -4,6 +4,7 @@ import { useCart } from "@/lib/cart-context";
 import { getDeliveryRates } from "@/lib/order.functions";
 import { CheckoutForm } from "@/components/site/checkout-form";
 import { Section } from "@/components/site/ui";
+import { SITE_URL } from "@/lib/site";
 
 export const Route = createFileRoute("/checkout")({
   loader: async () => {

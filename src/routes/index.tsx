@@ -9,6 +9,7 @@ import { ProductGrid, ProductThumb } from "@/components/site/product-card";
 import { FaqList } from "@/components/site/faq-list";
 import { HeroSlider, readHeroSlides } from "@/components/site/hero-slider";
 import { PromoPopup, readPromoPopup } from "@/components/site/promo-popup";
+import { SITE_URL } from "@/lib/site";
 
 import { Section } from "@/components/site/ui";
 

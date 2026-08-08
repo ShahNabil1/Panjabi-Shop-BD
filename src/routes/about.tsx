@@ -4,6 +4,7 @@ import { useLang } from "@/lib/language-context";
 import { tr } from "@/lib/i18n";
 import { useSiteData } from "@/components/site/site-header";
 import { Breadcrumbs, Prose, Section } from "@/components/site/ui";
+import { SITE_URL } from "@/lib/site";
 
 export const Route = createFileRoute("/about")({
   head: () => ({
