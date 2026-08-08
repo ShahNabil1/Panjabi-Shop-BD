@@ -7,7 +7,7 @@ import { pick, tr } from "@/lib/i18n";
 import { ProductGrid } from "@/components/site/product-card";
 import { NotFoundView } from "@/components/site/not-found-view";
 import { Breadcrumbs, Prose, Section } from "@/components/site/ui";
-import { absoluteUrl } from "@/lib/site";
+import { absoluteUrl, pageTitle } from "@/lib/site";
 
 export const Route = createFileRoute("/c/$category/")({
   loader: async ({ params }): Promise<CategoryPageData> => {
@@ -20,7 +20,7 @@ export const Route = createFileRoute("/c/$category/")({
       return { meta: [{ title: "পাওয়া যায়নি" }, { name: "robots", content: "noindex" }] };
     }
     const c = loaderData.category;
-    const title = c.meta_title || `${c.name_bn} | ${c.name_en}`;
+    const title = c.meta_title || pageTitle(c.name_bn);
     const description =
       c.meta_description ||
       c.description_bn ||

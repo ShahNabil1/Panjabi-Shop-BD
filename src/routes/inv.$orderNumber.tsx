@@ -7,6 +7,7 @@ import logoMark from "@/assets/upoharkabbo-logo.png";
 import { getOrderSummaryShort } from "@/lib/order.functions";
 import { courierLabel, courierTrackingUrl, orderStatusLabel } from "@/lib/order-receipt";
 import { formatPrice } from "@/lib/i18n";
+import { pageTitle } from "@/lib/site";
 
 function searchSchema(input: Record<string, unknown>): {
   p: string | number;
@@ -23,7 +24,7 @@ export const Route = createFileRoute("/inv/$orderNumber")({
   validateSearch: searchSchema,
   head: ({ params }) => ({
     meta: [
-      { title: `Invoice ${params.orderNumber} — Upoharkabbo` },
+      { title: pageTitle(`Invoice ${params.orderNumber}`, "Upoharkabbo") },
       { name: "description", content: "Your Upoharkabbo order invoice — print or save as PDF." },
       { name: "robots", content: "noindex, nofollow" },
       { property: "og:title", content: "Invoice — Upoharkabbo" },

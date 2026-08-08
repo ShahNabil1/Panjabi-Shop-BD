@@ -7,6 +7,7 @@ import { pick, tr } from "@/lib/i18n";
 import { ProductGrid } from "@/components/site/product-card";
 import { NotFoundView } from "@/components/site/not-found-view";
 import { Breadcrumbs, Section } from "@/components/site/ui";
+import { pageTitle } from "@/lib/site";
 
 export const Route = createFileRoute("/offers/$promotion")({
   loader: async ({ params }): Promise<PromotionPageData> => {
@@ -19,7 +20,7 @@ export const Route = createFileRoute("/offers/$promotion")({
       return { meta: [{ title: "অফারটি পাওয়া যায়নি" }, { name: "robots", content: "noindex" }] };
     }
     const p = loaderData.promotion;
-    const title = p.metaTitle || `${p.titleBn} | ${p.titleEn}`;
+    const title = p.metaTitle || pageTitle(p.titleBn);
     const description = p.metaDescription || p.subtitleBn || `${p.titleBn} — সীমিত সময়ের অফার।`;
     const url = `/offers/${params.promotion}`;
     return {

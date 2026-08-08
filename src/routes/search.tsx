@@ -6,6 +6,7 @@ import { useLang } from "@/lib/language-context";
 import { formatNumber, tr } from "@/lib/i18n";
 import { ProductGrid } from "@/components/site/product-card";
 import { Breadcrumbs, Section } from "@/components/site/ui";
+import { pageTitle } from "@/lib/site";
 
 export const Route = createFileRoute("/search")({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -15,7 +16,7 @@ export const Route = createFileRoute("/search")({
   loader: async ({ deps }): Promise<SearchData> => searchProducts({ data: { q: deps.q } }),
   head: ({ loaderData }) => {
     const term = loaderData?.query ?? "";
-    const title = term ? `“${term}” — খোঁজার ফলাফল | উপহারকাব্য` : "পণ্য খুঁজুন | উপহারকাব্য";
+    const title = term ? pageTitle(`“${term}” — খোঁজার ফলাফল`) : pageTitle("পণ্য খুঁজুন");
     return {
       meta: [
         { title },

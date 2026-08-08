@@ -18,6 +18,7 @@ import type { CartItem } from "@/lib/cart-context";
 import { cn } from "@/lib/utils";
 import logoMark from "@/assets/upoharkabbo-logo.png";
 import { ImageLightbox, useLightbox } from "@/components/site/image-lightbox";
+import { pageTitle } from "@/lib/site";
 
 async function retryNetworkRequest<T>(request: () => Promise<T>): Promise<T> {
   const delays = [150, 400];
@@ -50,7 +51,7 @@ export const Route = createFileRoute("/lp/$slug")({
     }
     const { landing, product, images } = loaderData;
     const seo = landing.seo;
-    const title = landing.metaTitle || landing.headlineBn || product.nameBn;
+    const title = landing.metaTitle || pageTitle(landing.headlineBn || product.nameBn);
     const description =
       landing.metaDescription ||
       product.shortBn ||

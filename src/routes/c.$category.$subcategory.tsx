@@ -6,7 +6,7 @@ import { useLang } from "@/lib/language-context";
 import { pick, tr } from "@/lib/i18n";
 import { ProductGrid } from "@/components/site/product-card";
 import { NotFoundView } from "@/components/site/not-found-view";
-import { absoluteUrl } from "@/lib/site";
+import { absoluteUrl, pageTitle } from "@/lib/site";
 import { Breadcrumbs, Prose, Section } from "@/components/site/ui";
 
 export const Route = createFileRoute("/c/$category/$subcategory")({
@@ -23,7 +23,7 @@ export const Route = createFileRoute("/c/$category/$subcategory")({
     }
     const s = loaderData.subcategory;
     const c = loaderData.category;
-    const title = s.meta_title || `${s.name_bn} — ${c.name_bn} | ${s.name_en}`;
+    const title = s.meta_title || pageTitle(`${s.name_bn} — ${c.name_bn}`);
     const description =
       s.meta_description ||
       s.description_bn ||

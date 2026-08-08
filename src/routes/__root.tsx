@@ -68,7 +68,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           content:
             "width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content",
         },
-        { title: brand },
+        { title: `${brand} — গিফট কম্বো ও উপহার সামগ্রী` },
         { property: "og:site_name", content: brand },
         { property: "og:type", content: "website" },
         { name: "twitter:card", content: "summary_large_image" },
