@@ -1,6 +1,8 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import type { ReactNode } from "react";
+
 import { Plus, Search, Trash2, UserCheck } from "lucide-react";
 import { toast } from "sonner";
 
@@ -33,38 +35,68 @@ const input =
   "w-full rounded-xl border border-border bg-background px-3 py-2.5 text-sm text-foreground outline-none transition-colors focus:border-primary";
 
 /**
- * Height-animated container: keeps children mounted and collapses them with a
- * grid-rows transition so switching modes never causes a layout jump.
- * `gapClass` cancels the parent's vertical rhythm while collapsed.
+ * Height-animated container: measures its content and animates an explicit
+ * pixel height (plus margin/opacity) so expanding and collapsing glides
+ * instead of jumping. Children stay mounted the whole time.
  */
 function Collapse({
   open,
   children,
-  gapClass = "-mb-5",
+  gapClass,
+  gap = 20,
 }: {
   open: boolean;
-  children: React.ReactNode;
+  children: ReactNode;
+  /** kept for call-site compatibility; "" means no extra vertical rhythm */
   gapClass?: string;
+  gap?: number;
 }) {
+  const innerRef = useRef<HTMLDivElement | null>(null);
+  const [height, setHeight] = useState(0);
+  const gapPx = gapClass === "" ? 0 : gap;
+
+  useLayoutEffect(() => {
+    const el = innerRef.current;
+    if (!el) return;
+    const measure = () => setHeight(el.offsetHeight);
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  const EASE = "cubic-bezier(0.22, 0.61, 0.24, 1)";
+
   return (
     <div
       aria-hidden={!open}
-      className={cn(
-        "grid transition-all duration-[420ms] ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none",
-        open ? "grid-rows-[1fr] opacity-100 blur-0" : cn("grid-rows-[0fr] opacity-0 blur-[2px]", gapClass),
-      )}
+      style={{
+        height: open ? height : 0,
+        marginBottom: open ? 0 : -gapPx,
+        transition: `height 760ms ${EASE}, margin-bottom 760ms ${EASE}, opacity 620ms ${EASE}, filter 620ms ${EASE}`,
+        opacity: open ? 1 : 0,
+        filter: open ? "blur(0px)" : "blur(3px)",
+        overflow: "hidden",
+        willChange: "height, opacity",
+      }}
+      className="motion-reduce:!transition-none"
     >
       <div
-        className={cn(
-          "min-h-0 overflow-hidden transition-transform duration-[420ms] ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none",
-          open ? "translate-y-0 scale-100" : "-translate-y-1 scale-[0.98]",
-        )}
+        ref={innerRef}
+        style={{
+          transform: open ? "translateY(0px) scale(1)" : "translateY(-6px) scale(0.985)",
+          transformOrigin: "top center",
+          transition: `transform 760ms ${EASE}`,
+          willChange: "transform",
+        }}
+        className={cn("motion-reduce:!transition-none", !open && "pointer-events-none")}
       >
-        {!open ? <div className="pointer-events-none">{children}</div> : children}
+        {children}
       </div>
     </div>
   );
 }
+
 
 
 type Line = {
@@ -117,7 +149,7 @@ function money(n: number) {
   return `৳ ${n.toLocaleString("en-US")}`;
 }
 
-function Label({ children }: { children: React.ReactNode }) {
+function Label({ children }: { children: ReactNode }) {
   return <span className="mb-1.5 block text-sm font-semibold text-foreground">{children}</span>;
 }
 
