@@ -29,6 +29,7 @@ const COURIERS: Record<
     src: pathaoAsset.url,
     chip: "bg-white text-[#E32227] ring-[#E32227]/30",
     ring: "ring-[#E32227]/25 bg-white",
+    watermarkClass: "opacity-[0.11] mix-blend-multiply",
   },
   carrybee: {
     label: "CarryBee",
