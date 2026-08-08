@@ -17,12 +17,16 @@ export const Route = createFileRoute("/search")({
   head: ({ loaderData }) => {
     const term = loaderData?.query ?? "";
     const title = term ? pageTitle(`“${term}” — খোঁজার ফলাফল`) : pageTitle("পণ্য খুঁজুন");
+    const description = term
+      ? `উপহারকাব্যের গিফট কম্বো ক্যাটালগে “${term}” খোঁজার ফলাফল দেখুন।`
+      : "উপহারকাব্যের গিফট কম্বো ক্যাটালগে আপনার পছন্দের উপহার খুঁজুন।";
     return {
       meta: [
         { title },
-        { name: "description", content: "উপহারকাব্যের গিফট কম্বো ক্যাটালগে নাম, ব্র্যান্ড বা এসকেইউ দিয়ে খুঁজুন।" },
+        { name: "description", content: description },
         { name: "robots", content: "noindex, follow" },
         { property: "og:title", content: title },
+        { property: "og:description", content: description },
         { property: "og:url", content: "/search" },
       ],
       links: [{ rel: "canonical", href: "/search" }],
