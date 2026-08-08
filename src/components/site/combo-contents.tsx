@@ -1,6 +1,7 @@
 import type { ComboContentItem } from "@/lib/types";
 import { useLang } from "@/lib/language-context";
 import { formatNumber, pick } from "@/lib/i18n";
+import { ImageLightbox, useLightbox } from "@/components/site/image-lightbox";
 
 export function ComboContents({
   items,
@@ -12,6 +13,11 @@ export function ComboContents({
   onSelect?: (itemId: string, variantId: string) => void;
 }) {
   const { lang } = useLang();
+  const lightbox = useLightbox();
+  const galleryImages = items.map((item) => ({
+    src: item.image,
+    alt: pick(lang, item.nameBn, item.nameEn),
+  })).filter((img) => img.src);
   if (items.length === 0) return null;
 
   return (
