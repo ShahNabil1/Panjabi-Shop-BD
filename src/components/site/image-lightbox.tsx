@@ -1,3 +1,4 @@
+import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
@@ -110,91 +111,88 @@ export function ImageLightbox({
       onClick={handleBackdropClick}
       onTouchStart={onTouchStart}
       onTouchEnd={onTouchEnd}
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-background/95 backdrop-blur-sm"
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-foreground/70 p-4 backdrop-blur-md"
       role="dialog"
       aria-modal="true"
       aria-label="Image preview"
     >
-      <button
-        type="button"
-        onClick={onClose}
-        aria-label="Close preview"
-        className="absolute right-3 top-3 z-10 flex size-10 items-center justify-center rounded-full bg-card text-foreground shadow-md transition-colors hover:bg-muted"
-      >
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M18 6 6 18" />
-          <path d="m6 6 12 12" />
-        </svg>
-      </button>
-
       {images.length > 1 ? (
-        <div className="absolute left-3 top-1/2 z-10 -translate-y-1/2">
-          <button
-            type="button"
-            disabled={!canPrev}
-            onClick={(e) => {
-              e.stopPropagation();
-              setIndex((i) => Math.max(i - 1, 0));
-              setScale(1);
-              setIsZoomed(false);
-            }}
-            aria-label="Previous image"
-            className="flex size-10 items-center justify-center rounded-full bg-card text-foreground shadow-md transition-colors hover:bg-muted disabled:opacity-40"
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="m15 18-6-6 6-6" />
-            </svg>
-          </button>
-        </div>
+        <button
+          type="button"
+          disabled={!canPrev}
+          onClick={(e) => {
+            e.stopPropagation();
+            setIndex((i) => Math.max(i - 1, 0));
+            setScale(1);
+            setIsZoomed(false);
+          }}
+          aria-label="Previous image"
+          className="absolute left-2 top-1/2 z-10 flex size-11 -translate-y-1/2 items-center justify-center rounded-full bg-card/90 text-foreground shadow-lg backdrop-blur transition-all hover:bg-primary hover:text-primary-foreground active:scale-95 disabled:opacity-30 sm:left-5"
+        >
+          <ChevronLeft className="size-5" />
+        </button>
       ) : null}
 
       {images.length > 1 ? (
-        <div className="absolute right-3 top-1/2 z-10 -translate-y-1/2">
-          <button
-            type="button"
-            disabled={!canNext}
-            onClick={(e) => {
-              e.stopPropagation();
-              setIndex((i) => Math.min(i + 1, images.length - 1));
-              setScale(1);
-              setIsZoomed(false);
-            }}
-            aria-label="Next image"
-            className="flex size-10 items-center justify-center rounded-full bg-card text-foreground shadow-md transition-colors hover:bg-muted disabled:opacity-40"
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="m9 18 6-6-6-6" />
-            </svg>
-          </button>
-        </div>
+        <button
+          type="button"
+          disabled={!canNext}
+          onClick={(e) => {
+            e.stopPropagation();
+            setIndex((i) => Math.min(i + 1, images.length - 1));
+            setScale(1);
+            setIsZoomed(false);
+          }}
+          aria-label="Next image"
+          className="absolute right-2 top-1/2 z-10 flex size-11 -translate-y-1/2 items-center justify-center rounded-full bg-card/90 text-foreground shadow-lg backdrop-blur transition-all hover:bg-primary hover:text-primary-foreground active:scale-95 disabled:opacity-30 sm:right-5"
+        >
+          <ChevronRight className="size-5" />
+        </button>
       ) : null}
 
       <div
-        className="relative max-h-[85vh] w-full max-w-5xl px-12"
+        className="relative inline-flex max-h-[86vh] max-w-[92vw] flex-col items-center"
         onClick={(e) => e.stopPropagation()}
       >
         {current ? (
-          <img
-            key={current.src}
-            src={current.src}
-            alt={current.alt || ""}
-            onClick={toggleZoom}
-            className={cn(
-              "mx-auto max-h-[85vh] w-auto max-w-full rounded-lg object-contain shadow-2xl transition-transform duration-300",
-              isZoomed ? "cursor-zoom-out" : "cursor-zoom-in",
-            )}
-            style={{ transform: `scale(${scale})` }}
-          />
+          <div className="relative overflow-hidden rounded-xl bg-card shadow-2xl ring-1 ring-border/40">
+            <img
+              key={current.src}
+              src={current.src}
+              alt={current.alt || ""}
+              onClick={toggleZoom}
+              className={cn(
+                "block max-h-[80vh] w-auto max-w-[92vw] object-contain transition-transform duration-300",
+                isZoomed ? "cursor-zoom-out" : "cursor-zoom-in",
+              )}
+              style={{ transform: `scale(${scale})` }}
+            />
+
+            <button
+              type="button"
+              onClick={onClose}
+              aria-label="Close preview"
+              className="absolute right-2 top-2 z-10 flex size-9 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg ring-2 ring-background/70 transition-all hover:bg-primary/90 active:scale-95"
+            >
+              <X className="size-5" strokeWidth={2.5} />
+            </button>
+
+            {current.alt ? (
+              <p className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-foreground/70 to-transparent px-4 pb-3 pt-8 text-center text-sm font-semibold text-background">
+                {current.alt}
+              </p>
+            ) : null}
+          </div>
+        ) : null}
+
+        {images.length > 1 ? (
+          <div className="mt-3 flex items-center gap-1.5 rounded-full bg-card/95 px-3.5 py-1.5 text-sm font-semibold shadow-lg backdrop-blur">
+            <span className="font-en text-primary">{index + 1}</span>
+            <span className="text-muted-foreground">/</span>
+            <span className="font-en text-muted-foreground">{images.length}</span>
+          </div>
         ) : null}
       </div>
-
-      {images.length > 1 ? (
-        <div className="absolute bottom-4 left-1/2 z-10 flex -translate-x-1/2 items-center gap-2 rounded-full bg-card px-3 py-1.5 text-sm font-medium shadow-md">
-          <span>{index + 1}</span>
-          <span className="text-muted-foreground">/</span>
-          <span className="text-muted-foreground">{images.length}</span>
-        </div>
-      ) : null}
     </div>,
     document.body,
   );
