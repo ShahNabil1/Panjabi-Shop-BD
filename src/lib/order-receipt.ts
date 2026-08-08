@@ -13,10 +13,14 @@ export type ReceiptRaw = {
   delivery_charge: number;
   discount: number;
   total: number;
+  courier_provider?: string | null;
+  courier_consignment_id?: string | null;
+  courier_tracking_code?: string | null;
   items: Array<{
     product_name: string;
     product_slug: string | null;
     variant_label: string | null;
+    image_url?: string | null;
     unit_price: number;
     quantity: number;
     line_total: number;
@@ -46,10 +50,14 @@ export function mapReceipt(order: ReceiptRaw) {
     deliveryCharge: Number(order.delivery_charge),
     discount: Number(order.discount),
     total: Number(order.total),
+    courierProvider: order.courier_provider ?? null,
+    courierConsignmentId: order.courier_consignment_id ?? null,
+    courierTrackingCode: order.courier_tracking_code ?? null,
     items: (order.items ?? []).map((i) => ({
       name: i.product_name,
       slug: i.product_slug,
       variantLabel: i.variant_label,
+      imageUrl: i.image_url ?? null,
       unitPrice: Number(i.unit_price),
       quantity: i.quantity,
       lineTotal: Number(i.line_total),
@@ -101,4 +109,31 @@ export function orderStatusLabel(status: string | null | undefined) {
 export function phoneLast4(phone: string | null | undefined) {
   const digits = String(phone ?? "").replace(/\D/g, "");
   return digits.slice(-4);
+}
+
+/** Public parcel tracking link for the courier that carries the order. */
+export function courierTrackingUrl(
+  provider: string | null | undefined,
+  consignmentId: string | null | undefined,
+  trackingCode: string | null | undefined,
+  phone?: string | null,
+) {
+  const key = String(provider ?? "").toLowerCase();
+  const code = (trackingCode || consignmentId || "").trim();
+  if (!key || !code) return null;
+  if (key === "steadfast") return `https://steadfast.com.bd/t/${encodeURIComponent(code)}`;
+  if (key === "pathao") {
+    const digits = String(phone ?? "").replace(/\D/g, "");
+    return `https://merchant.pathao.com/tracking?consignment_id=${encodeURIComponent(code)}&phone=${encodeURIComponent(digits)}`;
+  }
+  if (key === "carrybee") return `https://carrybee.com/tracking?consignment_id=${encodeURIComponent(code)}`;
+  return null;
+}
+
+export function courierLabel(provider: string | null | undefined) {
+  const key = String(provider ?? "").toLowerCase();
+  if (key === "steadfast") return "Steadfast";
+  if (key === "pathao") return "Pathao";
+  if (key === "carrybee") return "CarryBee";
+  return key ? key.replace(/\b\w/g, (c) => c.toUpperCase()) : "Courier";
 }

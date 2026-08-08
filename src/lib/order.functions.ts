@@ -24,10 +24,14 @@ export type OrderSummary = {
   deliveryCharge: number;
   discount: number;
   total: number;
+  courierProvider?: string | null;
+  courierConsignmentId?: string | null;
+  courierTrackingCode?: string | null;
   items: Array<{
     name: string;
     slug: string | null;
     variantLabel: string | null;
+    imageUrl?: string | null;
     unitPrice: number;
     quantity: number;
     lineTotal: number;
