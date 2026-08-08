@@ -7,7 +7,7 @@ import { pick, tr } from "@/lib/i18n";
 import { ProductGrid } from "@/components/site/product-card";
 import { NotFoundView } from "@/components/site/not-found-view";
 import { Breadcrumbs, Prose, Section } from "@/components/site/ui";
-import { absoluteUrl } from "@/lib/site";
+import { absoluteUrl, pageTitle } from "@/lib/site";
 
 export const Route = createFileRoute("/c/$category/")({
   loader: async ({ params }): Promise<CategoryPageData> => {
