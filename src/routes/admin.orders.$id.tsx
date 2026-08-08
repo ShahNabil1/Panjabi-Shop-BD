@@ -599,7 +599,13 @@ function AdminOrderDetail() {
       {/* Fraud checker directly under the order title */}
       <CourierReport phone={order.customer_phone} />
 
-      <CustomerCard order={order} locked={dispatchLocked} />
+      <CustomerCard
+        order={order}
+        locked={dispatchLocked}
+        courierOptions={activePartners.map((p) => providerLabels[p.provider])}
+        courier={courier || order.delivery_partner || ""}
+        onCourierChange={setCourier}
+      />
 
       <DeliveryNoteCard
         orderId={order.id}
