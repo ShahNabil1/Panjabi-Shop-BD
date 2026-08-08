@@ -61,10 +61,36 @@ export function ImageLightbox({
       if (e.key === "ArrowLeft") setIndex((i) => Math.max(i - 1, 0));
     };
     document.addEventListener("keydown", onKey);
-    document.body.style.overflow = "hidden";
+
+    const html = document.documentElement;
+    const body = document.body;
+    const originalHtmlOverflow = html.style.overflow;
+    const originalBodyOverflow = body.style.overflow;
+    const originalBodyPosition = body.style.position;
+    const originalBodyTop = body.style.top;
+    const originalBodyWidth = body.style.width;
+    const scrollY = window.scrollY;
+
+    html.style.overflow = "hidden";
+    body.style.overflow = "hidden";
+    body.style.position = "fixed";
+    body.style.top = `-${scrollY}px`;
+    body.style.width = "100%";
+
+    const onTouchMove = (e: TouchEvent) => {
+      if (e.target === containerRef.current) e.preventDefault();
+    };
+    document.addEventListener("touchmove", onTouchMove, { passive: false });
+
     return () => {
       document.removeEventListener("keydown", onKey);
-      document.body.style.overflow = "";
+      document.removeEventListener("touchmove", onTouchMove);
+      html.style.overflow = originalHtmlOverflow;
+      body.style.overflow = originalBodyOverflow;
+      body.style.position = originalBodyPosition;
+      body.style.top = originalBodyTop;
+      body.style.width = originalBodyWidth;
+      window.scrollTo(0, scrollY);
     };
   }, [isOpen, images.length, onClose]);
 
