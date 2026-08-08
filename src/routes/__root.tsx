@@ -168,7 +168,8 @@ function Chrome({ children, brand }: { children: ReactNode; brand: string }) {
   const bare =
     pathname.startsWith("/admin") ||
     pathname.startsWith("/auth") ||
-    pathname.startsWith("/invoice");
+    pathname.startsWith("/invoice") ||
+    pathname.startsWith("/inv/");
   const isLanding = pathname.startsWith("/lp");
 
   if (bare) {
