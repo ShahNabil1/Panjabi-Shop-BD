@@ -76,7 +76,32 @@ function collectedAmount(order: unknown): number | null {
   return v === null || v === undefined ? null : Number(v);
 }
 
+/** Pathao and CarryBee settle COD money back to us; Steadfast does not report it. */
+function isPayoutCourier(order: unknown): boolean {
+  const o = order as {
+    delivery_partner?: string | null;
+    order_consignments?: Array<{ provider?: string | null }>;
+  };
+  const providers = [
+    o.delivery_partner,
+    ...(o.order_consignments ?? []).map((c) => c.provider),
+  ].filter(Boolean) as string[];
+  return providers.some((p) => p === "pathao" || p === "carrybee");
+}
+
+/** Money is only collectable once the parcel is delivered or partially delivered. */
+function isPayable(order: unknown): boolean {
+  const o = order as { status?: string | null; courier_status?: string | null };
+  return (
+    o.status === "delivered" ||
+    o.status === "partial_delivered" ||
+    o.courier_status === "delivered" ||
+    o.courier_status === "partial_delivered"
+  );
+}
+
 /** Courier payout (an `order.paid` invoice webhook) for this order, if received. */
+
 function courierPayout(order: unknown): { invoice: string | null } | null {
   const rows = (
     order as {
@@ -390,7 +415,9 @@ export function OrdersBoard({
                     })()}
                     {(() => {
                       const collected = collectedAmount(o);
-                      if (collected === null) return null;
+                      // Only Pathao / CarryBee report a collected amount, and it
+                      // only means anything once the parcel is (partially) delivered.
+                      if (collected === null || !isPayoutCourier(o) || !isPayable(o)) return null;
                       const partial =
                         (o as { courier_status?: string | null }).courier_status ===
                           "partial_delivered" || o.status === "partial_delivered";
@@ -415,18 +442,32 @@ export function OrdersBoard({
                     })()}
 
                     {(() => {
+                      // Every delivered / partial-delivered Pathao or CarryBee parcel
+                      // carries a payout chip: red until the courier settles, green after.
+                      if (!isPayoutCourier(o) || !isPayable(o)) return null;
                       const payout = courierPayout(o);
-                      if (!payout) return null;
+                      if (payout) {
+                        return (
+                          <span
+                            title={`Courier payout received${payout.invoice ? ` · Invoice ${payout.invoice}` : ""}`}
+                            className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-bold text-emerald-900 ring-1 ring-emerald-300"
+                          >
+                            <Banknote className="size-3" />
+                            Courier paid{payout.invoice ? ` · ${payout.invoice}` : ""}
+                          </span>
+                        );
+                      }
                       return (
                         <span
-                          title={`Courier payout received${payout.invoice ? ` · Invoice ${payout.invoice}` : ""}`}
-                          className="inline-flex items-center gap-1 rounded-full bg-green-50 px-2 py-0.5 text-xs font-bold text-green-800 ring-1 ring-green-200"
+                          title="Courier has not paid this parcel out yet"
+                          className="inline-flex items-center gap-1 rounded-full bg-rose-100 px-2 py-0.5 text-xs font-bold text-rose-900 ring-1 ring-rose-300"
                         >
                           <Banknote className="size-3" />
-                          Paid{payout.invoice ? ` · ${payout.invoice}` : ""}
+                          Courier unpaid
                         </span>
                       );
                     })()}
+
                   </div>
 
                   <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
