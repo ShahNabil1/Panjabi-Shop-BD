@@ -6,7 +6,7 @@ import { useLang } from "@/lib/language-context";
 import { pick, tr } from "@/lib/i18n";
 import { ProductGrid } from "@/components/site/product-card";
 import { NotFoundView } from "@/components/site/not-found-view";
-import { absoluteUrl } from "@/lib/site";
+import { absoluteUrl, pageTitle } from "@/lib/site";
 import { Breadcrumbs, Prose, Section } from "@/components/site/ui";
 
 export const Route = createFileRoute("/c/$category/$subcategory")({
