@@ -283,7 +283,9 @@ function AdminLayout() {
                 <div className="overflow-hidden">
                   <button
                     type="button"
-                    onClick={() => toggleSection(section.title)}
+                    onClick={(e) =>
+                      toggleSection(section.title, e.currentTarget.closest("div[data-section]"))
+                    }
                     aria-expanded={open}
                     tabIndex={collapsed ? -1 : 0}
                     className={cn(
