@@ -137,7 +137,7 @@ function LandingPagesAdmin() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="none">Select a product</SelectItem>
-                {(products.data ?? []).map((p) => (
+                {(products.data ?? []).filter((p) => p.kind !== "component").map((p) => (
                   <SelectItem key={p.id} value={p.id}>
                     {p.name_bn}
                   </SelectItem>
