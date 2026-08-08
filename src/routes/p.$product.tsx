@@ -250,8 +250,8 @@ function ProductPage() {
 
           <div className="min-w-0">
             {badge ? (
-              <span className="inline-block rounded-sm bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">
-                {badge}
+              <span className="inline-block rounded-sm bg-primary/10 px-2.5 py-1 text-xs font-semibold uppercase text-primary">
+                {product.badgeEn || badge}
               </span>
             ) : null}
             <h1 className="mt-2 text-2xl font-bold leading-snug tracking-tight sm:text-3xl">
