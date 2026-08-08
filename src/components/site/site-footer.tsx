@@ -55,17 +55,17 @@ export function SiteFooter() {
           <h2 className="text-base font-bold text-primary">Important Links</h2>
           <ul className="mt-3 space-y-2">
             <li>
-              <Link to="/about" className="text-sm text-muted-foreground hover:text-primary">
+              <Link to="/about" className="text-sm text-foreground/80 hover:text-primary">
                 {tr(lang, "about")}
               </Link>
             </li>
             <li>
-              <Link to="/faq" className="text-sm text-muted-foreground hover:text-primary">
+              <Link to="/faq" className="text-sm text-foreground/80 hover:text-primary">
                 {tr(lang, "faq")}
               </Link>
             </li>
             <li>
-              <Link to="/offers" className="text-sm text-muted-foreground hover:text-primary">
+              <Link to="/offers" className="text-sm text-foreground/80 hover:text-primary">
                 {tr(lang, "offers")}
               </Link>
             </li>
@@ -76,17 +76,17 @@ export function SiteFooter() {
           <h2 className="text-base font-bold text-primary">Legal</h2>
           <ul className="mt-3 space-y-2">
             <li>
-              <span className="cursor-default text-sm text-muted-foreground hover:text-primary">
+              <span className="cursor-default text-sm text-foreground/80 hover:text-primary">
                 Privacy Policy
               </span>
             </li>
             <li>
-              <span className="cursor-default text-sm text-muted-foreground hover:text-primary">
+              <span className="cursor-default text-sm text-foreground/80 hover:text-primary">
                 Terms & Conditions
               </span>
             </li>
             <li>
-              <span className="cursor-default text-sm text-muted-foreground hover:text-primary">
+              <span className="cursor-default text-sm text-foreground/80 hover:text-primary">
                 Return Policy
               </span>
             </li>
@@ -95,7 +95,7 @@ export function SiteFooter() {
 
         <div className="min-w-0">
           <h2 className="text-base font-bold text-primary">{tr(lang, "contact")}</h2>
-          <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
+          <ul className="mt-3 space-y-2 text-sm text-foreground/80">
             {contact.phone ? (
               <li className="flex items-center gap-2 truncate">
                 <Phone className="h-4 w-4 shrink-0 text-primary" />
