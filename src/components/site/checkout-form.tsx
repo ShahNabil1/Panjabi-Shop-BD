@@ -461,9 +461,13 @@ export function CheckoutForm({
                   {i.comboSelections.length > 0 ? (
                     <ul className="mt-2 grid gap-1 rounded-lg bg-secondary/50 px-3 py-2 text-xs">
                       {i.comboSelections.map((selection) => (
-                        <li key={`${selection.itemId}-${selection.variantId}`} className="flex gap-1">
+                        <li key={`${selection.itemId}-${selection.variantId ?? "base"}`} className="flex gap-1">
                           <span className="font-semibold">{pick(lang, selection.itemNameBn, selection.itemNameEn)}:</span>
-                          <span className="text-muted-foreground">{pick(lang, selection.variantLabelBn, selection.variantLabelEn)}</span>
+                          <span className="text-muted-foreground">
+                            {selection.variantLabelBn || selection.variantLabelEn
+                              ? pick(lang, selection.variantLabelBn ?? "", selection.variantLabelEn ?? "")
+                              : `Qty ${selection.quantity}`}
+                          </span>
                         </li>
                       ))}
                     </ul>
