@@ -70,6 +70,17 @@ export function CustomerCard({
 }) {
   const qc = useQueryClient();
   const [editing, setEditing] = useState(false);
+  const [historyOpen, setHistoryOpen] = useState(false);
+  const phoneForHistory = order.customer_phone.trim();
+  const lookup = useQuery({
+    queryKey: ["admin", "customer-lookup", phoneForHistory],
+    queryFn: () => adminLookupCustomer({ data: { phone: phoneForHistory } }),
+    enabled: /^01[3-9]\d{8}$/.test(phoneForHistory),
+    staleTime: 60 * 1000,
+  });
+  /** The current order is included in the count, so subtract it. */
+  const previousCount = Math.max(0, (lookup.data?.orderCount ?? 0) - 1);
+
   const baseline = {
     customerName: order.customer_name,
     customerPhone: order.customer_phone,
