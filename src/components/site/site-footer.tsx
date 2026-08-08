@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import { Phone, Mail, MapPin } from "lucide-react";
 
 import { useLang } from "@/lib/language-context";
 import { tr } from "@/lib/i18n";
@@ -32,7 +33,7 @@ export function SiteFooter() {
             <span className="inline-block h-2 w-2 rounded-full bg-primary animate-pulse" />
             Follow us on
           </p>
-          <div className="mt-2 flex flex-wrap items-center gap-4">
+          <div className="mt-3 flex flex-wrap items-center gap-3">
             {SOCIAL_LINKS.map(({ key, href, label, icon: Icon, colorClass }) => (
               <a
                 key={key}
@@ -41,18 +42,18 @@ export function SiteFooter() {
                 rel={href.startsWith("http") ? "noopener noreferrer" : undefined}
                 aria-label={label}
                 className={cn(
-                  "flex items-center justify-center p-1 transition-transform hover:scale-110",
+                  "flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary transition-all hover:scale-110 hover:bg-primary hover:text-primary-foreground",
                   colorClass,
                 )}
               >
-                <Icon className="h-6 w-6" />
+                <Icon className="h-5 w-5" />
               </a>
             ))}
           </div>
         </div>
 
         <div>
-          <h2 className="text-sm font-semibold">About Upoharkabbo</h2>
+          <h2 className="text-base font-bold text-primary">Important Links</h2>
           <ul className="mt-3 space-y-2">
             <li>
               <Link to="/about" className="text-sm text-muted-foreground hover:text-primary">
@@ -78,7 +79,7 @@ export function SiteFooter() {
         </div>
 
         <div>
-          <h2 className="text-sm font-semibold">Legal</h2>
+          <h2 className="text-base font-bold text-primary">Legal</h2>
           <ul className="mt-3 space-y-2">
             <li>
               <span className="cursor-default text-sm text-muted-foreground">
@@ -99,24 +100,34 @@ export function SiteFooter() {
         </div>
 
         <div className="min-w-0">
-          <h2 className="text-sm font-semibold">{tr(lang, "contact")}</h2>
+          <h2 className="text-base font-bold text-primary">{tr(lang, "contact")}</h2>
           <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
             {contact.phone ? (
-              <li className="truncate">
+              <li className="flex items-center gap-2 truncate">
+                <Phone className="h-4 w-4 shrink-0 text-primary" />
                 <a href={`tel:${contact.phone}`} className="hover:text-primary">
                   {contact.phone}
                 </a>
               </li>
             ) : null}
             {contact.email ? (
-              <li className="truncate">
+              <li className="flex items-center gap-2 truncate">
+                <Mail className="h-4 w-4 shrink-0 text-primary" />
                 <a href={`mailto:${contact.email}`} className="font-en hover:text-primary">
                   {contact.email}
                 </a>
               </li>
             ) : null}
-            {contact.address ? <li>{contact.address}</li> : null}
-            <li className="pt-1 font-medium text-foreground">{tr(lang, "cod")}</li>
+            {contact.address ? (
+              <li className="flex items-start gap-2">
+                <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                <span>{contact.address}</span>
+              </li>
+            ) : null}
+            <li className="flex items-center gap-2 pt-1 font-medium text-foreground">
+              <span className="inline-block h-2 w-2 rounded-full bg-primary" />
+              {tr(lang, "cod")}
+            </li>
           </ul>
         </div>
       </div>
