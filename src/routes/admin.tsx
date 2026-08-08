@@ -71,6 +71,7 @@ const sections: Array<{ title: string; items: NavItem[] }> = [
       { to: "/admin/orders/create", label: "Create Order", icon: PlusCircle },
       { to: "/admin/orders", label: "Web Orders", icon: ShoppingCart, exact: true },
       { to: "/admin/orders/list", label: "Order List", icon: ListOrdered },
+      { to: "/admin/orders/search", label: "Search Orders", icon: SearchIcon },
     ],
   },
   {

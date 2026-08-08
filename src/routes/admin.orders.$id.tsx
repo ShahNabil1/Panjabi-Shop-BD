@@ -71,9 +71,16 @@ function defaultScheduleValue(): string {
 export const Route = createFileRoute("/admin/orders/$id")({
   validateSearch: (
     search: Record<string, unknown>,
-  ): { takeover?: number; from?: "list"; tab?: string; q?: string; page?: number } => ({
+  ): {
+    takeover?: number;
+    from?: "list" | "search";
+    tab?: string;
+    q?: string;
+    page?: number;
+  } => ({
     ...(search["takeover"] ? { takeover: 1 as const } : {}),
     ...(search["from"] === "list" ? { from: "list" as const } : {}),
+    ...(search["from"] === "search" ? { from: "search" as const } : {}),
     ...(typeof search["tab"] === "string" && search["tab"] ? { tab: search["tab"] } : {}),
     ...(typeof search["q"] === "string" && search["q"] ? { q: search["q"] } : {}),
     ...(Number(search["page"]) > 1 ? { page: Number(search["page"]) } : {}),
@@ -110,7 +117,12 @@ function AdminOrderDetail() {
   const { id: slug } = useParams({ from: "/admin/orders/$id" });
   const { takeover, from, tab, q, page } = useSearch({ from: "/admin/orders/$id" });
   /** Return to whichever board (and tab / search / page) the user came from. */
-  const backTo = from === "list" ? "/admin/orders/list" : "/admin/orders";
+  const backTo =
+    from === "list"
+      ? "/admin/orders/list"
+      : from === "search"
+        ? "/admin/orders/search"
+        : "/admin/orders";
   const backSearch = {
     ...(tab ? { tab } : {}),
     ...(q ? { q } : {}),
