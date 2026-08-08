@@ -47,7 +47,7 @@ export function PhoneActions({
         }}
         title="Copy number"
         className={cn(
-          "inline-flex items-center gap-1.5 rounded-md bg-muted px-2 py-1 font-mono transition-colors hover:bg-muted/70 active:scale-[0.98]",
+          "inline-flex items-center gap-1.5 rounded-md bg-indigo-50 px-2 py-1 font-mono font-semibold tracking-tight text-indigo-700 ring-1 ring-indigo-200 transition-colors hover:bg-indigo-100 hover:text-indigo-900 active:scale-[0.98]",
           size === "sm" ? "text-[11px]" : "text-xs",
         )}
       >
