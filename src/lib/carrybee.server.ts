@@ -114,6 +114,55 @@ export async function carrybeeAreaSuggestion(creds: CarrybeeCreds, search: strin
   );
 }
 
+/**
+ * POST /api/v2/address-details — resolves a free-text address string into
+ * CarryBee city / zone (and sometimes area) identifiers. Query needs ≥10 chars.
+ */
+export type CarrybeeResolvedAddress = {
+  cityId: number | null;
+  cityName: string | null;
+  zoneId: number | null;
+  zoneName: string | null;
+  areaId: number | null;
+  areaName: string | null;
+  raw: Record<string, unknown>;
+};
+
+export async function carrybeeAddressDetails(
+  creds: CarrybeeCreds,
+  query: string,
+): Promise<CarrybeeResolvedAddress> {
+  const body = await call(creds, "/api/v2/address-details", {
+    method: "POST",
+    body: JSON.stringify({ query }),
+  });
+  const d0 = body["data"];
+  const d = (Array.isArray(d0) ? (d0[0] ?? {}) : (d0 ?? body)) as Record<string, unknown>;
+  const n = (...keys: string[]) => {
+    for (const k of keys) {
+      const v = d[k];
+      if (v != null && v !== "" && !Number.isNaN(Number(v))) return Number(v);
+    }
+    return null;
+  };
+  const s = (...keys: string[]) => {
+    for (const k of keys) {
+      const v = d[k];
+      if (typeof v === "string" && v.trim()) return v.trim();
+    }
+    return null;
+  };
+  return {
+    cityId: n("city_id", "cityId"),
+    cityName: s("city_name", "city"),
+    zoneId: n("zone_id", "zoneId"),
+    zoneName: s("zone_name", "zone"),
+    areaId: n("area_id", "areaId"),
+    areaName: s("area_name", "area"),
+    raw: d,
+  };
+}
+
 export type CarrybeeOrderInput = {
   store_id: number;
   merchant_order_id: string;
@@ -194,4 +243,35 @@ export function carrybeeFeeFromDetails(d: Record<string, unknown>): number | nul
   };
   if (d["delivery_fee"] == null && d["cod_fee"] == null) return null;
   return num("delivery_fee") + num("cod_fee");
+}
+
+/**
+ * POST /api/v2/orders/{consignment_id}/cancel
+ * Only possible while the parcel has not been picked up yet.
+ */
+export async function carrybeeCancelOrder(
+  creds: CarrybeeCreds,
+  consignmentId: string,
+  reason: string,
+): Promise<Record<string, unknown>> {
+  return call(creds, `/api/v2/orders/${encodeURIComponent(consignmentId)}/cancel`, {
+    method: "POST",
+    body: JSON.stringify({ cancellation_reason: reason.slice(0, 199) }),
+  });
+}
+
+/**
+ * POST /api/v2/orders/{consignment_id}/exchange — creates an exchange parcel
+ * against a previously delivered consignment. Returns an `EX…` consignment id.
+ */
+export async function carrybeeCreateExchange(
+  creds: CarrybeeCreds,
+  consignmentId: string,
+  input: Partial<CarrybeeOrderInput>,
+): Promise<CarrybeeOrderResult> {
+  const body = await call(creds, `/api/v2/orders/${encodeURIComponent(consignmentId)}/exchange`, {
+    method: "POST",
+    body: JSON.stringify(input),
+  });
+  return readOrder(body);
 }
