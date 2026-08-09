@@ -40,7 +40,7 @@ export function CategoryCard({
 
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
 
-        <div className="absolute right-3 top-3 grid size-9 place-items-center rounded-full bg-white/90 text-foreground opacity-0 shadow-sm backdrop-blur-sm transition-all duration-300 group-hover:opacity-100">
+        <div className="absolute right-3 top-3 grid size-9 place-items-center rounded-full bg-white/90 text-foreground opacity-0 shadow-sm backdrop-blur-sm transition-all duration-300 group-hover:opacity-100 group-hover:bg-primary group-hover:text-primary-foreground group-active:bg-primary group-active:text-primary-foreground active:bg-primary active:text-primary-foreground">
           <ArrowUpRight className="size-4" />
         </div>
 
