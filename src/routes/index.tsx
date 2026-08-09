@@ -1,5 +1,5 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Percent } from "lucide-react";
 
 import { getHomeData } from "@/lib/catalog.functions";
 import type { HomeData } from "@/lib/types";
