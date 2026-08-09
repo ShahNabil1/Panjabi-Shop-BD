@@ -181,6 +181,7 @@ function Chrome({ children, brand }: { children: ReactNode; brand: string }) {
   const isLanding = pathname.startsWith("/lp");
   const bareOnMobile = pathname.startsWith("/invoice") || pathname.startsWith("/inv/");
   const isCheckout = pathname === "/checkout";
+  const isProduct = pathname.startsWith("/p/");
 
   if (bare) {
     return <div className="min-h-screen">{children}</div>;
@@ -193,7 +194,20 @@ function Chrome({ children, brand }: { children: ReactNode; brand: string }) {
       </div>
       <main className="flex-1">{children}</main>
       <div className={bareOnMobile ? "hidden md:block" : ""}>
-        {isLanding ? <LandingFooter brand={brand} /> : <SiteFooter minimalOnMobile={isCheckout} />}
+        {isLanding ? (
+          <LandingFooter brand={brand} />
+        ) : isProduct ? (
+          <>
+            <div className="sm:hidden">
+              <LandingFooter brand={brand} />
+            </div>
+            <div className="hidden sm:block">
+              <SiteFooter />
+            </div>
+          </>
+        ) : (
+          <SiteFooter minimalOnMobile={isCheckout} />
+        )}
       </div>
     </div>
   );
