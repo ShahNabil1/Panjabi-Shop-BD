@@ -5,7 +5,8 @@ import { getHomeData } from "@/lib/catalog.functions";
 import type { HomeData } from "@/lib/types";
 import { useLang } from "@/lib/language-context";
 import { pick, tr } from "@/lib/i18n";
-import { ProductGrid, ProductThumb } from "@/components/site/product-card";
+import { ProductGrid } from "@/components/site/product-card";
+import { CategoryCard } from "@/components/site/category-card";
 import { FaqList } from "@/components/site/faq-list";
 import { HeroSlider, readHeroSlides } from "@/components/site/hero-slider";
 import { PromoPopup, readPromoPopup } from "@/components/site/promo-popup";
@@ -94,42 +95,20 @@ function HomePage() {
 
 
       <Section
-        title={tr(lang, "allCategories")}
+        title="OUR CATEGORY"
         action={
           <Link
             to="/categories"
             className="group inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm transition-all duration-200 hover:scale-105 hover:shadow-md active:scale-95"
           >
-            {tr(lang, "allCategories")}
+            All Categories
             <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5" />
           </Link>
         }
       >
         <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
           {featuredCategories.map((c) => (
-            <Link
-              key={c.id}
-              to="/c/$category"
-              params={{ category: c.slug }}
-              className="group overflow-hidden rounded-lg border border-border bg-card transition-shadow hover:shadow-[var(--shadow-card)]"
-            >
-              <div className="aspect-16/10 overflow-hidden bg-secondary">
-                <ProductThumb
-                  src={c.image_url}
-                  alt={pick(lang, c.name_bn, c.name_en)}
-                  label={pick(lang, c.name_bn, c.name_en)}
-                  className="transition-transform duration-500 group-hover:scale-105"
-                />
-              </div>
-              <div className="p-3.5 text-center sm:text-left">
-                <h3 className="text-[15px] font-semibold">{pick(lang, c.name_bn, c.name_en)}</h3>
-                {c.subcategories.length > 0 ? (
-                  <p className="mt-1 line-clamp-1 text-xs text-muted-foreground">
-                    {c.subcategories.map((s) => pick(lang, s.name_bn, s.name_en)).join(" · ")}
-                  </p>
-                ) : null}
-              </div>
-            </Link>
+            <CategoryCard key={c.id} category={c} lang={lang} />
           ))}
         </div>
       </Section>
@@ -154,7 +133,7 @@ function HomePage() {
         </Section>
       ))}
 
-      <Section title={tr(lang, "popular")}>
+      <Section title="POPULAR PRODUCTS">
         <ProductGrid products={data.featured.slice(0, 8)} />
       </Section>
 
