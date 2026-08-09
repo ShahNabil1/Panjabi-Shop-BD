@@ -1,5 +1,5 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Percent } from "lucide-react";
 
 import { getHomeData } from "@/lib/catalog.functions";
 import type { HomeData } from "@/lib/types";
@@ -124,13 +124,22 @@ function HomePage() {
                 ? "সব ক্যাটাগরি ঘুরে দেখুন এবং পছন্দের উপহার বক্স বেছে নিন।"
                 : "Browse all categories and pick your favorite gift box."}
             </p>
-            <Link
-              to="/categories"
-              className="mt-4 group inline-flex items-center gap-1.5 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm transition-all duration-200 hover:scale-105 hover:shadow-md active:scale-95"
-            >
-              {lang === "bn" ? "সব ক্যাটাগরি দেখুন" : "Browse All Categories"}
-              <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5" />
-            </Link>
+            <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
+              <Link
+                to="/categories"
+                className="group inline-flex items-center gap-1.5 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm transition-all duration-200 hover:scale-105 hover:shadow-md active:scale-95"
+              >
+                {lang === "bn" ? "সব ক্যাটাগরি দেখুন" : "Browse All Categories"}
+                <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5" />
+              </Link>
+              <Link
+                to="/offers"
+                className="group inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-5 py-2.5 text-sm font-semibold transition-all duration-200 hover:scale-105 hover:border-primary hover:text-primary hover:shadow-md active:scale-95"
+              >
+                <Percent className="h-4 w-4" />
+                {lang === "bn" ? "অফার দেখুন" : "View Offers"}
+              </Link>
+            </div>
           </div>
         )}
       </Section>
