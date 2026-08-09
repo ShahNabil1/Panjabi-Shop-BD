@@ -249,7 +249,9 @@ export function SiteHeader() {
 
       <div className="hidden border-t border-border/70 bg-surface lg:block">
         <div className="mx-auto flex max-w-6xl items-center gap-6 overflow-x-auto px-4 py-2">
-          {categories.map((c) => (
+          {categories
+            .filter((c) => c.show_in_header)
+            .map((c) => (
             <Link
               key={c.id}
               to="/c/$category"
