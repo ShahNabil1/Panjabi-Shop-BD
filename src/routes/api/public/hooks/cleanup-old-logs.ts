@@ -6,11 +6,13 @@ export const Route = createFileRoute("/api/public/hooks/cleanup-old-logs")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const authHeader = request.headers.get("authorization") ?? "";
-        const apiKey = request.headers.get("apikey") ?? authHeader.replace("Bearer ", "");
+        // Cron-only endpoint: authenticate with a server-only secret, never the
+        // publishable key (that one ships to every browser).
+        const cronSecret = process.env["CRON_HOOK_SECRET"];
+        const supplied = request.headers.get("x-cron-secret") ?? "";
         const expected = process.env["SUPABASE_PUBLISHABLE_KEY"]!;
 
-        if (!apiKey || apiKey !== expected) {
+        if (!cronSecret || supplied !== cronSecret) {
           return new Response(JSON.stringify({ error: "Unauthorized" }), {
             status: 401,
             headers: { "Content-Type": "application/json" },
