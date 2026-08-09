@@ -420,7 +420,7 @@ function ProductPage() {
       </Section>
 
       {related.length > 0 ? (
-        <Section title={tr(lang, "related")}>
+        <Section title="Related products">
           <ProductGrid products={related} />
         </Section>
       ) : null}
