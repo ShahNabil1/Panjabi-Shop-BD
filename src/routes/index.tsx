@@ -116,8 +116,8 @@ function HomePage() {
           <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-card/50 px-6 py-10 text-center">
             <p className="text-base font-semibold text-foreground">
               {lang === "bn"
-                ? "এখনো কোনো ফিচার্ড ক্যাটাগরি নেই"
-                : "No featured categories yet"}
+                ? "বিশেষ ক্যাটাগরির আপডেট আসার আগ পর্যন্ত সম্পূর্ণ ক্যাটালগ থেকে বেছে নিন।"
+                : "Until our featured categories are updated, explore the full catalog."}
             </p>
             <p className="mt-1 max-w-md text-sm text-muted-foreground">
               {lang === "bn"
