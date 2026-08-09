@@ -66,7 +66,7 @@ export const Route = createFileRoute("/categories")({
 
 function AllCategoriesPage() {
   const { lang } = useLang();
-  const { categories } = Route.useLoaderData();
+  const { categories } = Route.useLoaderData() as { categories: CategoryWithSubs[] };
 
   return (
     <Section>

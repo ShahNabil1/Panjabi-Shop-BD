@@ -16,6 +16,7 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as CartRouteImport } from './routes/cart'
 import { Route as CatalogDotxmlRouteImport } from './routes/catalog[.]xml'
+import { Route as CategoriesRouteImport } from './routes/categories'
 import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as FaqRouteImport } from './routes/faq'
@@ -88,6 +89,11 @@ const CartRoute = CartRouteImport.update({
 const CatalogDotxmlRoute = CatalogDotxmlRouteImport.update({
   id: '/catalog.xml',
   path: '/catalog.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CategoriesRoute = CategoriesRouteImport.update({
+  id: '/categories',
+  path: '/categories',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CheckoutRoute = CheckoutRouteImport.update({
@@ -293,6 +299,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/cart': typeof CartRoute
   '/catalog.xml': typeof CatalogDotxmlRoute
+  '/categories': typeof CategoriesRoute
   '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
   '/faq': typeof FaqRoute
@@ -339,6 +346,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/cart': typeof CartRoute
   '/catalog.xml': typeof CatalogDotxmlRoute
+  '/categories': typeof CategoriesRoute
   '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
   '/faq': typeof FaqRoute
@@ -387,6 +395,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/cart': typeof CartRoute
   '/catalog.xml': typeof CatalogDotxmlRoute
+  '/categories': typeof CategoriesRoute
   '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
   '/faq': typeof FaqRoute
@@ -436,6 +445,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/cart'
     | '/catalog.xml'
+    | '/categories'
     | '/checkout'
     | '/contact'
     | '/faq'
@@ -482,6 +492,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/cart'
     | '/catalog.xml'
+    | '/categories'
     | '/checkout'
     | '/contact'
     | '/faq'
@@ -529,6 +540,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/cart'
     | '/catalog.xml'
+    | '/categories'
     | '/checkout'
     | '/contact'
     | '/faq'
@@ -577,6 +589,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   CartRoute: typeof CartRoute
   CatalogDotxmlRoute: typeof CatalogDotxmlRoute
+  CategoriesRoute: typeof CategoriesRoute
   CheckoutRoute: typeof CheckoutRoute
   ContactRoute: typeof ContactRoute
   FaqRoute: typeof FaqRoute
@@ -645,6 +658,13 @@ declare module '@tanstack/react-router' {
       path: '/catalog.xml'
       fullPath: '/catalog.xml'
       preLoaderRoute: typeof CatalogDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/categories': {
+      id: '/categories'
+      path: '/categories'
+      fullPath: '/categories'
+      preLoaderRoute: typeof CategoriesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/checkout': {
@@ -974,6 +994,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   CartRoute: CartRoute,
   CatalogDotxmlRoute: CatalogDotxmlRoute,
+  CategoriesRoute: CategoriesRoute,
   CheckoutRoute: CheckoutRoute,
   ContactRoute: ContactRoute,
   FaqRoute: FaqRoute,
