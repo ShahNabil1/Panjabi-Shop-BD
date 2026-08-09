@@ -106,11 +106,33 @@ function HomePage() {
           </Link>
         }
       >
-        <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
-          {featuredCategories.map((c) => (
-            <CategoryCard key={c.id} category={c} lang={lang} />
-          ))}
-        </div>
+        {featuredCategories.length > 0 ? (
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+            {featuredCategories.map((c) => (
+              <CategoryCard key={c.id} category={c} lang={lang} />
+            ))}
+          </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-card/50 px-6 py-10 text-center">
+            <p className="text-base font-semibold text-foreground">
+              {lang === "bn"
+                ? "এখনো কোনো ফিচার্ড ক্যাটাগরি নেই"
+                : "No featured categories yet"}
+            </p>
+            <p className="mt-1 max-w-md text-sm text-muted-foreground">
+              {lang === "bn"
+                ? "সব ক্যাটাগরি ঘুরে দেখুন এবং পছন্দের উপহার বক্স বেছে নিন।"
+                : "Browse all categories and pick your favorite gift box."}
+            </p>
+            <Link
+              to="/categories"
+              className="mt-4 group inline-flex items-center gap-1.5 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm transition-all duration-200 hover:scale-105 hover:shadow-md active:scale-95"
+            >
+              {lang === "bn" ? "সব ক্যাটাগরি দেখুন" : "Browse All Categories"}
+              <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5" />
+            </Link>
+          </div>
+        )}
       </Section>
 
       {data.promotions.map((promo) => (
