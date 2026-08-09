@@ -2,16 +2,15 @@ import { createFileRoute } from "@tanstack/react-router";
 
 /**
  * Daily Steadfast payout reconciliation (4:00 AM Bangladesh time).
- * Called by pg_cron with the project's publishable key.
+ * Called by pg_cron with a server-only cron secret (x-cron-secret header).
  */
 export const Route = createFileRoute("/api/public/hooks/steadfast-payments")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const authHeader = request.headers.get("authorization") ?? "";
-        const apiKey = request.headers.get("apikey") ?? authHeader.replace("Bearer ", "");
-        const expected = process.env["SUPABASE_PUBLISHABLE_KEY"]!;
-        if (!apiKey || apiKey !== expected) {
+        const cronSecret = process.env["CRON_HOOK_SECRET"];
+        const supplied = request.headers.get("x-cron-secret") ?? "";
+        if (!cronSecret || supplied !== cronSecret) {
           return new Response(JSON.stringify({ error: "Unauthorized" }), {
             status: 401,
             headers: { "Content-Type": "application/json" },
