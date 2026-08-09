@@ -60,6 +60,8 @@ function emptyCategory(): CategoryInput {
     meta_description: null,
     sort_order: 0,
     is_active: true,
+    is_featured: false,
+    show_in_header: true,
   };
 }
 
@@ -90,6 +92,10 @@ function TaxonomyPage() {
   });
   const [cat, setCat] = useState<CategoryInput>(emptyCategory());
   const [sub, setSub] = useState<SubcategoryInput>({ ...emptyCategory(), category_id: "" });
+
+  const allCats = (data?.categories ?? []) as any[];
+  const featuredCount = allCats.filter((c) => c.is_featured).length;
+  const isCurrentFeatured = Boolean(cat.id && allCats.find((c) => c.id === cat.id)?.is_featured);
 
   const refresh = () => qc.invalidateQueries({ queryKey: ["admin"] });
 
@@ -201,11 +207,39 @@ function TaxonomyPage() {
               }
             />
           </Field>
-          <ToggleField
-            label="Active"
-            checked={cat.is_active}
-            onChange={(v) => setCat({ ...cat, is_active: v })}
-          />
+          <Field label="Meta description">
+            <textarea
+              className="min-h-[64px] w-full rounded-xl border border-border/80 bg-background/70 p-3 text-sm transition-all duration-200 focus-visible:border-primary/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/25"
+              rows={2}
+              maxLength={160}
+              placeholder="50–160 characters, shown in Google & social previews"
+              value={cat.meta_description ?? ""}
+              onChange={(e) => setCat({ ...cat, meta_description: e.target.value || null })}
+            />
+          </Field>
+          <div className="grid gap-2 sm:grid-cols-3">
+            <ToggleField
+              label="Active"
+              checked={cat.is_active}
+              onChange={(v) => setCat({ ...cat, is_active: v })}
+            />
+            <ToggleField
+              label={`Featured (${featuredCount}/4)`}
+              checked={cat.is_featured}
+              onChange={(v) => {
+                if (v && featuredCount >= 4 && !isCurrentFeatured) {
+                  toast.error("Maximum 4 featured categories allowed");
+                  return;
+                }
+                setCat({ ...cat, is_featured: v });
+              }}
+            />
+            <ToggleField
+              label="Show on hero section"
+              checked={cat.show_in_header}
+              onChange={(v) => setCat({ ...cat, show_in_header: v })}
+            />
+          </div>
           <div className="flex gap-2 pt-1">
             <Button
               loading={saveCat.isPending}
@@ -257,6 +291,16 @@ function TaxonomyPage() {
                     >
                       {c.is_active ? "Visible" : "Hidden"}
                     </span>
+                    {(c as any).is_featured ? (
+                      <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-primary">
+                        Featured
+                      </span>
+                    ) : null}
+                    {(c as any).show_in_header ? (
+                      <span className="rounded-full bg-sky-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-sky-700">
+                        Hero
+                      </span>
+                    ) : null}
                     <Button
                       size="sm"
                       variant="outline"
@@ -340,7 +384,43 @@ function TaxonomyPage() {
               value={sub.sort_order}
               onChange={(v) => setSub({ ...sub, sort_order: v })}
             />
+            <TextField
+              label="Meta title"
+              value={sub.meta_title ?? ""}
+              onChange={(v) => setSub({ ...sub, meta_title: v || null })}
+            />
+            <ImageField
+              cropPreset="card"
+              label="Subcategory image (used as OG preview)"
+              folder="categories"
+              value={sub.image_url}
+              onChange={(v) => setSub({ ...sub, image_url: v })}
+            />
           </div>
+          <Field label="Meta description">
+            <textarea
+              className="min-h-[64px] w-full rounded-xl border border-border/80 bg-background/70 p-3 text-sm transition-all duration-200 focus-visible:border-primary/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/25"
+              rows={2}
+              maxLength={160}
+              placeholder="50–160 characters, shown in Google & social previews"
+              value={sub.meta_description ?? ""}
+              onChange={(e) => setSub({ ...sub, meta_description: e.target.value || null })}
+            />
+          </Field>
+          <Field label="Description">
+            <textarea
+              className="min-h-[84px] w-full rounded-xl border border-border/80 bg-background/70 p-3 text-sm transition-all duration-200 focus-visible:border-primary/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/25"
+              rows={3}
+              value={sub.description_bn ?? ""}
+              onChange={(e) =>
+                setSub({
+                  ...sub,
+                  description_bn: e.target.value || null,
+                  description_en: e.target.value || null,
+                })
+              }
+            />
+          </Field>
           <ToggleField
             label="Active"
             checked={sub.is_active}

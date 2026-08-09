@@ -249,7 +249,9 @@ export function SiteHeader() {
 
       <div className="hidden border-t border-border/70 bg-surface lg:block">
         <div className="mx-auto flex max-w-6xl items-center gap-6 overflow-x-auto px-4 py-2">
-          {categories.map((c) => (
+          {categories
+            .filter((c) => c.show_in_header)
+            .map((c) => (
             <Link
               key={c.id}
               to="/c/$category"
@@ -261,6 +263,14 @@ export function SiteHeader() {
               <span className="absolute -bottom-0.5 left-0 h-0.5 w-0 bg-primary transition-all duration-300 group-hover:w-full" />
             </Link>
           ))}
+          <Link
+            to="/categories"
+            activeProps={{ className: "text-primary" }}
+            className="group relative ml-auto whitespace-nowrap text-sm font-semibold text-primary transition-all duration-200 hover:scale-105 active:scale-95"
+          >
+            {tr(lang, "allCategories")}
+            <span className="absolute -bottom-0.5 left-0 h-0.5 w-0 bg-primary transition-all duration-300 group-hover:w-full" />
+          </Link>
         </div>
       </div>
 
@@ -273,6 +283,13 @@ export function SiteHeader() {
                 {tr(lang, "categories")}
               </p>
               <div className="flex flex-col gap-1">
+                <Link
+                  to="/categories"
+                  onClick={() => setOpen(false)}
+                  className="block py-1 text-sm font-semibold text-primary"
+                >
+                  {tr(lang, "allCategories")}
+                </Link>
                 {categories.map((c) => (
                   <div key={c.id}>
                     <Link

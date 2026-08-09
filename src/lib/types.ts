@@ -10,6 +10,8 @@ export type CategoryRow = {
   meta_description: string | null;
   sort_order: number;
   is_active: boolean;
+  is_featured: boolean;
+  show_in_header: boolean;
 };
 
 export type SubcategoryRow = {

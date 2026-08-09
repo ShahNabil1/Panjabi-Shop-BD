@@ -42,6 +42,7 @@ function HomePage() {
   const data = Route.useLoaderData() as HomeData;
   const slides = readHeroSlides(data.settings["hero"]);
   const popup = readPromoPopup(data.settings["popup"]);
+  const featuredCategories = data.categories.filter((c) => c.is_featured).slice(0, 4);
 
   return (
     <>
@@ -92,9 +93,20 @@ function HomePage() {
 
 
 
-      <Section title={tr(lang, "allCategories")}>
+      <Section
+        title={tr(lang, "allCategories")}
+        action={
+          <Link
+            to="/categories"
+            className="group inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm transition-all duration-200 hover:scale-105 hover:shadow-md active:scale-95"
+          >
+            {tr(lang, "allCategories")}
+            <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5" />
+          </Link>
+        }
+      >
         <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
-          {data.categories.map((c) => (
+          {featuredCategories.map((c) => (
             <Link
               key={c.id}
               to="/c/$category"
