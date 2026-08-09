@@ -192,11 +192,13 @@ export const categorySchema = z.object({
   meta_description: optText,
   sort_order: z.number().int().min(0).default(0),
   is_active: z.boolean().default(true),
+  is_featured: z.boolean().default(false),
+  show_in_header: z.boolean().default(true),
 });
 
-export const subcategorySchema = categorySchema.extend({
-  category_id: uuid,
-});
+export const subcategorySchema = categorySchema
+  .omit({ is_featured: true, show_in_header: true })
+  .extend({ category_id: uuid });
 
 export const productImageSchema = z.object({
   url: z.string().trim().min(1).max(1000),
