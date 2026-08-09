@@ -53,10 +53,12 @@ export type Database = {
           id: string
           image_url: string | null
           is_active: boolean
+          is_featured: boolean
           meta_description: string | null
           meta_title: string | null
           name_bn: string
           name_en: string
+          show_in_header: boolean
           slug: string
           sort_order: number
           updated_at: string
@@ -69,10 +71,12 @@ export type Database = {
           id?: string
           image_url?: string | null
           is_active?: boolean
+          is_featured?: boolean
           meta_description?: string | null
           meta_title?: string | null
           name_bn: string
           name_en: string
+          show_in_header?: boolean
           slug: string
           sort_order?: number
           updated_at?: string
@@ -85,10 +89,12 @@ export type Database = {
           id?: string
           image_url?: string | null
           is_active?: boolean
+          is_featured?: boolean
           meta_description?: string | null
           meta_title?: string | null
           name_bn?: string
           name_en?: string
+          show_in_header?: boolean
           slug?: string
           sort_order?: number
           updated_at?: string
