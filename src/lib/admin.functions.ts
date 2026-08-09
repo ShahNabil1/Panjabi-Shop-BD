@@ -304,6 +304,11 @@ export const adminSaveCategory = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const db = await requireAdmin(context.supabase, context.userId);
     const { id, ...rest } = data;
+    if (rest.is_featured) {
+      const existing = await db.from("categories").select("id").eq("is_featured", true);
+      const others = (existing.data ?? []).filter((c) => c.id !== id);
+      if (others.length >= 4) throw new Error("Maximum 4 featured categories allowed");
+    }
     const res = id
       ? await db.from("categories").update(rest).eq("id", id).select("id").single()
       : await db.from("categories").insert(rest).select("id").single();
