@@ -7,6 +7,7 @@ import {
   API_SECRET_MASK,
   INTEGRATION_GROUPS,
   groupKeys,
+  requiredGroupKeys,
   integrationMeta,
   type IntegrationGroup,
 } from "./integrations-shared";
@@ -62,7 +63,7 @@ export const adminListIntegrations = createServerFn({ method: "GET" })
         if (!value) continue;
         out[field.key] = field.secret ? API_SECRET_MASK : value;
       }
-      const keys = groupKeys(group);
+      const keys = requiredGroupKeys(group);
       return {
         group,
         values: out,

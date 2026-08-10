@@ -11,6 +11,8 @@ export type IntegrationField = {
   secret: boolean;
   placeholder?: string;
   hint?: string;
+  /** Optional fields never block the "Configured" status of their group. */
+  optional?: boolean;
 };
 
 export const integrationMeta: Record<
@@ -31,6 +33,14 @@ export const integrationMeta: Record<
         label: "Public base URL",
         secret: false,
         placeholder: "https://cdn.example.com",
+      },
+      {
+        key: "CLOUDFLARE_ANALYTICS_API_TOKEN",
+        label: "Analytics API Token",
+        secret: true,
+        optional: true,
+        placeholder: "Zone Analytics Read token",
+        hint: "Read-only token used to show live image transformation usage.",
       },
     ],
   },
@@ -53,3 +63,7 @@ export const integrationMeta: Record<
 
 export const groupKeys = (group: IntegrationGroup) =>
   integrationMeta[group].fields.map((f) => f.key);
+
+/** Keys that must be present for a group to count as configured. */
+export const requiredGroupKeys = (group: IntegrationGroup) =>
+  integrationMeta[group].fields.filter((f) => !f.optional).map((f) => f.key);
