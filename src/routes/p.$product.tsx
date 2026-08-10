@@ -1,5 +1,5 @@
 import { Link, createFileRoute, notFound, useSearch } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ArrowRight } from "lucide-react";
 
 import { getProductPage } from "@/lib/catalog.functions";
@@ -12,6 +12,7 @@ import { absoluteUrl, pageTitle } from "@/lib/site";
 import { Breadcrumbs, Section } from "@/components/site/ui";
 import { AddToCartBar } from "@/components/site/add-to-cart";
 import { ComboContents } from "@/components/site/combo-contents";
+import { comboItemIdBySku, comboSelectionBySku, variantSelectionBySku } from "@/lib/sku-preselect";
 import { cn } from "@/lib/utils";
 import { ImageLightbox, useLightbox } from "@/components/site/image-lightbox";
 
@@ -148,17 +149,21 @@ function ProductPage() {
     Route.useLoaderData() as ProductPageData;
   // Catalogue ads deep-link with ?sku=… so the advertised variant is preselected.
   const search = useSearch({ strict: false }) as { sku?: string };
+  const skuParam = typeof search.sku === "string" ? search.sku : undefined;
   const [active, setActive] = useState(0);
-  const [selected, setSelected] = useState<Record<string, string>>(() => {
-    const sku = typeof search.sku === "string" ? search.sku : "";
-    const match = sku ? variants.find((v) => v.sku === sku) : undefined;
-    return match ? { [match.group_name_bn]: match.id, [match.group_name_en]: match.id } : {};
-  });
-  const [comboSelected, setComboSelected] = useState<Record<string, string>>(() =>
-    Object.fromEntries(
-      comboItems.flatMap((item) => item.variants[0] ? [[item.id, item.variants[0].id]] : []),
-    ),
+  const [selected, setSelected] = useState<Record<string, string>>(() =>
+    variantSelectionBySku(skuParam, variants),
   );
+  const [comboSelected, setComboSelected] = useState<Record<string, string>>(() =>
+    comboSelectionBySku(skuParam, comboItems),
+  );
+  const highlightedComboId = comboItemIdBySku(skuParam, comboItems);
+  // Navigating between catalogue links reuses the component, so re-sync on ?sku= change.
+  useEffect(() => {
+    setSelected((prev) => ({ ...prev, ...variantSelectionBySku(skuParam, variants) }));
+    setComboSelected(comboSelectionBySku(skuParam, comboItems));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [skuParam, product.id]);
   const lightbox = useLightbox();
   const galleryImages = images
     .filter((img) => Boolean(img.url))
@@ -422,7 +427,7 @@ function ProductPage() {
           </div>
         </div>
 
-        <ComboContents items={comboItems} selected={comboSelected} onSelect={(itemId, variantId) =>
+        <ComboContents items={comboItems} selected={comboSelected} highlightId={highlightedComboId} onSelect={(itemId, variantId) =>
           setComboSelected((current) => ({ ...current, [itemId]: variantId }))
         } />
 
