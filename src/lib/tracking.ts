@@ -51,6 +51,50 @@ export function newEventId(event: string): string {
   return `${event}.${vid}.${Math.floor(Date.now() / 1000)}.${rand}`;
 }
 
+/** Funnel events that also get a server-side (CAPI) twin. */
+const SERVER_TWIN = new Set(["view_item", "add_to_cart", "begin_checkout"]);
+
+type TwinContent = { id: string; name?: string | undefined; category?: string | undefined; quantity: number; price: number };
+
+/**
+ * Replays a funnel event to Meta CAPI / TikTok Events API with the *same*
+ * `event_id`, so both platforms de-duplicate the browser+server pair.
+ * Fire-and-forget: a tracking failure must never affect the UI.
+ */
+function sendServerTwin(event: string, eventId: string, payload: DataLayerRecord, attribution: Record<string, string | undefined>) {
+  if (!SERVER_TWIN.has(event)) return;
+  const raw = Array.isArray(payload["contents"]) ? (payload["contents"] as Record<string, unknown>[]) : [];
+  const contents: TwinContent[] = raw
+    .map((c) => ({
+      id: String(c["id"] ?? c["content_id"] ?? ""),
+      name: c["content_name"] ? String(c["content_name"]) : undefined,
+      category: c["content_category"] ? String(c["content_category"]) : undefined,
+      quantity: Number(c["quantity"] ?? 1) || 1,
+      price: Number(c["price"] ?? c["item_price"] ?? 0) || 0,
+    }))
+    .filter((c) => c.id);
+  if (!contents.length) return;
+
+  void import("./funnel-capi.functions")
+    .then(({ trackFunnelEvent }) =>
+      trackFunnelEvent({
+        data: {
+          event: event as "view_item" | "add_to_cart" | "begin_checkout",
+          eventId,
+          url: window.location.href,
+          value: Number(payload["value"] ?? 0) || 0,
+          contents,
+          fbp: attribution["fbp"],
+          fbc: attribution["fbc"],
+          ttp: attribution["ttp"],
+          ttclid: attribution["ttclid"],
+          externalId: visitorId() ?? undefined,
+        },
+      }),
+    )
+    .catch(() => undefined);
+}
+
 /** Pushes an event into the GTM dataLayer (no-op during SSR). */
 export function pushEvent(
   event: string,
@@ -72,8 +116,10 @@ export function pushEvent(
     ttp: attribution.ttp,
     ...payload,
   });
+  sendServerTwin(event, eventId, payload, attribution as Record<string, string | undefined>);
   return eventId;
 }
+
 
 /** GA4 / Meta friendly ecommerce block for a set of items. */
 export function ecommerce(items: TrackingItem[], extra?: DataLayerRecord): DataLayerRecord {
