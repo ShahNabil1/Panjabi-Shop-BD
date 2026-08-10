@@ -218,7 +218,7 @@ export async function processCourierWebhook(
     _event: parsed.event ?? "",
     _consignment_id: parsed.consignmentId ?? "",
     _merchant_order_id: parsed.merchantOrderId ?? "",
-    _payload: payload as never,
+    _payload: stored as never,
     _status: status,
     _raw_status: parsed.rawStatus,
     _message: parsed.message ?? (status ? courierStatusLabels[status] : ""),
