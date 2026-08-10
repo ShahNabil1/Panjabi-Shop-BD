@@ -64,15 +64,20 @@ function GroupCard({
   const [values, setValues] = useState<Record<string, string>>({});
   const [savedSnapshot, setSavedSnapshot] = useState<string>("{}");
   const [result, setResult] = useState<IntegrationTestResult | null>(null);
+  const [unlocked, setUnlocked] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
 
   useEffect(() => {
     const next = state?.values ?? {};
     setValues(next);
     setSavedSnapshot(JSON.stringify(next));
     setResult(state?.lastTest ?? null);
+    setUnlocked(false);
   }, [state]);
 
+  const locked = Boolean(state?.configured) && !unlocked;
   const isDirty = JSON.stringify(values) !== savedSnapshot;
+
 
   const save = useMutation({
     mutationFn: () => adminSaveIntegration({ data: { group, values } }),
