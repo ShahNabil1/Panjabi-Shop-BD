@@ -1,6 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 
-import { bucketWidth, canTransform, cdnImage, getCachedWidth, rememberWidth } from "@/lib/cdn-image";
+import {
+  bucketWidth,
+  canTransform,
+  cdnImage,
+  getCachedWidth,
+  rememberWidth,
+} from "@/lib/cdn-image";
 import { cn } from "@/lib/utils";
 
 type SmartImageProps = {
