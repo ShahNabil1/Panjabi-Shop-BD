@@ -39,6 +39,7 @@ import { Route as AdminCombosIndexRouteImport } from './routes/admin.combos.inde
 import { Route as AdminCombosIdRouteImport } from './routes/admin.combos.$id'
 import { Route as AdminMarketingIndexRouteImport } from './routes/admin.marketing.index'
 import { Route as AdminMarketingCampaignsRouteImport } from './routes/admin.marketing.campaigns'
+import { Route as AdminMarketingCreativesRouteImport } from './routes/admin.marketing.creatives'
 import { Route as AdminOrdersIndexRouteImport } from './routes/admin.orders.index'
 import { Route as AdminOrdersIdRouteImport } from './routes/admin.orders.$id'
 import { Route as AdminOrdersCreateRouteImport } from './routes/admin.orders.create'
@@ -209,6 +210,11 @@ const AdminMarketingCampaignsRoute = AdminMarketingCampaignsRouteImport.update({
   path: '/marketing/campaigns',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminMarketingCreativesRoute = AdminMarketingCreativesRouteImport.update({
+  id: '/marketing/creatives',
+  path: '/marketing/creatives',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminOrdersIndexRoute = AdminOrdersIndexRouteImport.update({
   id: '/orders/',
   path: '/orders/',
@@ -338,6 +344,7 @@ export interface FileRoutesByFullPath {
   '/offers/': typeof OffersIndexRoute
   '/admin/combos/$id': typeof AdminCombosIdRoute
   '/admin/marketing/campaigns': typeof AdminMarketingCampaignsRoute
+  '/admin/marketing/creatives': typeof AdminMarketingCreativesRoute
   '/admin/orders/$id': typeof AdminOrdersIdRoute
   '/admin/orders/create': typeof AdminOrdersCreateRoute
   '/admin/orders/list': typeof AdminOrdersListRoute
@@ -388,6 +395,7 @@ export interface FileRoutesByTo {
   '/offers': typeof OffersIndexRoute
   '/admin/combos/$id': typeof AdminCombosIdRoute
   '/admin/marketing/campaigns': typeof AdminMarketingCampaignsRoute
+  '/admin/marketing/creatives': typeof AdminMarketingCreativesRoute
   '/admin/orders/$id': typeof AdminOrdersIdRoute
   '/admin/orders/create': typeof AdminOrdersCreateRoute
   '/admin/orders/list': typeof AdminOrdersListRoute
@@ -440,6 +448,7 @@ export interface FileRoutesById {
   '/offers/': typeof OffersIndexRoute
   '/admin/combos/$id': typeof AdminCombosIdRoute
   '/admin/marketing/campaigns': typeof AdminMarketingCampaignsRoute
+  '/admin/marketing/creatives': typeof AdminMarketingCreativesRoute
   '/admin/orders/$id': typeof AdminOrdersIdRoute
   '/admin/orders/create': typeof AdminOrdersCreateRoute
   '/admin/orders/list': typeof AdminOrdersListRoute
@@ -493,6 +502,7 @@ export interface FileRouteTypes {
     | '/offers/'
     | '/admin/combos/$id'
     | '/admin/marketing/campaigns'
+    | '/admin/marketing/creatives'
     | '/admin/orders/$id'
     | '/admin/orders/create'
     | '/admin/orders/list'
@@ -543,6 +553,7 @@ export interface FileRouteTypes {
     | '/offers'
     | '/admin/combos/$id'
     | '/admin/marketing/campaigns'
+    | '/admin/marketing/creatives'
     | '/admin/orders/$id'
     | '/admin/orders/create'
     | '/admin/orders/list'
@@ -594,6 +605,7 @@ export interface FileRouteTypes {
     | '/offers/'
     | '/admin/combos/$id'
     | '/admin/marketing/campaigns'
+    | '/admin/marketing/creatives'
     | '/admin/orders/$id'
     | '/admin/orders/create'
     | '/admin/orders/list'
@@ -857,6 +869,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminMarketingCampaignsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/marketing/creatives': {
+      id: '/admin/marketing/creatives'
+      path: '/marketing/creatives'
+      fullPath: '/admin/marketing/creatives'
+      preLoaderRoute: typeof AdminMarketingCreativesRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/orders/': {
       id: '/admin/orders/'
       path: '/orders'
@@ -1002,6 +1021,7 @@ interface AdminRouteChildren {
   AdminIndexRoute: typeof AdminIndexRoute
   AdminCombosIdRoute: typeof AdminCombosIdRoute
   AdminMarketingCampaignsRoute: typeof AdminMarketingCampaignsRoute
+  AdminMarketingCreativesRoute: typeof AdminMarketingCreativesRoute
   AdminOrdersIdRoute: typeof AdminOrdersIdRoute
   AdminOrdersCreateRoute: typeof AdminOrdersCreateRoute
   AdminOrdersListRoute: typeof AdminOrdersListRoute
@@ -1029,6 +1049,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminIndexRoute: AdminIndexRoute,
   AdminCombosIdRoute: AdminCombosIdRoute,
   AdminMarketingCampaignsRoute: AdminMarketingCampaignsRoute,
+  AdminMarketingCreativesRoute: AdminMarketingCreativesRoute,
   AdminOrdersIdRoute: AdminOrdersIdRoute,
   AdminOrdersCreateRoute: AdminOrdersCreateRoute,
   AdminOrdersListRoute: AdminOrdersListRoute,
