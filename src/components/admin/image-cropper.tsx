@@ -1,44 +1,43 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { Check, Crop as CropIcon, Loader2, RotateCw, X, ZoomIn, ZoomOut } from "lucide-react";
+import { Check, Crop as CropIcon, Loader2, RotateCw, X } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
 export type CropPreset = {
   id: string;
   label: string;
-  hint: string;
-  ratio: number;
+  /** null = free-form crop. */
+  ratio: number | null;
 };
 
 /** Aspect ratios the storefront actually renders. */
 export const CROP_PRESETS: CropPreset[] = [
-  { id: "card", label: "কার্ড / গ্রিড", hint: "হোম ও ক্যাটালগ কার্ড · 4:5", ratio: 4 / 5 },
-  { id: "square", label: "স্কয়ার", hint: "প্রোডাক্ট গ্যালারি · 1:1", ratio: 1 },
-  { id: "product", label: "প্রোডাক্ট পেইজ", hint: "ডিটেইল ভিউ · 3:4", ratio: 3 / 4 },
-  { id: "landing", label: "ল্যান্ডিং / ব্যানার", hint: "হিরো ও ওয়াইড · 16:9", ratio: 16 / 9 },
-  { id: "og", label: "OG / শেয়ার", hint: "সোশ্যাল প্রিভিউ · 1.91:1", ratio: 1.91 },
+  { id: "free", label: "ফ্রি", ratio: null },
+  { id: "square", label: "১:১", ratio: 1 },
+  { id: "card", label: "৪:৫", ratio: 4 / 5 },
+  { id: "product", label: "৩:৪", ratio: 3 / 4 },
+  { id: "landing", label: "১৬:৯", ratio: 16 / 9 },
+  { id: "og", label: "১.৯১:১", ratio: 1.91 },
 ];
 
-const MIN_ZOOM = 1;
-const MAX_ZOOM = 5;
+type Rect = { x: number; y: number; w: number; h: number };
 
-type Point = { x: number; y: number };
+const MIN_SIZE = 24;
 
 function clamp(v: number, min: number, max: number) {
   return Math.min(max, Math.max(min, v));
 }
 
-async function loadImage(src: string): Promise<HTMLImageElement> {
-  const img = new Image();
-  img.crossOrigin = "anonymous";
-  img.decoding = "async";
-  await new Promise<void>((resolve, reject) => {
-    img.onload = () => resolve();
+function loadImage(src: string): Promise<HTMLImageElement> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.decoding = "async";
+    img.onload = () => resolve(img);
     img.onerror = () => reject(new Error("ছবিটি লোড করা যায়নি (CORS?)"));
     img.src = src;
   });
-  return img;
 }
 
 function rotateSource(img: HTMLImageElement): Promise<string> {
@@ -54,14 +53,39 @@ function rotateSource(img: HTMLImageElement): Promise<string> {
   );
 }
 
+/** Fit the crop box inside the displayed image, honouring the aspect ratio. */
+function fitRect(box: { w: number; h: number }, ratio: number | null): Rect {
+  if (!ratio) return { x: 0, y: 0, w: box.w, h: box.h };
+  let w = box.w;
+  let h = w / ratio;
+  if (h > box.h) {
+    h = box.h;
+    w = h * ratio;
+  }
+  return { x: (box.w - w) / 2, y: (box.h - h) / 2, w, h };
+}
+
+type HandleId = "nw" | "ne" | "sw" | "se" | "n" | "s" | "w" | "e";
+
+const HANDLES: { id: HandleId; className: string; corner: boolean }[] = [
+  { id: "nw", className: "left-0 top-0 -translate-x-1/2 -translate-y-1/2 cursor-nwse-resize", corner: true },
+  { id: "ne", className: "right-0 top-0 translate-x-1/2 -translate-y-1/2 cursor-nesw-resize", corner: true },
+  { id: "sw", className: "bottom-0 left-0 -translate-x-1/2 translate-y-1/2 cursor-nesw-resize", corner: true },
+  { id: "se", className: "bottom-0 right-0 translate-x-1/2 translate-y-1/2 cursor-nwse-resize", corner: true },
+  { id: "n", className: "left-1/2 top-0 -translate-x-1/2 -translate-y-1/2 cursor-ns-resize", corner: false },
+  { id: "s", className: "bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 cursor-ns-resize", corner: false },
+  { id: "w", className: "left-0 top-1/2 -translate-x-1/2 -translate-y-1/2 cursor-ew-resize", corner: false },
+  { id: "e", className: "right-0 top-1/2 translate-x-1/2 -translate-y-1/2 cursor-ew-resize", corner: false },
+];
+
 /**
- * Advanced crop dialog — aspect presets that match the real storefront
- * surfaces, pinch/scroll zoom, drag to reposition and live device previews.
+ * Standard crop dialog: the whole image is always visible, a draggable and
+ * resizable crop rectangle sits on top of it, with optional aspect locks.
  */
 export function ImageCropperDialog({
   src,
   fileName = "image.webp",
-  initialPreset = "card",
+  initialPreset = "free",
   onCancel,
   onCropped,
 }: {
@@ -75,22 +99,47 @@ export function ImageCropperDialog({
   const [image, setImage] = useState<HTMLImageElement | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [source, setSource] = useState(src);
-  const [presetId, setPresetId] = useState(initialPreset);
-  const [zoom, setZoom] = useState(1);
-  const [offset, setOffset] = useState<Point>({ x: 0, y: 0 });
+  const [presetId, setPresetId] = useState(
+    CROP_PRESETS.some((p) => p.id === initialPreset) ? initialPreset : "free",
+  );
   const [busy, setBusy] = useState(false);
-  const [stage, setStage] = useState({ w: 0, h: 0 });
-  const [preview, setPreview] = useState<string | null>(null);
+  /** Rendered image box inside the stage (letterboxed, object-contain). */
+  const [box, setBox] = useState({ w: 0, h: 0 });
+  const [rect, setRect] = useState<Rect>({ x: 0, y: 0, w: 0, h: 0 });
 
-  const stageRef = useRef<HTMLDivElement>(null);
-  const dragRef = useRef<{ px: number; py: number; ox: number; oy: number } | null>(null);
+  const imgRef = useRef<HTMLImageElement>(null);
+  const dragRef = useRef<{ mode: "move" | HandleId; px: number; py: number; start: Rect } | null>(
+    null,
+  );
 
-  const preset = CROP_PRESETS.find((p) => p.id === presetId) ?? CROP_PRESETS[0]!;
+  const ratio = CROP_PRESETS.find((p) => p.id === presetId)?.ratio ?? null;
 
   useEffect(() => setMounted(true), []);
 
+  // Lock the page behind the dialog.
+  useEffect(() => {
+    if (!mounted) return;
+    const body = document.body;
+    const prevOverflow = body.style.overflow;
+    const prevPadding = body.style.paddingRight;
+    const gap = window.innerWidth - document.documentElement.clientWidth;
+    body.style.overflow = "hidden";
+    if (gap > 0) body.style.paddingRight = `${gap}px`;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onCancel();
+    };
+    document.addEventListener("keydown", onKey);
+    return () => {
+      body.style.overflow = prevOverflow;
+      body.style.paddingRight = prevPadding;
+      document.removeEventListener("keydown", onKey);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mounted]);
+
   useEffect(() => {
     let alive = true;
+    setError(null);
     loadImage(source)
       .then((img) => alive && setImage(img))
       .catch((e) => alive && setError(e instanceof Error ? e.message : "লোড করা যায়নি"));
@@ -99,105 +148,123 @@ export function ImageCropperDialog({
     };
   }, [source]);
 
-  // Measure the stage so the crop box can be laid out in real pixels.
-  useEffect(() => {
-    const el = stageRef.current;
+  // Track the rendered image box.
+  useLayoutEffect(() => {
+    const el = imgRef.current;
     if (!el) return;
-    const ro = new ResizeObserver(() => {
-      setStage({ w: el.clientWidth, h: el.clientHeight });
-    });
+    const measure = () => setBox({ w: el.clientWidth, h: el.clientHeight });
+    measure();
+    const ro = new ResizeObserver(measure);
     ro.observe(el);
-    setStage({ w: el.clientWidth, h: el.clientHeight });
     return () => ro.disconnect();
-  }, [mounted]);
+  }, [image]);
 
-  const crop = useMemo(() => {
-    if (!stage.w || !stage.h) return { w: 0, h: 0 };
-    const maxW = stage.w - 48;
-    const maxH = stage.h - 48;
-    let w = maxW;
-    let h = w / preset.ratio;
-    if (h > maxH) {
-      h = maxH;
-      w = h * preset.ratio;
-    }
-    return { w, h };
-  }, [stage, preset.ratio]);
+  // Reset the crop box whenever the image or aspect changes.
+  useEffect(() => {
+    if (!box.w || !box.h) return;
+    setRect(fitRect(box, ratio));
+  }, [box.w, box.h, ratio]);
 
-  const baseScale = useMemo(() => {
-    if (!image || !crop.w) return 1;
-    return Math.max(crop.w / image.naturalWidth, crop.h / image.naturalHeight);
-  }, [image, crop]);
+  const onPointerDown = (mode: "move" | HandleId) => (e: React.PointerEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    (e.currentTarget as HTMLElement).setPointerCapture?.(e.pointerId);
+    dragRef.current = { mode, px: e.clientX, py: e.clientY, start: rect };
+  };
 
-  const scale = baseScale * zoom;
+  const onPointerMove = useCallback(
+    (e: React.PointerEvent) => {
+      const d = dragRef.current;
+      if (!d || !box.w) return;
+      const dx = e.clientX - d.px;
+      const dy = e.clientY - d.py;
+      const s = d.start;
 
-  const clampOffset = useCallback(
-    (next: Point, s = scale) => {
-      if (!image) return next;
-      const maxX = Math.max(0, (image.naturalWidth * s - crop.w) / 2);
-      const maxY = Math.max(0, (image.naturalHeight * s - crop.h) / 2);
-      return { x: clamp(next.x, -maxX, maxX), y: clamp(next.y, -maxY, maxY) };
+      if (d.mode === "move") {
+        setRect({
+          ...s,
+          x: clamp(s.x + dx, 0, box.w - s.w),
+          y: clamp(s.y + dy, 0, box.h - s.h),
+        });
+        return;
+      }
+
+      let { x, y, w, h } = s;
+      const right = s.x + s.w;
+      const bottom = s.y + s.h;
+
+      if (d.mode.includes("w")) {
+        x = clamp(s.x + dx, 0, right - MIN_SIZE);
+        w = right - x;
+      }
+      if (d.mode.includes("e")) {
+        w = clamp(s.w + dx, MIN_SIZE, box.w - s.x);
+      }
+      if (d.mode.includes("n")) {
+        y = clamp(s.y + dy, 0, bottom - MIN_SIZE);
+        h = bottom - y;
+      }
+      if (d.mode.includes("s")) {
+        h = clamp(s.h + dy, MIN_SIZE, box.h - s.y);
+      }
+
+      if (ratio) {
+        // Keep the aspect: derive the other edge, anchored on the dragged corner.
+        const horizontal = d.mode.includes("w") || d.mode.includes("e");
+        if (horizontal) h = w / ratio;
+        else w = h * ratio;
+        if (d.mode.includes("n")) y = bottom - h;
+        if (d.mode.includes("w")) x = right - w;
+        // Clamp back inside the image without breaking the ratio.
+        if (x < 0 || y < 0 || x + w > box.w || y + h > box.h) {
+          const scale = Math.min(
+            1,
+            x < 0 ? (right - 0) / w : 1,
+            y < 0 ? (bottom - 0) / h : 1,
+            x + w > box.w ? (box.w - x) / w : 1,
+            y + h > box.h ? (box.h - y) / h : 1,
+          );
+          w *= scale;
+          h *= scale;
+          if (d.mode.includes("n")) y = bottom - h;
+          if (d.mode.includes("w")) x = right - w;
+          x = clamp(x, 0, box.w - w);
+          y = clamp(y, 0, box.h - h);
+        }
+      }
+
+      setRect({ x, y, w, h });
     },
-    [image, crop, scale],
+    [box, ratio],
   );
 
-  useEffect(() => {
-    setOffset((o) => clampOffset(o));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [zoom, presetId, crop.w, crop.h, image]);
+  const endDrag = () => {
+    dragRef.current = null;
+  };
 
-  // Reset framing when the aspect changes.
-  useEffect(() => {
-    setZoom(1);
-    setOffset({ x: 0, y: 0 });
-  }, [presetId]);
-
-  const renderCrop = useCallback(
-    async (maxEdge = 2000): Promise<Blob | null> => {
-      if (!image || !crop.w) return null;
-      const sw = crop.w / scale;
-      const sh = crop.h / scale;
-      const sx = (image.naturalWidth * scale) / 2 - crop.w / 2 - offset.x;
-      const sy = (image.naturalHeight * scale) / 2 - crop.h / 2 - offset.y;
-      const ratio = Math.min(1, maxEdge / Math.max(sw, sh));
-      const outW = Math.max(1, Math.round(sw * ratio));
-      const outH = Math.max(1, Math.round(sh * ratio));
+  const confirm = async () => {
+    if (!image || !rect.w || !box.w) return;
+    setBusy(true);
+    try {
+      const sx = (rect.x / box.w) * image.naturalWidth;
+      const sy = (rect.y / box.h) * image.naturalHeight;
+      const sw = (rect.w / box.w) * image.naturalWidth;
+      const sh = (rect.h / box.h) * image.naturalHeight;
+      const fit = Math.min(1, 2000 / Math.max(sw, sh));
+      const outW = Math.max(1, Math.round(sw * fit));
+      const outH = Math.max(1, Math.round(sh * fit));
       const canvas = document.createElement("canvas");
       canvas.width = outW;
       canvas.height = outH;
       const ctx = canvas.getContext("2d")!;
       ctx.imageSmoothingQuality = "high";
-      ctx.drawImage(image, sx / scale, sy / scale, sw, sh, 0, 0, outW, outH);
-      return new Promise((resolve) => canvas.toBlob(resolve, "image/webp", 0.92));
-    },
-    [image, crop, scale, offset],
-  );
-
-  // Live preview thumbnail for the device mockups.
-  useEffect(() => {
-    let url: string | null = null;
-    let alive = true;
-    const t = setTimeout(() => {
-      void renderCrop(600).then((blob) => {
-        if (!blob || !alive) return;
-        url = URL.createObjectURL(blob);
-        setPreview(url);
-      });
-    }, 140);
-    return () => {
-      alive = false;
-      clearTimeout(t);
-      if (url) URL.revokeObjectURL(url);
-    };
-  }, [renderCrop]);
-
-  const confirm = async () => {
-    setBusy(true);
-    try {
-      const blob = await renderCrop(2000);
+      ctx.drawImage(image, sx, sy, sw, sh, 0, 0, outW, outH);
+      const blob = await new Promise<Blob | null>((resolve) =>
+        canvas.toBlob(resolve, "image/webp", 0.92),
+      );
       if (!blob) throw new Error("ক্রপ করা যায়নি");
       const base = fileName.replace(/\.[^.]+$/, "") || "image";
-      onCropped(new File([blob], `${base}-${preset.id}.webp`, { type: "image/webp" }));
+      onCropped(new File([blob], `${base}-crop.webp`, { type: "image/webp" }));
     } catch {
       setBusy(false);
     }
@@ -207,15 +274,12 @@ export function ImageCropperDialog({
 
   return createPortal(
     <div className="fixed inset-0 z-[120] flex items-center justify-center p-3 sm:p-6">
-      <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" onClick={onCancel} />
-      <div className="relative flex max-h-[92vh] w-full max-w-4xl flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-2xl">
+      <div className="absolute inset-0 bg-foreground/60 backdrop-blur-sm" onClick={onCancel} />
+      <div className="relative flex max-h-[92vh] w-full max-w-3xl flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-2xl">
         <div className="flex items-center justify-between gap-3 border-b border-border/70 px-4 py-3">
           <div className="flex items-center gap-2">
             <CropIcon className="size-4 text-primary" />
-            <div>
-              <p className="text-sm font-bold leading-tight">ছবি ক্রপ করুন</p>
-              <p className="text-[11px] text-muted-foreground">{preset.hint}</p>
-            </div>
+            <p className="text-sm font-bold">ছবি ক্রপ করুন</p>
           </div>
           <button
             type="button"
@@ -226,14 +290,14 @@ export function ImageCropperDialog({
           </button>
         </div>
 
-        <div className="flex flex-wrap gap-1.5 border-b border-border/70 px-4 py-2.5">
+        <div className="flex flex-wrap items-center gap-1.5 border-b border-border/70 px-4 py-2.5">
           {CROP_PRESETS.map((p) => (
             <button
               key={p.id}
               type="button"
               onClick={() => setPresetId(p.id)}
               className={cn(
-                "rounded-lg border px-2.5 py-1 text-[11px] font-semibold transition-all duration-200",
+                "rounded-lg border px-2.5 py-1 text-[11px] font-semibold transition-colors",
                 p.id === presetId
                   ? "border-primary bg-primary/10 text-primary"
                   : "border-border/80 bg-card text-muted-foreground hover:border-primary/40 hover:text-foreground",
@@ -242,143 +306,108 @@ export function ImageCropperDialog({
               {p.label}
             </button>
           ))}
+          <span className="ml-auto flex items-center gap-1.5">
+            <button
+              type="button"
+              onClick={() => setRect(fitRect(box, ratio))}
+              className="rounded-lg border border-border/80 bg-card px-2.5 py-1 text-[11px] font-semibold text-muted-foreground transition-colors hover:text-foreground"
+            >
+              রিসেট
+            </button>
+            <button
+              type="button"
+              title="৯০° ঘোরান"
+              onClick={async () => {
+                if (!image) return;
+                const url = await rotateSource(image);
+                setImage(null);
+                setSource(url);
+              }}
+              className="rounded-lg border border-border/80 bg-card p-1.5 transition-colors hover:border-primary/40 hover:bg-muted"
+            >
+              <RotateCw className="size-3.5" />
+            </button>
+          </span>
         </div>
 
-        <div className="grid flex-1 gap-4 overflow-y-auto p-4 md:grid-cols-[1fr_200px]">
-          <div className="space-y-3">
-            <div
-              ref={stageRef}
-              onPointerDown={(e) => {
-                (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
-                dragRef.current = { px: e.clientX, py: e.clientY, ox: offset.x, oy: offset.y };
-              }}
-              onPointerMove={(e) => {
-                const d = dragRef.current;
-                if (!d) return;
-                setOffset(
-                  clampOffset({ x: d.ox + (e.clientX - d.px), y: d.oy + (e.clientY - d.py) }),
-                );
-              }}
-              onPointerUp={() => (dragRef.current = null)}
-              onPointerLeave={() => (dragRef.current = null)}
-              onWheel={(e) => {
-                setZoom((z) => clamp(z - e.deltaY * 0.0015, MIN_ZOOM, MAX_ZOOM));
-              }}
-              className="relative h-[320px] w-full cursor-grab touch-none select-none overflow-hidden rounded-xl bg-muted/50 active:cursor-grabbing sm:h-[380px]"
-            >
-              {image && crop.w ? (
-                <>
-                  <img
-                    src={source}
-                    alt=""
-                    draggable={false}
-                    className="pointer-events-none absolute left-1/2 top-1/2 max-w-none"
-                    style={{
-                      width: image.naturalWidth * scale,
-                      height: image.naturalHeight * scale,
-                      transform: `translate(calc(-50% + ${offset.x}px), calc(-50% + ${offset.y}px))`,
-                    }}
-                  />
-                  <div className="pointer-events-none absolute inset-0">
+        <div className="flex min-h-0 flex-1 items-center justify-center overflow-hidden bg-muted/40 p-4">
+          <div className="relative inline-block max-h-full">
+            {error ? (
+              <p className="p-10 text-xs text-muted-foreground">{error}</p>
+            ) : (
+              <>
+                <img
+                  ref={imgRef}
+                  src={source}
+                  alt=""
+                  draggable={false}
+                  className="block max-h-[58vh] max-w-full select-none object-contain"
+                />
+                {box.w && rect.w ? (
+                  <div
+                    className="absolute inset-0 touch-none"
+                    onPointerMove={onPointerMove}
+                    onPointerUp={endDrag}
+                    onPointerCancel={endDrag}
+                  >
                     <div
-                      className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-sm shadow-[0_0_0_9999px_hsl(var(--background)/0.72)]"
-                      style={{ width: crop.w, height: crop.h }}
+                      onPointerDown={onPointerDown("move")}
+                      className="absolute cursor-move shadow-[0_0_0_9999px_hsl(var(--foreground)/0.55)]"
+                      style={{ left: rect.x, top: rect.y, width: rect.w, height: rect.h }}
                     >
-                      <div className="absolute inset-0 border-2 border-primary/90" />
-                      <div className="absolute inset-0 grid grid-cols-3 grid-rows-3">
+                      <div className="absolute inset-0 border border-background/90" />
+                      <div className="pointer-events-none absolute inset-0 grid grid-cols-3 grid-rows-3">
                         {Array.from({ length: 9 }).map((_, i) => (
-                          <div key={i} className="border border-primary-foreground/20" />
+                          <div key={i} className="border border-background/25" />
                         ))}
                       </div>
+                      {HANDLES.filter((h) => h.corner || !ratio).map((h) => (
+                        <span
+                          key={h.id}
+                          onPointerDown={onPointerDown(h.id)}
+                          className={cn(
+                            "absolute size-3 rounded-full border-2 border-background bg-primary",
+                            h.className,
+                          )}
+                        />
+                      ))}
                     </div>
                   </div>
-                </>
-              ) : (
-                <div className="flex size-full items-center justify-center text-xs text-muted-foreground">
-                  {error ?? "লোড হচ্ছে…"}
-                </div>
-              )}
-            </div>
-
-            <div className="flex items-center gap-3">
-              <ZoomOut className="size-4 shrink-0 text-muted-foreground" />
-              <input
-                type="range"
-                min={MIN_ZOOM}
-                max={MAX_ZOOM}
-                step={0.01}
-                value={zoom}
-                onChange={(e) => setZoom(Number(e.target.value))}
-                className="h-1.5 w-full cursor-pointer appearance-none rounded-full bg-muted accent-primary"
-              />
-              <ZoomIn className="size-4 shrink-0 text-muted-foreground" />
-              <button
-                type="button"
-                title="৯০° ঘোরান"
-                onClick={async () => {
-                  if (!image) return;
-                  const url = await rotateSource(image);
-                  setImage(null);
-                  setSource(url);
-                  setZoom(1);
-                  setOffset({ x: 0, y: 0 });
-                }}
-                className="shrink-0 rounded-lg border border-border/80 bg-card p-1.5 transition-colors hover:border-primary/40 hover:bg-muted"
-              >
-                <RotateCw className="size-3.5" />
-              </button>
-            </div>
-          </div>
-
-          <div className="space-y-3">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
-              লাইভ প্রিভিউ
-            </p>
-            <PreviewTile label="ডেস্কটপ কার্ড" src={preview} className="aspect-[4/5] w-full" />
-            <PreviewTile label="মোবাইল কার্ড" src={preview} className="aspect-square w-24" />
-            <PreviewTile label="প্রোডাক্ট পেইজ" src={preview} className="aspect-[3/4] w-28" />
+                ) : null}
+              </>
+            )}
           </div>
         </div>
 
-        <div className="flex items-center justify-end gap-2 border-t border-border/70 px-4 py-3">
-          <button
-            type="button"
-            onClick={onCancel}
-            className="rounded-xl border border-border/80 bg-card px-3 py-1.5 text-xs font-semibold transition-colors hover:bg-muted"
-          >
-            বাতিল
-          </button>
-          <button
-            type="button"
-            disabled={!image || busy}
-            onClick={confirm}
-            className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-3.5 py-1.5 text-xs font-bold text-primary-foreground transition-all duration-200 hover:-translate-y-0.5 disabled:opacity-60"
-          >
-            {busy ? <Loader2 className="size-3.5 animate-spin" /> : <Check className="size-3.5" />}
-            ক্রপ করে আপলোড
-          </button>
+        <div className="flex items-center justify-between gap-2 border-t border-border/70 px-4 py-3">
+          <p className="font-en text-[11px] text-muted-foreground">
+            {image && box.w
+              ? `${Math.round((rect.w / box.w) * image.naturalWidth)} × ${Math.round(
+                  (rect.h / box.h) * image.naturalHeight,
+                )} px`
+              : "লোড হচ্ছে…"}
+          </p>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={onCancel}
+              className="rounded-xl border border-border/80 bg-card px-3 py-1.5 text-xs font-semibold transition-colors hover:bg-muted"
+            >
+              বাতিল
+            </button>
+            <button
+              type="button"
+              disabled={!image || busy || !rect.w}
+              onClick={confirm}
+              className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-3.5 py-1.5 text-xs font-bold text-primary-foreground transition-all duration-200 hover:-translate-y-0.5 disabled:opacity-60"
+            >
+              {busy ? <Loader2 className="size-3.5 animate-spin" /> : <Check className="size-3.5" />}
+              ক্রপ করে সেভ
+            </button>
+          </div>
         </div>
       </div>
     </div>,
     document.body,
-  );
-}
-
-function PreviewTile({
-  label,
-  src,
-  className,
-}: {
-  label: string;
-  src: string | null;
-  className?: string;
-}) {
-  return (
-    <div className="space-y-1">
-      <p className="text-[10px] text-muted-foreground">{label}</p>
-      <div className={cn("overflow-hidden rounded-lg border border-border/70 bg-muted", className)}>
-        {src ? <img src={src} alt="" className="size-full object-cover" /> : null}
-      </div>
-    </div>
   );
 }
