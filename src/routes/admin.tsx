@@ -17,6 +17,7 @@ import {
   MessageSquareText,
   BarChart3,
   Clapperboard,
+  Users2,
   Megaphone,
 
   Package,
