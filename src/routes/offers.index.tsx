@@ -9,19 +9,28 @@ import { Breadcrumbs, Section } from "@/components/site/ui";
 
 export const Route = createFileRoute("/offers/")({
   loader: async (): Promise<PromotionListData> => getPromotions(),
-  head: () => ({
-    meta: [
-      { title: "অফার ও ক্যাম্পেইন | Offers — উপহারকাব্য" },
-      {
-        name: "description",
-        content: "চলমান সব অফার, ফ্ল্যাশ সেল আর নতুন কালেকশন এক জায়গায়। ক্যাশ অন ডেলিভারি সারা দেশে।",
-      },
-      { property: "og:title", content: "অফার ও ক্যাম্পেইন | Offers — উপহারকাব্য" },
-      { property: "og:description", content: "চলমান সব অফার আর নতুন কালেকশন এক জায়গায়।" },
-      { property: "og:url", content: "/offers" },
-    ],
-    links: [{ rel: "canonical", href: "/offers" }],
-  }),
+  head: ({ loaderData }) => {
+    const empty = (loaderData ?? []).length === 0;
+    const url = absoluteUrl("/offers");
+    return {
+      meta: [
+        { title: "অফার ও ক্যাম্পেইন | Offers — উপহারকাব্য" },
+        {
+          name: "description",
+          content:
+            "চলমান সব অফার, ফ্ল্যাশ সেল আর নতুন কালেকশন এক জায়গায়। ক্যাশ অন ডেলিভারি সারা দেশে।",
+        },
+        { property: "og:title", content: "অফার ও ক্যাম্পেইন | Offers — উপহারকাব্য" },
+        { property: "og:description", content: "চলমান সব অফার আর নতুন কালেকশন এক জায়গায়।" },
+        { property: "og:url", content: url },
+        { property: "og:type", content: "website" },
+        // No running offers = empty page; keep it out of the index until it has content.
+        ...(empty ? [{ name: "robots", content: "noindex, follow" }] : []),
+      ],
+      links: [{ rel: "canonical", href: url }],
+    };
+  },
+
   component: OffersPage,
 });
 
