@@ -104,9 +104,16 @@ export async function probeMetaCapi(cfg: TrackingConfig): Promise<Probe> {
   const json = (await res.json().catch(() => ({}))) as Record<string, unknown>;
   if (!res.ok) {
     const err = (json["error"] ?? {}) as Record<string, unknown>;
+    // error_user_msg / error_data explain *which* field Meta rejected; the bare
+    // "Invalid parameter" title alone is useless for debugging.
+    const detail =
+      err["error_user_msg"] ??
+      (err["error_data"] as Record<string, unknown> | undefined)?.["details"] ??
+      "";
+    const base = String(err["message"] ?? `Graph API error ${res.status}`);
     return {
       ok: false,
-      message: String(err["message"] ?? `Graph API error ${res.status}`),
+      message: detail ? `${base} — ${String(detail)}` : base,
       details: [],
     };
   }
