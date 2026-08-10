@@ -279,6 +279,7 @@ export async function migrateBatch(offset = 0): Promise<R2MigrateBatchResult> {
     nextOffset: nextOffset < total ? nextOffset : null,
     total,
     lastKey: batch.at(-1)?.key ?? null,
+    blocked: null,
   };
 }
 
