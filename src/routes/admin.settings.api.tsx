@@ -490,10 +490,7 @@ function ApiSettingsAdmin() {
 
   return (
     <div className="space-y-6 pb-16">
-      <AdminHeading
-        title="API & Integrations"
-        description="Storage, SMS and courier-check credentials — stored securely in the database, editable any time."
-      />
+      <AdminHeading title="API & Integrations" />
 
       <R2MigrationCard />
 
