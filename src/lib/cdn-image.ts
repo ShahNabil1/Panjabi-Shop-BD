@@ -35,7 +35,11 @@ export function bucketWidth(px: number): number {
   return IMAGE_WIDTHS.find((w) => w >= px) ?? last;
 }
 
-/** Only same-zone sources may be transformed (Sources = "This zone only"). */
+/**
+ * Only assets hosted on a zone subdomain (e.g. cdn.upoharkabbo.com) can be
+ * transformed — the apex/www hosts run the app worker and never expose
+ * /cdn-cgi/image/.
+ */
 export function canTransform(src: string | null | undefined): src is string {
   if (!src) return false;
   if (src.includes("/cdn-cgi/")) return false;
@@ -45,7 +49,8 @@ export function canTransform(src: string | null | undefined): src is string {
   if (!/^https?:\/\//i.test(src)) return false;
   try {
     const host = new URL(src).hostname;
-    return host === ZONE_HOST || host.endsWith(`.${ZONE_HOST}`);
+    if (APP_HOSTS.has(host)) return false;
+    return host.endsWith(`.${ZONE_HOST}`);
   } catch {
     return false;
   }
@@ -66,8 +71,11 @@ export function cdnImage(src: string, opts: TransformOptions): string {
   ]
     .filter(Boolean)
     .join(",");
-  return `${ZONE_ORIGIN}/cdn-cgi/image/${params}/${src}`;
+  // Requested on the asset host itself, using a path-relative source.
+  const url = new URL(src);
+  return `${url.origin}/cdn-cgi/image/${params}${url.pathname}${url.search}`;
 }
+
 
 /* ------------------------------------------------------------------ */
 /* Per-device width memory                                             */
