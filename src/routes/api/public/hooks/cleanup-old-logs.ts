@@ -1,53 +1,38 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { createClient } from "@supabase/supabase-js";
-import type { Database } from "@/integrations/supabase/types";
 
+/**
+ * Daily order-log retention cleanup.
+ * Called by pg_cron with a server-only cron secret (x-cron-secret header).
+ */
 export const Route = createFileRoute("/api/public/hooks/cleanup-old-logs")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        // Cron-only endpoint: authenticate with a server-only secret, never the
-        // publishable key (that one ships to every browser).
-        const cronSecret = process.env["CRON_HOOK_SECRET"];
-        const supplied = request.headers.get("x-cron-secret") ?? "";
-        const expected = process.env["SUPABASE_PUBLISHABLE_KEY"]!;
-
-        if (!cronSecret || supplied !== cronSecret) {
+        const { isValidCronSecret } = await import("@/lib/cron-secret.server");
+        if (!(await isValidCronSecret(request.headers.get("x-cron-secret")))) {
           return new Response(JSON.stringify({ error: "Unauthorized" }), {
             status: 401,
             headers: { "Content-Type": "application/json" },
           });
         }
 
-        const supabase = createClient<Database>(process.env["SUPABASE_URL"]!, expected, {
-          auth: { persistSession: false, autoRefreshToken: false },
-          global: {
-            fetch: (input, init) => {
-              const h = new Headers(init?.headers);
-              if (expected.startsWith("sb_") && h.get("Authorization") === `Bearer ${expected}`) {
-                h.delete("Authorization");
-              }
-              h.set("apikey", expected);
-              return fetch(input, { ...init, headers: h });
-            },
-          },
-        });
+        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-        const { data: setting } = await supabase
+        const { data: setting } = await supabaseAdmin
           .from("site_settings")
           .select("value")
           .eq("key", "retention")
-          .single();
+          .maybeSingle();
 
-        const enabled = (setting?.value as Record<string, unknown> | undefined)?.["enabled"] ?? true;
-        if (!enabled) {
+        const value = (setting?.value ?? {}) as Record<string, unknown>;
+        if ((value["enabled"] ?? true) === false) {
           return Response.json({ success: true, message: "Cleanup disabled" });
         }
 
-        const days = Number((setting?.value as Record<string, unknown> | undefined)?.["days"] ?? 90);
+        const days = Number(value["days"] ?? 90);
         const safeDays = Number.isFinite(days) && days > 0 ? Math.min(days, 730) : 90;
 
-        const { data, error } = await supabase.rpc("cleanup_old_order_logs", {
+        const { data, error } = await supabaseAdmin.rpc("cleanup_old_order_logs", {
           _retention_days: safeDays,
         });
 
@@ -59,15 +44,16 @@ export const Route = createFileRoute("/api/public/hooks/cleanup-old-logs")({
         }
 
         const result = (data as Record<string, unknown> | null) ?? {};
-        const now = new Date().toISOString();
         const nextValue = {
-          ...((setting?.value ?? {}) as Record<string, unknown>),
+          ...value,
           days: safeDays,
-          last_run: now,
+          last_run: new Date().toISOString(),
           last_result: result,
         };
 
-        await supabase.from("site_settings").upsert({ key: "retention", value: nextValue as never }, { onConflict: "key" });
+        await supabaseAdmin
+          .from("site_settings")
+          .upsert({ key: "retention", value: nextValue as never }, { onConflict: "key" });
 
         return Response.json({ success: true, result });
       },
