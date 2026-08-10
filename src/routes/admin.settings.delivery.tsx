@@ -7,9 +7,7 @@ import {
   Copy,
   Link2,
   Loader2,
-  Lock,
   Pencil,
-
   Plug,
   Plus,
   Radio,
