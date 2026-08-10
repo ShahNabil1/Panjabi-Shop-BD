@@ -156,8 +156,10 @@ function LandingPage() {
         price: unitPrice,
         quantity: Math.min(qty, stock > 0 ? stock : qty),
         stock,
-        sku: activeVariant ? null : product.sku,
+        // Catalogue id — variant SKU wins so landing orders match the feed.
+        sku: activeVariant?.sku ?? product.sku,
         variantId: activeVariant?.id ?? null,
+
         variantLabelBn: activeVariant
           ? `${activeVariant.group_name_bn}: ${activeVariant.value_bn}`
           : null,
