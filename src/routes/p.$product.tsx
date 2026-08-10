@@ -1,5 +1,5 @@
 import { Link, createFileRoute, notFound, useSearch } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ArrowRight } from "lucide-react";
 
 import { getProductPage } from "@/lib/catalog.functions";
@@ -12,6 +12,7 @@ import { absoluteUrl, pageTitle } from "@/lib/site";
 import { Breadcrumbs, Section } from "@/components/site/ui";
 import { AddToCartBar } from "@/components/site/add-to-cart";
 import { ComboContents } from "@/components/site/combo-contents";
+import { comboItemIdBySku, comboSelectionBySku, variantSelectionBySku } from "@/lib/sku-preselect";
 import { cn } from "@/lib/utils";
 import { ImageLightbox, useLightbox } from "@/components/site/image-lightbox";
 
