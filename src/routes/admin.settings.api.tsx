@@ -30,25 +30,6 @@ export const Route = createFileRoute("/admin/settings/api")({
   component: ApiSettingsAdmin,
 });
 
-function SourceChip({ source }: { source: "database" | "environment" | "missing" }) {
-  const map = {
-    database: { label: "Saved here", cls: "border-emerald-200 bg-emerald-50 text-emerald-900" },
-    environment: { label: "From server env", cls: "border-amber-200 bg-amber-50 text-amber-900" },
-    missing: { label: "Not set", cls: "border-border bg-muted/50 text-muted-foreground" },
-  } as const;
-  const item = map[source];
-  return (
-    <span
-      className={cn(
-        "inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide",
-        item.cls,
-      )}
-    >
-      {item.label}
-    </span>
-  );
-}
-
 function GroupCard({
   group,
   state,
@@ -60,16 +41,23 @@ function GroupCard({
 }) {
   const meta = integrationMeta[group];
   const [values, setValues] = useState<Record<string, string>>({});
+  const [savedSnapshot, setSavedSnapshot] = useState<string>("{}");
   const [result, setResult] = useState<IntegrationTestResult | null>(null);
 
   useEffect(() => {
-    setValues(state?.values ?? {});
+    const next = state?.values ?? {};
+    setValues(next);
+    setSavedSnapshot(JSON.stringify(next));
+    setResult(state?.lastTest ?? null);
   }, [state]);
+
+  const isDirty = JSON.stringify(values) !== savedSnapshot;
 
   const save = useMutation({
     mutationFn: () => adminSaveIntegration({ data: { group, values } }),
     onSuccess: async () => {
       toast.success(`${meta.title} saved`);
+      setSavedSnapshot(JSON.stringify(values));
       setResult(null);
       await onSaved();
     },
@@ -88,15 +76,33 @@ function GroupCard({
 
   const test = useMutation({
     mutationFn: () => adminTestIntegration({ data: { group } }),
-    onSuccess: (res) => {
+    onSuccess: async (res) => {
       setResult(res);
       if (res.ok) toast.success(`${meta.title}: ${res.message}`);
       else toast.error(`${meta.title}: ${res.message}`);
+      await onSaved();
     },
     onError: (e: Error) => toast.error(e.message),
   });
 
   const busy = save.isPending || remove.isPending;
+
+  const verified = Boolean(result?.ok) && !isDirty;
+  const status = !state?.configured
+    ? { label: "Incomplete", cls: "border-border bg-muted/50 text-muted-foreground", dot: "bg-muted-foreground" }
+    : verified
+      ? {
+          label: "Verified",
+          cls: "border-emerald-200 bg-emerald-50 text-emerald-900",
+          dot: "bg-emerald-600",
+        }
+      : result && !result.ok
+        ? { label: "Failed", cls: "border-rose-200 bg-rose-50 text-rose-900", dot: "bg-rose-600" }
+        : {
+            label: "Not verified",
+            cls: "border-amber-200 bg-amber-50 text-amber-900",
+            dot: "bg-amber-500",
+          };
 
   return (
     <Panel className="space-y-4">
@@ -104,34 +110,31 @@ function GroupCard({
         <div>
           <h2 className="ig-text text-sm font-bold">{meta.title}</h2>
           <p className="mt-1 text-xs text-muted-foreground">{meta.description}</p>
+          <p className="mt-1 text-[11px] text-muted-foreground">
+            {result
+              ? `Last checked ${new Date(result.checkedAt).toLocaleString("en-US", {
+                  timeZone: "Asia/Dhaka",
+                })}`
+              : "Not verified yet"}
+          </p>
         </div>
         <span
           className={cn(
             "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-semibold",
-            state?.configured
-              ? "border-emerald-200 bg-emerald-50 text-emerald-900"
-              : "border-border bg-muted/50 text-muted-foreground",
+            status.cls,
           )}
         >
-          <span
-            className={cn(
-              "size-1.5 rounded-full",
-              state?.configured ? "bg-emerald-600" : "bg-muted-foreground",
-            )}
-          />
-          {state?.configured ? "Configured" : "Incomplete"}
+          <span className={cn("size-1.5 rounded-full", status.dot)} />
+          {status.label}
         </span>
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2">
         {meta.fields.map((field) => (
           <div key={field.key} className="space-y-1.5">
-            <div className="flex items-center justify-between gap-2">
-              <span className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground">
-                {field.key}
-              </span>
-              <SourceChip source={state?.sources[field.key] ?? "missing"} />
-            </div>
+            <span className="block text-[11px] font-bold uppercase tracking-wide text-muted-foreground">
+              {field.key}
+            </span>
             <TextField
               label={field.label}
               value={values[field.key] ?? ""}
@@ -139,10 +142,10 @@ function GroupCard({
               onChange={(v: string) => setValues((prev) => ({ ...prev, [field.key]: v }))}
               {...(field.hint ? { hint: field.hint } : {})}
             />
-
           </div>
         ))}
       </div>
+
 
       {state?.envOnly ? (
         <p className="rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-900">
@@ -152,9 +155,13 @@ function GroupCard({
       ) : null}
 
       <div className="flex flex-wrap items-center gap-2">
-        <Button type="button" disabled={busy} onClick={() => save.mutate()}>
-          {save.isPending ? <Loader2 className="mr-1.5 size-4 animate-spin" /> : null}
-          Save
+        <Button type="button" disabled={busy || !isDirty} onClick={() => save.mutate()}>
+          {save.isPending ? (
+            <Loader2 className="mr-1.5 size-4 animate-spin" />
+          ) : !isDirty ? (
+            <CheckCircle2 className="mr-1.5 size-4" />
+          ) : null}
+          {!isDirty && !save.isPending ? "Saved" : "Save"}
         </Button>
         <Button
           type="button"

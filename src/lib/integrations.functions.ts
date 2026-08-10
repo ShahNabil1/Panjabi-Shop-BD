@@ -21,7 +21,12 @@ export type IntegrationGroupState = {
   configured: boolean;
   /** True when every value is still coming from environment variables. */
   envOnly: boolean;
+  /** Last stored connection test for this group (null when never tested). */
+  lastTest: IntegrationTestResult | null;
 };
+
+/** Row key used to persist the last connection test of a group. */
+const testKey = (group: IntegrationGroup) => `INTEGRATION_TEST_${group.toUpperCase()}`;
 
 /** Admin-only: current state of every managed integration credential. */
 export const adminListIntegrations = createServerFn({ method: "GET" })
@@ -33,6 +38,20 @@ export const adminListIntegrations = createServerFn({ method: "GET" })
     );
     const values = await getIntegrationValues();
     const sources = await getIntegrationSources();
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const tests = new Map<string, IntegrationTestResult>();
+    const { data: testRows } = await supabaseAdmin
+      .from("integration_credentials")
+      .select("key, value")
+      .in("key", INTEGRATION_GROUPS.map(testKey));
+    for (const row of testRows ?? []) {
+      try {
+        tests.set(row.key as string, JSON.parse(row.value as string) as IntegrationTestResult);
+      } catch {
+        /* ignore malformed rows */
+      }
+    }
 
     return INTEGRATION_GROUPS.map((group) => {
       const out: Record<string, string> = {};
@@ -50,9 +69,11 @@ export const adminListIntegrations = createServerFn({ method: "GET" })
         sources: src,
         configured: keys.every((k) => Boolean(values[k])),
         envOnly: keys.every((k) => src[k] === "environment"),
+        lastTest: tests.get(testKey(group)) ?? null,
       };
     });
   });
+
 
 const saveSchema = z.object({
   group: groupSchema,
@@ -102,6 +123,8 @@ export const adminSaveIntegration = createServerFn({ method: "POST" })
     if (removals.length) {
       await supabaseAdmin.from("integration_credentials").delete().in("key", removals);
     }
+    // Credentials changed → the previous connection test no longer proves anything.
+    await supabaseAdmin.from("integration_credentials").delete().eq("key", testKey(data.group));
     clearIntegrationCache();
 
     // Switched to a different bucket → remember the old one so media can be migrated.
@@ -137,7 +160,7 @@ export const adminRemoveIntegration = createServerFn({ method: "POST" })
     const { error } = await supabaseAdmin
       .from("integration_credentials")
       .delete()
-      .in("key", groupKeys(data.group));
+      .in("key", [...groupKeys(data.group), testKey(data.group)]);
     if (error) throw new Error(error.message);
     clearIntegrationCache();
     return { ok: true };
@@ -169,6 +192,7 @@ export const adminTestIntegration = createServerFn({ method: "POST" })
       checkedAt,
     });
 
+    const result: IntegrationTestResult = await (async (): Promise<IntegrationTestResult> => {
     try {
       if (data.group === "r2") {
         const { readR2Config, probeR2 } = await import("./r2.server");
@@ -261,6 +285,15 @@ export const adminTestIntegration = createServerFn({ method: "POST" })
     } catch (error) {
       return fail(error instanceof Error ? error.message : "Unknown error");
     }
+    })();
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    await supabaseAdmin
+      .from("integration_credentials")
+      .upsert([{ key: testKey(data.group), value: JSON.stringify(result) }], {
+        onConflict: "key",
+      });
+    return result;
   });
 
 export type R2MigrationState = {
