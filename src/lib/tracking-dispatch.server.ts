@@ -15,10 +15,12 @@
 
 import type { SupabaseClient } from "@supabase/supabase-js";
 
+import type { Database } from "@/integrations/supabase/types";
+
 import { readTrackingConfig, type TrackingConfig } from "./tracking.server";
 import { SITE_URL } from "./site";
 
-type Db = SupabaseClient<never, never, never>;
+type Db = SupabaseClient<Database>;
 
 export type Platform = "meta" | "tiktok" | "ga4";
 
@@ -77,12 +79,9 @@ function normalizePhone(raw: string | null | undefined): string | undefined {
   return digits;
 }
 
-function splitName(full: string | null | undefined): { first?: string; last?: string } {
+function splitName(full: string | null | undefined): { first: string; last: string } {
   const parts = (full ?? "").trim().split(/\s+/).filter(Boolean);
-  if (!parts.length) return {};
-  const out: { first?: string; last?: string } = { first: parts[0] };
-  if (parts.length > 1) out.last = parts[parts.length - 1];
-  return out;
+  return { first: parts[0] ?? "", last: parts.length > 1 ? (parts[parts.length - 1] ?? "") : "" };
 }
 
 function attrOf(order: OrderRow): Attribution {
