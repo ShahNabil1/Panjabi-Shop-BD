@@ -160,7 +160,7 @@ export const adminRemoveIntegration = createServerFn({ method: "POST" })
     const { error } = await supabaseAdmin
       .from("integration_credentials")
       .delete()
-      .in("key", groupKeys(data.group));
+      .in("key", [...groupKeys(data.group), testKey(data.group)]);
     if (error) throw new Error(error.message);
     clearIntegrationCache();
     return { ok: true };
