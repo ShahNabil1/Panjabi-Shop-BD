@@ -173,7 +173,10 @@ function FaqsAdmin() {
     <div className="space-y-6 pb-16">
       <AdminHeading title="FAQ" description="Questions and answers shown on the homepage and FAQ page." />
 
+      <FaqSeoPanel />
+
       <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_400px]">
+
         <Panel className="space-y-4">
           <h2 className="flex items-center gap-2 text-sm font-bold">
             <HelpCircle className="size-4 text-primary" />
