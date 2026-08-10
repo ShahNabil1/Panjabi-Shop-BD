@@ -213,11 +213,21 @@ async function sendMeta(
           num_items: order.order_items.reduce((s, i) => s + i.quantity, 0),
           content_type: "product",
           content_ids: order.order_items.map(contentIdOf),
-          contents: order.order_items.map((i) => ({
-            id: contentIdOf(i),
-            quantity: i.quantity,
-            item_price: Number(i.unit_price),
-          })),
+          content_category: [
+            ...new Set(order.order_items.map(categoryOf).filter(Boolean)),
+          ].join(", "),
+          contents: order.order_items.map((i) => {
+            const l = lineOf(i);
+            return {
+              id: l.id,
+              quantity: l.quantity,
+              item_price: l.price,
+              title: l.name,
+              ...(l.category ? { category: l.category } : {}),
+              ...(l.brand ? { brand: l.brand } : {}),
+              ...(l.group ? { item_group_id: l.group } : {}),
+            };
+          }),
         },
       },
     ],
@@ -261,13 +271,18 @@ async function sendTikTok(
           currency: "BDT",
           value: Number(order.total),
           order_id: order.order_number,
-          contents: order.order_items.map((i) => ({
-            content_id: contentIdOf(i),
-            content_type: "product",
-            content_name: i.product_name,
-            quantity: i.quantity,
-            price: Number(i.unit_price),
-          })),
+          contents: order.order_items.map((i) => {
+            const l = lineOf(i);
+            return {
+              content_id: l.id,
+              content_type: "product",
+              content_name: l.name,
+              ...(l.category ? { content_category: l.category } : {}),
+              ...(l.brand ? { brand: l.brand } : {}),
+              quantity: l.quantity,
+              price: l.price,
+            };
+          }),
         },
       },
     ],
@@ -320,12 +335,19 @@ async function sendGa4(
               ...(a["utm_medium"] ? { medium: a["utm_medium"] } : {}),
               ...(a["utm_campaign"] ? { campaign: a["utm_campaign"] } : {}),
               event_id: eventId,
-              items: order.order_items.map((i) => ({
-                item_id: contentIdOf(i),
-                item_name: i.product_name,
-                price: Number(i.unit_price),
-                quantity: i.quantity,
-              })),
+              items: order.order_items.map((i) => {
+                const l = lineOf(i);
+                return {
+                  item_id: l.id,
+                  item_name: l.name,
+                  ...(l.category ? { item_category: l.category } : {}),
+                  ...(l.variant ? { item_variant: l.variant } : {}),
+                  ...(l.brand ? { item_brand: l.brand } : {}),
+                  ...(l.group ? { item_group_id: l.group } : {}),
+                  price: l.price,
+                  quantity: l.quantity,
+                };
+              }),
             },
           },
         ],
@@ -386,7 +408,7 @@ async function loadOrder(db: Db, orderId: string): Promise<OrderRow | null> {
   const { data } = await db
     .from("orders")
     .select(
-      "id, order_number, customer_name, customer_phone, customer_email, city, district, division, subtotal, delivery_charge, total, created_at, customer_ip, customer_user_agent, attribution, order_items(product_id, product_name, product_slug, sku, unit_price, quantity, line_total)",
+      "id, order_number, customer_name, customer_phone, customer_email, city, district, division, subtotal, delivery_charge, total, created_at, customer_ip, customer_user_agent, attribution, order_items(product_id, product_name, product_slug, variant_label, sku, unit_price, quantity, line_total, products:product_id(sku, brand, categories:category_id(name_en)))",
     )
     .eq("id", orderId)
     .maybeSingle();
