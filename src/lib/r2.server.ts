@@ -1,5 +1,7 @@
 import { AwsClient } from "aws4fetch";
 
+import { getIntegrationValues } from "./integration-secrets.server";
+
 export type R2Config = {
   accountId: string;
   accessKeyId: string;
@@ -8,12 +10,14 @@ export type R2Config = {
   publicBaseUrl: string;
 };
 
-export function readR2Config(): R2Config | null {
-  const accountId = process.env["R2_ACCOUNT_ID"];
-  const accessKeyId = process.env["R2_ACCESS_KEY_ID"];
-  const secretAccessKey = process.env["R2_SECRET_ACCESS_KEY"];
-  const bucket = process.env["R2_BUCKET"];
-  const publicBaseUrl = process.env["R2_PUBLIC_BASE_URL"];
+/** Reads R2 settings from the admin panel, falling back to environment vars. */
+export async function readR2Config(): Promise<R2Config | null> {
+  const v = await getIntegrationValues();
+  const accountId = v["R2_ACCOUNT_ID"];
+  const accessKeyId = v["R2_ACCESS_KEY_ID"];
+  const secretAccessKey = v["R2_SECRET_ACCESS_KEY"];
+  const bucket = v["R2_BUCKET"];
+  const publicBaseUrl = v["R2_PUBLIC_BASE_URL"];
   if (!accountId || !accessKeyId || !secretAccessKey || !bucket || !publicBaseUrl) return null;
   return {
     accountId,
@@ -23,6 +27,7 @@ export function readR2Config(): R2Config | null {
     publicBaseUrl: publicBaseUrl.replace(/\/+$/, ""),
   };
 }
+
 
 function client(cfg: R2Config) {
   return new AwsClient({
