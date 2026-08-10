@@ -539,32 +539,8 @@ export async function fetchSitemapData() {
 }
 
 
-export async function fetchCatalogFeed() {
-  const db = createPublicServerClient();
-  const { data } = await db
-    .from("products")
-    .select(
-      "id, slug, name_bn, name_en, short_description_bn, short_description_en, price, compare_at_price, stock, sku, brand, product_images(url, sort_order), categories(name_en)",
-    )
-    .eq("is_active", true)
-    .neq("kind", "component")
-    .order("sort_order");
-  return (data ?? []) as Array<{
-    id: string;
-    slug: string;
-    name_bn: string;
-    name_en: string;
-    short_description_bn: string | null;
-    short_description_en: string | null;
-    price: number | string;
-    compare_at_price: number | string | null;
-    stock: number;
-    sku: string | null;
-    brand: string | null;
-    product_images: Array<{ url: string; sort_order: number }> | null;
-    categories: { name_en: string } | null;
-  }>;
-}
+export { fetchCatalogFeed } from "./catalog-feed.server";
+
 
 export type { CategoryRow, SubcategoryRow, SettingsMap, SettingValue };
 
