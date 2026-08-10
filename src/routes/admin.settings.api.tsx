@@ -237,29 +237,31 @@ function R2MigrationCard() {
     setRunning(true);
     setLog([]);
     setProgress({ copied: 0, skipped: 0, failed: 0 });
-    let token: string | null = null;
+    let offset = 0;
     let copied = 0;
     let skipped = 0;
     let failed = 0;
+    let total = 0;
     const errors: string[] = [];
     try {
       for (let page = 0; page < 500; page += 1) {
         const res: Awaited<ReturnType<typeof adminR2MigrateBatch>> = await adminR2MigrateBatch({
-          data: { token },
+          data: { offset },
         });
         copied += res.copied;
         skipped += res.skipped;
         failed += res.failed;
+        total = res.total;
         errors.push(...res.errors);
         setProgress({ copied, skipped, failed });
         setLog((prev) => [
           `Batch ${page + 1}: ${res.copied} copied, ${res.skipped} already there${
             res.failed ? `, ${res.failed} failed` : ""
-          }`,
+          } · ${res.total} total referenced`,
           ...prev,
         ]);
-        token = res.nextToken;
-        if (!token) break;
+        offset = res.nextOffset ?? -1;
+        if (offset < 0) break;
       }
       if (failed > 0) {
         toast.error(`${failed} file(s) failed — run migrate again to retry them.`);
@@ -285,8 +287,9 @@ function R2MigrationCard() {
             Bucket change detected
           </h2>
           <p className="mt-1 text-xs text-muted-foreground">
-            All existing images, invoices and videos still live in the old bucket. Migrate copies
-            every file into the new bucket and updates every stored link.
+            All images, invoices and videos referenced in the database still point to the old
+            bucket. Migrate copies those referenced files into the new bucket and updates every
+            stored link. The old token only needs read permission; bucket listing is not required.
           </p>
         </div>
       </div>

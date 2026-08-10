@@ -203,6 +203,22 @@ export async function objectExists(cfg: R2Config, key: string): Promise<boolean>
   return res.ok;
 }
 
+/** Quick read permission check for a single key. */
+export async function probeObjectRead(
+  cfg: R2Config,
+  key: string,
+): Promise<{ ok: boolean; status: number; message: string }> {
+  const res = await client(cfg).fetch(objectUrl(cfg, key), { method: "HEAD" });
+  if (res.ok) return { ok: true, status: res.status, message: "Readable" };
+  const text = await res.text().catch(() => "");
+  const msg = /<Message>([^<]+)<\/Message>/.exec(text)?.[1];
+  return {
+    ok: false,
+    status: res.status,
+    message: msg ?? `Read failed (${res.status})`,
+  };
+}
+
 /** Streams one object from the source bucket into the destination bucket. */
 export async function copyObjectAcross(
   from: R2Config,

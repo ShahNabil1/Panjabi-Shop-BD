@@ -4,7 +4,12 @@
  * When the R2 credentials are changed to a different bucket, the previously
  * effective configuration is snapshotted into `integration_credentials` under
  * `PREV_R2_*` keys. The admin can then run a migration that copies every
- * object into the new bucket and rewrites all stored media links.
+ * referenced media object into the new bucket and rewrites all stored links.
+ *
+ * This version is database-driven: it scans the URLs stored in Supabase
+ * (product images, categories, promotions, etc.) instead of listing the old
+ * bucket. That means the old R2 token only needs `GetObject` permission;
+ * `ListBucket` is no longer required.
  */
 
 import type { R2Config } from "./r2.server";
@@ -80,38 +85,165 @@ export type R2MigrateBatchResult = {
   skipped: number;
   failed: number;
   errors: string[];
-  nextToken: string | null;
+  /** Next offset, or null when every referenced object has been processed. */
+  nextOffset: number | null;
+  /** Total number of unique referenced objects to migrate. */
+  total: number;
   lastKey: string | null;
 };
 
-/** Copies one page of objects from the old bucket to the new one. */
-export async function migrateBatch(token: string | null): Promise<R2MigrateBatchResult> {
-  const { readR2Config, listObjectsPage, objectExists, copyObjectAcross } = await import(
-    "./r2.server"
-  );
+type KeyRef = { key: string; sourceUrl: string };
+
+const BATCH_SIZE = 50;
+
+/**
+ * Walk every known media URL column and collect the unique R2 object keys that
+ * belong to the old public base URL. Uses `r2_key` when stored, otherwise
+ * derives the key from the URL by stripping the base.
+ */
+async function collectKeys(from: R2Config): Promise<KeyRef[]> {
+  const db = await admin();
+  const base = from.publicBaseUrl.replace(/\/+$/, "");
+  const prefix = `${base}/`;
+
+  // Each entry: [table, column, optional r2_key column]
+  const columns: { table: string; urlCol: string; keyCol?: string }[] = [
+    { table: "categories", urlCol: "image_url" },
+    { table: "subcategories", urlCol: "image_url" },
+    { table: "products", urlCol: "og_image_url" },
+    { table: "product_images", urlCol: "url", keyCol: "r2_key" },
+    { table: "promotions", urlCol: "banner_url" },
+    { table: "profiles", urlCol: "avatar_url" },
+    { table: "landing_pages", urlCol: "og_image_url" },
+  ];
+
+  const seen = new Map<string, string>();
+
+  for (const { table, urlCol, keyCol } of columns) {
+    let page = 0;
+    while (true) {
+      const cols = `${urlCol}${keyCol ? `, ${keyCol}` : ""}`;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const res = (await (db as any)
+        .from(table)
+        .select(cols)
+        .not(urlCol, "is", null)
+        .like(urlCol, `${prefix}%`)
+        .range(page * 1000, (page + 1) * 1000 - 1)) as {
+        data: Record<string, string | null>[] | null;
+        error: { message: string } | null;
+      };
+
+      if (res.error) {
+        // Non-fatal: log and continue so one broken table does not block the rest.
+        console.warn(`[r2-migration] could not read ${table}.${urlCol}:`, res.error.message);
+        break;
+      }
+
+      const data = res.data ?? [];
+      if (!data.length) break;
+
+      for (const row of data) {
+        const url = row[urlCol];
+        if (!url) continue;
+        const explicitKey = keyCol ? row[keyCol] : null;
+        const key = explicitKey?.trim() || url.slice(prefix.length);
+        if (!key) continue;
+        seen.set(key, url);
+      }
+
+      if (data.length < 1000) break;
+      page += 1;
+    }
+  }
+
+  // landing_pages.content may contain image URLs inside JSONB.
+  {
+    let page = 0;
+    while (true) {
+      const builder = db.from("landing_pages") as unknown as {
+        select: (columns: string) => {
+          filter: (column: string, operator: string, value: string) => {
+            range: (from: number, to: number) => Promise<unknown>;
+          };
+        };
+      };
+      const res = (await builder
+        .select("content")
+        .filter("content::text", "like", `%${prefix}%`)
+        .range(page * 1000, (page + 1) * 1000 - 1)) as {
+        data: { content: unknown }[] | null;
+        error: { message: string } | null;
+      };
+
+      if (res.error) {
+        console.warn("[r2-migration] could not read landing_pages.content:", res.error.message);
+        break;
+      }
+
+      const data = res.data ?? [];
+      if (!data.length) break;
+
+      const urlPattern = new RegExp(
+        `${escapeRegExp(prefix)}([^"'\\s<>|{}\\\\^\`\[\]]+)`,
+        "g",
+      );
+
+      for (const row of data) {
+        const content = JSON.stringify(row.content);
+        let match;
+        while ((match = urlPattern.exec(content)) !== null) {
+          const key = decodeURIComponent(match[1] ?? "").split("?")[0];
+          if (!key) continue;
+          seen.set(key, `${prefix}${key}`);
+        }
+      }
+
+      if (data.length < 1000) break;
+      page += 1;
+    }
+  }
+
+  return Array.from(seen.entries()).map(([key, sourceUrl]) => ({ key, sourceUrl }));
+}
+
+function escapeRegExp(value: string) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+/** Copies one batch of referenced objects from the old bucket to the new one. */
+export async function migrateBatch(offset = 0): Promise<R2MigrateBatchResult> {
+  const { readR2Config, objectExists, copyObjectAcross } = await import("./r2.server");
   const to = await readR2Config();
   if (!to) throw new Error("New R2 configuration is incomplete.");
   const from = await readPreviousR2();
   if (!from) throw new Error("No previous bucket recorded — nothing to migrate.");
   if (sameBucket(from, to)) throw new Error("Source and destination bucket are the same.");
 
-  let page;
-  try {
-    page = await listObjectsPage(from, token, 100);
-  } catch (err) {
-    const detail = err instanceof Error ? err.message : "unknown error";
-    throw new Error(
-      `Could not read the old bucket "${from.bucket}" (${detail}). ` +
-        "The saved old R2 credentials are invalid or lack ListBucket/read permission. " +
-        "Fix the old bucket's API token, or press “Skip migration” to forget it.",
-    );
+  const all = await collectKeys(from);
+  const total = all.length;
+  const batch = all.slice(offset, offset + BATCH_SIZE);
+
+  // Pre-flight: confirm we can read from the old bucket before copying everything.
+  const firstRef = batch[0];
+  if (firstRef) {
+    const { probeObjectRead } = await import("./r2.server");
+    const probe = await probeObjectRead(from, firstRef.key);
+    if (!probe.ok && (probe.status === 403 || probe.status === 401)) {
+      throw new Error(
+        `Cannot read the old bucket "${from.bucket}" (${probe.status} ${probe.message}). ` +
+          "The saved old R2 credentials lack GetObject permission, so files cannot be copied. " +
+          "Fix the old bucket's API token, or press “Skip migration” to forget it.",
+      );
+    }
   }
+
   let copied = 0;
   let skipped = 0;
   let failed = 0;
   const errors: string[] = [];
 
-  for (const key of page.keys) {
+  for (const { key } of batch) {
     try {
       if (await objectExists(to, key)) {
         skipped += 1;
@@ -127,13 +259,15 @@ export async function migrateBatch(token: string | null): Promise<R2MigrateBatch
     }
   }
 
+  const nextOffset = offset + batch.length;
   return {
     copied,
     skipped,
     failed,
     errors,
-    nextToken: page.nextToken,
-    lastKey: page.keys.at(-1) ?? null,
+    nextOffset: nextOffset < total ? nextOffset : null,
+    total,
+    lastKey: batch.at(-1)?.key ?? null,
   };
 }
 
