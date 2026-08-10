@@ -237,29 +237,31 @@ function R2MigrationCard() {
     setRunning(true);
     setLog([]);
     setProgress({ copied: 0, skipped: 0, failed: 0 });
-    let token: string | null = null;
+    let offset = 0;
     let copied = 0;
     let skipped = 0;
     let failed = 0;
+    let total = 0;
     const errors: string[] = [];
     try {
       for (let page = 0; page < 500; page += 1) {
         const res: Awaited<ReturnType<typeof adminR2MigrateBatch>> = await adminR2MigrateBatch({
-          data: { token },
+          data: { offset },
         });
         copied += res.copied;
         skipped += res.skipped;
         failed += res.failed;
+        total = res.total;
         errors.push(...res.errors);
         setProgress({ copied, skipped, failed });
         setLog((prev) => [
           `Batch ${page + 1}: ${res.copied} copied, ${res.skipped} already there${
             res.failed ? `, ${res.failed} failed` : ""
-          }`,
+          } · ${res.total} total referenced`,
           ...prev,
         ]);
-        token = res.nextToken;
-        if (!token) break;
+        offset = res.nextOffset ?? -1;
+        if (offset < 0) break;
       }
       if (failed > 0) {
         toast.error(`${failed} file(s) failed — run migrate again to retry them.`);
