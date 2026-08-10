@@ -7,9 +7,7 @@ import {
   Copy,
   Link2,
   Loader2,
-  Lock,
   Pencil,
-
   Plug,
   Plus,
   Radio,
@@ -373,12 +371,6 @@ function PartnerCard({
         </div>
       </div>
 
-      {locked ? (
-        <p className="flex items-center gap-2 rounded-xl border border-border/70 bg-muted/40 px-3 py-2 text-[11px] font-medium text-muted-foreground">
-          <Lock className="size-3.5" />
-          Credentials are locked. Click “Edit credentials” to change them.
-        </p>
-      ) : null}
 
       <div className="grid gap-4 sm:grid-cols-2">
         {fields.map((f) => (
@@ -464,10 +456,6 @@ function PartnerCard({
             Test webhook
           </Button>
         </div>
-        <p className="text-[11px] text-muted-foreground">
-          "Test webhook" only checks that our public endpoint answers correctly. It does not verify
-          that {providerLabels[provider]} has accepted the integration on their panel.
-        </p>
         {ping ? (
           <div
             className={cn(
