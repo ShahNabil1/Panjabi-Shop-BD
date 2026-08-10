@@ -419,6 +419,14 @@ function R2MigrationCard() {
         </div>
       </dl>
 
+      {blocked ? (
+        <p className="rounded-xl border border-destructive/30 bg-destructive/10 px-3 py-2 text-xs font-medium text-destructive">
+          {blocked}
+        </p>
+      ) : null}
+
+
+
       <div className="flex flex-wrap items-center gap-2">
         <Button type="button" disabled={running} onClick={run}>
           {running ? (
