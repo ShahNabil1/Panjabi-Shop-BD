@@ -284,16 +284,16 @@ export const adminR2MigrationState = createServerFn({ method: "GET" })
     };
   });
 
-/** Admin-only: copies one page of objects from the old bucket to the new one. */
+/** Admin-only: copies one batch of referenced media into the new bucket. */
 export const adminR2MigrateBatch = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) =>
-    z.object({ token: z.string().nullable().default(null) }).parse(input),
+    z.object({ offset: z.number().int().min(0).default(0) }).parse(input),
   )
   .handler(async ({ data, context }) => {
     await requireAdmin(context.supabase, context.userId);
     const { migrateBatch } = await import("./r2-migration.server");
-    return migrateBatch(data.token);
+    return migrateBatch(data.offset);
   });
 
 /** Admin-only: rewrites every stored media link and closes the migration. */
