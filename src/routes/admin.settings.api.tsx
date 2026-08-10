@@ -471,10 +471,6 @@ function ApiSettingsAdmin() {
         title="API & Integrations"
         description="Storage, SMS and courier-check credentials — stored securely in the database, editable any time."
       />
-      <p className="rounded-xl border border-border/70 bg-muted/40 px-3 py-2 text-xs text-muted-foreground">
-        Secret values are never shown again after saving — the {API_SECRET_MASK} placeholder means
-        the stored value stays untouched. Clearing a field and saving deletes that value.
-      </p>
 
       <R2MigrationCard />
 
