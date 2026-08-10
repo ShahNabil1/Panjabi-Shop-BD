@@ -370,18 +370,19 @@ type PlanEntry = { platform: Platform; event: string };
 
 /**
  * Status → conversion mapping agreed with the business:
- *   pending / processing (order placed) → Meta Purchase · TikTok PlaceAnOrder · GA4 purchase
+ *   confirmed / pending (order confirmed by admin) → Meta Purchase ·
+ *     TikTok PlaceAnOrder · GA4 purchase
  *   delivered  → TikTok CompletePayment (TikTok's "purchase" event)
  *   cancelled / returned → GA4 refund
  *
- * Website checkout creates orders directly as `processing`, so both entry
- * statuses map to the same "order placed" conversion set. Server-side dedupe
- * (tracking_events) makes sure it only ever fires once per order.
+ * A website order is created as `processing` (not yet verified), so no
+ * conversion fires at checkout. When admin confirms it the order moves to
+ * `pending` and the sale is counted once (tracking_events dedupe).
  */
 export function eventPlan(status: string): PlanEntry[] {
   switch (status) {
     case "pending":
-    case "processing":
+    case "confirmed":
       return [
         { platform: "meta", event: "Purchase" },
         { platform: "tiktok", event: "PlaceAnOrder" },
@@ -396,6 +397,7 @@ export function eventPlan(status: string): PlanEntry[] {
       return [];
   }
 }
+
 
 /* -------------------------------------------------------------- dispatch */
 
