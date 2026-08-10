@@ -568,8 +568,6 @@ export function ProductEditor({ id, kind }: { id: string; kind: ProductKind }) {
               <ImageUploadButton
                 folder={mediaFolder}
                 multiple
-                crop
-                cropPreset={isComponent ? "square" : "card"}
                 label="Upload images"
                 onUploaded={(urls) =>
                   set("images", [
@@ -618,7 +616,20 @@ export function ProductEditor({ id, kind }: { id: string; kind: ProductKind }) {
               >
                 <div className="size-14 shrink-0 overflow-hidden rounded-lg bg-muted transition-transform duration-300 group-hover:scale-105">
                   {img.url ? (
-                    <img src={img.url} alt="" className="size-full object-cover" />
+                    <CropExistingButton
+                      folder={mediaFolder}
+                      url={img.url}
+                      cropPreset={i === 0 && !isComponent ? "card" : "square"}
+                      className="size-full"
+                      onCropped={(u) =>
+                        set(
+                          "images",
+                          draft.images.map((x, j) => (j === i ? { ...x, url: u } : x)),
+                        )
+                      }
+                    >
+                      <img src={img.url} alt="" className="size-full object-cover" />
+                    </CropExistingButton>
                   ) : (
                     <div className="flex size-full items-center justify-center text-muted-foreground">
                       <Upload className="size-4" />
