@@ -319,3 +319,70 @@ export type ProductAttribution = {
   campaigns: AttributionCampaignRow[];
   channels: AttributionChannelRow[];
 };
+
+/* ------------------------------------------------------------------ *
+ * Automated rule scheduling
+ * ------------------------------------------------------------------ */
+
+export type AutomationSettings = {
+  /** Master switch — when off the cron endpoint does nothing. */
+  enabled: boolean;
+  /** Report only: decisions are logged but never sent to Meta. */
+  dryRun: boolean;
+  level: CampaignLevel;
+  preset: MarketingPreset;
+  thresholds: ControlThresholds;
+  /** Which verdicts the robot is allowed to act on. */
+  actions: { pause: boolean; scale: boolean; reduce: boolean };
+  /** Never raise a daily budget above this (account currency). 0 = no cap. */
+  maxDailyBudget: number;
+  /** Safety valve so one bad night cannot touch the whole account. */
+  maxActionsPerRun: number;
+};
+
+export const DEFAULT_AUTOMATION: AutomationSettings = {
+  enabled: false,
+  dryRun: true,
+  level: "campaign",
+  preset: "7d",
+  thresholds: DEFAULT_THRESHOLDS,
+  actions: { pause: true, scale: false, reduce: false },
+  maxDailyBudget: 0,
+  maxActionsPerRun: 5,
+};
+
+export type AutomationActionLog = {
+  id: string;
+  name: string;
+  action: RuleAction;
+  reason: string;
+  spend: number;
+  roas: number;
+  /** applied | skipped | failed | planned (dry run) */
+  outcome: "applied" | "skipped" | "failed" | "planned";
+  detail?: string;
+};
+
+export type AutomationRun = {
+  id: string;
+  trigger: string;
+  dryRun: boolean;
+  level: string;
+  preset: string;
+  evaluated: number;
+  applied: number;
+  skipped: number;
+  actions: AutomationActionLog[];
+  error: string | null;
+  createdAt: string;
+};
+
+export type AutomationState = {
+  settings: AutomationSettings;
+  runs: AutomationRun[];
+  /** What the robot would do right now, using the saved settings. */
+  preview: AutomationActionLog[];
+  connected: boolean;
+  message?: string;
+  currency: string;
+};
