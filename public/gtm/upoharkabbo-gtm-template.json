@@ -1,6 +1,6 @@
 {
   "exportFormatVersion": 2,
-  "exportTime": "2026-08-10T20:54:05.484Z",
+  "exportTime": "2026-08-10T21:08:25.325Z",
   "containerVersion": {
     "accountId": "0",
     "containerId": "0",
@@ -1814,6 +1814,38 @@
             "value": "customer_phone"
           }
         ]
+      }
+    ],
+    "builtInVariable": [
+      {
+        "accountId": "0",
+        "containerId": "0",
+        "type": "PAGE_URL",
+        "name": "Page URL"
+      },
+      {
+        "accountId": "0",
+        "containerId": "0",
+        "type": "PAGE_HOSTNAME",
+        "name": "Page Hostname"
+      },
+      {
+        "accountId": "0",
+        "containerId": "0",
+        "type": "PAGE_PATH",
+        "name": "Page Path"
+      },
+      {
+        "accountId": "0",
+        "containerId": "0",
+        "type": "REFERRER",
+        "name": "Referrer"
+      },
+      {
+        "accountId": "0",
+        "containerId": "0",
+        "type": "EVENT",
+        "name": "Event"
       }
     ],
     "fingerprint": "0"
