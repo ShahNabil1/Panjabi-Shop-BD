@@ -6,6 +6,8 @@ import { useLang } from "@/lib/language-context";
 import { pick, tr } from "@/lib/i18n";
 import { ProductThumb } from "@/components/site/product-card";
 import { Breadcrumbs, Section } from "@/components/site/ui";
+import { absoluteUrl } from "@/lib/site";
+
 
 export const Route = createFileRoute("/offers/")({
   loader: async (): Promise<PromotionListData> => getPromotions(),
