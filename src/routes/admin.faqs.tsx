@@ -1,11 +1,17 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useConfirm } from "@/components/ui/confirm-dialog";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { HelpCircle, Pencil, Trash2, X } from "lucide-react";
+import { HelpCircle, Pencil, Search, Trash2, X } from "lucide-react";
 
-import { adminDeleteFaq, adminListFaqs, adminSaveFaq } from "@/lib/admin.functions";
+import {
+  adminDeleteFaq,
+  adminListFaqs,
+  adminListSettings,
+  adminSaveFaq,
+  adminSaveSetting,
+} from "@/lib/admin.functions";
 import type { FaqInput } from "@/lib/admin-schema";
 import {
   AdminHeading,
@@ -16,11 +22,106 @@ import {
   TextField,
   ToggleField,
 } from "@/components/admin/kit";
+import { ImageUploadButton } from "@/components/admin/image-upload";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/admin/faqs")({
   component: FaqsAdmin,
 });
+
+type FaqSeo = { meta_title: string; meta_description: string; og_image: string };
+
+const EMPTY_SEO: FaqSeo = { meta_title: "", meta_description: "", og_image: "" };
+
+function FaqSeoPanel() {
+  const qc = useQueryClient();
+  const { data: settings } = useQuery({
+    queryKey: ["admin", "settings"],
+    queryFn: () => adminListSettings(),
+  });
+  const [seo, setSeo] = useState<FaqSeo>(EMPTY_SEO);
+
+  useEffect(() => {
+    const row = (settings ?? []).find((s: { key: string }) => s.key === "faq_seo");
+    const v = (row?.value ?? {}) as Partial<FaqSeo>;
+    setSeo({
+      meta_title: v.meta_title ?? "",
+      meta_description: v.meta_description ?? "",
+      og_image: v.og_image ?? "",
+    });
+  }, [settings]);
+
+  const save = useMutation({
+    mutationFn: () => adminSaveSetting({ data: { key: "faq_seo", value: seo } }),
+    onSuccess: async () => {
+      toast.success("FAQ SEO saved");
+      await qc.invalidateQueries({ queryKey: ["admin", "settings"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  return (
+    <Panel className="space-y-4">
+      <div>
+        <h2 className="flex items-center gap-2 text-sm font-bold">
+          <Search className="size-4 text-primary" />
+          FAQ page SEO
+        </h2>
+        <p className="mt-1 text-xs text-muted-foreground">
+          Meta title, description and social share image for the public /faq page. Leave blank to
+          use the built-in defaults.
+        </p>
+      </div>
+      <TextField
+        label="Meta title"
+        value={seo.meta_title}
+        onChange={(v) => setSeo({ ...seo, meta_title: v })}
+      />
+      <AreaField
+        label="Meta description"
+        rows={3}
+        value={seo.meta_description}
+        onChange={(v) => setSeo({ ...seo, meta_description: v })}
+      />
+      <div className="space-y-2">
+        <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+          OG image
+        </p>
+        <div className="flex items-center gap-3">
+          {seo.og_image ? (
+            <img
+              src={seo.og_image}
+              alt="FAQ share preview"
+              className="h-16 w-28 rounded-md border border-border object-cover"
+            />
+          ) : (
+            <div className="flex h-16 w-28 items-center justify-center rounded-md border border-dashed border-border text-[11px] text-muted-foreground">
+              No image
+            </div>
+          )}
+          <ImageUploadButton
+            folder="site"
+            label="Upload"
+            onUploaded={(urls) => urls[0] && setSeo({ ...seo, og_image: urls[0] })}
+          />
+          {seo.og_image ? (
+            <Button variant="ghost" size="sm" onClick={() => setSeo({ ...seo, og_image: "" })}>
+              <X className="size-4" />
+            </Button>
+          ) : null}
+        </div>
+      </div>
+      <Button
+        loading={save.isPending}
+        onClick={() => save.mutate()}
+        className="ig-gradient transition-transform duration-300 hover:scale-[1.02]"
+      >
+        Save SEO
+      </Button>
+    </Panel>
+  );
+}
+
 
 function emptyFaq(): FaqInput {
   return {
