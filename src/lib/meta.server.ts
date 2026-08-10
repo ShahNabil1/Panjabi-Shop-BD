@@ -80,6 +80,7 @@ export async function metaGet<T = unknown>(
           error_subcode?: number;
           type?: string;
           error_user_msg?: string;
+          fbtrace_id?: string;
         };
       } | null
     )?.error;
@@ -88,9 +89,14 @@ export async function metaGet<T = unknown>(
       err?.code !== undefined ? `code ${err.code}` : null,
       err?.error_subcode ? `subcode ${err.error_subcode}` : null,
       err?.type ?? null,
+      err?.fbtrace_id ? `trace ${err.fbtrace_id}` : null,
+      err?.code === 200 && !err?.error_subcode
+        ? "App-level restriction: check App Dashboard → App Review / Business verification"
+        : null,
     ].filter(Boolean);
     throw new MetaApiError(`${path.split("?")[0]} → ${bits.join(" · ")}`, res.status, err?.code);
   }
+
 
   return body as T;
 }
