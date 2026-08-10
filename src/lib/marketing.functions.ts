@@ -7,10 +7,12 @@ import {
   CAMPAIGN_LEVELS,
   MARKETING_PRESETS,
   type CampaignPerformance,
+  type CreativePerformance,
   type MarketingOverview,
 } from "./marketing-shared";
 import {
   buildCampaignPerformance,
+  buildCreativePerformance,
   buildMarketingOverview,
   clearMarketingCache,
 } from "./marketing.server";
@@ -47,4 +49,19 @@ export const marketingCampaigns = createServerFn({ method: "POST" })
     await requireAdmin(context.supabase, context.userId);
     if (data.refresh) clearMarketingCache();
     return buildCampaignPerformance(data.preset, data.level);
+  });
+
+const creativeSchema = z.object({
+  preset: z.enum(MARKETING_PRESETS).default("7d"),
+  refresh: z.boolean().optional(),
+});
+
+/** Admin-only: creative level performance with hook / hold rates. */
+export const marketingCreatives = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => creativeSchema.parse(input ?? {}))
+  .handler(async ({ data, context }): Promise<CreativePerformance> => {
+    await requireAdmin(context.supabase, context.userId);
+    if (data.refresh) clearMarketingCache();
+    return buildCreativePerformance(data.preset);
   });
