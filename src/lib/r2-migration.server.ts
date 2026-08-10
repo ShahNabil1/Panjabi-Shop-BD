@@ -90,6 +90,8 @@ export type R2MigrateBatchResult = {
   /** Total number of unique referenced objects to migrate. */
   total: number;
   lastKey: string | null;
+  /** Set when the old bucket cannot be read at all — migration is impossible. */
+  blocked: string | null;
 };
 
 type KeyRef = { key: string; sourceUrl: string };
