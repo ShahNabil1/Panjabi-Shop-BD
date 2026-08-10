@@ -1552,6 +1552,65 @@ export type Database = {
           },
         ]
       }
+      tracking_events: {
+        Row: {
+          attempts: number
+          created_at: string
+          emq: number | null
+          event_id: string
+          event_name: string
+          id: string
+          match_keys: string[]
+          message: string | null
+          order_id: string | null
+          platform: string
+          request: Json
+          response: Json
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          attempts?: number
+          created_at?: string
+          emq?: number | null
+          event_id: string
+          event_name: string
+          id?: string
+          match_keys?: string[]
+          message?: string | null
+          order_id?: string | null
+          platform: string
+          request?: Json
+          response?: Json
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          attempts?: number
+          created_at?: string
+          emq?: number | null
+          event_id?: string
+          event_name?: string
+          id?: string
+          match_keys?: string[]
+          message?: string | null
+          order_id?: string | null
+          platform?: string
+          request?: Json
+          response?: Json
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tracking_events_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string

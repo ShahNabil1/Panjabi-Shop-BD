@@ -244,6 +244,17 @@ export const adminUpdateOrderStatus = createServerFn({ method: "POST" })
         });
       }
     }
+
+    // Server-side conversion fan-out (Meta CAPI · TikTok Events · GA4 MP).
+    // Deduped per order+platform+event, and never allowed to break the update.
+    if (before !== data.status) {
+      try {
+        const { dispatchOrderEvents } = await import("./tracking-dispatch.server");
+        await dispatchOrderEvents(db, data.id, data.status);
+      } catch {
+        // Tracking outages must not fail the status change.
+      }
+    }
     return { ok: true };
   });
 
