@@ -16,6 +16,8 @@ import { SpecShowcase } from "@/components/site/spec-showcase";
 import { ComboContents } from "@/components/site/combo-contents";
 import { comboItemIdBySku, comboSelectionBySku, resolveVariantBySku } from "@/lib/sku-preselect";
 import type { CartItem } from "@/lib/cart-context";
+import { ecommerce, useScrollDepth, useTrackOnce } from "@/lib/tracking";
+import { cartTrackingItems } from "@/lib/tracking-items";
 import { cn } from "@/lib/utils";
 import logoMark from "@/assets/upoharkabbo-logo.png";
 import { ImageLightbox, useLightbox } from "@/components/site/image-lightbox";
