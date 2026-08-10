@@ -39,6 +39,14 @@ export async function readTrackingConfig(): Promise<TrackingConfig> {
   };
 }
 
+/** SHA-256 hex — Meta requires hashed values for identity fields. */
+async function sha256Hex(input: string): Promise<string> {
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(input.trim().toLowerCase()));
+  return Array.from(new Uint8Array(buf))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+}
+
 export type Probe = {
   ok: boolean;
   message: string;
@@ -65,15 +73,25 @@ export async function probeMetaCapi(cfg: TrackingConfig): Promise<Probe> {
   if (!cfg.metaPixelId || !cfg.metaCapiToken)
     return { ok: false, message: "Pixel ID or access token missing", details: [] };
 
+  // Meta rejects the payload ("Invalid parameter") unless user_data carries at
+  // least one real matching key — a UA string alone is not enough. A synthetic
+  // fbp + IP + hashed external_id satisfies the requirement for the probe.
+  const now = Math.floor(Date.now() / 1000);
+  const externalId = await sha256Hex(`connection-test-${cfg.metaPixelId}`);
   const body: Record<string, unknown> = {
     data: [
       {
         event_name: "PageView",
-        event_time: Math.floor(Date.now() / 1000),
+        event_time: now,
         event_id: `conn-test.${Date.now()}`,
         action_source: "website",
         event_source_url: "https://upoharkabbo.com/",
-        user_data: { client_user_agent: "UpoharkabboConnectionTest/1.0" },
+        user_data: {
+          client_user_agent: "UpoharkabboConnectionTest/1.0",
+          client_ip_address: "203.0.113.1",
+          fbp: `fb.1.${Date.now()}.1234567890`,
+          external_id: externalId,
+        },
       },
     ],
   };
