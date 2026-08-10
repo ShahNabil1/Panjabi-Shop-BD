@@ -8,6 +8,8 @@ import {
   Loader2,
   Pencil,
   PlugZap,
+  Gauge,
+  RefreshCw,
   Trash2,
   TriangleAlert,
   XCircle,
@@ -35,6 +37,7 @@ import {
   adminR2MigrationState,
   adminRemoveIntegration,
   adminSaveIntegration,
+  adminImageTransformUsage,
   adminTestIntegration,
   type IntegrationGroupState,
   type IntegrationTestResult,
@@ -50,6 +53,60 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/admin/settings/api")({
   component: ApiSettingsAdmin,
 });
+
+function TransformUsageCard() {
+  const q = useQuery({
+    queryKey: ["admin", "transform-usage"],
+    queryFn: () => adminImageTransformUsage(),
+    refetchInterval: 60_000,
+    refetchOnWindowFocus: true,
+  });
+  const data = q.data;
+  const count = data?.count ?? null;
+  const limit = data?.limit ?? 5000;
+  const pct = count === null ? 0 : Math.min(100, (count / limit) * 100);
+  const tone =
+    pct >= 90 ? "bg-rose-500" : pct >= 70 ? "bg-amber-500" : "bg-emerald-500";
+
+  return (
+    <div className="rounded-xl border border-border/70 bg-muted/30 px-3 py-3">
+      <div className="flex flex-wrap items-center gap-2">
+        <Gauge className="size-4 text-muted-foreground" />
+        <span className="text-[10px] font-bold tracking-wider text-muted-foreground uppercase">
+          Image transformations · this month
+        </span>
+        <button
+          type="button"
+          onClick={() => void q.refetch()}
+          className="ml-auto inline-flex items-center gap-1 text-[11px] font-semibold text-muted-foreground hover:text-foreground"
+        >
+          <RefreshCw className={cn("size-3", q.isFetching && "animate-spin")} />
+          Refresh
+        </button>
+      </div>
+
+      <div className="mt-2 flex items-baseline gap-2">
+        <span className="ig-text text-2xl font-bold tabular-nums">
+          {q.isLoading ? "…" : count === null ? "—" : count.toLocaleString("en-US")}
+        </span>
+        <span className="text-xs font-semibold text-muted-foreground">
+          / {limit.toLocaleString("en-US")} unique
+        </span>
+      </div>
+
+      <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-border">
+        <div className={cn("h-full rounded-full transition-all", tone)} style={{ width: `${pct}%` }} />
+      </div>
+
+      <p className="mt-2 text-[11px] text-muted-foreground">
+        {data?.message || "Loading live usage…"}
+        {data?.checkedAt && data.count !== null
+          ? ` · ${new Date(data.checkedAt).toLocaleTimeString()}`
+          : ""}
+      </p>
+    </div>
+  );
+}
 
 function GroupCard({
   group,
@@ -169,6 +226,7 @@ function GroupCard({
 
       </div>
 
+      {group === "r2" ? <TransformUsageCard /> : null}
 
       {state?.envOnly ? (
         <p className="rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-900">
