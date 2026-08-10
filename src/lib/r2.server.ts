@@ -160,3 +160,58 @@ export async function probeR2(cfg: R2Config): Promise<R2Probe> {
     return { ...base, ok: false, message: err instanceof Error ? err.message : "Unknown error" };
   }
 }
+
+/* ------------------------------------------------------------------ */
+/* Bucket migration helpers                                            */
+/* ------------------------------------------------------------------ */
+
+function decodeXml(value: string) {
+  return value
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'");
+}
+
+export type R2ListPage = { keys: string[]; nextToken: string | null };
+
+/** One page of object keys, oldest-listed first, with a continuation token. */
+export async function listObjectsPage(
+  cfg: R2Config,
+  token: string | null,
+  maxKeys = 200,
+): Promise<R2ListPage> {
+  const url = new URL(`https://${cfg.accountId}.r2.cloudflarestorage.com/${cfg.bucket}`);
+  url.searchParams.set("list-type", "2");
+  url.searchParams.set("max-keys", String(maxKeys));
+  if (token) url.searchParams.set("continuation-token", token);
+  const res = await client(cfg).fetch(url.toString(), { method: "GET" });
+  const text = await res.text();
+  if (!res.ok) {
+    const msg = /<Message>([^<]+)<\/Message>/.exec(text)?.[1];
+    throw new Error(msg ?? `Listing failed (${res.status})`);
+  }
+  const keys = [...text.matchAll(/<Key>([^<]+)<\/Key>/g)].map((m) => decodeXml(m[1] ?? ""));
+  const next = /<NextContinuationToken>([^<]+)<\/NextContinuationToken>/.exec(text)?.[1];
+  return { keys: keys.filter(Boolean), nextToken: next ? decodeXml(next) : null };
+}
+
+/** True when the object already exists in the bucket. */
+export async function objectExists(cfg: R2Config, key: string): Promise<boolean> {
+  const res = await client(cfg).fetch(objectUrl(cfg, key), { method: "HEAD" });
+  return res.ok;
+}
+
+/** Streams one object from the source bucket into the destination bucket. */
+export async function copyObjectAcross(
+  from: R2Config,
+  to: R2Config,
+  key: string,
+): Promise<void> {
+  const res = await client(from).fetch(objectUrl(from, key), { method: "GET" });
+  if (!res.ok) throw new Error(`read failed (${res.status})`);
+  const contentType = res.headers.get("content-type") ?? "application/octet-stream";
+  const body = await res.arrayBuffer();
+  await putObject(to, key, body, contentType);
+}
