@@ -72,9 +72,26 @@ export async function metaGet<T = unknown>(
     /* non-JSON body */
   }
   if (!res.ok) {
-    const err = (body as { error?: { message?: string; code?: number } } | null)?.error;
-    throw new MetaApiError(err?.message || `Meta API failed [${res.status}]`, res.status, err?.code);
+    const err = (
+      body as {
+        error?: {
+          message?: string;
+          code?: number;
+          error_subcode?: number;
+          type?: string;
+          error_user_msg?: string;
+        };
+      } | null
+    )?.error;
+    const bits = [
+      err?.error_user_msg || err?.message || `HTTP ${res.status}`,
+      err?.code !== undefined ? `code ${err.code}` : null,
+      err?.error_subcode ? `subcode ${err.error_subcode}` : null,
+      err?.type ?? null,
+    ].filter(Boolean);
+    throw new MetaApiError(`${path.split("?")[0]} → ${bits.join(" · ")}`, res.status, err?.code);
   }
+
   return body as T;
 }
 
@@ -88,8 +105,26 @@ export type MetaProbe = {
 export async function probeMeta(cfg: MetaConfig): Promise<MetaProbe> {
   const details: { label: string; value: string }[] = [];
   try {
+    // Token introspection first — it explains most "blocked" style failures.
+    try {
+      const dbg = await metaGet<{
+        data?: { scopes?: string[]; is_valid?: boolean; app_id?: string; type?: string };
+      }>(cfg, "debug_token", { input_token: cfg.accessToken });
+      const d = dbg.data ?? {};
+      details.push({ label: "Token valid", value: d.is_valid ? "yes" : "no" });
+      if (d.type) details.push({ label: "Token type", value: d.type });
+      if (d.app_id) details.push({ label: "App ID", value: d.app_id });
+      details.push({ label: "Scopes", value: (d.scopes ?? []).join(", ") || "none" });
+    } catch (e) {
+      details.push({
+        label: "Token check",
+        value: e instanceof Error ? e.message : "failed",
+      });
+    }
+
     const me = await metaGet<{ name?: string; id?: string }>(cfg, "me", { fields: "id,name" });
     details.push({ label: "Token owner", value: me.name || me.id || "—" });
+
 
     const acct = await metaGet<{
       name?: string;
