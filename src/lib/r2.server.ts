@@ -116,3 +116,47 @@ export async function putObject(
   if (!res.ok) throw new Error(`R2 upload failed (${res.status})`);
   return publicUrlFor(cfg, key);
 }
+
+export type R2Probe = {
+  ok: boolean;
+  message: string;
+  bucket: string;
+  publicBaseUrl: string;
+  objects: number | null;
+  truncated: boolean;
+  latestKey: string | null;
+};
+
+/** Live bucket check — lists a page of objects with the stored credentials. */
+export async function probeR2(cfg: R2Config): Promise<R2Probe> {
+  const base: Omit<R2Probe, "ok" | "message"> = {
+    bucket: cfg.bucket,
+    publicBaseUrl: cfg.publicBaseUrl,
+    objects: null,
+    truncated: false,
+    latestKey: null,
+  };
+  try {
+    const url = new URL(`https://${cfg.accountId}.r2.cloudflarestorage.com/${cfg.bucket}`);
+    url.searchParams.set("list-type", "2");
+    url.searchParams.set("max-keys", "1000");
+    const res = await client(cfg).fetch(url.toString(), { method: "GET" });
+    const text = await res.text();
+    if (!res.ok) {
+      const msg = /<Message>([^<]+)<\/Message>/.exec(text)?.[1];
+      return { ...base, ok: false, message: msg ?? `Bucket request failed (${res.status})` };
+    }
+    const keys = [...text.matchAll(/<Key>([^<]+)<\/Key>/g)].map((m) => m[1] ?? "");
+    const truncated = /<IsTruncated>true<\/IsTruncated>/.test(text);
+    return {
+      ...base,
+      ok: true,
+      message: "Bucket reachable",
+      objects: keys.length,
+      truncated,
+      latestKey: keys.at(-1) ?? null,
+    };
+  } catch (err) {
+    return { ...base, ok: false, message: err instanceof Error ? err.message : "Unknown error" };
+  }
+}
