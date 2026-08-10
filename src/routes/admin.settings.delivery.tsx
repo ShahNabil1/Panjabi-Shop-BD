@@ -190,9 +190,13 @@ function PartnerCard({
   })();
 
   const [removeOpen, setRemoveOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
+  const [unlocked, setUnlocked] = useState(false);
+  const locked = Boolean(row) && !unlocked;
   const [testing, setTesting] = useState(false);
   const [saving, setSaving] = useState(false);
   const [removing, setRemoving] = useState(false);
+
   const [result, setResult] = useState<{ ok: boolean; message: string } | null>(
     row ? { ok: row.connection_ok, message: row.connection_message ?? "" } : null,
   );
