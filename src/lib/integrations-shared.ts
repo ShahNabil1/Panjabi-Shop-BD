@@ -40,7 +40,7 @@ export const integrationMeta: Record<
         secret: true,
         optional: true,
         placeholder: "Zone Analytics Read token",
-        hint: "Read-only token used to show live image transformation usage.",
+        hint: "Read-only token used to show live image transformation connection & usage.",
       },
     ],
   },
