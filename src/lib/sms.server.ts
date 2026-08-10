@@ -1,4 +1,5 @@
 import type { Db } from "./admin.server";
+import { getIntegrationValues } from "./integration-secrets.server";
 
 /**
  * BulkSMSBD gateway helper.
@@ -79,8 +80,9 @@ function parseCode(raw: string): number | null {
 /** Sends one SMS through BulkSMSBD and maps the provider code to a human message. */
 export async function sendBulkSms(phone: string, message: string): Promise<SmsResult> {
   const segments = smsSegments(message);
-  const apiKey = process.env["BULKSMSBD_API_KEY"];
-  const senderId = process.env["BULKSMSBD_SENDER_ID"];
+  const creds = await getIntegrationValues();
+  const apiKey = creds["BULKSMSBD_API_KEY"];
+  const senderId = creds["BULKSMSBD_SENDER_ID"];
 
   if (!apiKey || !senderId) {
     return {
@@ -125,7 +127,7 @@ export async function sendBulkSms(phone: string, message: string): Promise<SmsRe
 
 /** Reads the remaining SMS credit balance. */
 export async function getSmsBalance(): Promise<{ ok: boolean; balance: number | null; message: string }> {
-  const apiKey = process.env["BULKSMSBD_API_KEY"];
+  const apiKey = (await getIntegrationValues())["BULKSMSBD_API_KEY"];
   if (!apiKey) return { ok: false, balance: null, message: "BulkSMSBD credentials are not configured" };
   try {
     const res = await fetch(`${BALANCE_API_URL}?api_key=${encodeURIComponent(apiKey)}`);

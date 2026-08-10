@@ -35,7 +35,7 @@ export const createUploadTicket = createServerFn({ method: "POST" })
   .handler(async ({ data, context }): Promise<MediaUploadTicket> => {
     await requireAdmin(context.supabase, context.userId);
     const { readR2Config, buildKey, signUploadUrl, publicUrlFor } = await import("@/lib/r2.server");
-    const cfg = readR2Config();
+    const cfg = await readR2Config();
     if (!cfg) throw new Error("R2 কনফিগার করা নেই। সেটিংসে R2 সিক্রেটগুলো যোগ করুন।");
 
     const key = buildKey(data.folder, data.fileName);
@@ -53,7 +53,7 @@ export const deleteUpload = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     await requireAdmin(context.supabase, context.userId);
     const { readR2Config, deleteObject } = await import("@/lib/r2.server");
-    const cfg = readR2Config();
+    const cfg = await readR2Config();
     if (!cfg) throw new Error("R2 কনফিগার করা নেই।");
     await deleteObject(cfg, data.key);
     return { ok: true };
@@ -65,5 +65,5 @@ export const getMediaStatus = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     await requireAdmin(context.supabase, context.userId);
     const { readR2Config } = await import("@/lib/r2.server");
-    return { configured: readR2Config() !== null };
+    return { configured: (await readR2Config()) !== null };
   });
