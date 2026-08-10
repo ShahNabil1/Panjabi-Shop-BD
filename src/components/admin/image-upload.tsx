@@ -382,15 +382,9 @@ export function ImageField({
               />
             ) : null}
             {value ? (
-              <button
-                type="button"
-                onClick={() => onChange(null)}
-                className="inline-flex items-center gap-1 text-[11px] text-muted-foreground transition-colors hover:text-destructive"
-              >
-                <X className="size-3" />
-                Remove
-              </button>
+              <ImageDeleteButton url={value} onRemoved={() => onChange(null)} label="Delete" />
             ) : null}
+
           </div>
         </div>
       </div>
