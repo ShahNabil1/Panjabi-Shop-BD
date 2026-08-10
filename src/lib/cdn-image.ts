@@ -7,8 +7,14 @@
  */
 
 /** Zone that has Transformations enabled. Sources must live on this zone. */
-const ZONE_ORIGIN = "https://upoharkabbo.com";
 const ZONE_HOST = "upoharkabbo.com";
+/**
+ * Hosts that serve the app itself — their `/cdn-cgi/image/…` path is swallowed
+ * by the app worker, so transformations must be requested on the asset host
+ * (e.g. cdn.upoharkabbo.com) instead.
+ */
+const APP_HOSTS = new Set([ZONE_HOST, `www.${ZONE_HOST}`]);
+
 
 /** Bucketed widths — fewer distinct variants means fewer billable transforms. */
 export const IMAGE_WIDTHS = [160, 240, 320, 400, 480, 640, 768, 960, 1200, 1600, 1920] as const;
