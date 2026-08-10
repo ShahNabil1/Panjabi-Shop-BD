@@ -15,6 +15,7 @@ import {
   LogOut,
   Menu,
   MessageSquareText,
+  Megaphone,
 
   Package,
   PlusCircle,
@@ -93,6 +94,10 @@ const sections: Array<{ title: string; items: NavItem[] }> = [
   },
 
 
+  {
+    title: "Marketing",
+    items: [{ to: "/admin/marketing", label: "Overview", icon: Megaphone, exact: true }],
+  },
   {
     title: "Content",
     items: [
