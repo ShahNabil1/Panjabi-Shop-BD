@@ -226,8 +226,60 @@ export async function processCourierWebhook(
 
   if (error) return { processed: false, message: error.message };
   const result = data as { processed?: boolean; message?: string } | null;
+
+  // A courier callback can move the order to delivered / returned / cancelled,
+  // which are conversion-relevant. The webhook runs with the publishable key,
+  // so the fan-out uses the service-role client (RLS blocks anon here).
+  // Never allowed to fail the acknowledgement — couriers retry aggressively.
+  if (result?.processed) {
+    try {
+      await dispatchCourierConversions(provider, parsed.consignmentId, parsed.merchantOrderId);
+    } catch {
+      // Tracking outages must not break webhook acknowledgement.
+    }
+  }
+
   return {
     processed: result?.processed ?? false,
     message: result?.message ?? "No response from the database",
   };
+}
+
+/** Resolves the order touched by a courier callback and fires its conversions. */
+async function dispatchCourierConversions(
+  provider: DeliveryProvider,
+  consignmentId: string | null,
+  merchantOrderId: string | null,
+): Promise<void> {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { dispatchOrderEvents } = await import("./tracking-dispatch.server");
+
+  let orderId: string | null = null;
+  let orderStatus: string | null = null;
+
+  if (consignmentId) {
+    const { data } = await supabaseAdmin
+      .from("order_consignments")
+      .select("order_id, orders(status)")
+      .eq("consignment_id", consignmentId)
+      .eq("provider", provider)
+      .maybeSingle();
+    const row = data as { order_id?: string; orders?: { status?: string } | null } | null;
+    orderId = row?.order_id ?? null;
+    orderStatus = row?.orders?.status ?? null;
+  }
+  if (!orderId && merchantOrderId) {
+    const { data } = await supabaseAdmin
+      .from("orders")
+      .select("id, status")
+      .eq("order_number", merchantOrderId)
+      .maybeSingle();
+    const row = data as { id?: string; status?: string } | null;
+    orderId = row?.id ?? null;
+    orderStatus = row?.status ?? null;
+  }
+  if (!orderId || !orderStatus) return;
+
+  await dispatchOrderEvents(supabaseAdmin as unknown as Db, orderId, orderStatus);
+
 }
