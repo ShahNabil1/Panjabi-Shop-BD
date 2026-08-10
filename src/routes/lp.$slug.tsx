@@ -186,6 +186,22 @@ function LandingPage() {
     [product, images, activeVariant, unitPrice, qty, stock, comboItems, comboSelected],
   );
 
+  // Landing funnel: view_page + view_item on load, plus 25/50/75/100% scroll.
+  const trackedItems = useMemo(() => cartTrackingItems(items), [items]);
+  const viewPayload = useMemo(
+    () => ({ ...ecommerce(trackedItems), page_type: "landing", landing_slug: landing.slug }),
+    [trackedItems, landing.slug],
+  );
+  useTrackOnce("view_page", viewPayload);
+  useTrackOnce("view_item", viewPayload);
+  useScrollDepth(
+    useMemo(
+      () => ({ page_type: "landing", landing_slug: landing.slug, content_ids: trackedItems.map((i) => i.id) }),
+      [landing.slug, trackedItems],
+    ),
+  );
+
+
   const landingFaqs = (product.faq ?? []).map((f, i) => ({
     id: String(i),
     question_bn: f["question_bn"] ?? f["question"] ?? "",
