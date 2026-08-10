@@ -10,10 +10,13 @@ export function ComboContents({
   items,
   selected,
   onSelect,
+  highlightId,
 }: {
   items: ComboContentItem[];
   selected?: Record<string, string>;
   onSelect?: (itemId: string, variantId: string) => void;
+  /** Combo row advertised by a catalogue ad (?sku=…) — gently highlighted. */
+  highlightId?: string | null;
 }) {
   const { lang } = useLang();
   const lightbox = useLightbox();
@@ -45,7 +48,11 @@ export function ComboContents({
         {items.map((item, i) => (
           <li
             key={item.id}
-            className="group flex items-center gap-3 rounded-xl border border-border bg-card p-3 transition-shadow duration-300 hover:shadow-[var(--shadow-lift)]"
+            className={`group flex items-center gap-3 rounded-xl border bg-card p-3 transition-shadow duration-300 hover:shadow-[var(--shadow-lift)] ${
+              highlightId === item.id
+                ? "border-primary shadow-[var(--shadow-lift)] ring-1 ring-primary/30"
+                : "border-border"
+            }`}
           >
             <button
               type="button"
