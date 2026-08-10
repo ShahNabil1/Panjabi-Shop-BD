@@ -559,6 +559,16 @@ export const adminCancelCarrybeeConsignment = createServerFn({ method: "POST" })
         { actor: who, meta: { provider: "carrybee", reason: data.reason } },
       );
 
+      // Cancelling here changes the order status outside adminUpdateOrderStatus,
+      // so the conversion fan-out (GA4 refund) is triggered explicitly.
+      try {
+        const { dispatchOrderEvents } = await import("./tracking-dispatch.server");
+        await dispatchOrderEvents(db, data.orderId, "cancelled");
+      } catch {
+        // Tracking outages must not fail the cancellation.
+      }
+
+
       return { ok: true, message: "CarryBee consignment cancelled" };
     } catch (error) {
       return { ok: false, message: (error as Error).message };
