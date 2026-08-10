@@ -225,9 +225,10 @@ export async function migrateBatch(offset = 0): Promise<R2MigrateBatchResult> {
   const batch = all.slice(offset, offset + BATCH_SIZE);
 
   // Pre-flight: confirm we can read from the old bucket before copying everything.
-  if (batch.length > 0) {
-    const { readR2Config, probeObjectRead } = await import("./r2.server");
-    const probe = await probeObjectRead(from, batch[0].key);
+  const firstRef = batch[0];
+  if (firstRef) {
+    const { probeObjectRead } = await import("./r2.server");
+    const probe = await probeObjectRead(from, firstRef.key);
     if (!probe.ok && (probe.status === 403 || probe.status === 401)) {
       throw new Error(
         `Cannot read the old bucket "${from.bucket}" (${probe.status} ${probe.message}). ` +
