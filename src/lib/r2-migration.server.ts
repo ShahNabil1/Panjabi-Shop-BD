@@ -124,8 +124,8 @@ async function collectKeys(from: R2Config): Promise<KeyRef[]> {
     while (true) {
       const cols = `${urlCol}${keyCol ? `, ${keyCol}` : ""}`;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const builder: any = db.from(table);
-      const res = (await builder
+      const res = (await (db as any)
+        .from(table)
         .select(cols)
         .not(urlCol, "is", null)
         .like(urlCol, `${prefix}%`)
