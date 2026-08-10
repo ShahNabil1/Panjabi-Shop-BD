@@ -122,9 +122,20 @@ async function collectKeys(from: R2Config): Promise<KeyRef[]> {
   for (const { table, urlCol, keyCol } of columns) {
     let page = 0;
     while (true) {
-      const { data, error } = await db
-        .from(table)
-        .select(`${urlCol}${keyCol ? `, ${keyCol}` : ""}`)
+      const cols = `${urlCol}${keyCol ? `, ${keyCol}` : ""}`;
+      const { data, error } = await (db.from(table) as unknown as {
+        select: (columns: string) => {
+          not: (column: string, operator: string, value: null) => {
+            like: (column: string, pattern: string) => {
+              range: (from: number, to: number) => Promise<{
+                data: Record<string, string | null>[] | null;
+                error: { message: string } | null;
+              }>;
+            };
+          };
+        };
+      })
+        .select(cols)
         .not(urlCol, "is", null)
         .like(urlCol, `${prefix}%`)
         .range(page * 1000, (page + 1) * 1000 - 1);
@@ -138,9 +149,9 @@ async function collectKeys(from: R2Config): Promise<KeyRef[]> {
       if (!data?.length) break;
 
       for (const row of data) {
-        const url = (row as Record<string, unknown>)[urlCol] as string | null;
+        const url = row[urlCol];
         if (!url) continue;
-        const explicitKey = keyCol ? ((row as Record<string, unknown>)[keyCol] as string | null) : null;
+        const explicitKey = keyCol ? row[keyCol] : null;
         const key = explicitKey?.trim() || url.slice(prefix.length);
         if (!key) continue;
         seen.set(key, url);
