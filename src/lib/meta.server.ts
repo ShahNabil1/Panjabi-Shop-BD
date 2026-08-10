@@ -72,9 +72,26 @@ export async function metaGet<T = unknown>(
     /* non-JSON body */
   }
   if (!res.ok) {
-    const err = (body as { error?: { message?: string; code?: number } } | null)?.error;
-    throw new MetaApiError(err?.message || `Meta API failed [${res.status}]`, res.status, err?.code);
+    const err = (
+      body as {
+        error?: {
+          message?: string;
+          code?: number;
+          error_subcode?: number;
+          type?: string;
+          error_user_msg?: string;
+        };
+      } | null
+    )?.error;
+    const bits = [
+      err?.error_user_msg || err?.message || `HTTP ${res.status}`,
+      err?.code !== undefined ? `code ${err.code}` : null,
+      err?.error_subcode ? `subcode ${err.error_subcode}` : null,
+      err?.type ?? null,
+    ].filter(Boolean);
+    throw new MetaApiError(`${path.split("?")[0]} → ${bits.join(" · ")}`, res.status, err?.code);
   }
+
   return body as T;
 }
 
