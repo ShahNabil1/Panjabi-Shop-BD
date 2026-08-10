@@ -97,7 +97,7 @@ export function OrderSourcePanel({
   attribution,
 }: {
   source: string;
-  attribution?: AttributionPayload | null;
+  attribution?: AttributionPayload | null | undefined;
 }) {
   const last = attribution?.last;
   const first = attribution?.first;
