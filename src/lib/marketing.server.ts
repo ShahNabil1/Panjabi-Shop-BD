@@ -11,7 +11,10 @@
 
 import { actId, metaGet, readMetaConfig, type MetaConfig } from "./meta.server";
 import type {
+  AudienceHealth,
+  AudienceRow,
   CampaignLevel,
+  CatalogHealth,
   CampaignPerformance,
   CreativePerformance,
   DateRange,
@@ -20,6 +23,7 @@ import type {
   MarketingSeriesPoint,
   MetaMetrics,
   OrderMetrics,
+  PixelHealth,
 } from "./marketing-shared";
 
 export { MARKETING_PRESETS } from "./marketing-shared";
@@ -648,6 +652,209 @@ export async function buildCreativePerformance(
       currency: "USD",
       range,
       rows: [],
+    };
+  }
+}
+
+/* ------------------------------------------------------------------ *
+ * Audience, catalog and pixel health (Marketing → Audiences)
+ * ------------------------------------------------------------------ */
+
+type RawAudience = {
+  id: string;
+  name?: string;
+  subtype?: string;
+  description?: string;
+  approximate_count_lower_bound?: number;
+  approximate_count_upper_bound?: number;
+  retention_days?: number;
+  delivery_status?: { code?: number; description?: string };
+  operation_status?: { code?: number; description?: string };
+  time_updated?: number;
+};
+
+const MIN_AUDIENCE_SIZE = 1000;
+
+async function loadAudiences(cfg: MetaConfig): Promise<AudienceRow[]> {
+  const res = await metaGet<{ data?: RawAudience[] }>(
+    cfg,
+    `${actId(cfg.adAccountId)}/customaudiences`,
+    {
+      fields:
+        "id,name,subtype,description,approximate_count_lower_bound,approximate_count_upper_bound,retention_days,delivery_status,operation_status,time_updated",
+      limit: 100,
+    },
+  );
+  return (res.data ?? []).map((a) => {
+    const lower = a.approximate_count_lower_bound ?? null;
+    const upper = a.approximate_count_upper_bound ?? null;
+    const approximateCount = upper ?? lower;
+    return {
+      id: a.id,
+      name: a.name ?? a.id,
+      subtype: a.subtype ?? null,
+      description: a.description ?? null,
+      approximateCount,
+      retentionDays: a.retention_days ?? null,
+      deliveryStatus: a.delivery_status?.description ?? null,
+      operationStatus: a.operation_status?.description ?? null,
+      updatedAt: a.time_updated ? new Date(a.time_updated * 1000).toISOString() : null,
+      ready: (approximateCount ?? 0) >= MIN_AUDIENCE_SIZE,
+    } satisfies AudienceRow;
+  });
+}
+
+async function loadCatalogHealth(cfg: MetaConfig): Promise<CatalogHealth> {
+  if (!cfg.catalogId) {
+    return { configured: false, id: null, name: null, productCount: null, productSets: null, issues: [] };
+  }
+  const [meta, sets, diagnostics] = await Promise.all([
+    metaGet<{ name?: string; product_count?: number }>(cfg, cfg.catalogId, {
+      fields: "name,product_count",
+    }).catch(() => ({}) as { name?: string; product_count?: number }),
+    metaGet<{ summary?: { total_count?: number } }>(cfg, `${cfg.catalogId}/product_sets`, {
+      summary: "total_count",
+      limit: 1,
+    }).catch(() => ({}) as { summary?: { total_count?: number } }),
+    metaGet<{
+      data?: {
+        diagnostic_group?: string;
+        severity?: string;
+        title?: string;
+        type?: string;
+        affected_entity?: string;
+        number_of_affected_items?: number;
+      }[];
+    }>(cfg, `${cfg.catalogId}/diagnostics`, { limit: 25 }).catch(() => ({ data: [] })),
+  ]);
+
+  return {
+    configured: true,
+    id: cfg.catalogId,
+    name: meta.name ?? null,
+    productCount: meta.product_count ?? null,
+    productSets: sets.summary?.total_count ?? null,
+    issues: (diagnostics.data ?? []).map((d) => ({
+      severity: (d.severity ?? "WARNING").toLowerCase(),
+      title: d.title ?? d.diagnostic_group ?? "Catalog issue",
+      affectedCount: d.number_of_affected_items ?? null,
+      type: d.type ?? d.diagnostic_group ?? null,
+    })),
+  };
+}
+
+async function loadPixelHealth(cfg: MetaConfig): Promise<PixelHealth | null> {
+  const pixel = await metaGet<{
+    id?: string;
+    name?: string;
+    last_fired_time?: string;
+    automatic_matching_fields?: string[];
+    enable_automatic_matching?: boolean;
+  }>(cfg, cfg.pixelId, {
+    fields: "id,name,last_fired_time,enable_automatic_matching,automatic_matching_fields",
+  }).catch(() => null);
+  if (!pixel) return null;
+
+  const stats = await metaGet<{
+    data?: { aggregation?: string; data?: { value?: string; count?: number }[] }[];
+  }>(cfg, `${cfg.pixelId}/stats`, { aggregation: "event", limit: 1 }).catch(() => ({ data: [] }));
+
+  const bucket = stats.data?.[0]?.data ?? [];
+  const events = bucket
+    .map((e) => ({ name: e.value ?? "unknown", count: e.count ?? 0 }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 8);
+
+  const lastFiredAt = pixel.last_fired_time ?? null;
+  const hoursSinceLastEvent = lastFiredAt
+    ? Math.max(0, Math.round((Date.now() - new Date(lastFiredAt).getTime()) / 3_600_000))
+    : null;
+
+  return {
+    id: pixel.id ?? cfg.pixelId,
+    name: pixel.name ?? null,
+    lastFiredAt,
+    hoursSinceLastEvent,
+    matchRate: null,
+    automaticMatching: pixel.enable_automatic_matching ?? null,
+    events,
+  };
+}
+
+/** Builds the Marketing → Audiences payload (audiences + catalog + pixel). */
+export async function buildAudienceHealth(): Promise<AudienceHealth> {
+  const cfg = await readMetaConfig();
+  if (!cfg) {
+    return {
+      connected: false,
+      message: "Meta Marketing API is not configured yet.",
+      audiences: [],
+      catalog: { configured: false, id: null, name: null, productCount: null, productSets: null, issues: [] },
+      pixel: null,
+      recommendations: [],
+    };
+  }
+
+  try {
+    const [audiences, catalog, pixel] = await Promise.all([
+      cached(`aud:${cfg.adAccountId}:${cfg.version}`, () => loadAudiences(cfg)),
+      cached(`cat:${cfg.catalogId ?? "none"}:${cfg.version}`, () => loadCatalogHealth(cfg)),
+      cached(`pix:${cfg.pixelId}:${cfg.version}`, () => loadPixelHealth(cfg)),
+    ]);
+
+    const recommendations: AudienceHealth["recommendations"] = [];
+    const tooSmall = audiences.filter((a) => !a.ready).length;
+    if (!audiences.length) {
+      recommendations.push({
+        tone: "critical",
+        text: "No custom audiences yet — create a purchaser exclusion list and a 180-day website visitor audience to unlock retargeting and Lookalikes.",
+      });
+    } else if (tooSmall) {
+      recommendations.push({
+        tone: "warning",
+        text: `${tooSmall} audience(s) are below Meta's 1,000-person delivery floor and cannot be targeted yet.`,
+      });
+    } else {
+      recommendations.push({ tone: "good", text: "All custom audiences are large enough to deliver." });
+    }
+
+    if (!audiences.some((a) => (a.subtype ?? "").toUpperCase() === "LOOKALIKE")) {
+      recommendations.push({
+        tone: "warning",
+        text: "No Lookalike audience found — build a 1% Lookalike from your delivered-purchasers list for the cheapest cold traffic.",
+      });
+    }
+
+    if (pixel?.hoursSinceLastEvent != null && pixel.hoursSinceLastEvent > 24) {
+      recommendations.push({
+        tone: "critical",
+        text: `Pixel has not fired in ${pixel.hoursSinceLastEvent} hours — tracking is likely broken.`,
+      });
+    } else if (pixel?.lastFiredAt) {
+      recommendations.push({ tone: "good", text: "Pixel is receiving events normally." });
+    }
+
+    if (!catalog.configured) {
+      recommendations.push({
+        tone: "warning",
+        text: "No catalog ID saved — add it in API & Integrations to enable Dynamic Product Ads and catalog diagnostics.",
+      });
+    } else if (catalog.issues.some((i) => i.severity === "critical")) {
+      recommendations.push({
+        tone: "critical",
+        text: "Meta reports critical catalog issues — affected products cannot be advertised.",
+      });
+    }
+
+    return { connected: true, audiences, catalog, pixel, recommendations };
+  } catch (err) {
+    return {
+      connected: false,
+      message: err instanceof Error ? err.message : "Failed to load audience health.",
+      audiences: [],
+      catalog: { configured: false, id: null, name: null, productCount: null, productSets: null, issues: [] },
+      pixel: null,
+      recommendations: [],
     };
   }
 }
