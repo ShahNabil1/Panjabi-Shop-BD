@@ -30,7 +30,16 @@ export type Attribution = {
   fbp?: string | undefined;
   ttclid?: string | undefined;
   gclid?: string | undefined;
+  /** TikTok browser id cookie (_ttp) — needed by the TikTok Events API. */
+  ttp?: string | undefined;
+  /** GA4 client id parsed out of the _ga cookie (Measurement Protocol). */
+  ga_client_id?: string | undefined;
+  /** GA4 session id parsed out of the _ga_<container> cookie. */
+  ga_session_id?: string | undefined;
+  /** Stable first-party visitor id — Meta/TikTok `external_id`. */
+  external_id?: string | undefined;
   /** Context */
+
   referrer?: string | undefined;
   landing_page?: string | undefined;
   channel?: string | undefined;
