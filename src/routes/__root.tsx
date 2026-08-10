@@ -85,7 +85,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       ],
       links: [
         { rel: "stylesheet", href: appCss },
+        // Google's crawler prefers a root .ico; keep the PNG variants for browsers.
+        { rel: "icon", href: "/favicon.ico", sizes: "48x48" },
         { rel: "icon", href: "/favicon.png", type: "image/png", sizes: "64x64" },
+
         { rel: "icon", href: "/icon-192.png", type: "image/png", sizes: "192x192" },
         { rel: "icon", href: "/icon-512.png", type: "image/png", sizes: "512x512" },
         { rel: "apple-touch-icon", href: "/apple-touch-icon.png", sizes: "180x180" },
@@ -137,7 +140,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
                 "@type": "WebSite",
                 "@id": `${SITE_URL}/#website`,
                 name: brand,
+                alternateName: ["Upoharkabbo", "upoharkabbo.com"],
                 url: SITE_URL,
+
                 inLanguage: ["bn", "en"],
                 publisher: { "@id": `${SITE_URL}/#organization` },
                 potentialAction: {

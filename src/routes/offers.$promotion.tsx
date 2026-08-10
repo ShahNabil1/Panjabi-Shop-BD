@@ -8,7 +8,7 @@ import { pick, tr } from "@/lib/i18n";
 import { ProductGrid } from "@/components/site/product-card";
 import { NotFoundView } from "@/components/site/not-found-view";
 import { Breadcrumbs, Section } from "@/components/site/ui";
-import { pageTitle } from "@/lib/site";
+import { absoluteUrl, pageTitle } from "@/lib/site";
 
 export const Route = createFileRoute("/offers/$promotion")({
   loader: async ({ params }): Promise<PromotionPageData> => {
@@ -23,7 +23,8 @@ export const Route = createFileRoute("/offers/$promotion")({
     const p = loaderData.promotion;
     const title = p.metaTitle || pageTitle(p.titleBn);
     const description = p.metaDescription || p.subtitleBn || `${p.titleBn} — সীমিত সময়ের অফার।`;
-    const url = `/offers/${params.promotion}`;
+    const url = absoluteUrl(`/offers/${params.promotion}`);
+    const empty = (loaderData.products ?? []).length === 0;
     return {
       meta: [
         { title },
@@ -31,12 +32,16 @@ export const Route = createFileRoute("/offers/$promotion")({
         { property: "og:title", content: title },
         { property: "og:description", content: description },
         { property: "og:url", content: url },
+        { property: "og:type", content: "website" },
         ...(p.bannerUrl ? [{ property: "og:image", content: p.bannerUrl }] : []),
         ...(p.bannerUrl ? [{ name: "twitter:image", content: p.bannerUrl }] : []),
+        // An offer with no products is a thin page — don't index it yet.
+        ...(empty ? [{ name: "robots", content: "noindex, follow" }] : []),
       ],
       links: [{ rel: "canonical", href: url }],
     };
   },
+
   notFoundComponent: () => <NotFoundView />,
   component: PromotionPage,
 });

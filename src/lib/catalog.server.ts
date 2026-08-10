@@ -444,13 +444,26 @@ export async function fetchPromotionList() {
 
 export async function fetchFaqs() {
   const db = createPublicServerClient();
-  const { data } = await db
-    .from("faqs")
-    .select("id, question_bn, question_en, answer_bn, answer_en")
-    .eq("is_active", true)
-    .order("sort_order");
-  return data ?? [];
+  const [faqRes, seoRes] = await Promise.all([
+    db
+      .from("faqs")
+      .select("id, question_bn, question_en, answer_bn, answer_en")
+      .eq("is_active", true)
+      .order("sort_order"),
+    db.from("site_settings").select("value").eq("key", "faq_seo").maybeSingle(),
+  ]);
+  const seoRaw = (seoRes.data?.value ?? {}) as Record<string, unknown>;
+  const str = (v: unknown) => (typeof v === "string" && v.trim() ? v.trim() : "");
+  return {
+    items: faqRes.data ?? [],
+    seo: {
+      metaTitle: str(seoRaw["meta_title"]),
+      metaDescription: str(seoRaw["meta_description"]),
+      ogImage: str(seoRaw["og_image"]),
+    },
+  };
 }
+
 
 export async function fetchSearch(query: string) {
   const term = query.trim();
@@ -488,7 +501,7 @@ export async function fetchPopularProducts(limit = 4) {
 
 export async function fetchSitemapData() {
   const db = createPublicServerClient();
-  const [cats, subs, prods, landings, promos] = await Promise.all([
+  const [cats, subs, prods, landings, promos, faqCount] = await Promise.all([
     db.from("categories").select("slug, updated_at").eq("is_active", true),
     db.from("subcategories").select("slug, updated_at, categories(slug)").eq("is_active", true),
     db
@@ -497,8 +510,20 @@ export async function fetchSitemapData() {
       .eq("is_active", true)
       .neq("kind", "component"),
     db.from("landing_pages").select("slug, updated_at").eq("is_active", true),
-    db.from("promotions").select("slug, updated_at").eq("is_active", true),
+    db
+      .from("promotions")
+      .select("slug, updated_at, promotion_products(product_id)")
+      .eq("is_active", true),
+    db.from("faqs").select("id", { count: "exact", head: true }).eq("is_active", true),
   ]);
+  const promotions = ((promos.data ?? []) as Array<{
+    slug: string;
+    updated_at: string;
+    promotion_products: Array<{ product_id: string }> | null;
+  }>)
+    // An offer page with no products is a thin page — keep it out of the sitemap.
+    .filter((p) => (p.promotion_products?.length ?? 0) > 0)
+    .map((p) => ({ slug: p.slug, updated_at: p.updated_at }));
   return {
     categories: cats.data ?? [],
     subcategories: (subs.data ?? []) as Array<{
@@ -508,9 +533,11 @@ export async function fetchSitemapData() {
     }>,
     products: prods.data ?? [],
     landings: landings.data ?? [],
-    promotions: promos.data ?? [],
+    promotions,
+    faqCount: faqCount.count ?? 0,
   };
 }
+
 
 export async function fetchCatalogFeed() {
   const db = createPublicServerClient();
