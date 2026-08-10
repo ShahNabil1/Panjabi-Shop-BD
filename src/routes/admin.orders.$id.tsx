@@ -151,29 +151,38 @@ function AdminOrderDetail() {
 
   const claim = async (force: boolean) => {
     if (!id) return;
-    const res = await adminClaimOrder({ data: { id, ...(force ? { force: true } : {}) } });
-    if (res.ok) {
-      ownsRef.current = true;
-      setBlockedBy(null);
-    } else {
+    try {
+      const res = await adminClaimOrder({ data: { id, ...(force ? { force: true } : {}) } });
+      if (res.ok) {
+        ownsRef.current = true;
+        setBlockedBy(null);
+      } else {
+        ownsRef.current = false;
+        setBlockedBy(res.heldBy);
+      }
+    } catch {
+      // Not signed in (or session expired) — presence simply stays unclaimed.
       ownsRef.current = false;
-      setBlockedBy(res.heldBy);
     }
   };
+
 
   useEffect(() => {
     if (!id) return;
     void claim(takeover === 1);
     const beat = setInterval(() => {
-      if (ownsRef.current) void adminHeartbeatOrder({ data: { id } });
+      // Presence is best-effort: after sign-out these calls 401, which must
+      // not surface as an unhandled rejection (blank screen).
+      if (ownsRef.current) void adminHeartbeatOrder({ data: { id } }).catch(() => {});
     }, 25_000);
     return () => {
       clearInterval(beat);
-      if (ownsRef.current) void adminReleaseOrder({ data: { id } });
+      if (ownsRef.current) void adminReleaseOrder({ data: { id } }).catch(() => {});
       ownsRef.current = false;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
+
 
   // Someone else claimed the order while we were inside it.
   useEffect(() => {
