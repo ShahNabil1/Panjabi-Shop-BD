@@ -30,7 +30,16 @@ export type Attribution = {
   fbp?: string | undefined;
   ttclid?: string | undefined;
   gclid?: string | undefined;
+  /** TikTok browser id cookie (_ttp) — needed by the TikTok Events API. */
+  ttp?: string | undefined;
+  /** GA4 client id parsed out of the _ga cookie (Measurement Protocol). */
+  ga_client_id?: string | undefined;
+  /** GA4 session id parsed out of the _ga_<container> cookie. */
+  ga_session_id?: string | undefined;
+  /** Stable first-party visitor id — Meta/TikTok `external_id`. */
+  external_id?: string | undefined;
   /** Context */
+
   referrer?: string | undefined;
   landing_page?: string | undefined;
   channel?: string | undefined;
@@ -90,6 +99,42 @@ function randomFbp(): string {
   return `fb.1.${Date.now()}.${rand}`;
 }
 
+const VISITOR_KEY = "upoharkabbo-visitor-id";
+
+/**
+ * Stable first-party visitor id, reused as `external_id` for Meta/TikTok.
+ * It never contains personal data — just a random UUID kept in localStorage
+ * and mirrored into a cookie so it survives across landing pages too.
+ */
+export function visitorId(): string | undefined {
+  if (typeof window === "undefined") return undefined;
+  try {
+    const stored = localStorage.getItem(VISITOR_KEY) ?? readCookie(VISITOR_KEY);
+    if (stored) {
+      writeCookie(VISITOR_KEY, stored);
+      localStorage.setItem(VISITOR_KEY, stored);
+      return stored;
+    }
+    const next =
+      typeof crypto !== "undefined" && "randomUUID" in crypto
+        ? crypto.randomUUID()
+        : `v-${Date.now()}-${Math.random().toString(36).slice(2, 12)}`;
+    localStorage.setItem(VISITOR_KEY, next);
+    writeCookie(VISITOR_KEY, next);
+    return next;
+  } catch {
+    return undefined;
+  }
+}
+
+/** GA4 session id — stored by GA in a `_ga_<CONTAINER>` cookie. */
+export function gaSessionId(): string | undefined {
+  if (typeof document === "undefined") return undefined;
+  const match = document.cookie.match(/_ga_[A-Z0-9]+=GS\d\.\d\.(\d+)/);
+  return match?.[1] ?? undefined;
+}
+
+
 /** Human-readable bucket used in the admin panel and the attribution report. */
 export function channelOf(a: Attribution): string {
   const source = (a.utm_source ?? "").toLowerCase();
@@ -134,6 +179,21 @@ function parseCurrent(): Attribution {
     writeCookie("_fbp", fbp);
   }
   out.fbp = fbp;
+
+  // TikTok browser id — only read, never faked (TikTok rejects invented ids).
+  const ttp = readCookie("_ttp");
+  if (ttp) out.ttp = ttp;
+
+  // GA4 client id lives in the _ga cookie: GA1.1.<clientId>.
+  const ga = readCookie("_ga");
+  const gaParts = ga?.split(".") ?? [];
+  if (gaParts.length >= 4) out.ga_client_id = `${gaParts[2]}.${gaParts[3]}`;
+  const gaSession = gaSessionId();
+  if (gaSession) out.ga_session_id = gaSession;
+
+  out.external_id = visitorId();
+
+
 
   const referrer = clean(document.referrer);
   if (referrer && !referrer.includes(window.location.host)) out.referrer = referrer;
