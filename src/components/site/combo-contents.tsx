@@ -60,8 +60,10 @@ export function ComboContents({
                     src={item.image}
                     alt={pick(lang, item.nameBn, item.nameEn)}
                     baseWidth={160}
-                    className="size-full cursor-zoom-in object-cover transition-transform duration-500 group-hover:scale-105"
+                    fit="contain"
+                    className="size-full cursor-zoom-in object-contain transition-transform duration-500 group-hover:scale-105"
                   />
+
                   <span className="pointer-events-none absolute inset-0 flex items-center justify-center bg-foreground/25 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
                     <Maximize2 className="size-5 text-background drop-shadow" strokeWidth={2.5} />
                   </span>
