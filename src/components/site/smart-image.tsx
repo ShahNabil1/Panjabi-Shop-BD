@@ -55,6 +55,9 @@ export function SmartImage({
   const ref = useRef<HTMLImageElement>(null);
   const [width, setWidth] = useState(() => getCachedWidth(src) ?? bucketWidth(baseWidth));
   const [cssWidth, setCssWidth] = useState<number | null>(null);
+  const [rawFallback, setRawFallback] = useState(false);
+
+  useEffect(() => setRawFallback(false), [src]);
 
   useEffect(() => {
     setWidth((prev) => Math.max(prev, getCachedWidth(src) ?? 0));
@@ -83,13 +86,15 @@ export function SmartImage({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [src]);
 
-  const finalSrc = cdnImage(src, {
+  const finalSrc = rawFallback
+    ? src
+    : cdnImage(src, {
     width,
     ...(height ? { height } : {}),
     fit,
     gravity,
     ...(quality ? { quality } : {}),
-  });
+      });
 
   /** Single fixed-width variant is served, so the hint mirrors the rendered box. */
   const autoSizes = sizes ?? `${Math.round(cssWidth ?? baseWidth)}px`;
@@ -108,7 +113,13 @@ export function SmartImage({
         decoding={priority ? "sync" : "async"}
         fetchPriority={priority ? "high" : "auto"}
         onClick={onClick}
-        onError={onError}
+        onError={() => {
+          if (!rawFallback && finalSrc !== src) {
+            setRawFallback(true);
+            return;
+          }
+          onError?.();
+        }}
         style={style}
         className={cn(className)}
       />

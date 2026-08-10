@@ -43,10 +43,8 @@ export function ProductThumb({
   return (
     <div
       aria-hidden
-      onClick={onClick}
       className={cn(
         "flex h-full w-full items-center justify-center bg-secondary text-2xl font-bold text-muted-foreground/60",
-        onClick ? "cursor-zoom-in" : "",
         className,
       )}
     >
