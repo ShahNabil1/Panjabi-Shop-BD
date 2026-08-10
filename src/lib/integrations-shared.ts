@@ -2,7 +2,7 @@
 
 export const API_SECRET_MASK = "••••••••";
 
-export const INTEGRATION_GROUPS = ["r2", "bulksmsbd", "bdcourier"] as const;
+export const INTEGRATION_GROUPS = ["r2", "meta", "bulksmsbd", "bdcourier"] as const;
 export type IntegrationGroup = (typeof INTEGRATION_GROUPS)[number];
 
 export type IntegrationField = {
