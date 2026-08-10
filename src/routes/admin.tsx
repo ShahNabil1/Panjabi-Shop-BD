@@ -16,7 +16,6 @@ import {
   Menu,
   MessageSquareText,
   BarChart3,
-  Boxes,
   Clapperboard,
   Users2,
   SlidersHorizontal,
