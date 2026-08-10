@@ -109,6 +109,7 @@ const sections: Array<{ title: string; items: NavItem[] }> = [
       { to: "/admin/marketing/audiences", label: "Audiences", icon: Users2 },
       { to: "/admin/marketing/control", label: "Control Center", icon: SlidersHorizontal },
       { to: "/admin/marketing/automation", label: "Automation", icon: Bot },
+      { to: "/admin/marketing/tracking", label: "Tracking Debug", icon: Activity },
     ],
   },
   {
