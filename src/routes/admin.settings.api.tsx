@@ -63,10 +63,13 @@ function TransformUsageCard() {
   });
   const data = q.data;
   const count = data?.count ?? null;
-  const limit = data?.limit ?? 5000;
-  const pct = count === null ? 0 : Math.min(100, (count / limit) * 100);
-  const tone =
-    pct >= 90 ? "bg-rose-500" : pct >= 70 ? "bg-amber-500" : "bg-emerald-500";
+  // No hard ceiling — the bar fills toward the next 5k milestone and rolls on.
+  const STEP = 5000;
+  const milestone = count === null ? STEP : (Math.floor(count / STEP) + 1) * STEP;
+  const pct = count === null ? 0 : ((count % STEP) / STEP) * 100;
+  const near = count !== null && count % STEP >= STEP * 0.85;
+  const tone = near ? "bg-amber-500" : "bg-emerald-500";
+  const resetAt = new Date(Date.UTC(new Date().getUTCFullYear(), new Date().getUTCMonth() + 1, 1));
 
   return (
     <div className="rounded-xl border border-border/70 bg-muted/30 px-3 py-3">
@@ -89,14 +92,18 @@ function TransformUsageCard() {
         <span className="ig-text text-2xl font-bold tabular-nums">
           {q.isLoading ? "…" : count === null ? "—" : count.toLocaleString("en-US")}
         </span>
-        <span className="text-xs font-semibold text-muted-foreground">
-          / {limit.toLocaleString("en-US")} unique
-        </span>
+        <span className="text-xs font-semibold text-muted-foreground">unique transformations</span>
+        {count !== null ? (
+          <span className="ml-auto text-[11px] font-semibold text-muted-foreground tabular-nums">
+            next {milestone.toLocaleString("en-US")}
+          </span>
+        ) : null}
       </div>
 
       <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-border">
         <div className={cn("h-full rounded-full transition-all", tone)} style={{ width: `${pct}%` }} />
       </div>
+
 
       <p className="mt-2 text-[11px] text-muted-foreground">
         {data?.message || "Loading live usage…"}
