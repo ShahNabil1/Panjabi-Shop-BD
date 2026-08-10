@@ -37,7 +37,32 @@ const MARKS: Record<
     ring: "ring-[#E0218A]/25 bg-white",
     imgClass: "w-[88%] object-contain",
   },
+  gtm: {
+    label: "Google Tag Manager",
+    src: gtmAsset.url,
+    ring: "ring-[#4285F4]/25 bg-white",
+    imgClass: "w-[86%] object-contain",
+  },
+  metacapi: {
+    label: "Meta Conversions API",
+    src: metaAsset.url,
+    ring: "ring-[#0866FF]/25 bg-white",
+    imgClass: "w-[88%] object-contain",
+  },
+  tiktok: {
+    label: "TikTok Events API",
+    src: tiktokAsset.url,
+    ring: "ring-[#FE2C55]/25 bg-white",
+    imgClass: "size-full object-cover",
+  },
+  ga4: {
+    label: "Google Analytics 4",
+    src: ga4Asset.url,
+    ring: "ring-[#F9AB00]/25 bg-white",
+    imgClass: "w-[80%] object-contain",
+  },
 };
+
 
 export function IntegrationMark({
   group,
