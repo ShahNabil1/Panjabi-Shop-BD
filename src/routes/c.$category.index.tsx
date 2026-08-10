@@ -8,6 +8,7 @@ import { ProductGrid } from "@/components/site/product-card";
 import { NotFoundView } from "@/components/site/not-found-view";
 import { Breadcrumbs, Prose, Section } from "@/components/site/ui";
 import { absoluteUrl, pageTitle } from "@/lib/site";
+import { useViewItemList } from "@/lib/tracking-items";
 
 export const Route = createFileRoute("/c/$category/")({
   loader: async ({ params }): Promise<CategoryPageData> => {
