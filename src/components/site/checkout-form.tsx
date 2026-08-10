@@ -233,6 +233,15 @@ export function CheckoutForm({
   const delivery =
     rates.freeAll || (rates.freeAbove > 0 && subtotal >= rates.freeAbove) ? 0 : rates[area];
 
+  // Funnel: begin_checkout as soon as the form is on screen with items.
+  const trackedItems = useMemo(() => cartTrackingItems(items), [items]);
+  const checkoutPayload = useMemo(
+    () => ({ ...ecommerce(trackedItems), page_type: source }),
+    [trackedItems, source],
+  );
+  useTrackOnce("begin_checkout", checkoutPayload, items.length > 0);
+
+
   // ---- Coupon (validated on the server, re-checked again when ordering) ----
   const checkCoupon = useServerFn(validateCoupon);
   const [couponCode, setCouponCode] = useState("");
