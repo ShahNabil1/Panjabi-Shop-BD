@@ -15,6 +15,7 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as CartRouteImport } from './routes/cart'
+import { Route as CatalogDotcsvRouteImport } from './routes/catalog[.]csv'
 import { Route as CatalogDotxmlRouteImport } from './routes/catalog[.]xml'
 import { Route as CategoriesRouteImport } from './routes/categories'
 import { Route as CheckoutRouteImport } from './routes/checkout'
@@ -93,6 +94,11 @@ const AuthRoute = AuthRouteImport.update({
 const CartRoute = CartRouteImport.update({
   id: '/cart',
   path: '/cart',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CatalogDotcsvRoute = CatalogDotcsvRouteImport.update({
+  id: '/catalog.csv',
+  path: '/catalog.csv',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CatalogDotxmlRoute = CatalogDotxmlRouteImport.update({
@@ -355,6 +361,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
   '/cart': typeof CartRoute
+  '/catalog.csv': typeof CatalogDotcsvRoute
   '/catalog.xml': typeof CatalogDotxmlRoute
   '/categories': typeof CategoriesRoute
   '/checkout': typeof CheckoutRoute
@@ -411,6 +418,7 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
   '/cart': typeof CartRoute
+  '/catalog.csv': typeof CatalogDotcsvRoute
   '/catalog.xml': typeof CatalogDotxmlRoute
   '/categories': typeof CategoriesRoute
   '/checkout': typeof CheckoutRoute
@@ -469,6 +477,7 @@ export interface FileRoutesById {
   '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
   '/cart': typeof CartRoute
+  '/catalog.csv': typeof CatalogDotcsvRoute
   '/catalog.xml': typeof CatalogDotxmlRoute
   '/categories': typeof CategoriesRoute
   '/checkout': typeof CheckoutRoute
@@ -528,6 +537,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/auth'
     | '/cart'
+    | '/catalog.csv'
     | '/catalog.xml'
     | '/categories'
     | '/checkout'
@@ -584,6 +594,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/auth'
     | '/cart'
+    | '/catalog.csv'
     | '/catalog.xml'
     | '/categories'
     | '/checkout'
@@ -641,6 +652,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/auth'
     | '/cart'
+    | '/catalog.csv'
     | '/catalog.xml'
     | '/categories'
     | '/checkout'
@@ -699,6 +711,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRouteWithChildren
   AuthRoute: typeof AuthRoute
   CartRoute: typeof CartRoute
+  CatalogDotcsvRoute: typeof CatalogDotcsvRoute
   CatalogDotxmlRoute: typeof CatalogDotxmlRoute
   CategoriesRoute: typeof CategoriesRoute
   CheckoutRoute: typeof CheckoutRoute
@@ -763,6 +776,13 @@ declare module '@tanstack/react-router' {
       path: '/cart'
       fullPath: '/cart'
       preLoaderRoute: typeof CartRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/catalog.csv': {
+      id: '/catalog.csv'
+      path: '/catalog.csv'
+      fullPath: '/catalog.csv'
+      preLoaderRoute: typeof CatalogDotcsvRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/catalog.xml': {
@@ -1184,6 +1204,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRouteWithChildren,
   AuthRoute: AuthRoute,
   CartRoute: CartRoute,
+  CatalogDotcsvRoute: CatalogDotcsvRoute,
   CatalogDotxmlRoute: CatalogDotxmlRoute,
   CategoriesRoute: CategoriesRoute,
   CheckoutRoute: CheckoutRoute,
@@ -1209,13 +1230,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
