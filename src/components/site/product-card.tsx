@@ -23,7 +23,7 @@ export function ProductThumb({
   alt: string;
   label: string;
   className?: string;
-  onClick?: () => void;
+  onClick?: (() => void) | undefined;
 }) {
   const [failed, setFailed] = useState(false);
 

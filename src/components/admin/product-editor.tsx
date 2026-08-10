@@ -598,7 +598,7 @@ export function ProductEditor({ id, kind }: { id: string; kind: ProductKind }) {
           }
         />
         <p className="mb-3 text-[11px] text-muted-foreground">
-          ছবি ব্রাউজারেই WebP-তে কমপ্রেস হয় (সর্বোচ্চ 2000px)। প্রথম ছবিটিই OG/সোশ্যাল প্রিভিউ
+          আসল ছবি সরাসরি আপলোড হয়, সাইজ/ফরম্যাট এজ-এ অটো অপটিমাইজ হয়। ছবির উপর ক্লিক করে ক্রপ করা যায়। প্রথম ছবিটিই OG/সোশ্যাল প্রিভিউ
           হিসেবে যায়।
         </p>
 
