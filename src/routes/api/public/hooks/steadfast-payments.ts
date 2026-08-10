@@ -8,9 +8,8 @@ export const Route = createFileRoute("/api/public/hooks/steadfast-payments")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const cronSecret = process.env["CRON_HOOK_SECRET"];
-        const supplied = request.headers.get("x-cron-secret") ?? "";
-        if (!cronSecret || supplied !== cronSecret) {
+        const { isValidCronSecret } = await import("@/lib/cron-secret.server");
+        if (!(await isValidCronSecret(request.headers.get("x-cron-secret")))) {
           return new Response(JSON.stringify({ error: "Unauthorized" }), {
             status: 401,
             headers: { "Content-Type": "application/json" },
