@@ -95,7 +95,17 @@ export async function migrateBatch(token: string | null): Promise<R2MigrateBatch
   if (!from) throw new Error("No previous bucket recorded — nothing to migrate.");
   if (sameBucket(from, to)) throw new Error("Source and destination bucket are the same.");
 
-  const page = await listObjectsPage(from, token, 100);
+  let page;
+  try {
+    page = await listObjectsPage(from, token, 100);
+  } catch (err) {
+    const detail = err instanceof Error ? err.message : "unknown error";
+    throw new Error(
+      `Could not read the old bucket "${from.bucket}" (${detail}). ` +
+        "The saved old R2 credentials are invalid or lack ListBucket/read permission. " +
+        "Fix the old bucket's API token, or press “Skip migration” to forget it.",
+    );
+  }
   let copied = 0;
   let skipped = 0;
   let failed = 0;
