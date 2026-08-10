@@ -424,14 +424,38 @@ function R2MigrationCard() {
           variant="ghost"
           disabled={running}
           className="text-destructive hover:bg-destructive/10"
-          onClick={async () => {
-            if (!window.confirm("Skip migration and forget the old bucket?")) return;
-            await adminR2DiscardMigration();
-            await qc.invalidateQueries({ queryKey: ["admin", "r2-migration"] });
-          }}
+          onClick={() => setSkipOpen(true)}
         >
           Skip
         </Button>
+        <AlertDialog open={skipOpen} onOpenChange={setSkipOpen}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle className="flex items-center gap-2">
+                <TriangleAlert className="size-4 text-destructive" />
+                Skip migration?
+              </AlertDialogTitle>
+              <AlertDialogDescription>
+                The old bucket will be forgotten and existing links will keep pointing to it. Any
+                media that is not copied over may stop loading permanently. This cannot be undone.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Keep migration</AlertDialogCancel>
+              <AlertDialogAction
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                onClick={async () => {
+                  await adminR2DiscardMigration();
+                  await qc.invalidateQueries({ queryKey: ["admin", "r2-migration"] });
+                  toast.success("Migration skipped — old bucket forgotten.");
+                }}
+              >
+                Skip migration
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+
         {running || progress.copied || progress.skipped || progress.failed ? (
           <span className="text-xs font-semibold text-muted-foreground">
             {progress.copied} copied · {progress.skipped} skipped · {progress.failed} failed
