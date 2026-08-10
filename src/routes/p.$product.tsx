@@ -14,6 +14,8 @@ import { AddToCartBar } from "@/components/site/add-to-cart";
 import { ComboContents } from "@/components/site/combo-contents";
 import { comboItemIdBySku, comboSelectionBySku, variantSelectionBySku } from "@/lib/sku-preselect";
 import { cn } from "@/lib/utils";
+import { ecommerce, useTrackOnce } from "@/lib/tracking";
+import { catalogId } from "@/lib/tracking-items";
 import { ImageLightbox, useLightbox } from "@/components/site/image-lightbox";
 
 export const Route = createFileRoute("/p/$product")({
