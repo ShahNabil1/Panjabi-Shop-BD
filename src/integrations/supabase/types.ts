@@ -872,6 +872,7 @@ export type Database = {
           advance_amount: number
           advance_method: string | null
           alt_phone: string | null
+          attribution: Json
           auto_sms_status: string
           city: string
           courier_consignment_id: string | null
@@ -912,6 +913,7 @@ export type Database = {
           advance_amount?: number
           advance_method?: string | null
           alt_phone?: string | null
+          attribution?: Json
           auto_sms_status?: string
           city: string
           courier_consignment_id?: string | null
@@ -952,6 +954,7 @@ export type Database = {
           advance_amount?: number
           advance_method?: string | null
           alt_phone?: string | null
+          attribution?: Json
           auto_sms_status?: string
           city?: string
           courier_consignment_id?: string | null
