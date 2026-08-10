@@ -327,6 +327,7 @@ function R2MigrationCard() {
   });
   const [running, setRunning] = useState(false);
   const [log, setLog] = useState<string[]>([]);
+  const [blocked, setBlocked] = useState<string | null>(null);
   const [progress, setProgress] = useState({ copied: 0, skipped: 0, failed: 0 });
 
   if (!state.data?.pending || !state.data.from || !state.data.to) return null;
