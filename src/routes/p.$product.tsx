@@ -414,7 +414,8 @@ function ProductPage() {
                 image: images[0]?.url ?? null,
                 price: unitPrice,
                 stock: activeVariant ? activeVariant.stock : product.stock,
-                sku: product.sku,
+                sku: activeSku,
+                category: categoryName ?? null,
                 variantId: activeVariant?.id ?? null,
                 variantLabelBn: activeVariant
                   ? `${activeVariant.group_name_bn}: ${activeVariant.value_bn}`
