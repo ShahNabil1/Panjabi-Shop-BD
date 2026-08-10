@@ -196,7 +196,7 @@ export const adminTestIntegration = createServerFn({ method: "POST" })
     const result: IntegrationTestResult = await (async (): Promise<IntegrationTestResult> => {
     try {
       if (data.group === "r2") {
-        const { readR2Config, probeR2 } = await import("./r2.server");
+        const { readR2Config, probeR2, formatBytes } = await import("./r2.server");
         const cfg = await readR2Config();
         if (!cfg) return fail("R2 credentials are incomplete");
         const probe = await probeR2(cfg);
