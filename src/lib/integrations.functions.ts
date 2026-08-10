@@ -190,6 +190,7 @@ export const adminTestIntegration = createServerFn({ method: "POST" })
       checkedAt,
     });
 
+    const result: IntegrationTestResult = await (async (): Promise<IntegrationTestResult> => {
     try {
       if (data.group === "r2") {
         const { readR2Config, probeR2 } = await import("./r2.server");
