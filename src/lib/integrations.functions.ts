@@ -216,7 +216,13 @@ export const adminTestIntegration = createServerFn({ method: "POST" })
                       ? "—"
                       : `${probe.objects}${probe.truncated ? "+" : ""}`,
                 },
-                { label: "Latest object", value: probe.latestKey ?? "—" },
+                {
+                  label: "Bucket size",
+                  value:
+                    probe.totalBytes === null
+                      ? "—"
+                      : `${formatBytes(probe.totalBytes)}${probe.truncated ? "+" : ""}`,
+                },
               ]
             : [],
         };
