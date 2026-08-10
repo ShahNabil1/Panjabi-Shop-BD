@@ -9,6 +9,22 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { requireAdmin } from "./admin.server";
 
+/**
+ * Public tracking config for the browser. Only the GTM container id is
+ * exposed — every pixel id and API secret stays server-side. The container is
+ * what loads Meta Pixel, TikTok Pixel, GA4 and Microsoft Clarity.
+ */
+export const getGtmContainerId = createServerFn({ method: "GET" }).handler(async () => {
+  try {
+    const { readTrackingConfig } = await import("./tracking.server");
+    const cfg = await readTrackingConfig();
+    const id = cfg.gtmId.toUpperCase();
+    return { gtmId: /^GTM-[A-Z0-9]{6,9}$/.test(id) ? id : "" };
+  } catch {
+    return { gtmId: "" };
+  }
+});
+
 const listSchema = z.object({
   platform: z.enum(["all", "meta", "tiktok", "ga4"]).default("all"),
   status: z.enum(["all", "sent", "failed", "skipped"]).default("all"),
@@ -27,7 +43,8 @@ export type TrackingEventRow = {
   message: string | null;
   match_keys: string[];
   emq: number | null;
-  response: unknown;
+  /** Raw API response, pretty-printed for the debug drawer. */
+  response: string;
   attempts: number;
   created_at: string;
 };
@@ -54,7 +71,10 @@ export const listTrackingEvents = createServerFn({ method: "GET" })
     if (error) throw new Error(error.message);
 
     const events: TrackingEventRow[] = (rows ?? []).map((row) => {
-      const r = row as unknown as TrackingEventRow & { orders: { order_number: string } | null };
+      const r = row as unknown as Omit<TrackingEventRow, "response"> & {
+        response: unknown;
+        orders: { order_number: string } | null;
+      };
       return {
         id: r.id,
         order_id: r.order_id,
@@ -66,7 +86,7 @@ export const listTrackingEvents = createServerFn({ method: "GET" })
         message: r.message,
         match_keys: r.match_keys ?? [],
         emq: r.emq,
-        response: r.response,
+        response: JSON.stringify(r.response ?? {}, null, 2).slice(0, 4000),
         attempts: r.attempts,
         created_at: r.created_at,
       };
