@@ -552,28 +552,85 @@ function PartnerCard({
           {testing ? <Loader2 className="size-4 animate-spin" /> : <Plug className="size-4" />}
           Test connection
         </Button>
-        <Button
-          type="button"
-          onClick={save}
-          disabled={saving || !result?.ok || !isDirty || !!noteError}
-          className="bg-emerald-600 text-white hover:bg-emerald-700 active:scale-95 disabled:opacity-60"
-        >
-          {saving ? (
-            <Loader2 className="size-4 animate-spin" />
-          ) : !isDirty ? (
-            <CheckCircle2 className="size-4" />
-          ) : (
-            <Save className="size-4" />
-          )}
-          {!isDirty && !saving ? "Saved" : "Save partner"}
-        </Button>
-        {!result?.ok ? (
-          <span className="text-xs text-muted-foreground">
-            Run a successful connection test before saving.
-          </span>
-        ) : !isDirty ? (
-          <span className="text-xs text-muted-foreground">No unsaved changes.</span>
-        ) : null}
+        {locked ? (
+          <>
+            <Button type="button" onClick={() => setEditOpen(true)} className="active:scale-95">
+              <Pencil className="size-4" />
+              Edit credentials
+            </Button>
+            <AlertDialog open={editOpen} onOpenChange={setEditOpen}>
+              <AlertDialogContent className="rounded-2xl">
+                <AlertDialogHeader>
+                  <AlertDialogTitle className="flex items-center gap-2 text-amber-600">
+                    <TriangleAlert className="size-5" />
+                    Edit {providerLabels[provider]} credentials?
+                  </AlertDialogTitle>
+                  <AlertDialogDescription>
+                    These credentials are live. A wrong or incomplete value will immediately break
+                    this courier — order dispatch, tracking and webhooks can stop working. Only
+                    continue if you have the correct values at hand, and run “Test connection”
+                    before saving.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel className="rounded-xl">Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    className="rounded-xl bg-amber-600 text-white hover:bg-amber-700 active:scale-95"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setEditOpen(false);
+                      setUnlocked(true);
+                    }}
+                  >
+                    I understand, let me edit
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </>
+        ) : (
+          <>
+            <Button
+              type="button"
+              onClick={save}
+              disabled={saving || !result?.ok || !isDirty || !!noteError}
+              className="bg-emerald-600 text-white hover:bg-emerald-700 active:scale-95 disabled:opacity-60"
+            >
+              {saving ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : !isDirty ? (
+                <CheckCircle2 className="size-4" />
+              ) : (
+                <Save className="size-4" />
+              )}
+              {!isDirty && !saving ? "Saved" : "Save partner"}
+            </Button>
+            {row ? (
+              <Button
+                type="button"
+                variant="outline"
+                className="active:scale-95"
+                onClick={() => {
+                  const init: Record<string, string> = {};
+                  for (const f of fields) init[f.key] = row.credentials?.[f.key] ?? "";
+                  setValues(init);
+                  setNoteTemplate(savedTemplate);
+                  setUnlocked(false);
+                }}
+              >
+                Cancel
+              </Button>
+            ) : null}
+            {!result?.ok ? (
+              <span className="text-xs text-muted-foreground">
+                Run a successful connection test before saving.
+              </span>
+            ) : !isDirty ? (
+              <span className="text-xs text-muted-foreground">No unsaved changes.</span>
+            ) : null}
+          </>
+        )}
+
         {row ? (
           <AlertDialog open={removeOpen} onOpenChange={setRemoveOpen}>
             <AlertDialogTrigger asChild>
