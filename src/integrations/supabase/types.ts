@@ -927,6 +927,7 @@ export type Database = {
           customer_ip: string | null
           customer_name: string
           customer_phone: string
+          customer_user_agent: string | null
           delivery_area: string | null
           delivery_charge: number
           delivery_note: string | null
@@ -968,6 +969,7 @@ export type Database = {
           customer_ip?: string | null
           customer_name: string
           customer_phone: string
+          customer_user_agent?: string | null
           delivery_area?: string | null
           delivery_charge?: number
           delivery_note?: string | null
@@ -1009,6 +1011,7 @@ export type Database = {
           customer_ip?: string | null
           customer_name?: string
           customer_phone?: string
+          customer_user_agent?: string | null
           delivery_area?: string | null
           delivery_charge?: number
           delivery_note?: string | null
