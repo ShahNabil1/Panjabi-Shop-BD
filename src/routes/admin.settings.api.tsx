@@ -6,7 +6,6 @@ import {
   ArrowRightLeft,
   CheckCircle2,
   Loader2,
-  Lock,
   Pencil,
   PlugZap,
   Trash2,
