@@ -20,6 +20,10 @@ export type TrackingItem = {
   id: string;
   name?: string | undefined;
   category?: string | undefined;
+  /** Variant label, e.g. "Size: M" — matches the catalogue variant row. */
+  variant?: string | undefined;
+  /** Parent product grouping (catalogue `item_group_id`). */
+  item_group_id?: string | undefined;
   quantity: number;
   price: number;
 };
