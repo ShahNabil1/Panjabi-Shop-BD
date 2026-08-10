@@ -17,6 +17,8 @@ export type CartItem = {
   variantId: string | null;
   variantLabelBn: string | null;
   variantLabelEn: string | null;
+  /** Catalogue category name (English) — sent with marketing events. */
+  category?: string | null;
   comboSelections: ComboSelection[];
 };
 
