@@ -10,18 +10,16 @@
  */
 
 import { actId, metaGet, readMetaConfig, type MetaConfig } from "./meta.server";
+import type {
+  DateRange,
+  MarketingOverview,
+  MarketingPreset,
+  MarketingSeriesPoint,
+  MetaMetrics,
+  OrderMetrics,
+} from "./marketing-shared";
 
-export const MARKETING_PRESETS = ["today", "yesterday", "7d", "14d", "30d", "90d"] as const;
-export type MarketingPreset = (typeof MARKETING_PRESETS)[number];
-
-export const presetLabel: Record<MarketingPreset, string> = {
-  today: "Today",
-  yesterday: "Yesterday",
-  "7d": "Last 7 days",
-  "14d": "Last 14 days",
-  "30d": "Last 30 days",
-  "90d": "Last 90 days",
-};
+export { MARKETING_PRESETS } from "./marketing-shared";
 
 const DAY = 86_400_000;
 const CACHE_TTL_MS = 5 * 60_000;
@@ -42,8 +40,6 @@ export function clearMarketingCache() {
 }
 
 const isoDay = (d: Date) => d.toISOString().slice(0, 10);
-
-export type DateRange = { since: string; until: string; days: number };
 
 /** Resolve a preset into an inclusive `YYYY-MM-DD` range (UTC based). */
 export function resolveRange(preset: MarketingPreset): DateRange {
@@ -102,23 +98,6 @@ function pickAction(list: InsightAction[] | undefined, match: (t: string) => boo
   for (const a of list ?? []) if (match(a.action_type)) best = Math.max(best, num(a.value));
   return best;
 }
-
-export type MetaMetrics = {
-  spend: number;
-  impressions: number;
-  clicks: number;
-  reach: number;
-  frequency: number;
-  cpm: number;
-  cpc: number;
-  ctr: number;
-  purchases: number;
-  purchaseValue: number;
-  roas: number;
-  addToCart: number;
-  initiateCheckout: number;
-  landingPageViews: number;
-};
 
 function toMetrics(rows: InsightRow[]): MetaMetrics {
   let spend = 0;
@@ -179,17 +158,6 @@ async function fetchInsights(
   });
 }
 
-export type OrderMetrics = {
-  orders: number;
-  revenue: number;
-  deliveredOrders: number;
-  deliveredRevenue: number;
-  pendingOrders: number;
-  cancelledOrders: number;
-  averageOrderValue: number;
-  deliveryRate: number;
-};
-
 type OrderRow = { total: number | string; status: string; created_at: string };
 
 const DELIVERED = new Set(["delivered", "partial_delivered"]);
@@ -227,38 +195,6 @@ export function toOrderMetrics(rows: OrderRow[]): OrderMetrics {
     deliveryRate: settled > 0 ? (deliveredOrders / settled) * 100 : 0,
   };
 }
-
-export type MarketingSeriesPoint = {
-  date: string;
-  spend: number;
-  revenue: number;
-  deliveredRevenue: number;
-  orders: number;
-  metaPurchases: number;
-};
-
-export type MarketingOverview = {
-  connected: boolean;
-  message?: string;
-  currency: string;
-  accountName: string;
-  range: DateRange;
-  meta: MetaMetrics;
-  metaPrevious: MetaMetrics;
-  orders: OrderMetrics;
-  ordersPrevious: OrderMetrics;
-  series: MarketingSeriesPoint[];
-  /** Store revenue ÷ ad spend across every channel. */
-  blendedRoas: number;
-  /** Delivered (money actually collected) revenue ÷ ad spend. */
-  trueRoas: number;
-  blendedRoasPrevious: number;
-  trueRoasPrevious: number;
-  costPerOrder: number;
-  costPerDeliveredOrder: number;
-  /** Ad spend as a percentage of store revenue. */
-  spendShare: number;
-};
 
 type SupabaseLike = {
   from: (table: string) => {
