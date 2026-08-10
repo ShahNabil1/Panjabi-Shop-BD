@@ -8,6 +8,7 @@ import { ProductGrid } from "@/components/site/product-card";
 import { NotFoundView } from "@/components/site/not-found-view";
 import { absoluteUrl, pageTitle } from "@/lib/site";
 import { Breadcrumbs, Prose, Section } from "@/components/site/ui";
+import { useViewItemList } from "@/lib/tracking-items";
 
 export const Route = createFileRoute("/c/$category/$subcategory")({
   loader: async ({ params }): Promise<SubcategoryPageData> => {
@@ -93,6 +94,7 @@ function SubcategoryPage() {
   const catName = pick(lang, category.name_bn, category.name_en);
   const subName = pick(lang, subcategory.name_bn, subcategory.name_en);
   const description = pick(lang, subcategory.description_bn, subcategory.description_en);
+  useViewItemList(`${category.name_en} / ${subcategory.name_en}`, products, subcategory.name_en);
 
   return (
     <Section>

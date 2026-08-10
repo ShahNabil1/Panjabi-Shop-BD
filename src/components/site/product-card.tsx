@@ -10,6 +10,8 @@ import { getComboSelections } from "@/lib/catalog.functions";
 import { useLang } from "@/lib/language-context";
 import { badgeLabel, discountPercent, formatNumber, formatPrice, pick, toBnDigits, tr } from "@/lib/i18n";
 import type { ProductCard as ProductCardData } from "@/lib/supabase-public";
+import { ecommerce, pushEvent } from "@/lib/tracking";
+import { catalogId } from "@/lib/tracking-items";
 import { cn } from "@/lib/utils";
 
 export function ProductThumb({
@@ -99,6 +101,18 @@ export function ProductCard({ product }: { product: ProductCardData }) {
       variantLabelEn: null,
       comboSelections,
     });
+    pushEvent(
+      "add_to_cart",
+      ecommerce([
+        {
+          id: catalogId(product.sku, product.slug, product.id),
+          name: product.nameEn || product.nameBn,
+          item_group_id: product.slug,
+          quantity: 1,
+          price: product.price,
+        },
+      ]),
+    );
   };
 
   const onAddToCart = (e: React.MouseEvent) => {

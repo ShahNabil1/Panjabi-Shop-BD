@@ -16,6 +16,8 @@ import { SpecShowcase } from "@/components/site/spec-showcase";
 import { ComboContents } from "@/components/site/combo-contents";
 import { comboItemIdBySku, comboSelectionBySku, resolveVariantBySku } from "@/lib/sku-preselect";
 import type { CartItem } from "@/lib/cart-context";
+import { ecommerce, useScrollDepth, useTrackOnce } from "@/lib/tracking";
+import { cartTrackingItems } from "@/lib/tracking-items";
 import { cn } from "@/lib/utils";
 import logoMark from "@/assets/upoharkabbo-logo.png";
 import { ImageLightbox, useLightbox } from "@/components/site/image-lightbox";
@@ -156,8 +158,10 @@ function LandingPage() {
         price: unitPrice,
         quantity: Math.min(qty, stock > 0 ? stock : qty),
         stock,
-        sku: activeVariant ? null : product.sku,
+        // Catalogue id — variant SKU wins so landing orders match the feed.
+        sku: activeVariant?.sku ?? product.sku,
         variantId: activeVariant?.id ?? null,
+
         variantLabelBn: activeVariant
           ? `${activeVariant.group_name_bn}: ${activeVariant.value_bn}`
           : null,
@@ -183,6 +187,22 @@ function LandingPage() {
     ],
     [product, images, activeVariant, unitPrice, qty, stock, comboItems, comboSelected],
   );
+
+  // Landing funnel: view_page + view_item on load, plus 25/50/75/100% scroll.
+  const trackedItems = useMemo(() => cartTrackingItems(items), [items]);
+  const viewPayload = useMemo(
+    () => ({ ...ecommerce(trackedItems), page_type: "landing", landing_slug: landing.slug }),
+    [trackedItems, landing.slug],
+  );
+  useTrackOnce("view_page", viewPayload);
+  useTrackOnce("view_item", viewPayload);
+  useScrollDepth(
+    useMemo(
+      () => ({ page_type: "landing", landing_slug: landing.slug, content_ids: trackedItems.map((i) => i.id) }),
+      [landing.slug, trackedItems],
+    ),
+  );
+
 
   const landingFaqs = (product.faq ?? []).map((f, i) => ({
     id: String(i),

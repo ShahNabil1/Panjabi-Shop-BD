@@ -24,6 +24,8 @@ import { ProductThumb } from "@/components/site/product-card";
 import { QuantityStepper } from "@/components/site/add-to-cart";
 import { cn } from "@/lib/utils";
 import { normalizePhoneInput } from "@/lib/phone";
+import { ecommerce, pushEvent, useTrackOnce } from "@/lib/tracking";
+import { cartTrackingItems } from "@/lib/tracking-items";
 
 export type DeliveryRates = {
   inside_dhaka: number;
@@ -231,6 +233,15 @@ export function CheckoutForm({
   const delivery =
     rates.freeAll || (rates.freeAbove > 0 && subtotal >= rates.freeAbove) ? 0 : rates[area];
 
+  // Funnel: begin_checkout as soon as the form is on screen with items.
+  const trackedItems = useMemo(() => cartTrackingItems(items), [items]);
+  const checkoutPayload = useMemo(
+    () => ({ ...ecommerce(trackedItems), page_type: source }),
+    [trackedItems, source],
+  );
+  useTrackOnce("begin_checkout", checkoutPayload, items.length > 0);
+
+
   // ---- Coupon (validated on the server, re-checked again when ordering) ----
   const checkCoupon = useServerFn(validateCoupon);
   const [couponCode, setCouponCode] = useState("");
@@ -364,6 +375,21 @@ export function CheckoutForm({
         },
       });
       placedRef.current = true;
+      // Browser purchase — `event_id` matches the server-side CAPI twin
+      // (`<order_number>.purchase`), so Meta/TikTok de-duplicate it.
+      pushEvent(
+        "purchase",
+        {
+          ...ecommerce(trackedItems, { transaction_id: result.orderNumber, shipping: delivery }),
+          transaction_id: result.orderNumber,
+          order_number: result.orderNumber,
+          value: Number(result.total ?? total),
+          shipping: delivery,
+          customer_phone: phone.trim(),
+          page_type: source,
+        },
+        { eventId: `${result.orderNumber}.purchase`.toLowerCase() },
+      );
       onPlaced?.();
       clear();
       void navigate({

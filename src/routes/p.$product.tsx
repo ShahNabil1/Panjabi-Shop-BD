@@ -1,5 +1,5 @@
 import { Link, createFileRoute, notFound, useSearch } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ArrowRight } from "lucide-react";
 
 import { getProductPage } from "@/lib/catalog.functions";
@@ -14,6 +14,8 @@ import { AddToCartBar } from "@/components/site/add-to-cart";
 import { ComboContents } from "@/components/site/combo-contents";
 import { comboItemIdBySku, comboSelectionBySku, variantSelectionBySku } from "@/lib/sku-preselect";
 import { cn } from "@/lib/utils";
+import { ecommerce, useTrackOnce } from "@/lib/tracking";
+import { catalogId } from "@/lib/tracking-items";
 import { ImageLightbox, useLightbox } from "@/components/site/image-lightbox";
 
 export const Route = createFileRoute("/p/$product")({
@@ -190,6 +192,30 @@ function ProductPage() {
     variants.find((v) => selectedIds.includes(v.id)) ??
     (groups.size === 1 ? (variants[0] ?? null) : null);
   const unitPrice = product.price + Number(activeVariant?.price_delta ?? 0);
+  // Catalogue id: variant SKU when a variant is picked, else the product SKU.
+  const activeSku = activeVariant?.sku ?? product.sku;
+  const categoryName = category?.name_en ?? undefined;
+
+  const viewItem = useMemo(
+    () =>
+      ecommerce([
+        {
+          id: catalogId(activeSku, product.slug, product.id),
+          name: product.nameEn || product.nameBn,
+          category: categoryName,
+          variant: activeVariant
+            ? `${activeVariant.group_name_en}: ${activeVariant.value_en}`
+            : undefined,
+          item_group_id: product.slug,
+          quantity: 1,
+          price: unitPrice,
+        },
+      ]),
+    [activeSku, product, categoryName, activeVariant, unitPrice],
+  );
+  useTrackOnce("view_item", viewItem);
+
+
 
 
 
@@ -388,7 +414,8 @@ function ProductPage() {
                 image: images[0]?.url ?? null,
                 price: unitPrice,
                 stock: activeVariant ? activeVariant.stock : product.stock,
-                sku: product.sku,
+                sku: activeSku,
+                category: categoryName ?? null,
                 variantId: activeVariant?.id ?? null,
                 variantLabelBn: activeVariant
                   ? `${activeVariant.group_name_bn}: ${activeVariant.value_bn}`

@@ -20,6 +20,10 @@ export type TrackingItem = {
   id: string;
   name?: string | undefined;
   category?: string | undefined;
+  /** Variant label, e.g. "Size: M" — matches the catalogue variant row. */
+  variant?: string | undefined;
+  /** Parent product grouping (catalogue `item_group_id`). */
+  item_group_id?: string | undefined;
   quantity: number;
   price: number;
 };
@@ -82,6 +86,8 @@ export function ecommerce(items: TrackingItem[], extra?: DataLayerRecord): DataL
         item_id: i.id,
         item_name: i.name,
         item_category: i.category,
+        item_variant: i.variant,
+        item_group_id: i.item_group_id,
         price: i.price,
         quantity: i.quantity,
       })),
@@ -89,7 +95,17 @@ export function ecommerce(items: TrackingItem[], extra?: DataLayerRecord): DataL
     },
     content_type: "product",
     content_ids: items.map((i) => i.id),
-    contents: items.map((i) => ({ id: i.id, quantity: i.quantity, item_price: i.price })),
+    content_name: items[0]?.name,
+    content_category: items[0]?.category,
+    contents: items.map((i) => ({
+      id: i.id,
+      quantity: i.quantity,
+      item_price: i.price,
+      item_name: i.name,
+      item_category: i.category,
+      item_variant: i.variant,
+      item_group_id: i.item_group_id,
+    })),
     num_items: items.reduce((sum, i) => sum + i.quantity, 0),
     value,
     currency: "BDT",

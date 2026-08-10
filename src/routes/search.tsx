@@ -7,6 +7,9 @@ import { formatNumber, tr } from "@/lib/i18n";
 import { ProductGrid } from "@/components/site/product-card";
 import { Breadcrumbs, Section } from "@/components/site/ui";
 import { pageTitle } from "@/lib/site";
+import { useViewItemList } from "@/lib/tracking-items";
+import { pushEvent } from "@/lib/tracking";
+import { useEffect } from "react";
 
 export const Route = createFileRoute("/search")({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -38,6 +41,10 @@ export const Route = createFileRoute("/search")({
 function SearchPage() {
   const { lang } = useLang();
   const { query, products } = Route.useLoaderData() as SearchData;
+  useViewItemList(query ? `Search: ${query}` : "Search", products);
+  useEffect(() => {
+    if (query) pushEvent("search", { search_term: query, results: products.length });
+  }, [query, products.length]);
 
   return (
     <Section>

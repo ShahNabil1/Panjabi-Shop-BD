@@ -9,6 +9,7 @@ import { ProductGrid } from "@/components/site/product-card";
 import { NotFoundView } from "@/components/site/not-found-view";
 import { Breadcrumbs, Section } from "@/components/site/ui";
 import { absoluteUrl, pageTitle } from "@/lib/site";
+import { useViewItemList } from "@/lib/tracking-items";
 
 export const Route = createFileRoute("/offers/$promotion")({
   loader: async ({ params }): Promise<PromotionPageData> => {
@@ -51,6 +52,7 @@ function PromotionPage() {
   const { promotion, products } = Route.useLoaderData() as PromotionPageData;
   const title = pick(lang, promotion.titleBn, promotion.titleEn);
   const subtitle = pick(lang, promotion.subtitleBn, promotion.subtitleEn);
+  useViewItemList(promotion.titleEn, products);
 
   return (
     <Section>
