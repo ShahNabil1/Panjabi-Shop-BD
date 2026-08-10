@@ -12,6 +12,7 @@ import {
   type ControlCenter,
   type CreativePerformance,
   type MarketingOverview,
+  type ProductAttribution,
 } from "./marketing-shared";
 import {
   buildAudienceHealth,
@@ -19,6 +20,7 @@ import {
   buildControlCenter,
   buildCreativePerformance,
   buildMarketingOverview,
+  buildProductAttribution,
   clearMarketingCache,
   setDailyBudget,
   setEntityStatus,
@@ -136,4 +138,22 @@ export const marketingSetBudget = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     await requireAdmin(context.supabase, context.userId);
     return setDailyBudget(data.id, data.amount, data.level);
+  });
+
+const attributionSchema = z.object({
+  preset: z.enum(MARKETING_PRESETS).default("30d"),
+  refresh: z.boolean().optional(),
+});
+
+/** Admin-only: product-level attribution (orders × campaigns × Meta spend). */
+export const marketingAttribution = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => attributionSchema.parse(input ?? {}))
+  .handler(async ({ data, context }): Promise<ProductAttribution> => {
+    const db = await requireAdmin(context.supabase, context.userId);
+    if (data.refresh) clearMarketingCache();
+    return buildProductAttribution(
+      db as unknown as Parameters<typeof buildProductAttribution>[0],
+      data.preset,
+    );
   });
