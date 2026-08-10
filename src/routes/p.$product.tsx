@@ -190,6 +190,30 @@ function ProductPage() {
     variants.find((v) => selectedIds.includes(v.id)) ??
     (groups.size === 1 ? (variants[0] ?? null) : null);
   const unitPrice = product.price + Number(activeVariant?.price_delta ?? 0);
+  // Catalogue id: variant SKU when a variant is picked, else the product SKU.
+  const activeSku = activeVariant?.sku ?? product.sku;
+  const categoryName = category?.name_en ?? undefined;
+
+  const viewItem = useMemo(
+    () =>
+      ecommerce([
+        {
+          id: catalogId(activeSku, product.slug, product.id),
+          name: product.nameEn || product.nameBn,
+          category: categoryName,
+          variant: activeVariant
+            ? `${activeVariant.group_name_en}: ${activeVariant.value_en}`
+            : undefined,
+          item_group_id: product.slug,
+          quantity: 1,
+          price: unitPrice,
+        },
+      ]),
+    [activeSku, product, categoryName, activeVariant, unitPrice],
+  );
+  useTrackOnce("view_item", viewItem);
+
+
 
 
 
