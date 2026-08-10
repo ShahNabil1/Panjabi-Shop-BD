@@ -336,6 +336,7 @@ function R2MigrationCard() {
   const run = async () => {
     setRunning(true);
     setLog([]);
+    setBlocked(null);
     setProgress({ copied: 0, skipped: 0, failed: 0 });
     let offset = 0;
     let copied = 0;
@@ -348,6 +349,11 @@ function R2MigrationCard() {
         const res: Awaited<ReturnType<typeof adminR2MigrateBatch>> = await adminR2MigrateBatch({
           data: { offset },
         });
+        if (res.blocked) {
+          setBlocked(res.blocked);
+          toast.error("Old bucket is not readable");
+          return;
+        }
         copied += res.copied;
         skipped += res.skipped;
         failed += res.failed;
