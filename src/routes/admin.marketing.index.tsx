@@ -35,7 +35,7 @@ import {
   type MarketingPreset,
 } from "@/lib/marketing-shared";
 import { AdminHeading, Panel } from "@/components/admin/kit";
-import { BrandLoader } from "@/components/admin/kit-loader";
+import { BrandLoader } from "@/components/admin/brand-loader";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
