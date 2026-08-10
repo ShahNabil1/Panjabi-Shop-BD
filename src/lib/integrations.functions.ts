@@ -123,6 +123,8 @@ export const adminSaveIntegration = createServerFn({ method: "POST" })
     if (removals.length) {
       await supabaseAdmin.from("integration_credentials").delete().in("key", removals);
     }
+    // Credentials changed → the previous connection test no longer proves anything.
+    await supabaseAdmin.from("integration_credentials").delete().eq("key", testKey(data.group));
     clearIntegrationCache();
 
     // Switched to a different bucket → remember the old one so media can be migrated.
