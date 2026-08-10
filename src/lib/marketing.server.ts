@@ -9,12 +9,15 @@
  * dashboard can be refreshed freely without burning through Meta rate limits.
  */
 
-import { actId, metaGet, readMetaConfig, type MetaConfig } from "./meta.server";
+import { actId, metaGet, metaPost, readMetaConfig, type MetaConfig } from "./meta.server";
 import type {
   AudienceHealth,
   AudienceRow,
   CampaignLevel,
   CatalogHealth,
+  ControlCenter,
+  ControlRow,
+  ControlThresholds,
   CampaignPerformance,
   CreativePerformance,
   DateRange,
@@ -24,6 +27,7 @@ import type {
   MetaMetrics,
   OrderMetrics,
   PixelHealth,
+  RuleAction,
 } from "./marketing-shared";
 
 export { MARKETING_PRESETS } from "./marketing-shared";
@@ -857,4 +861,117 @@ export async function buildAudienceHealth(): Promise<AudienceHealth> {
       recommendations: [],
     };
   }
+}
+
+/* ------------------------------------------------------------------ *
+ * Control center — rule evaluation + live campaign controls
+ * ------------------------------------------------------------------ */
+
+function evaluateRule(
+  row: { spend: number; purchases: number; roas: number; frequency: number },
+  t: ControlThresholds,
+): { action: RuleAction; reason: string } {
+  if (row.spend < t.minSpend) {
+    return { action: "watch", reason: `Only ${row.spend.toFixed(2)} spent — not enough data yet.` };
+  }
+  if (row.purchases === 0) {
+    return { action: "pause", reason: `Spent ${row.spend.toFixed(2)} with zero purchases.` };
+  }
+  if (row.roas >= t.scaleRoas) {
+    return {
+      action: "scale",
+      reason: `ROAS ${row.roas.toFixed(2)}x is above your ${t.scaleRoas}x scaling bar.`,
+    };
+  }
+  if (row.roas < t.pauseRoas) {
+    return {
+      action: "pause",
+      reason: `ROAS ${row.roas.toFixed(2)}x is below break-even (${t.pauseRoas}x).`,
+    };
+  }
+  if (row.frequency >= 3) {
+    return {
+      action: "reduce",
+      reason: `Frequency ${row.frequency.toFixed(1)} — audience fatigue, refresh creative or widen targeting.`,
+    };
+  }
+  return { action: "watch", reason: `ROAS ${row.roas.toFixed(2)}x — profitable but not scale-ready.` };
+}
+
+/** Builds the Marketing → Control payload (performance + suggested action). */
+export async function buildControlCenter(
+  preset: MarketingPreset,
+  level: CampaignLevel,
+  thresholds: ControlThresholds,
+): Promise<ControlCenter> {
+  const perf = await buildCampaignPerformance(preset, level);
+  const rows: ControlRow[] = perf.rows.map((r) => {
+    const verdict = evaluateRule(r, thresholds);
+    return {
+      id: r.id,
+      name: r.name,
+      level,
+      status: r.status,
+      effectiveStatus: r.effectiveStatus,
+      dailyBudget: r.dailyBudget,
+      lifetimeBudget: r.lifetimeBudget,
+      spend: r.spend,
+      purchases: r.purchases,
+      purchaseValue: r.purchaseValue,
+      roas: r.roas,
+      costPerPurchase: r.costPerPurchase,
+      ctr: r.ctr,
+      frequency: r.frequency,
+      action: verdict.action,
+      reason: verdict.reason,
+    };
+  });
+
+  const order: Record<RuleAction, number> = { pause: 0, scale: 1, reduce: 2, watch: 3 };
+  rows.sort((a, b) => order[a.action] - order[b.action] || b.spend - a.spend);
+
+  return {
+    connected: perf.connected,
+    message: perf.message,
+    currency: perf.currency,
+    range: perf.range,
+    level,
+    thresholds,
+    rows,
+    summary: {
+      spend: perf.totals.spend,
+      revenue: perf.totals.purchaseValue,
+      roas: perf.totals.roas,
+      activeCount: rows.filter((r) => (r.effectiveStatus ?? r.status) === "ACTIVE").length,
+    },
+  };
+}
+
+const CONTROL_EDGE: Record<CampaignLevel, string> = {
+  campaign: "campaign",
+  adset: "adset",
+  ad: "ad",
+};
+
+/** Pause or resume a campaign / ad set / ad. */
+export async function setEntityStatus(id: string, status: "ACTIVE" | "PAUSED") {
+  const cfg = await readMetaConfig();
+  if (!cfg) throw new Error("Meta Marketing API is not configured.");
+  await metaPost(cfg, id, { status });
+  clearMarketingCache();
+  return { ok: true as const, status };
+}
+
+/**
+ * Set a new daily budget. Meta expects minor units (cents), so the value we
+ * receive in account currency is converted before the write.
+ */
+export async function setDailyBudget(id: string, amount: number, level: CampaignLevel) {
+  const cfg = await readMetaConfig();
+  if (!cfg) throw new Error("Meta Marketing API is not configured.");
+  if (!Number.isFinite(amount) || amount <= 0) throw new Error("Budget must be greater than zero.");
+  void CONTROL_EDGE[level];
+  await metaPost(cfg, id, { daily_budget: Math.round(amount * 100) });
+  clearMarketingCache();
+  return { ok: true as const, dailyBudget: amount };
 }
