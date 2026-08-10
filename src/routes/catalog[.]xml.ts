@@ -1,10 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import type {} from "@tanstack/react-start";
 
-import { fetchCatalogFeed } from "@/lib/catalog.server";
-
-// TODO: replace with your project URL once a project name or custom domain is set.
-const BASE_URL = "";
+import { fetchCatalogFeed } from "@/lib/catalog-feed.server";
+import { SITE_URL } from "@/lib/site";
 
 function esc(value: string) {
   return value
@@ -14,56 +12,62 @@ function esc(value: string) {
     .replace(/"/g, "&quot;");
 }
 
+/**
+ * Google Merchant / Meta Catalog / TikTok Catalog all read this RSS 2.0 feed.
+ * One row per purchasable SKU (product, sub-product and every variant).
+ */
 export const Route = createFileRoute("/catalog.xml")({
   server: {
     handlers: {
       GET: async () => {
-        const products = await fetchCatalogFeed();
+        const items = await fetchCatalogFeed();
 
-        const items = products.map((p) => {
-          const image = [...(p.product_images ?? [])].sort(
-            (a, b) => a.sort_order - b.sort_order,
-          )[0]?.url;
-          const description = p.short_description_bn || p.short_description_en || p.name_bn;
-
-          return [
+        const entries = items.map((p) =>
+          [
             "    <item>",
-            `      <g:id>${esc(p.sku || p.id)}</g:id>`,
-            `      <g:title>${esc(p.name_bn)}</g:title>`,
-            `      <g:description>${esc(description)}</g:description>`,
-            `      <g:link>${BASE_URL}/p/${esc(p.slug)}</g:link>`,
-            image ? `      <g:image_link>${esc(image)}</g:image_link>` : null,
-            `      <g:availability>${p.stock > 0 ? "in stock" : "out of stock"}</g:availability>`,
-            `      <g:price>${Number(p.compare_at_price ?? p.price).toFixed(2)} BDT</g:price>`,
-            p.compare_at_price && Number(p.compare_at_price) > Number(p.price)
-              ? `      <g:sale_price>${Number(p.price).toFixed(2)} BDT</g:sale_price>`
+            `      <g:id>${esc(p.id)}</g:id>`,
+            `      <g:item_group_id>${esc(p.itemGroupId)}</g:item_group_id>`,
+            `      <g:title>${esc(p.title)}</g:title>`,
+            `      <g:description>${esc(p.description)}</g:description>`,
+            `      <g:link>${esc(p.link)}</g:link>`,
+            p.imageLink ? `      <g:image_link>${esc(p.imageLink)}</g:image_link>` : null,
+            ...p.additionalImages.map(
+              (url) => `      <g:additional_image_link>${esc(url)}</g:additional_image_link>`,
+            ),
+            `      <g:availability>${p.availability}</g:availability>`,
+            `      <g:quantity_to_sell_on_facebook>${p.quantity}</g:quantity_to_sell_on_facebook>`,
+            `      <g:price>${p.price.toFixed(2)} BDT</g:price>`,
+            p.salePrice !== null
+              ? `      <g:sale_price>${p.salePrice.toFixed(2)} BDT</g:sale_price>`
               : null,
-            `      <g:condition>new</g:condition>`,
-            p.brand ? `      <g:brand>${esc(p.brand)}</g:brand>` : null,
-            p.categories?.name_en
-              ? `      <g:product_type>${esc(p.categories.name_en)}</g:product_type>`
-              : null,
+            `      <g:condition>${p.condition}</g:condition>`,
+            `      <g:brand>${esc(p.brand)}</g:brand>`,
+            `      <g:mpn>${esc(p.mpn)}</g:mpn>`,
+            `      <g:identifier_exists>no</g:identifier_exists>`,
+            `      <g:product_type>${esc(p.productType)}</g:product_type>`,
+            p.variantLabel ? `      <g:custom_label_0>${esc(p.variantLabel)}</g:custom_label_0>` : null,
+            `      <g:custom_label_1>${esc(p.kind)}</g:custom_label_1>`,
             "    </item>",
           ]
             .filter(Boolean)
-            .join("\n");
-        });
+            .join("\n"),
+        );
 
         const xml = [
           '<?xml version="1.0" encoding="UTF-8"?>',
           '<rss version="2.0" xmlns:g="http://base.google.com/ns/1.0">',
           "  <channel>",
           "    <title>Upoharkabbo Product Catalogue</title>",
-          `    <link>${BASE_URL}/</link>`,
+          `    <link>${SITE_URL}/</link>`,
           "    <description>Curated gift combos and gift boxes for every occasion.</description>",
-          ...items,
+          ...entries,
           "  </channel>",
           "</rss>",
         ].join("\n");
 
         return new Response(xml, {
           headers: {
-            "Content-Type": "application/xml",
+            "Content-Type": "application/xml; charset=utf-8",
             "Cache-Control": "public, max-age=3600",
           },
         });
