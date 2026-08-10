@@ -2,6 +2,7 @@ import { Link, Outlet, createFileRoute, useNavigate, useRouter, useRouterState }
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import {
+  Activity,
   BadgePercent,
   Bot,
   Boxes,
@@ -109,6 +110,7 @@ const sections: Array<{ title: string; items: NavItem[] }> = [
       { to: "/admin/marketing/audiences", label: "Audiences", icon: Users2 },
       { to: "/admin/marketing/control", label: "Control Center", icon: SlidersHorizontal },
       { to: "/admin/marketing/automation", label: "Automation", icon: Bot },
+      { to: "/admin/marketing/tracking", label: "Tracking Debug", icon: Activity },
     ],
   },
   {
