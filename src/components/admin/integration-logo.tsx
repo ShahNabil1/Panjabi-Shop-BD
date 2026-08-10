@@ -2,6 +2,10 @@ import r2Asset from "@/assets/cloudflare-r2.png.asset.json";
 import bulksmsbdAsset from "@/assets/bulksmsbd.png.asset.json";
 import bdCourierAsset from "@/assets/bd-courier.png.asset.json";
 import metaAsset from "@/assets/meta.png.asset.json";
+import gtmAsset from "@/assets/gtm.png.asset.json";
+import ga4Asset from "@/assets/ga4.png.asset.json";
+import tiktokAsset from "@/assets/tiktok-ads.jpg.asset.json";
+
 import { cn } from "@/lib/utils";
 import type { IntegrationGroup } from "@/lib/integrations-shared";
 
@@ -33,7 +37,32 @@ const MARKS: Record<
     ring: "ring-[#E0218A]/25 bg-white",
     imgClass: "w-[88%] object-contain",
   },
+  gtm: {
+    label: "Google Tag Manager",
+    src: gtmAsset.url,
+    ring: "ring-[#4285F4]/25 bg-white",
+    imgClass: "w-[86%] object-contain",
+  },
+  metacapi: {
+    label: "Meta Conversions API",
+    src: metaAsset.url,
+    ring: "ring-[#0866FF]/25 bg-white",
+    imgClass: "w-[88%] object-contain",
+  },
+  tiktok: {
+    label: "TikTok Events API",
+    src: tiktokAsset.url,
+    ring: "ring-[#FE2C55]/25 bg-white",
+    imgClass: "size-full object-cover",
+  },
+  ga4: {
+    label: "Google Analytics 4",
+    src: ga4Asset.url,
+    ring: "ring-[#F9AB00]/25 bg-white",
+    imgClass: "w-[80%] object-contain",
+  },
 };
+
 
 export function IntegrationMark({
   group,

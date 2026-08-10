@@ -265,7 +265,33 @@ export const adminTestIntegration = createServerFn({ method: "POST" })
         };
       }
 
+      if (
+        data.group === "gtm" ||
+        data.group === "metacapi" ||
+        data.group === "tiktok" ||
+        data.group === "ga4"
+      ) {
+        const tracking = await import("./tracking.server");
+        const cfg = await tracking.readTrackingConfig();
+        const probe =
+          data.group === "gtm"
+            ? tracking.probeGtm(cfg)
+            : data.group === "metacapi"
+              ? await tracking.probeMetaCapi(cfg)
+              : data.group === "tiktok"
+                ? await tracking.probeTikTok(cfg)
+                : await tracking.probeGa4(cfg);
+        return {
+          group: data.group,
+          ok: probe.ok,
+          message: probe.message,
+          checkedAt,
+          details: probe.details,
+        };
+      }
+
       const { checkConnection, myPlan } = await import("./courier.server");
+
       const conn = (await checkConnection()) as Record<string, unknown>;
       const connData = (conn["data"] ?? {}) as Record<string, unknown>;
       const connected = Boolean(connData["connected"] && connData["authenticated"]);

@@ -2,8 +2,24 @@
 
 export const API_SECRET_MASK = "••••••••";
 
-export const INTEGRATION_GROUPS = ["r2", "meta", "bulksmsbd", "bdcourier"] as const;
+export const INTEGRATION_GROUPS = [
+  "r2",
+  "meta",
+  "bulksmsbd",
+  "bdcourier",
+  "gtm",
+  "metacapi",
+  "tiktok",
+  "ga4",
+] as const;
 export type IntegrationGroup = (typeof INTEGRATION_GROUPS)[number];
+
+/** Groups shown under the "Analytics & Tracking" heading of the admin page. */
+export const TRACKING_GROUPS = ["gtm", "metacapi", "tiktok", "ga4"] as const;
+export const PLATFORM_GROUPS = INTEGRATION_GROUPS.filter(
+  (g) => !(TRACKING_GROUPS as readonly string[]).includes(g),
+);
+
 
 export type IntegrationField = {
   key: string;
@@ -102,7 +118,86 @@ export const integrationMeta: Record<
     docs: "https://bdcourier.com",
     fields: [{ key: "BDCOURIER_API_KEY", label: "API Key", secret: true }],
   },
+  gtm: {
+    title: "Google Tag Manager",
+    description: "CONTAINER THAT LOADS META, TIKTOK, GA4 & CLARITY PIXELS",
+    docs: "https://tagmanager.google.com",
+    fields: [
+      {
+        key: "GTM_CONTAINER_ID",
+        label: "Container ID",
+        secret: false,
+        placeholder: "GTM-XXXXXXX",
+        hint: "Injected into every page automatically once saved. All browser pixels live inside this container.",
+      },
+    ],
+  },
+  metacapi: {
+    title: "Meta Conversions API",
+    description: "SERVER-SIDE PURCHASE EVENTS WITH PIXEL DEDUPLICATION",
+    docs: "https://business.facebook.com/events_manager2",
+    fields: [
+      {
+        key: "META_PIXEL_ID",
+        label: "Pixel / Dataset ID",
+        secret: false,
+        placeholder: "1234567890",
+        hint: "Same dataset used by the browser pixel in GTM — required for deduplication.",
+      },
+      { key: "META_CAPI_ACCESS_TOKEN", label: "Conversions API Access Token", secret: true },
+      {
+        key: "META_TEST_EVENT_CODE",
+        label: "Test Event Code",
+        secret: false,
+        optional: true,
+        placeholder: "TEST12345",
+        hint: "Only while testing in Events Manager. Clear it before going live.",
+      },
+    ],
+  },
+  tiktok: {
+    title: "TikTok Events API",
+    description: "SERVER-SIDE PLACEANORDER & PURCHASE EVENTS",
+    docs: "https://ads.tiktok.com/marketing_api/docs",
+    fields: [
+      {
+        key: "TIKTOK_PIXEL_ID",
+        label: "Pixel ID",
+        secret: false,
+        placeholder: "C1A2B3...",
+        hint: "Must match the pixel loaded through GTM.",
+      },
+      { key: "TIKTOK_EVENTS_ACCESS_TOKEN", label: "Events API Access Token", secret: true },
+      {
+        key: "TIKTOK_TEST_EVENT_CODE",
+        label: "Test Event Code",
+        secret: false,
+        optional: true,
+        placeholder: "TEST00000",
+      },
+    ],
+  },
+  ga4: {
+    title: "Google Analytics 4",
+    description: "MEASUREMENT PROTOCOL FOR SERVER-SIDE CONVERSIONS",
+    docs: "https://analytics.google.com",
+    fields: [
+      {
+        key: "GA4_MEASUREMENT_ID",
+        label: "Measurement ID",
+        secret: false,
+        placeholder: "G-XXXXXXXXXX",
+      },
+      {
+        key: "GA4_API_SECRET",
+        label: "Measurement Protocol API Secret",
+        secret: true,
+        hint: "Admin → Data Streams → Measurement Protocol API secrets.",
+      },
+    ],
+  },
 };
+
 
 export const groupKeys = (group: IntegrationGroup) =>
   integrationMeta[group].fields.map((f) => f.key);

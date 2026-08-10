@@ -13,6 +13,8 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { getLayoutData } from "../lib/catalog.functions";
 import { getLang } from "../lib/lang.functions";
+import { getGtmContainerId } from "../lib/tracking.functions";
+
 import { LanguageProvider, useLang } from "../lib/language-context";
 import { tr } from "../lib/i18n";
 import { SiteHeader } from "../components/site/site-header";
@@ -36,12 +38,13 @@ function str(value: unknown, fallback: string) {
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   loader: async () => {
-    const [lang, layout] = await Promise.all([
+    const [lang, layout, gtm] = await Promise.all([
       getLang().catch(() => "bn" as const),
       getLayoutData().catch(() => ({
         categories: [] as Awaited<ReturnType<typeof getLayoutData>>["categories"],
         settings: {} as Awaited<ReturnType<typeof getLayoutData>>["settings"],
       })),
+      getGtmContainerId().catch(() => ({ gtmId: "" })),
     ]);
     const general = layout.settings["general"] ?? {};
     const contactSetting = layout.settings["contact"] ?? {};
@@ -50,6 +53,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     return {
       lang,
       categories: layout.categories,
+      gtmId: gtm.gtmId,
       brand: str(general["brand_name"], "উপহারকাব্য"),
       tagline: str(general["tagline"], "গিফট কম্বো ও উপহার সামগ্রী · সারা দেশে ক্যাশ অন ডেলিভারি"),
       contact: {
@@ -59,6 +63,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
     };
   },
+
   head: ({ loaderData }) => {
     const brand = loaderData?.brand ?? "উপহারকাব্য";
     return {
@@ -104,6 +109,16 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 
       scripts: [
+        // Google Tag Manager — container id is managed from Admin → API &
+        // Integrations, so pixels can be swapped without a code change.
+        ...(loaderData?.gtmId
+          ? [
+              {
+                children: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','${loaderData.gtmId}');`,
+              },
+            ]
+          : []),
+
         {
           type: "application/ld+json",
           children: JSON.stringify({
