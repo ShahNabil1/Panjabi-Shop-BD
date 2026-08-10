@@ -2,7 +2,7 @@
 
 export const API_SECRET_MASK = "••••••••";
 
-export const INTEGRATION_GROUPS = ["r2", "bulksmsbd", "bdcourier"] as const;
+export const INTEGRATION_GROUPS = ["r2", "meta", "bulksmsbd", "bdcourier"] as const;
 export type IntegrationGroup = (typeof INTEGRATION_GROUPS)[number];
 
 export type IntegrationField = {
@@ -41,6 +41,49 @@ export const integrationMeta: Record<
         optional: true,
         placeholder: "Zone Analytics Read token",
         hint: "Read-only token used to show live image transformation connection & usage.",
+      },
+    ],
+  },
+  meta: {
+    title: "Meta Marketing API",
+    description: "ADS, PIXEL, CATALOG & PAGE INSIGHTS",
+    docs: "https://business.facebook.com/settings/system-users",
+    fields: [
+      {
+        key: "META_ACCESS_TOKEN",
+        label: "System User Access Token",
+        secret: true,
+        placeholder: "EAAG…",
+        hint: "Long-lived system user token with ads_read, ads_management, business_management, catalog_management.",
+      },
+      {
+        key: "META_AD_ACCOUNT_ID",
+        label: "Ad Account ID",
+        secret: false,
+        placeholder: "act_1234567890",
+      },
+      { key: "META_PIXEL_ID", label: "Pixel / Dataset ID", secret: false },
+      { key: "META_PAGE_ID", label: "Facebook Page ID", secret: false },
+      {
+        key: "META_BUSINESS_ID",
+        label: "Business Portfolio ID",
+        secret: false,
+        optional: true,
+        hint: "Needed for audience & business-level reporting.",
+      },
+      {
+        key: "META_CATALOG_ID",
+        label: "Catalog ID",
+        secret: false,
+        optional: true,
+        hint: "Enables catalog health & dynamic product ad checks.",
+      },
+      {
+        key: "META_API_VERSION",
+        label: "Graph API version",
+        secret: false,
+        optional: true,
+        placeholder: "v21.0",
       },
     ],
   },

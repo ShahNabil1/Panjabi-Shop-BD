@@ -17,6 +17,13 @@ export const INTEGRATION_KEYS = [
   "BULKSMSBD_API_KEY",
   "BULKSMSBD_SENDER_ID",
   "BDCOURIER_API_KEY",
+  "META_ACCESS_TOKEN",
+  "META_AD_ACCOUNT_ID",
+  "META_PIXEL_ID",
+  "META_PAGE_ID",
+  "META_BUSINESS_ID",
+  "META_CATALOG_ID",
+  "META_API_VERSION",
 ] as const;
 
 export type IntegrationKey = (typeof INTEGRATION_KEYS)[number];

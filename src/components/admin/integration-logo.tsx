@@ -1,6 +1,7 @@
 import r2Asset from "@/assets/cloudflare-r2.png.asset.json";
 import bulksmsbdAsset from "@/assets/bulksmsbd.png.asset.json";
 import bdCourierAsset from "@/assets/bd-courier.png.asset.json";
+import metaAsset from "@/assets/meta.png.asset.json";
 import { cn } from "@/lib/utils";
 import type { IntegrationGroup } from "@/lib/integrations-shared";
 
@@ -13,6 +14,12 @@ const MARKS: Record<
     src: r2Asset.url,
     ring: "ring-[#F6821F]/30 bg-[#F6821F]",
     imgClass: "size-full object-cover",
+  },
+  meta: {
+    label: "Meta Marketing API",
+    src: metaAsset.url,
+    ring: "ring-[#0866FF]/25 bg-white",
+    imgClass: "w-[88%] object-contain",
   },
   bulksmsbd: {
     label: "BulkSMSBD",

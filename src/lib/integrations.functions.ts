@@ -228,6 +228,20 @@ export const adminTestIntegration = createServerFn({ method: "POST" })
         };
       }
 
+      if (data.group === "meta") {
+        const { readMetaConfig, probeMeta } = await import("./meta.server");
+        const cfg = await readMetaConfig();
+        if (!cfg) return fail("Meta credentials are incomplete");
+        const probe = await probeMeta(cfg);
+        return {
+          group: "meta",
+          ok: probe.ok,
+          message: probe.message,
+          checkedAt,
+          details: probe.details,
+        };
+      }
+
       if (data.group === "bulksmsbd") {
         const { getSmsBalance } = await import("./sms.server");
         const res = await getSmsBalance();
