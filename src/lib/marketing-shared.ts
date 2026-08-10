@@ -156,3 +156,48 @@ export type CreativePerformance = {
   range: DateRange;
   rows: CreativeRow[];
 };
+
+export type AudienceRow = {
+  id: string;
+  name: string;
+  subtype: string | null;
+  description: string | null;
+  approximateCount: number | null;
+  retentionDays: number | null;
+  deliveryStatus: string | null;
+  operationStatus: string | null;
+  updatedAt: string | null;
+  /** Meta only lets you advertise to audiences of 1,000+ people. */
+  ready: boolean;
+};
+
+export type CatalogHealth = {
+  configured: boolean;
+  id: string | null;
+  name: string | null;
+  productCount: number | null;
+  productSets: number | null;
+  issues: { severity: string; title: string; affectedCount: number | null; type: string | null }[];
+};
+
+export type PixelHealth = {
+  id: string;
+  name: string | null;
+  lastFiredAt: string | null;
+  /** Hours since the last server/browser event reached the dataset. */
+  hoursSinceLastEvent: number | null;
+  matchRate: number | null;
+  automaticMatching: boolean | null;
+  /** Recent event names with volume, newest window Meta exposes. */
+  events: { name: string; count: number }[];
+};
+
+export type AudienceHealth = {
+  connected: boolean;
+  message?: string;
+  audiences: AudienceRow[];
+  catalog: CatalogHealth;
+  pixel: PixelHealth | null;
+  /** Warnings we generate ourselves from the payload above. */
+  recommendations: { tone: "critical" | "warning" | "good"; text: string }[];
+};
