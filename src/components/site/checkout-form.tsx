@@ -375,21 +375,9 @@ export function CheckoutForm({
         },
       });
       placedRef.current = true;
-      // Browser purchase — `event_id` matches the server-side CAPI twin
-      // (`<order_number>.purchase`), so Meta/TikTok de-duplicate it.
-      pushEvent(
-        "purchase",
-        {
-          ...ecommerce(trackedItems, { transaction_id: result.orderNumber, shipping: delivery }),
-          transaction_id: result.orderNumber,
-          order_number: result.orderNumber,
-          value: Number(result.total ?? total),
-          shipping: delivery,
-          customer_phone: phone.trim(),
-          page_type: source,
-        },
-        { eventId: `${result.orderNumber}.purchase`.toLowerCase() },
-      );
+      // No browser `purchase` here — a placed order is still unconfirmed.
+      // Purchase is sent server-side (CAPI/TikTok/GA4) when admin confirms it.
+
       onPlaced?.();
       clear();
       void navigate({
