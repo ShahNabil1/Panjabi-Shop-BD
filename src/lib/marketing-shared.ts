@@ -73,3 +73,48 @@ export type MarketingOverview = {
   /** Ad spend as a percentage of store revenue. */
   spendShare: number;
 };
+
+export const CAMPAIGN_LEVELS = ["campaign", "adset", "ad"] as const;
+export type CampaignLevel = (typeof CAMPAIGN_LEVELS)[number];
+
+export const levelLabel: Record<CampaignLevel, string> = {
+  campaign: "Campaigns",
+  adset: "Ad sets",
+  ad: "Ads",
+};
+
+export type CampaignRow = {
+  id: string;
+  name: string;
+  parentName: string | null;
+  status: string | null;
+  effectiveStatus: string | null;
+  objective: string | null;
+  dailyBudget: number | null;
+  lifetimeBudget: number | null;
+  spend: number;
+  impressions: number;
+  reach: number;
+  frequency: number;
+  clicks: number;
+  ctr: number;
+  cpc: number;
+  cpm: number;
+  purchases: number;
+  purchaseValue: number;
+  roas: number;
+  addToCart: number;
+  initiateCheckout: number;
+  landingPageViews: number;
+  costPerPurchase: number;
+};
+
+export type CampaignPerformance = {
+  connected: boolean;
+  message?: string;
+  currency: string;
+  level: CampaignLevel;
+  range: DateRange;
+  rows: CampaignRow[];
+  totals: MetaMetrics;
+};

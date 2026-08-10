@@ -15,6 +15,7 @@ import {
   LogOut,
   Menu,
   MessageSquareText,
+  BarChart3,
   Megaphone,
 
   Package,
@@ -96,7 +97,10 @@ const sections: Array<{ title: string; items: NavItem[] }> = [
 
   {
     title: "Marketing",
-    items: [{ to: "/admin/marketing", label: "Overview", icon: Megaphone, exact: true }],
+    items: [
+      { to: "/admin/marketing", label: "Overview", icon: Megaphone, exact: true },
+      { to: "/admin/marketing/campaigns", label: "Campaigns", icon: BarChart3 },
+    ],
   },
   {
     title: "Content",
