@@ -370,6 +370,13 @@ function PartnerCard({
         </div>
       </div>
 
+      {locked ? (
+        <p className="flex items-center gap-2 rounded-xl border border-border/70 bg-muted/40 px-3 py-2 text-[11px] font-medium text-muted-foreground">
+          <Lock className="size-3.5" />
+          Credentials are locked. Click “Edit credentials” to change them.
+        </p>
+      ) : null}
+
       <div className="grid gap-4 sm:grid-cols-2">
         {fields.map((f) => (
           <div key={f.key} className="space-y-1.5">
@@ -382,6 +389,7 @@ function PartnerCard({
               value={values[f.key] ?? ""}
               placeholder={f.placeholder ?? ""}
               autoComplete="off"
+              disabled={locked}
               onFocus={() => {
                 if (values[f.key] === SECRET_MASK) setValues((v) => ({ ...v, [f.key]: "" }));
               }}
@@ -401,6 +409,7 @@ function PartnerCard({
         <Textarea
           rows={3}
           maxLength={noteMax}
+          disabled={locked}
           aria-invalid={noteError ? true : undefined}
           className={`rounded-xl ${noteError ? "border-destructive focus-visible:ring-destructive/40" : ""}`}
           placeholder="e.g. Please call before delivery. Fragile item — handle with care."
@@ -408,6 +417,7 @@ function PartnerCard({
           onChange={(e) => setNoteTemplate(e.target.value)}
           onBlur={() => setNoteTemplate((v) => v.replace(/[ \t]+\n/g, "\n").trim())}
         />
+
         {noteError ? (
           <p className="text-[11px] font-medium text-destructive">{noteError}</p>
         ) : null}
