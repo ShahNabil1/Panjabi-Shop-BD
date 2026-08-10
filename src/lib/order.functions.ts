@@ -219,6 +219,8 @@ export const placeOrder = createServerFn({ method: "POST" })
         total,
         source: data.source,
         customer_ip: clientIp,
+        customer_user_agent: userAgent,
+
         attribution: data.attribution ?? {},
       },
       _items: lines.map((l) => ({
