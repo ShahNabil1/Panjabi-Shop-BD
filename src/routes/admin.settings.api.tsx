@@ -106,7 +106,7 @@ function TransformUsageCard() {
 
 
       <p className="mt-2 text-[11px] text-muted-foreground">
-        {data?.message || "Loading live usage…"}
+        {data?.message || "Loading live usage…"} · resets {resetAt.toLocaleDateString("en-US", { day: "numeric", month: "short" })}
         {data?.checkedAt && data.count !== null
           ? ` · ${new Date(data.checkedAt).toLocaleTimeString()}`
           : ""}
