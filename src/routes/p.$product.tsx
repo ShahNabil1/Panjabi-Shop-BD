@@ -1,4 +1,4 @@
-import { Link, createFileRoute, notFound } from "@tanstack/react-router";
+import { Link, createFileRoute, notFound, useSearch } from "@tanstack/react-router";
 import { useState } from "react";
 import { ArrowRight } from "lucide-react";
 
@@ -152,7 +152,7 @@ function ProductPage() {
   const [selected, setSelected] = useState<Record<string, string>>(() => {
     const sku = typeof search.sku === "string" ? search.sku : "";
     const match = sku ? variants.find((v) => v.sku === sku) : undefined;
-    return match ? { [`${match.group_name_bn}`]: match.id } : {};
+    return match ? { [match.group_name_bn]: match.id, [match.group_name_en]: match.id } : {};
   });
   const [comboSelected, setComboSelected] = useState<Record<string, string>>(() =>
     Object.fromEntries(
