@@ -123,15 +123,8 @@ async function collectKeys(from: R2Config): Promise<KeyRef[]> {
     let page = 0;
     while (true) {
       const cols = `${urlCol}${keyCol ? `, ${keyCol}` : ""}`;
-      const builder = db.from(table) as unknown as {
-        select: (columns: string) => {
-          not: (column: string, operator: string, value: null) => {
-            like: (column: string, pattern: string) => {
-              range: (from: number, to: number) => Promise<unknown>;
-            };
-          };
-        };
-      };
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const builder: any = db.from(table);
       const res = (await builder
         .select(cols)
         .not(urlCol, "is", null)
