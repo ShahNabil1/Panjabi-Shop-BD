@@ -10,6 +10,7 @@ import { useCart, type CartItem } from "@/lib/cart-context";
 import { useLang } from "@/lib/language-context";
 import { formatNumber, formatPrice, pick, tr } from "@/lib/i18n";
 import { captureIncompleteOrder, placeOrder } from "@/lib/order.functions";
+import { getAttribution } from "@/lib/attribution";
 import { validateCoupon } from "@/lib/coupons.functions";
 import {
   COUPON_CODE_RE,
@@ -166,6 +167,7 @@ export function CheckoutForm({
         upazila: s.upazila,
         note: s.note.trim(),
         source: s.source,
+        attribution: getAttribution(),
         items: s.items.map((i) => ({
           productId: i.productId,
           variantId: i.variantId,
@@ -343,6 +345,7 @@ export function CheckoutForm({
           note: note.trim(),
           couponCode: appliedCode ?? "",
           source,
+          attribution: getAttribution(),
 
           items: items.map((i) => ({
             productId: i.productId,

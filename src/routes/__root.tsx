@@ -27,6 +27,7 @@ import { ConfirmProvider } from "@/components/ui/confirm-dialog";
 import { SITE_URL } from "../lib/site";
 import { useDigitNormalizer } from "../lib/use-digit-normalizer";
 import { RoutePending } from "../components/site/route-pending";
+import { captureAttribution } from "../lib/attribution";
 
 
 function str(value: unknown, fallback: string) {
@@ -223,6 +224,13 @@ function RootComponent() {
   const { lang, brand } = Route.useLoaderData();
   // Bangla/Arabic-Indic digits typed in any field become English digits.
   useDigitNormalizer();
+
+  // Marketing attribution (UTM, fbclid → _fbc, _fbp) is captured on every page
+  // view — main site and landing pages alike — so checkout can attach it.
+  const href = useRouterState({ select: (s) => s.location.href });
+  useEffect(() => {
+    captureAttribution();
+  }, [href]);
 
   return (
     <QueryClientProvider client={queryClient}>

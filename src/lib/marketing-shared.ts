@@ -252,3 +252,70 @@ export type ControlCenter = {
   rows: ControlRow[];
   summary: { spend: number; revenue: number; roas: number; activeCount: number };
 };
+
+/* ------------------------------------------------------------------ *
+ * Product-level attribution
+ * ------------------------------------------------------------------ */
+
+export type AttributionProductRow = {
+  productId: string | null;
+  name: string;
+  slug: string | null;
+  orders: number;
+  units: number;
+  revenue: number;
+  deliveredRevenue: number;
+  deliveredOrders: number;
+  cancelledOrders: number;
+  /** Ad spend allocated to this product by its share of campaign revenue. */
+  spend: number;
+  roas: number;
+  trueRoas: number;
+  topChannel: string;
+  topCampaign: string | null;
+};
+
+export type AttributionCampaignRow = {
+  key: string;
+  campaignId: string | null;
+  campaignName: string;
+  channel: string;
+  orders: number;
+  revenue: number;
+  deliveredRevenue: number;
+  spend: number;
+  roas: number;
+  trueRoas: number;
+  matched: boolean;
+  topProducts: { name: string; units: number; revenue: number }[];
+};
+
+export type AttributionChannelRow = {
+  channel: string;
+  orders: number;
+  revenue: number;
+  deliveredRevenue: number;
+  spend: number;
+  roas: number;
+};
+
+export type ProductAttribution = {
+  connected: boolean;
+  message?: string;
+  currency: string;
+  range: DateRange;
+  totals: {
+    orders: number;
+    trackedOrders: number;
+    untrackedOrders: number;
+    revenue: number;
+    deliveredRevenue: number;
+    spend: number;
+    matchedSpend: number;
+    roas: number;
+    trueRoas: number;
+  };
+  products: AttributionProductRow[];
+  campaigns: AttributionCampaignRow[];
+  channels: AttributionChannelRow[];
+};

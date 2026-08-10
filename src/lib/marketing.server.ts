@@ -10,7 +10,11 @@
  */
 
 import { actId, metaGet, metaPost, readMetaConfig, type MetaConfig } from "./meta.server";
+import { channelOf, type AttributionPayload } from "./attribution";
 import type {
+  AttributionCampaignRow,
+  AttributionChannelRow,
+  AttributionProductRow,
   AudienceHealth,
   AudienceRow,
   CampaignLevel,
@@ -27,6 +31,7 @@ import type {
   MetaMetrics,
   OrderMetrics,
   PixelHealth,
+  ProductAttribution,
   RuleAction,
 } from "./marketing-shared";
 
@@ -974,4 +979,322 @@ export async function setDailyBudget(id: string, amount: number, level: Campaign
   await metaPost(cfg, id, { daily_budget: Math.round(amount * 100) });
   clearMarketingCache();
   return { ok: true as const, dailyBudget: amount };
+}
+
+/* ------------------------------------------------------------------ *
+ * Product-level attribution report
+ * ------------------------------------------------------------------ */
+
+type AttrOrderRow = {
+  id: string;
+  total: number | string;
+  status: string;
+  created_at: string;
+  source: string | null;
+  attribution: AttributionPayload | null;
+  order_items: {
+    product_id: string | null;
+    product_name: string;
+    product_slug: string | null;
+    quantity: number | string;
+    line_total: number | string;
+  }[];
+};
+
+type AttrDb = {
+  from: (table: string) => {
+    select: (cols: string) => {
+      gte: (
+        col: string,
+        v: string,
+      ) => {
+        lte: (col: string, v: string) => Promise<{ data: unknown; error: unknown }>;
+      };
+    };
+  };
+};
+
+const normName = (v: string) => v.trim().toLowerCase().replace(/\s+/g, " ");
+
+type Bucket = {
+  key: string;
+  campaignId: string | null;
+  campaignName: string;
+  channel: string;
+  orders: number;
+  revenue: number;
+  deliveredRevenue: number;
+  spend: number;
+  matched: boolean;
+  products: Map<string, { name: string; units: number; revenue: number }>;
+};
+
+/**
+ * Joins real orders (with their captured attribution) to Meta campaign spend
+ * so the admin can see which products each campaign actually sells, and what
+ * the campaign-allocated ROAS per product looks like.
+ */
+export async function buildProductAttribution(
+  db: AttrDb,
+  preset: MarketingPreset,
+): Promise<ProductAttribution> {
+  const range = resolveRange(preset);
+  const cfg = await readMetaConfig();
+
+  const { data } = await db
+    .from("orders")
+    .select(
+      "id, total, status, created_at, source, attribution, order_items(product_id, product_name, product_slug, quantity, line_total)",
+    )
+    .gte("created_at", `${range.since}T00:00:00Z`)
+    .lte("created_at", `${range.until}T23:59:59Z`);
+
+  const orders = ((data ?? []) as AttrOrderRow[]).filter((o) => o.status !== "incomplete");
+
+  // --- Meta campaign spend -------------------------------------------------
+  const spendById = new Map<string, number>();
+  const spendByName = new Map<string, number>();
+  let currency = "BDT";
+  let connected = false;
+  let message: string | undefined;
+  let totalSpend = 0;
+
+  if (cfg) {
+    try {
+      const [acct, rows] = await Promise.all([
+        cached(`acct:${cfg.adAccountId}:${cfg.version}`, () =>
+          metaGet<{ name?: string; currency?: string }>(cfg, actId(cfg.adAccountId), {
+            fields: "name,currency",
+          }),
+        ),
+        fetchInsights(cfg, range, {
+          level: "campaign",
+          fields: `${INSIGHT_FIELDS},${LEVEL_FIELDS.campaign}`,
+        }) as Promise<(InsightRow & Record<string, unknown>)[]>,
+      ]);
+      currency = acct.currency || currency;
+      connected = true;
+      for (const raw of rows) {
+        const id = String(raw["campaign_id"] ?? "");
+        const name = String(raw["campaign_name"] ?? id);
+        const spend = num(raw.spend);
+        totalSpend += spend;
+        if (id) spendById.set(id, (spendById.get(id) ?? 0) + spend);
+        if (name) spendByName.set(normName(name), (spendByName.get(normName(name)) ?? 0) + spend);
+      }
+    } catch (error) {
+      message = error instanceof Error ? error.message : "Meta insights unavailable";
+    }
+  } else {
+    message = "Meta Marketing API is not configured yet — spend and ROAS stay empty.";
+  }
+
+  // --- Bucket orders by campaign ------------------------------------------
+  const buckets = new Map<string, Bucket>();
+  const channels = new Map<string, AttributionChannelRow>();
+  const products = new Map<
+    string,
+    {
+      productId: string | null;
+      name: string;
+      slug: string | null;
+      orders: number;
+      units: number;
+      revenue: number;
+      deliveredRevenue: number;
+      deliveredOrders: number;
+      cancelledOrders: number;
+      spend: number;
+      channelMix: Map<string, number>;
+      campaignMix: Map<string, number>;
+    }
+  >();
+
+  let revenue = 0;
+  let deliveredRevenue = 0;
+  let trackedOrders = 0;
+
+  for (const o of orders) {
+    const touch = o.attribution?.last ?? o.attribution?.first ?? {};
+    const hasTouch = Object.keys(touch).some((k) => k !== "captured_at" && k !== "landing_page");
+    const channel = touch.channel ?? (hasTouch ? channelOf(touch) : "direct");
+    const campaignId = touch.campaign_id ?? null;
+    const campaignName = touch.campaign_name ?? touch.utm_campaign ?? null;
+    const key = campaignId ?? (campaignName ? `name:${normName(campaignName)}` : `channel:${channel}`);
+
+    const total = num(o.total);
+    const isVoid = VOID.has(o.status);
+    const isDelivered = DELIVERED.has(o.status);
+    const orderRevenue = isVoid ? 0 : total;
+    const orderDelivered = isDelivered ? total : 0;
+    revenue += orderRevenue;
+    deliveredRevenue += orderDelivered;
+    if (hasTouch) trackedOrders += 1;
+
+    let bucket = buckets.get(key);
+    if (!bucket) {
+      bucket = {
+        key,
+        campaignId,
+        campaignName: campaignName ?? (campaignId ? `Campaign ${campaignId}` : channel),
+        channel,
+        orders: 0,
+        revenue: 0,
+        deliveredRevenue: 0,
+        spend: 0,
+        matched: false,
+        products: new Map(),
+      };
+      buckets.set(key, bucket);
+    }
+    bucket.orders += 1;
+    bucket.revenue += orderRevenue;
+    bucket.deliveredRevenue += orderDelivered;
+
+    const ch = channels.get(channel) ?? {
+      channel,
+      orders: 0,
+      revenue: 0,
+      deliveredRevenue: 0,
+      spend: 0,
+      roas: 0,
+    };
+    ch.orders += 1;
+    ch.revenue += orderRevenue;
+    ch.deliveredRevenue += orderDelivered;
+    channels.set(channel, ch);
+
+    const lineTotal = (o.order_items ?? []).reduce((sum, i) => sum + num(i.line_total), 0) || 1;
+
+    for (const item of o.order_items ?? []) {
+      const pKey = item.product_id ?? `name:${normName(item.product_name)}`;
+      const share = num(item.line_total) / lineTotal;
+      const p = products.get(pKey) ?? {
+        productId: item.product_id,
+        name: item.product_name,
+        slug: item.product_slug,
+        orders: 0,
+        units: 0,
+        revenue: 0,
+        deliveredRevenue: 0,
+        deliveredOrders: 0,
+        cancelledOrders: 0,
+        spend: 0,
+        channelMix: new Map<string, number>(),
+        campaignMix: new Map<string, number>(),
+      };
+      p.orders += 1;
+      p.units += num(item.quantity);
+      p.revenue += isVoid ? 0 : num(item.line_total);
+      if (isDelivered) {
+        p.deliveredOrders += 1;
+        p.deliveredRevenue += num(item.line_total);
+      }
+      if (isVoid) p.cancelledOrders += 1;
+      p.channelMix.set(channel, (p.channelMix.get(channel) ?? 0) + orderRevenue * share);
+      p.campaignMix.set(bucket.key, (p.campaignMix.get(bucket.key) ?? 0) + orderRevenue * share);
+      products.set(pKey, p);
+
+      const bp = bucket.products.get(pKey) ?? {
+        name: item.product_name,
+        units: 0,
+        revenue: 0,
+      };
+      bp.units += num(item.quantity);
+      bp.revenue += isVoid ? 0 : num(item.line_total);
+      bucket.products.set(pKey, bp);
+    }
+  }
+
+  // --- Attach Meta spend to buckets ---------------------------------------
+  let matchedSpend = 0;
+  for (const bucket of buckets.values()) {
+    const spend =
+      (bucket.campaignId ? spendById.get(bucket.campaignId) : undefined) ??
+      spendByName.get(normName(bucket.campaignName)) ??
+      0;
+    bucket.spend = spend;
+    bucket.matched = spend > 0;
+    matchedSpend += spend;
+    const ch = channels.get(bucket.channel);
+    if (ch) ch.spend += spend;
+  }
+
+  // Allocate each bucket's spend across products by revenue share.
+  for (const bucket of buckets.values()) {
+    if (bucket.spend <= 0 || bucket.revenue <= 0) continue;
+    for (const [pKey, bp] of bucket.products) {
+      const p = products.get(pKey);
+      if (!p) continue;
+      p.spend += bucket.spend * (bp.revenue / bucket.revenue);
+    }
+  }
+
+  const pickTop = (m: Map<string, number>) =>
+    [...m.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? null;
+
+  const productRows: AttributionProductRow[] = [...products.values()]
+    .map((p) => {
+      const topCampaignKey = pickTop(p.campaignMix);
+      const bucket = topCampaignKey ? buckets.get(topCampaignKey) : undefined;
+      return {
+        productId: p.productId,
+        name: p.name,
+        slug: p.slug,
+        orders: p.orders,
+        units: p.units,
+        revenue: p.revenue,
+        deliveredRevenue: p.deliveredRevenue,
+        deliveredOrders: p.deliveredOrders,
+        cancelledOrders: p.cancelledOrders,
+        spend: p.spend,
+        roas: p.spend > 0 ? p.revenue / p.spend : 0,
+        trueRoas: p.spend > 0 ? p.deliveredRevenue / p.spend : 0,
+        topChannel: pickTop(p.channelMix) ?? "direct",
+        topCampaign: bucket && bucket.campaignId ? bucket.campaignName : (bucket?.campaignName ?? null),
+      };
+    })
+    .sort((a, b) => b.revenue - a.revenue);
+
+  const campaignRows: AttributionCampaignRow[] = [...buckets.values()]
+    .map((b) => ({
+      key: b.key,
+      campaignId: b.campaignId,
+      campaignName: b.campaignName,
+      channel: b.channel,
+      orders: b.orders,
+      revenue: b.revenue,
+      deliveredRevenue: b.deliveredRevenue,
+      spend: b.spend,
+      roas: b.spend > 0 ? b.revenue / b.spend : 0,
+      trueRoas: b.spend > 0 ? b.deliveredRevenue / b.spend : 0,
+      matched: b.matched,
+      topProducts: [...b.products.values()].sort((x, y) => y.revenue - x.revenue).slice(0, 4),
+    }))
+    .sort((a, b) => b.revenue - a.revenue);
+
+  const channelRows = [...channels.values()]
+    .map((c) => ({ ...c, roas: c.spend > 0 ? c.revenue / c.spend : 0 }))
+    .sort((a, b) => b.revenue - a.revenue);
+
+  return {
+    connected,
+    ...(message ? { message } : {}),
+    currency,
+    range,
+    totals: {
+      orders: orders.length,
+      trackedOrders,
+      untrackedOrders: orders.length - trackedOrders,
+      revenue,
+      deliveredRevenue,
+      spend: totalSpend,
+      matchedSpend,
+      roas: totalSpend > 0 ? revenue / totalSpend : 0,
+      trueRoas: totalSpend > 0 ? deliveredRevenue / totalSpend : 0,
+    },
+    products: productRows,
+    campaigns: campaignRows,
+    channels: channelRows,
+  };
 }

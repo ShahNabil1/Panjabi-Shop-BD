@@ -21,6 +21,8 @@ import {
 } from "@/lib/delivery-shared";
 import { Panel } from "@/components/admin/kit";
 import { CourierBadge, CourierMark, CourierWatermark } from "@/components/admin/courier-logo";
+import { OrderSourcePanel } from "@/components/admin/order/source-panel";
+import type { AttributionPayload } from "@/lib/attribution";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -216,6 +218,7 @@ export function FulfillmentCard({
   orderId,
   status,
   source,
+  attribution,
   orderStatus,
   partner,
   courierStatus,
@@ -233,6 +236,7 @@ export function FulfillmentCard({
   orderId: string;
   status: string;
   source: string;
+  attribution?: AttributionPayload | null;
   orderStatus: string;
   partner: string | null;
   courierStatus: string | null;
@@ -814,12 +818,8 @@ export function FulfillmentCard({
         </div>
       </Panel>
 
-      <Panel className="space-y-3">
-        <h2 className="text-sm font-bold">Order Source</h2>
-        <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-3 py-1 text-xs font-semibold text-foreground">
-          {source}
-        </span>
-      </Panel>
+      <OrderSourcePanel source={source} attribution={attribution} />
+
     </div>
   );
 }
