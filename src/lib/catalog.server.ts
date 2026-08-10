@@ -298,7 +298,7 @@ export async function fetchProduct(slug: string) {
        badge_bn, badge_en, rating, review_count, meta_title, meta_description, og_image_url,
        category_id, subcategory_id,
        product_images(id, url, alt_bn, alt_en, sort_order),
-       product_variants(id, group_name_bn, group_name_en, value_bn, value_en, price_delta, stock, sort_order, is_active)`,
+       product_variants(id, group_name_bn, group_name_en, value_bn, value_en, sku, price_delta, stock, sort_order, is_active)`,
     )
     .eq("slug", slug)
     .eq("is_active", true)
