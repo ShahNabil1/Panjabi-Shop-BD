@@ -563,7 +563,7 @@ function ApiSettingsAdmin() {
 
       <R2MigrationCard />
 
-      {INTEGRATION_GROUPS.map((group) => (
+      {PLATFORM_GROUPS.map((group) => (
         <GroupCard
           key={group}
           group={group}
@@ -571,6 +571,29 @@ function ApiSettingsAdmin() {
           onSaved={refresh}
         />
       ))}
+
+      <div className="space-y-6 pt-4">
+        <div className="border-t border-border/60 pt-6">
+          <h2 className="font-display text-lg font-semibold tracking-tight">
+            Analytics &amp; Tracking
+          </h2>
+          <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
+            Browser pixels (Meta, TikTok, GA4, Clarity) load through the GTM container below.
+            The server-side credentials here power deduplicated Conversions API, TikTok Events
+            API and GA4 Measurement Protocol events.
+          </p>
+        </div>
+
+        {TRACKING_GROUPS.map((group) => (
+          <GroupCard
+            key={group}
+            group={group}
+            state={q.data?.find((row) => row.group === group)}
+            onSaved={refresh}
+          />
+        ))}
+      </div>
+
     </div>
   );
 }
