@@ -6,6 +6,7 @@ import { ArrowLeft, CheckCircle2, Copy, Download, ExternalLink, FileText, Messag
 import { useEffect, useRef, useState } from "react";
 
 import { adminUpdateOrderStatus } from "@/lib/admin.functions";
+import type { AttributionPayload } from "@/lib/attribution";
 import { adminListDeliveryPartners } from "@/lib/delivery.functions";
 import { providerLabels } from "@/lib/delivery-shared";
 import {
