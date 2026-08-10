@@ -128,6 +128,77 @@ export async function verifyWebhookSecret(
 }
 
 /**
+ * Every payload key any part of the system actually reads: the provider
+ * parsers above plus the `courier_webhook_apply` SQL routine. Anything else
+ * (agent GPS traces, full order echoes, nested item arrays…) is dead weight
+ * that would slowly fill the database, so it is dropped before storing.
+ */
+const KEEP_KEYS = new Set([
+  "event",
+  "event_type",
+  "type",
+  "notification_type",
+  "consignment_id",
+  "consignmentId",
+  "tracking_id",
+  "tracking_code",
+  "trackingCode",
+  "order_id",
+  "merchant_order_id",
+  "merchantOrderId",
+  "merchant_order_no",
+  "invoice",
+  "reference",
+  "status",
+  "order_status",
+  "order_status_slug",
+  "delivery_status",
+  "tracking_message",
+  "reason",
+  "note",
+  "causes",
+  "agent_name",
+  "agent_phone",
+  "updated_at",
+  "timestamp",
+  // Money / return / payout fields read by courier_webhook_apply
+  "collected_amount",
+  "collected_amount_in_bdt",
+  "amount_collected",
+  "partial_delivery_amount",
+  "delivery_fee",
+  "cod_amount",
+  "total_fee",
+  "return_id",
+  "return_consignment_id",
+  "return_order_id",
+  "returned_consignment_id",
+  "invoice_id",
+  // Added by the receiver when the secret could not be verified
+  "_unverified_header",
+]);
+
+const MAX_STRING = 500;
+
+/** Keeps only the fields we read, with strings capped so one event stays tiny. */
+export function slimCourierPayload(payload: Payload): Payload {
+  const out: Payload = {};
+  for (const [key, value] of Object.entries(payload)) {
+    if (!KEEP_KEYS.has(key)) continue;
+    if (typeof value === "string") {
+      out[key] = value.length > MAX_STRING ? `${value.slice(0, MAX_STRING)}…` : value;
+    } else if (Array.isArray(value)) {
+      out[key] = value.slice(0, 10).map((v) => (typeof v === "object" ? JSON.stringify(v).slice(0, MAX_STRING) : v));
+    } else if (value !== null && typeof value === "object") {
+      continue;
+    } else {
+      out[key] = value as never;
+    }
+  }
+  return out;
+}
+
+/**
  * Stores the raw event, then updates the matching consignment + order.
  * Never throws: webhook senders retry aggressively, so failures are recorded
  * on the event row instead.
@@ -137,7 +208,9 @@ export async function processCourierWebhook(
   provider: DeliveryProvider,
   payload: Payload,
 ): Promise<{ processed: boolean; message: string }> {
+  // Parse from the full payload, store only the slimmed copy.
   const parsed = parseCourierPayload(provider, payload);
+  const stored = slimCourierPayload(payload);
   const status = parsed.rawStatus ? normaliseCourierStatus(provider, parsed.rawStatus) : "";
 
   const { data, error } = await db.rpc("courier_webhook_apply", {
