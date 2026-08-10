@@ -230,6 +230,10 @@ fbq('init', ${JSON.stringify(V("CFG - Meta Pixel ID"))});
   ),
 );
 
+/** Unquoted variable reference — arrays/numbers must NOT be wrapped in quotes,
+ *  otherwise GTM stringifies them ("[object Object]"). */
+const R = (name) => `{{${name}}}`;
+
 for (const [ev, fbEvent] of Object.entries(META_MAP)) {
   tag.push(
     html(
@@ -237,10 +241,10 @@ for (const [ev, fbEvent] of Object.entries(META_MAP)) {
       `<script>
   window.fbq && fbq('track', ${JSON.stringify(fbEvent)}, {
     content_type: ${JSON.stringify(V("DL - content_type"))} || 'product',
-    content_ids: ${JSON.stringify(V("DL - content_ids"))},
-    contents: ${JSON.stringify(V("DL - contents"))},
-    num_items: ${JSON.stringify(V("DL - num_items"))},
-    value: ${JSON.stringify(V("DL - value"))},
+    content_ids: ${R("DL - content_ids")},
+    contents: ${R("DL - contents")},
+    num_items: ${R("DL - num_items")},
+    value: ${R("DL - value")},
     currency: ${JSON.stringify(V("DL - currency"))} || 'BDT'
   }, { eventID: ${JSON.stringify(V("DL - event_id"))} });
 </script>`,
@@ -278,10 +282,14 @@ for (const [ev, ttEvent] of Object.entries(TT_MAP)) {
     html(
       `TikTok Pixel - ${ttEvent}`,
       `<script>
+  var _c = ${R("DL - contents")} || [];
+  var _ids = ${R("DL - content_ids")} || [];
   window.ttq && ttq.track(${JSON.stringify(ttEvent)}, {
-    contents: ${JSON.stringify(V("DL - contents"))},
+    contents: _c,
+    content_id: (_c[0] && (_c[0].content_id || _c[0].id)) || _ids[0],
+    content_name: _c[0] && _c[0].content_name,
     content_type: 'product',
-    value: ${JSON.stringify(V("DL - value"))},
+    value: ${R("DL - value")},
     currency: ${JSON.stringify(V("DL - currency"))} || 'BDT'
   }, { event_id: ${JSON.stringify(V("DL - event_id"))} });
 </script>`,

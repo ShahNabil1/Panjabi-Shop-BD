@@ -1,6 +1,6 @@
 {
   "exportFormatVersion": 2,
-  "exportTime": "2026-08-10T21:08:25.325Z",
+  "exportTime": "2026-08-10T21:31:58.842Z",
   "containerVersion": {
     "accountId": "0",
     "containerId": "0",
@@ -720,7 +720,7 @@
           {
             "type": "TEMPLATE",
             "key": "html",
-            "value": "<script>\n  window.fbq && fbq('track', \"PageView\", {\n    content_type: \"{{DL - content_type}}\" || 'product',\n    content_ids: \"{{DL - content_ids}}\",\n    contents: \"{{DL - contents}}\",\n    num_items: \"{{DL - num_items}}\",\n    value: \"{{DL - value}}\",\n    currency: \"{{DL - currency}}\" || 'BDT'\n  }, { eventID: \"{{DL - event_id}}\" });\n</script>"
+            "value": "<script>\n  window.fbq && fbq('track', \"PageView\", {\n    content_type: \"{{DL - content_type}}\" || 'product',\n    content_ids: {{DL - content_ids}},\n    contents: {{DL - contents}},\n    num_items: {{DL - num_items}},\n    value: {{DL - value}},\n    currency: \"{{DL - currency}}\" || 'BDT'\n  }, { eventID: \"{{DL - event_id}}\" });\n</script>"
           },
           {
             "type": "BOOLEAN",
@@ -742,7 +742,7 @@
           {
             "type": "TEMPLATE",
             "key": "html",
-            "value": "<script>\n  window.fbq && fbq('track', \"ViewContent\", {\n    content_type: \"{{DL - content_type}}\" || 'product',\n    content_ids: \"{{DL - content_ids}}\",\n    contents: \"{{DL - contents}}\",\n    num_items: \"{{DL - num_items}}\",\n    value: \"{{DL - value}}\",\n    currency: \"{{DL - currency}}\" || 'BDT'\n  }, { eventID: \"{{DL - event_id}}\" });\n</script>"
+            "value": "<script>\n  window.fbq && fbq('track', \"ViewContent\", {\n    content_type: \"{{DL - content_type}}\" || 'product',\n    content_ids: {{DL - content_ids}},\n    contents: {{DL - contents}},\n    num_items: {{DL - num_items}},\n    value: {{DL - value}},\n    currency: \"{{DL - currency}}\" || 'BDT'\n  }, { eventID: \"{{DL - event_id}}\" });\n</script>"
           },
           {
             "type": "BOOLEAN",
@@ -764,7 +764,7 @@
           {
             "type": "TEMPLATE",
             "key": "html",
-            "value": "<script>\n  window.fbq && fbq('track', \"AddToCart\", {\n    content_type: \"{{DL - content_type}}\" || 'product',\n    content_ids: \"{{DL - content_ids}}\",\n    contents: \"{{DL - contents}}\",\n    num_items: \"{{DL - num_items}}\",\n    value: \"{{DL - value}}\",\n    currency: \"{{DL - currency}}\" || 'BDT'\n  }, { eventID: \"{{DL - event_id}}\" });\n</script>"
+            "value": "<script>\n  window.fbq && fbq('track', \"AddToCart\", {\n    content_type: \"{{DL - content_type}}\" || 'product',\n    content_ids: {{DL - content_ids}},\n    contents: {{DL - contents}},\n    num_items: {{DL - num_items}},\n    value: {{DL - value}},\n    currency: \"{{DL - currency}}\" || 'BDT'\n  }, { eventID: \"{{DL - event_id}}\" });\n</script>"
           },
           {
             "type": "BOOLEAN",
@@ -786,7 +786,7 @@
           {
             "type": "TEMPLATE",
             "key": "html",
-            "value": "<script>\n  window.fbq && fbq('track', \"InitiateCheckout\", {\n    content_type: \"{{DL - content_type}}\" || 'product',\n    content_ids: \"{{DL - content_ids}}\",\n    contents: \"{{DL - contents}}\",\n    num_items: \"{{DL - num_items}}\",\n    value: \"{{DL - value}}\",\n    currency: \"{{DL - currency}}\" || 'BDT'\n  }, { eventID: \"{{DL - event_id}}\" });\n</script>"
+            "value": "<script>\n  window.fbq && fbq('track', \"InitiateCheckout\", {\n    content_type: \"{{DL - content_type}}\" || 'product',\n    content_ids: {{DL - content_ids}},\n    contents: {{DL - contents}},\n    num_items: {{DL - num_items}},\n    value: {{DL - value}},\n    currency: \"{{DL - currency}}\" || 'BDT'\n  }, { eventID: \"{{DL - event_id}}\" });\n</script>"
           },
           {
             "type": "BOOLEAN",
@@ -808,7 +808,7 @@
           {
             "type": "TEMPLATE",
             "key": "html",
-            "value": "<script>\n  window.fbq && fbq('track', \"AddPaymentInfo\", {\n    content_type: \"{{DL - content_type}}\" || 'product',\n    content_ids: \"{{DL - content_ids}}\",\n    contents: \"{{DL - contents}}\",\n    num_items: \"{{DL - num_items}}\",\n    value: \"{{DL - value}}\",\n    currency: \"{{DL - currency}}\" || 'BDT'\n  }, { eventID: \"{{DL - event_id}}\" });\n</script>"
+            "value": "<script>\n  window.fbq && fbq('track', \"AddPaymentInfo\", {\n    content_type: \"{{DL - content_type}}\" || 'product',\n    content_ids: {{DL - content_ids}},\n    contents: {{DL - contents}},\n    num_items: {{DL - num_items}},\n    value: {{DL - value}},\n    currency: \"{{DL - currency}}\" || 'BDT'\n  }, { eventID: \"{{DL - event_id}}\" });\n</script>"
           },
           {
             "type": "BOOLEAN",
@@ -830,7 +830,7 @@
           {
             "type": "TEMPLATE",
             "key": "html",
-            "value": "<script>\n  window.fbq && fbq('track', \"Purchase\", {\n    content_type: \"{{DL - content_type}}\" || 'product',\n    content_ids: \"{{DL - content_ids}}\",\n    contents: \"{{DL - contents}}\",\n    num_items: \"{{DL - num_items}}\",\n    value: \"{{DL - value}}\",\n    currency: \"{{DL - currency}}\" || 'BDT'\n  }, { eventID: \"{{DL - event_id}}\" });\n</script>"
+            "value": "<script>\n  window.fbq && fbq('track', \"Purchase\", {\n    content_type: \"{{DL - content_type}}\" || 'product',\n    content_ids: {{DL - content_ids}},\n    contents: {{DL - contents}},\n    num_items: {{DL - num_items}},\n    value: {{DL - value}},\n    currency: \"{{DL - currency}}\" || 'BDT'\n  }, { eventID: \"{{DL - event_id}}\" });\n</script>"
           },
           {
             "type": "BOOLEAN",
@@ -852,7 +852,7 @@
           {
             "type": "TEMPLATE",
             "key": "html",
-            "value": "<script>\n  window.fbq && fbq('track', \"Search\", {\n    content_type: \"{{DL - content_type}}\" || 'product',\n    content_ids: \"{{DL - content_ids}}\",\n    contents: \"{{DL - contents}}\",\n    num_items: \"{{DL - num_items}}\",\n    value: \"{{DL - value}}\",\n    currency: \"{{DL - currency}}\" || 'BDT'\n  }, { eventID: \"{{DL - event_id}}\" });\n</script>"
+            "value": "<script>\n  window.fbq && fbq('track', \"Search\", {\n    content_type: \"{{DL - content_type}}\" || 'product',\n    content_ids: {{DL - content_ids}},\n    contents: {{DL - contents}},\n    num_items: {{DL - num_items}},\n    value: {{DL - value}},\n    currency: \"{{DL - currency}}\" || 'BDT'\n  }, { eventID: \"{{DL - event_id}}\" });\n</script>"
           },
           {
             "type": "BOOLEAN",
@@ -874,7 +874,7 @@
           {
             "type": "TEMPLATE",
             "key": "html",
-            "value": "<script>\n  window.fbq && fbq('track', \"Contact\", {\n    content_type: \"{{DL - content_type}}\" || 'product',\n    content_ids: \"{{DL - content_ids}}\",\n    contents: \"{{DL - contents}}\",\n    num_items: \"{{DL - num_items}}\",\n    value: \"{{DL - value}}\",\n    currency: \"{{DL - currency}}\" || 'BDT'\n  }, { eventID: \"{{DL - event_id}}\" });\n</script>"
+            "value": "<script>\n  window.fbq && fbq('track', \"Contact\", {\n    content_type: \"{{DL - content_type}}\" || 'product',\n    content_ids: {{DL - content_ids}},\n    contents: {{DL - contents}},\n    num_items: {{DL - num_items}},\n    value: {{DL - value}},\n    currency: \"{{DL - currency}}\" || 'BDT'\n  }, { eventID: \"{{DL - event_id}}\" });\n</script>"
           },
           {
             "type": "BOOLEAN",
@@ -923,7 +923,7 @@
           {
             "type": "TEMPLATE",
             "key": "html",
-            "value": "<script>\n  window.ttq && ttq.track(\"ViewContent\", {\n    contents: \"{{DL - contents}}\",\n    content_type: 'product',\n    value: \"{{DL - value}}\",\n    currency: \"{{DL - currency}}\" || 'BDT'\n  }, { event_id: \"{{DL - event_id}}\" });\n</script>"
+            "value": "<script>\n  var _c = {{DL - contents}} || [];\n  var _ids = {{DL - content_ids}} || [];\n  window.ttq && ttq.track(\"ViewContent\", {\n    contents: _c,\n    content_id: (_c[0] && (_c[0].content_id || _c[0].id)) || _ids[0],\n    content_name: _c[0] && _c[0].content_name,\n    content_type: 'product',\n    value: {{DL - value}},\n    currency: \"{{DL - currency}}\" || 'BDT'\n  }, { event_id: \"{{DL - event_id}}\" });\n</script>"
           },
           {
             "type": "BOOLEAN",
@@ -945,7 +945,7 @@
           {
             "type": "TEMPLATE",
             "key": "html",
-            "value": "<script>\n  window.ttq && ttq.track(\"AddToCart\", {\n    contents: \"{{DL - contents}}\",\n    content_type: 'product',\n    value: \"{{DL - value}}\",\n    currency: \"{{DL - currency}}\" || 'BDT'\n  }, { event_id: \"{{DL - event_id}}\" });\n</script>"
+            "value": "<script>\n  var _c = {{DL - contents}} || [];\n  var _ids = {{DL - content_ids}} || [];\n  window.ttq && ttq.track(\"AddToCart\", {\n    contents: _c,\n    content_id: (_c[0] && (_c[0].content_id || _c[0].id)) || _ids[0],\n    content_name: _c[0] && _c[0].content_name,\n    content_type: 'product',\n    value: {{DL - value}},\n    currency: \"{{DL - currency}}\" || 'BDT'\n  }, { event_id: \"{{DL - event_id}}\" });\n</script>"
           },
           {
             "type": "BOOLEAN",
@@ -967,7 +967,7 @@
           {
             "type": "TEMPLATE",
             "key": "html",
-            "value": "<script>\n  window.ttq && ttq.track(\"InitiateCheckout\", {\n    contents: \"{{DL - contents}}\",\n    content_type: 'product',\n    value: \"{{DL - value}}\",\n    currency: \"{{DL - currency}}\" || 'BDT'\n  }, { event_id: \"{{DL - event_id}}\" });\n</script>"
+            "value": "<script>\n  var _c = {{DL - contents}} || [];\n  var _ids = {{DL - content_ids}} || [];\n  window.ttq && ttq.track(\"InitiateCheckout\", {\n    contents: _c,\n    content_id: (_c[0] && (_c[0].content_id || _c[0].id)) || _ids[0],\n    content_name: _c[0] && _c[0].content_name,\n    content_type: 'product',\n    value: {{DL - value}},\n    currency: \"{{DL - currency}}\" || 'BDT'\n  }, { event_id: \"{{DL - event_id}}\" });\n</script>"
           },
           {
             "type": "BOOLEAN",
@@ -989,7 +989,7 @@
           {
             "type": "TEMPLATE",
             "key": "html",
-            "value": "<script>\n  window.ttq && ttq.track(\"PlaceAnOrder\", {\n    contents: \"{{DL - contents}}\",\n    content_type: 'product',\n    value: \"{{DL - value}}\",\n    currency: \"{{DL - currency}}\" || 'BDT'\n  }, { event_id: \"{{DL - event_id}}\" });\n</script>"
+            "value": "<script>\n  var _c = {{DL - contents}} || [];\n  var _ids = {{DL - content_ids}} || [];\n  window.ttq && ttq.track(\"PlaceAnOrder\", {\n    contents: _c,\n    content_id: (_c[0] && (_c[0].content_id || _c[0].id)) || _ids[0],\n    content_name: _c[0] && _c[0].content_name,\n    content_type: 'product',\n    value: {{DL - value}},\n    currency: \"{{DL - currency}}\" || 'BDT'\n  }, { event_id: \"{{DL - event_id}}\" });\n</script>"
           },
           {
             "type": "BOOLEAN",
@@ -1011,7 +1011,7 @@
           {
             "type": "TEMPLATE",
             "key": "html",
-            "value": "<script>\n  window.ttq && ttq.track(\"Search\", {\n    contents: \"{{DL - contents}}\",\n    content_type: 'product',\n    value: \"{{DL - value}}\",\n    currency: \"{{DL - currency}}\" || 'BDT'\n  }, { event_id: \"{{DL - event_id}}\" });\n</script>"
+            "value": "<script>\n  var _c = {{DL - contents}} || [];\n  var _ids = {{DL - content_ids}} || [];\n  window.ttq && ttq.track(\"Search\", {\n    contents: _c,\n    content_id: (_c[0] && (_c[0].content_id || _c[0].id)) || _ids[0],\n    content_name: _c[0] && _c[0].content_name,\n    content_type: 'product',\n    value: {{DL - value}},\n    currency: \"{{DL - currency}}\" || 'BDT'\n  }, { event_id: \"{{DL - event_id}}\" });\n</script>"
           },
           {
             "type": "BOOLEAN",
@@ -1033,7 +1033,7 @@
           {
             "type": "TEMPLATE",
             "key": "html",
-            "value": "<script>\n  window.ttq && ttq.track(\"Contact\", {\n    contents: \"{{DL - contents}}\",\n    content_type: 'product',\n    value: \"{{DL - value}}\",\n    currency: \"{{DL - currency}}\" || 'BDT'\n  }, { event_id: \"{{DL - event_id}}\" });\n</script>"
+            "value": "<script>\n  var _c = {{DL - contents}} || [];\n  var _ids = {{DL - content_ids}} || [];\n  window.ttq && ttq.track(\"Contact\", {\n    contents: _c,\n    content_id: (_c[0] && (_c[0].content_id || _c[0].id)) || _ids[0],\n    content_name: _c[0] && _c[0].content_name,\n    content_type: 'product',\n    value: {{DL - value}},\n    currency: \"{{DL - currency}}\" || 'BDT'\n  }, { event_id: \"{{DL - event_id}}\" });\n</script>"
           },
           {
             "type": "BOOLEAN",
