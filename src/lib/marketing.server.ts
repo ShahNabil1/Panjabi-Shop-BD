@@ -11,6 +11,8 @@
 
 import { actId, metaGet, readMetaConfig, type MetaConfig } from "./meta.server";
 import type {
+  CampaignLevel,
+  CampaignPerformance,
   DateRange,
   MarketingOverview,
   MarketingPreset,
@@ -354,4 +356,143 @@ function dailySeries(
   }
 
   return [...points.values()];
+}
+
+/* ------------------------------------------------------------------ *
+ * Campaign / ad-set / ad level performance
+ * ------------------------------------------------------------------ */
+
+type EntityRow = {
+  id: string;
+  name?: string;
+  status?: string;
+  effective_status?: string;
+  objective?: string;
+  daily_budget?: string;
+  lifetime_budget?: string;
+};
+
+const LEVEL_FIELDS: Record<CampaignLevel, string> = {
+  campaign: "campaign_id,campaign_name",
+  adset: "adset_id,adset_name,campaign_name",
+  ad: "ad_id,ad_name,adset_name",
+};
+
+const EDGE: Record<CampaignLevel, string> = {
+  campaign: "campaigns",
+  adset: "adsets",
+  ad: "ads",
+};
+
+const ENTITY_FIELDS: Record<CampaignLevel, string> = {
+  campaign: "id,name,status,effective_status,objective,daily_budget,lifetime_budget",
+  adset: "id,name,status,effective_status,daily_budget,lifetime_budget",
+  ad: "id,name,status,effective_status",
+};
+
+async function loadEntities(cfg: MetaConfig, level: CampaignLevel) {
+  return cached(`ent:${level}:${cfg.adAccountId}:${cfg.version}`, async () => {
+    const res = await metaGet<{ data?: EntityRow[] }>(
+      cfg,
+      `${actId(cfg.adAccountId)}/${EDGE[level]}`,
+      { fields: ENTITY_FIELDS[level], limit: 200 },
+    );
+    const map = new Map<string, EntityRow>();
+    for (const row of res.data ?? []) map.set(row.id, row);
+    return map;
+  });
+}
+
+/** Builds the Marketing → Campaigns payload for one hierarchy level. */
+export async function buildCampaignPerformance(
+  preset: MarketingPreset,
+  level: CampaignLevel,
+): Promise<CampaignPerformance> {
+  const range = resolveRange(preset);
+  const cfg = await readMetaConfig();
+  const empty: CampaignPerformance = {
+    connected: false,
+    currency: "USD",
+    level,
+    range,
+    rows: [],
+    totals: emptyMeta(),
+  };
+  if (!cfg) {
+    return {
+      ...empty,
+      message: "Meta Marketing API is not configured yet.",
+    };
+  }
+
+  try {
+    const [acct, rows, entities] = await Promise.all([
+      cached(`acct:${cfg.adAccountId}:${cfg.version}`, () =>
+        metaGet<{ name?: string; currency?: string }>(cfg, actId(cfg.adAccountId), {
+          fields: "name,currency",
+        }),
+      ),
+      fetchInsights(cfg, range, {
+        level,
+        fields: `${INSIGHT_FIELDS},${LEVEL_FIELDS[level]}`,
+      }) as Promise<(InsightRow & Record<string, unknown>)[]>,
+      loadEntities(cfg, level),
+    ]);
+
+    const built = rows.map((raw) => {
+      const id = String(
+        raw[`${level}_id` as keyof typeof raw] ?? raw["campaign_id" as keyof typeof raw] ?? "",
+      );
+      const name = String(raw[`${level}_name` as keyof typeof raw] ?? id);
+      const parentName =
+        level === "adset"
+          ? ((raw["campaign_name" as keyof typeof raw] as string) ?? null)
+          : level === "ad"
+            ? ((raw["adset_name" as keyof typeof raw] as string) ?? null)
+            : null;
+      const m = toMetrics([raw]);
+      const ent = entities.get(id);
+      return {
+        id,
+        name,
+        parentName,
+        status: ent?.status ?? null,
+        effectiveStatus: ent?.effective_status ?? null,
+        objective: ent?.objective ?? null,
+        dailyBudget: ent?.daily_budget ? num(ent.daily_budget) / 100 : null,
+        lifetimeBudget: ent?.lifetime_budget ? num(ent.lifetime_budget) / 100 : null,
+        spend: m.spend,
+        impressions: m.impressions,
+        reach: m.reach,
+        frequency: m.frequency,
+        clicks: m.clicks,
+        ctr: m.ctr,
+        cpc: m.cpc,
+        cpm: m.cpm,
+        purchases: m.purchases,
+        purchaseValue: m.purchaseValue,
+        roas: m.roas,
+        addToCart: m.addToCart,
+        initiateCheckout: m.initiateCheckout,
+        landingPageViews: m.landingPageViews,
+        costPerPurchase: m.purchases > 0 ? m.spend / m.purchases : 0,
+      };
+    });
+
+    built.sort((a, b) => b.spend - a.spend);
+
+    return {
+      connected: true,
+      currency: acct.currency || "USD",
+      level,
+      range,
+      rows: built,
+      totals: toMetrics(rows),
+    };
+  } catch (error) {
+    return {
+      ...empty,
+      message: error instanceof Error ? error.message : "Meta insights unavailable",
+    };
+  }
 }
