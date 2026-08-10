@@ -278,8 +278,12 @@ for (const [ev, ttEvent] of Object.entries(TT_MAP)) {
     html(
       `TikTok Pixel - ${ttEvent}`,
       `<script>
+  var _c = ${JSON.stringify(V("DL - contents"))} || [];
+  var _ids = ${JSON.stringify(V("DL - content_ids"))} || [];
   window.ttq && ttq.track(${JSON.stringify(ttEvent)}, {
-    contents: ${JSON.stringify(V("DL - contents"))},
+    contents: _c,
+    content_id: (_c[0] && (_c[0].content_id || _c[0].id)) || _ids[0],
+    content_name: _c[0] && _c[0].content_name,
     content_type: 'product',
     value: ${JSON.stringify(V("DL - value"))},
     currency: ${JSON.stringify(V("DL - currency"))} || 'BDT'

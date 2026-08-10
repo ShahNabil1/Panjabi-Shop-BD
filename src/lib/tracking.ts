@@ -98,7 +98,12 @@ export function ecommerce(items: TrackingItem[], extra?: DataLayerRecord): DataL
     content_name: items[0]?.name,
     content_category: items[0]?.category,
     contents: items.map((i) => ({
+      // Meta reads `id`; TikTok requires `content_id` (Video Shopping Ads).
       id: i.id,
+      content_id: i.id,
+      content_name: i.name,
+      content_category: i.category,
+      price: i.price,
       quantity: i.quantity,
       item_price: i.price,
       item_name: i.name,
