@@ -259,7 +259,9 @@ function PartnerCard({
       });
       setResult({ ok: true, message: res.message });
       setSavedSnapshot(JSON.stringify(values));
+      setUnlocked(false);
       setNoteTemplate(noteTemplate.trim()); setSavedTemplate(noteTemplate.trim());
+
       toast.success(`${providerLabels[provider]} saved`);
       onDone();
     } catch (error) {
