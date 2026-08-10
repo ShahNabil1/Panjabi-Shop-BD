@@ -2,6 +2,7 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { ShoppingBag, Zap } from "lucide-react";
 
+import { SmartImage } from "@/components/site/smart-image";
 import { useCart } from "@/lib/cart-context";
 import { getComboSelections } from "@/lib/catalog.functions";
 
@@ -28,10 +29,10 @@ export function ProductThumb({
 
   if (src && !failed) {
     return (
-      <img
+      <SmartImage
         src={src}
         alt={alt}
-        loading="lazy"
+        baseWidth={480}
         onError={() => setFailed(true)}
         onClick={onClick}
         className={cn("h-full w-full object-cover", onClick ? "cursor-zoom-in" : "", className)}

@@ -1,3 +1,4 @@
+import { SmartImage } from "@/components/site/smart-image";
 import { Maximize2, ZoomIn } from "lucide-react";
 
 import type { ComboContentItem } from "@/lib/types";
@@ -55,10 +56,10 @@ export function ComboContents({
             >
               {item.image ? (
                 <>
-                  <img
+                  <SmartImage
                     src={item.image}
                     alt={pick(lang, item.nameBn, item.nameEn)}
-                    loading="lazy"
+                    baseWidth={160}
                     className="size-full cursor-zoom-in object-cover transition-transform duration-500 group-hover:scale-105"
                   />
                   <span className="pointer-events-none absolute inset-0 flex items-center justify-center bg-foreground/25 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
