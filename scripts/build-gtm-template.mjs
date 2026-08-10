@@ -329,6 +329,13 @@ const container = {
     tag,
     trigger,
     variable,
+    builtInVariable: [
+      ["PAGE_URL", "Page URL"],
+      ["PAGE_HOSTNAME", "Page Hostname"],
+      ["PAGE_PATH", "Page Path"],
+      ["REFERRER", "Referrer"],
+      ["EVENT", "Event"],
+    ].map(([type, name]) => ({ accountId: ACC, containerId: CNT, type, name })),
     fingerprint: "0",
   },
 };
