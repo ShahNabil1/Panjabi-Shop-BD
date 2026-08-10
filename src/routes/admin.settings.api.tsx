@@ -138,13 +138,6 @@ function GroupCard({
         <div>
           <h2 className="ig-text text-sm font-bold">{meta.title}</h2>
           <p className="mt-1 text-xs text-muted-foreground">{meta.description}</p>
-          <p className="mt-1 text-[11px] text-muted-foreground">
-            {result
-              ? `Last checked ${new Date(result.checkedAt).toLocaleString("en-US", {
-                  timeZone: "Asia/Dhaka",
-                })}`
-              : "Not verified yet"}
-          </p>
         </div>
         <span
           className={cn(
@@ -157,19 +150,9 @@ function GroupCard({
         </span>
       </div>
 
-      {locked ? (
-        <p className="flex items-center gap-2 rounded-xl border border-border/70 bg-muted/40 px-3 py-2 text-[11px] font-medium text-muted-foreground">
-          <Lock className="size-3.5" />
-          Credentials are locked. Click Edit to change them.
-        </p>
-      ) : null}
-
       <div className="grid gap-3 sm:grid-cols-2">
         {meta.fields.map((field) => (
           <div key={field.key} className="space-y-1.5">
-            <span className="block text-[11px] font-bold uppercase tracking-wide text-muted-foreground">
-              {field.key}
-            </span>
             <TextField
               label={field.label}
               value={values[field.key] ?? ""}
@@ -180,6 +163,7 @@ function GroupCard({
             />
           </div>
         ))}
+
       </div>
 
 
