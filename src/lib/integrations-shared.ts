@@ -19,7 +19,7 @@ export const integrationMeta: Record<
 > = {
   r2: {
     title: "Cloudflare R2",
-    description: ",MEDIA STORAGE - IMAGES, VIDEOS, INVOICE PDF, BANNERS",
+    description: "MEDIA STORAGE - IMAGES, VIDEOS, INVOICE PDF, BANNERS",
     docs: "https://dash.cloudflare.com/?to=/:account/r2",
     fields: [
       { key: "R2_ACCOUNT_ID", label: "Account ID", secret: false },
