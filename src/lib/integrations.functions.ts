@@ -68,6 +68,9 @@ export const adminSaveIntegration = createServerFn({ method: "POST" })
     const { getIntegrationValues, clearIntegrationCache } = await import(
       "./integration-secrets.server"
     );
+    const { readR2Config } = await import("./r2.server");
+    const beforeR2 = data.group === "r2" ? await readR2Config() : null;
+
     const current = await getIntegrationValues();
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
