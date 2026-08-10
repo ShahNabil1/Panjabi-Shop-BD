@@ -15,6 +15,12 @@ const MARKS: Record<
     ring: "ring-[#F6821F]/30 bg-[#F6821F]",
     imgClass: "size-full object-cover",
   },
+  meta: {
+    label: "Meta Marketing API",
+    src: metaAsset.url,
+    ring: "ring-[#0866FF]/25 bg-white",
+    imgClass: "w-[88%] object-contain",
+  },
   bulksmsbd: {
     label: "BulkSMSBD",
     src: bulksmsbdAsset.url,
