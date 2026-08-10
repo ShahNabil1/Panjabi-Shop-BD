@@ -21,7 +21,12 @@ export type IntegrationGroupState = {
   configured: boolean;
   /** True when every value is still coming from environment variables. */
   envOnly: boolean;
+  /** Last stored connection test for this group (null when never tested). */
+  lastTest: IntegrationTestResult | null;
 };
+
+/** Row key used to persist the last connection test of a group. */
+const testKey = (group: IntegrationGroup) => `INTEGRATION_TEST_${group.toUpperCase()}`;
 
 /** Admin-only: current state of every managed integration credential. */
 export const adminListIntegrations = createServerFn({ method: "GET" })
@@ -33,6 +38,20 @@ export const adminListIntegrations = createServerFn({ method: "GET" })
     );
     const values = await getIntegrationValues();
     const sources = await getIntegrationSources();
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const tests = new Map<string, IntegrationTestResult>();
+    const { data: testRows } = await supabaseAdmin
+      .from("integration_credentials")
+      .select("key, value")
+      .in("key", INTEGRATION_GROUPS.map(testKey));
+    for (const row of testRows ?? []) {
+      try {
+        tests.set(row.key as string, JSON.parse(row.value as string) as IntegrationTestResult);
+      } catch {
+        /* ignore malformed rows */
+      }
+    }
 
     return INTEGRATION_GROUPS.map((group) => {
       const out: Record<string, string> = {};
@@ -50,9 +69,11 @@ export const adminListIntegrations = createServerFn({ method: "GET" })
         sources: src,
         configured: keys.every((k) => Boolean(values[k])),
         envOnly: keys.every((k) => src[k] === "environment"),
+        lastTest: tests.get(testKey(group)) ?? null,
       };
     });
   });
+
 
 const saveSchema = z.object({
   group: groupSchema,
