@@ -18,12 +18,17 @@ export function ProductThumb({
   label,
   className,
   onClick,
+  fit = "contain",
+  priority,
 }: {
   src: string | null;
   alt: string;
   label: string;
   className?: string;
   onClick?: (() => void) | undefined;
+  /** contain = never crop the artwork (default), cover = fill the box. */
+  fit?: "contain" | "cover";
+  priority?: boolean;
 }) {
   const [failed, setFailed] = useState(false);
 
@@ -33,12 +38,20 @@ export function ProductThumb({
         src={src}
         alt={alt}
         baseWidth={480}
+        fit={fit}
+        {...(priority ? { priority: true } : {})}
         onError={() => setFailed(true)}
         onClick={onClick}
-        className={cn("h-full w-full object-cover", onClick ? "cursor-zoom-in" : "", className)}
+        className={cn(
+          "h-full w-full",
+          fit === "contain" ? "object-contain" : "object-cover",
+          onClick ? "cursor-zoom-in" : "",
+          className,
+        )}
       />
     );
   }
+
 
   return (
     <div

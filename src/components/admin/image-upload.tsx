@@ -1,10 +1,82 @@
 import { useCallback, useRef, useState } from "react";
 import { toast } from "sonner";
-import { Crop as CropIcon, ImagePlus, Loader2, Upload, X } from "lucide-react";
+import { Crop as CropIcon, ImagePlus, Loader2, Trash2, Upload } from "lucide-react";
 
-import { createUploadTicket } from "@/lib/media.functions";
+import { createUploadTicket, deleteUploadByUrl } from "@/lib/media.functions";
 import { ImageCropperDialog } from "@/components/admin/image-cropper";
+import { useConfirm } from "@/components/ui/confirm-dialog";
 import { cn } from "@/lib/utils";
+
+/**
+ * Removing an image must wipe the object from R2 too — otherwise the bucket
+ * keeps growing with files nothing links to. Confirms first, deletes the R2
+ * object, and only then drops the link from the record.
+ */
+export function useImageRemover() {
+  const confirm = useConfirm();
+  const [busy, setBusy] = useState(false);
+
+  const removeImage = useCallback(
+    async (url: string | null | undefined, onRemoved: () => void) => {
+      if (!url) {
+        onRemoved();
+        return;
+      }
+      const ok = await confirm({
+        title: "ছবিটি পার্মানেন্টলি ডিলিট হবে?",
+        description:
+          "R2 বাকেট থেকে ফাইলটি একবারে মুছে যাবে এবং ডাটাবেসের লিংকও সরে যাবে। এটি আর ফেরানো যাবে না।",
+        confirmLabel: "Delete permanently",
+        tone: "danger",
+      });
+      if (!ok) return;
+      setBusy(true);
+      try {
+        const res = await deleteUploadByUrl({ data: { url } });
+        toast.success(res.deleted ? "R2 থেকে ডিলিট হয়েছে" : "লিংকটি সরানো হয়েছে");
+        onRemoved();
+      } catch (err) {
+        toast.error(err instanceof Error ? err.message : "Delete failed");
+      } finally {
+        setBusy(false);
+      }
+    },
+    [confirm],
+  );
+
+  return { busy, removeImage };
+}
+
+/** Small trash button that deletes the object from R2 and clears the link. */
+export function ImageDeleteButton({
+  url,
+  onRemoved,
+  className,
+  label,
+}: {
+  url: string | null | undefined;
+  onRemoved: () => void;
+  className?: string | undefined;
+  label?: string;
+}) {
+  const { busy, removeImage } = useImageRemover();
+  return (
+    <button
+      type="button"
+      disabled={busy}
+      onClick={() => void removeImage(url, onRemoved)}
+      title="Delete permanently (R2 + link)"
+      className={cn(
+        "inline-flex items-center gap-1 text-[11px] text-muted-foreground transition-colors hover:text-destructive disabled:opacity-60",
+        className,
+      )}
+    >
+      {busy ? <Loader2 className="size-3 animate-spin" /> : <Trash2 className="size-3" />}
+      {label}
+    </button>
+  );
+}
+
 
 type Folder =
   | "products"
@@ -310,15 +382,9 @@ export function ImageField({
               />
             ) : null}
             {value ? (
-              <button
-                type="button"
-                onClick={() => onChange(null)}
-                className="inline-flex items-center gap-1 text-[11px] text-muted-foreground transition-colors hover:text-destructive"
-              >
-                <X className="size-3" />
-                Remove
-              </button>
+              <ImageDeleteButton url={value} onRemoved={() => onChange(null)} label="Delete" />
             ) : null}
+
           </div>
         </div>
       </div>

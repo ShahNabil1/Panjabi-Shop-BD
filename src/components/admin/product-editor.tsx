@@ -30,7 +30,12 @@ import {
   TextField,
   ToggleField,
 } from "@/components/admin/kit";
-import { CropExistingButton, ImageUploadButton } from "@/components/admin/image-upload";
+import {
+  CropExistingButton,
+  ImageUploadButton,
+  useImageRemover,
+} from "@/components/admin/image-upload";
+
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -129,6 +134,8 @@ export function ProductEditor({ id, kind }: { id: string; kind: ProductKind }) {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const [draft, setDraft] = useState<Draft>(emptyDraft(kind));
+  const { removeImage } = useImageRemover();
+
 
   const taxonomy = useQuery({
     queryKey: ["admin", "taxonomy"],
@@ -680,14 +687,17 @@ export function ProductEditor({ id, kind }: { id: string; kind: ProductKind }) {
                   variant="ghost"
                   className="rounded-lg text-muted-foreground hover:text-destructive"
                   onClick={() =>
-                    set(
-                      "images",
-                      draft.images.filter((_, j) => j !== i),
+                    void removeImage(img.url, () =>
+                      set(
+                        "images",
+                        draft.images.filter((_, j) => j !== i),
+                      ),
                     )
                   }
                 >
                   <Trash2 className="size-4" />
                 </Button>
+
               </div>
             ))}
           </div>

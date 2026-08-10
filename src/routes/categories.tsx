@@ -93,7 +93,8 @@ function AllCategoriesPage() {
                 src={c.image_url}
                 alt={pick(lang, c.name_bn, c.name_en)}
                 label={pick(lang, c.name_bn, c.name_en)}
-                className="transition-transform duration-500 group-hover:scale-105"
+                fit="cover"
+                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
               />
             </div>
             <div className="p-3.5 text-center sm:text-left">
