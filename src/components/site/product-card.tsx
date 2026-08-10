@@ -10,6 +10,8 @@ import { getComboSelections } from "@/lib/catalog.functions";
 import { useLang } from "@/lib/language-context";
 import { badgeLabel, discountPercent, formatNumber, formatPrice, pick, toBnDigits, tr } from "@/lib/i18n";
 import type { ProductCard as ProductCardData } from "@/lib/supabase-public";
+import { ecommerce, pushEvent } from "@/lib/tracking";
+import { catalogId } from "@/lib/tracking-items";
 import { cn } from "@/lib/utils";
 
 export function ProductThumb({
