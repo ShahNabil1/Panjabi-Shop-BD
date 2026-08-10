@@ -2,6 +2,7 @@ import { Link, Outlet, createFileRoute, useNavigate, useRouter, useRouterState }
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import {
+  Activity,
   BadgePercent,
   Bot,
   Boxes,
