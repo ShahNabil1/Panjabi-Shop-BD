@@ -627,6 +627,48 @@ export type Database = {
           },
         ]
       }
+      marketing_automation_runs: {
+        Row: {
+          actions: Json
+          applied: number
+          created_at: string
+          dry_run: boolean
+          error: string | null
+          evaluated: number
+          id: string
+          level: string
+          preset: string
+          skipped: number
+          trigger: string
+        }
+        Insert: {
+          actions?: Json
+          applied?: number
+          created_at?: string
+          dry_run?: boolean
+          error?: string | null
+          evaluated?: number
+          id?: string
+          level?: string
+          preset?: string
+          skipped?: number
+          trigger?: string
+        }
+        Update: {
+          actions?: Json
+          applied?: number
+          created_at?: string
+          dry_run?: boolean
+          error?: string | null
+          evaluated?: number
+          id?: string
+          level?: string
+          preset?: string
+          skipped?: number
+          trigger?: string
+        }
+        Relationships: []
+      }
       order_activity: {
         Row: {
           created_at: string

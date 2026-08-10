@@ -12,6 +12,7 @@ import {
   type ControlCenter,
   type CreativePerformance,
   type MarketingOverview,
+  type AutomationState,
   type ProductAttribution,
 } from "./marketing-shared";
 import {
@@ -156,4 +157,73 @@ export const marketingAttribution = createServerFn({ method: "POST" })
       db as unknown as Parameters<typeof buildProductAttribution>[0],
       data.preset,
     );
+  });
+
+const automationSettingsSchema = z.object({
+  enabled: z.boolean(),
+  dryRun: z.boolean(),
+  level: z.enum(CAMPAIGN_LEVELS),
+  preset: z.enum(MARKETING_PRESETS),
+  thresholds: z.object({
+    minSpend: z.number().min(0).max(1_000_000),
+    scaleRoas: z.number().min(0).max(100),
+    pauseRoas: z.number().min(0).max(100),
+    budgetStep: z.number().min(1).max(100),
+  }),
+  actions: z.object({ pause: z.boolean(), scale: z.boolean(), reduce: z.boolean() }),
+  maxDailyBudget: z.number().min(0).max(10_000_000),
+  maxActionsPerRun: z.number().int().min(1).max(50),
+});
+
+/** Admin-only: saved automation rules, recent runs and a live dry-run preview. */
+export const marketingAutomationState = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => z.object({ refresh: z.boolean().optional() }).parse(input ?? {}))
+  .handler(async ({ data, context }): Promise<AutomationState> => {
+    const db = await requireAdmin(context.supabase, context.userId);
+    if (data.refresh) clearMarketingCache();
+    const { listAutomationRuns, readAutomationSettings, runMarketingAutomation } = await import(
+      "./marketing-automation.server"
+    );
+    const anyDb = db as unknown as Parameters<typeof readAutomationSettings>[0];
+    const settings = await readAutomationSettings(anyDb);
+    const [runs, preview] = await Promise.all([
+      listAutomationRuns(anyDb),
+      runMarketingAutomation(anyDb, { trigger: "preview", settings, preview: true }),
+    ]);
+    return {
+      settings,
+      runs,
+      preview: preview.actions,
+      connected: !preview.skipped,
+      ...(preview.skipped ? { message: preview.message } : {}),
+      currency: preview.currency ?? "BDT",
+    };
+  });
+
+/** Admin-only: persist the automation rules used by the scheduled job. */
+export const marketingSaveAutomation = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => automationSettingsSchema.parse(input))
+  .handler(async ({ data, context }) => {
+    const db = await requireAdmin(context.supabase, context.userId);
+    const { writeAutomationSettings } = await import("./marketing-automation.server");
+    return writeAutomationSettings(
+      db as unknown as Parameters<typeof writeAutomationSettings>[0],
+      data,
+    );
+  });
+
+/** Admin-only: execute the automation immediately (respects the dry-run flag). */
+export const marketingRunAutomation = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => z.object({}).parse(input ?? {}))
+  .handler(async ({ context }) => {
+    const db = await requireAdmin(context.supabase, context.userId);
+    const { readAutomationSettings, runMarketingAutomation } = await import(
+      "./marketing-automation.server"
+    );
+    const anyDb = db as unknown as Parameters<typeof readAutomationSettings>[0];
+    const settings = await readAutomationSettings(anyDb);
+    return runMarketingAutomation(anyDb, { trigger: "manual", settings: { ...settings, enabled: true } });
   });

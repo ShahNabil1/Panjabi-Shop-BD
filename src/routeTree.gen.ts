@@ -40,6 +40,7 @@ import { Route as AdminCombosIdRouteImport } from './routes/admin.combos.$id'
 import { Route as AdminMarketingIndexRouteImport } from './routes/admin.marketing.index'
 import { Route as AdminMarketingAttributionRouteImport } from './routes/admin.marketing.attribution'
 import { Route as AdminMarketingAudiencesRouteImport } from './routes/admin.marketing.audiences'
+import { Route as AdminMarketingAutomationRouteImport } from './routes/admin.marketing.automation'
 import { Route as AdminMarketingCampaignsRouteImport } from './routes/admin.marketing.campaigns'
 import { Route as AdminMarketingControlRouteImport } from './routes/admin.marketing.control'
 import { Route as AdminMarketingCreativesRouteImport } from './routes/admin.marketing.creatives'
@@ -61,6 +62,7 @@ import { Route as CCategoryIndexRouteImport } from './routes/c.$category.index'
 import { Route as CCategorySubcategoryRouteImport } from './routes/c.$category.$subcategory'
 import { Route as ApiPublicCourierProviderRouteImport } from './routes/api/public/courier.$provider'
 import { Route as ApiPublicHooksCleanupOldLogsRouteImport } from './routes/api/public/hooks/cleanup-old-logs'
+import { Route as ApiPublicHooksMarketingAutomationRouteImport } from './routes/api/public/hooks/marketing-automation'
 import { Route as ApiPublicHooksSteadfastPaymentsRouteImport } from './routes/api/public/hooks/steadfast-payments'
 
 const IndexRoute = IndexRouteImport.update({
@@ -219,6 +221,12 @@ const AdminMarketingAudiencesRoute = AdminMarketingAudiencesRouteImport.update({
   path: '/marketing/audiences',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminMarketingAutomationRoute =
+  AdminMarketingAutomationRouteImport.update({
+    id: '/marketing/automation',
+    path: '/marketing/automation',
+    getParentRoute: () => AdminRoute,
+  } as any)
 const AdminMarketingCampaignsRoute = AdminMarketingCampaignsRouteImport.update({
   id: '/marketing/campaigns',
   path: '/marketing/campaigns',
@@ -327,6 +335,12 @@ const ApiPublicHooksCleanupOldLogsRoute =
     path: '/api/public/hooks/cleanup-old-logs',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksMarketingAutomationRoute =
+  ApiPublicHooksMarketingAutomationRouteImport.update({
+    id: '/api/public/hooks/marketing-automation',
+    path: '/api/public/hooks/marketing-automation',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksSteadfastPaymentsRoute =
   ApiPublicHooksSteadfastPaymentsRouteImport.update({
     id: '/api/public/hooks/steadfast-payments',
@@ -364,6 +378,7 @@ export interface FileRoutesByFullPath {
   '/admin/combos/$id': typeof AdminCombosIdRoute
   '/admin/marketing/attribution': typeof AdminMarketingAttributionRoute
   '/admin/marketing/audiences': typeof AdminMarketingAudiencesRoute
+  '/admin/marketing/automation': typeof AdminMarketingAutomationRoute
   '/admin/marketing/campaigns': typeof AdminMarketingCampaignsRoute
   '/admin/marketing/control': typeof AdminMarketingControlRoute
   '/admin/marketing/creatives': typeof AdminMarketingCreativesRoute
@@ -387,6 +402,7 @@ export interface FileRoutesByFullPath {
   '/c/$category/': typeof CCategoryIndexRoute
   '/api/public/courier/$provider': typeof ApiPublicCourierProviderRoute
   '/api/public/hooks/cleanup-old-logs': typeof ApiPublicHooksCleanupOldLogsRoute
+  '/api/public/hooks/marketing-automation': typeof ApiPublicHooksMarketingAutomationRoute
   '/api/public/hooks/steadfast-payments': typeof ApiPublicHooksSteadfastPaymentsRoute
 }
 export interface FileRoutesByTo {
@@ -418,6 +434,7 @@ export interface FileRoutesByTo {
   '/admin/combos/$id': typeof AdminCombosIdRoute
   '/admin/marketing/attribution': typeof AdminMarketingAttributionRoute
   '/admin/marketing/audiences': typeof AdminMarketingAudiencesRoute
+  '/admin/marketing/automation': typeof AdminMarketingAutomationRoute
   '/admin/marketing/campaigns': typeof AdminMarketingCampaignsRoute
   '/admin/marketing/control': typeof AdminMarketingControlRoute
   '/admin/marketing/creatives': typeof AdminMarketingCreativesRoute
@@ -441,6 +458,7 @@ export interface FileRoutesByTo {
   '/c/$category': typeof CCategoryIndexRoute
   '/api/public/courier/$provider': typeof ApiPublicCourierProviderRoute
   '/api/public/hooks/cleanup-old-logs': typeof ApiPublicHooksCleanupOldLogsRoute
+  '/api/public/hooks/marketing-automation': typeof ApiPublicHooksMarketingAutomationRoute
   '/api/public/hooks/steadfast-payments': typeof ApiPublicHooksSteadfastPaymentsRoute
 }
 export interface FileRoutesById {
@@ -474,6 +492,7 @@ export interface FileRoutesById {
   '/admin/combos/$id': typeof AdminCombosIdRoute
   '/admin/marketing/attribution': typeof AdminMarketingAttributionRoute
   '/admin/marketing/audiences': typeof AdminMarketingAudiencesRoute
+  '/admin/marketing/automation': typeof AdminMarketingAutomationRoute
   '/admin/marketing/campaigns': typeof AdminMarketingCampaignsRoute
   '/admin/marketing/control': typeof AdminMarketingControlRoute
   '/admin/marketing/creatives': typeof AdminMarketingCreativesRoute
@@ -497,6 +516,7 @@ export interface FileRoutesById {
   '/c/$category/': typeof CCategoryIndexRoute
   '/api/public/courier/$provider': typeof ApiPublicCourierProviderRoute
   '/api/public/hooks/cleanup-old-logs': typeof ApiPublicHooksCleanupOldLogsRoute
+  '/api/public/hooks/marketing-automation': typeof ApiPublicHooksMarketingAutomationRoute
   '/api/public/hooks/steadfast-payments': typeof ApiPublicHooksSteadfastPaymentsRoute
 }
 export interface FileRouteTypes {
@@ -531,6 +551,7 @@ export interface FileRouteTypes {
     | '/admin/combos/$id'
     | '/admin/marketing/attribution'
     | '/admin/marketing/audiences'
+    | '/admin/marketing/automation'
     | '/admin/marketing/campaigns'
     | '/admin/marketing/control'
     | '/admin/marketing/creatives'
@@ -554,6 +575,7 @@ export interface FileRouteTypes {
     | '/c/$category/'
     | '/api/public/courier/$provider'
     | '/api/public/hooks/cleanup-old-logs'
+    | '/api/public/hooks/marketing-automation'
     | '/api/public/hooks/steadfast-payments'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -585,6 +607,7 @@ export interface FileRouteTypes {
     | '/admin/combos/$id'
     | '/admin/marketing/attribution'
     | '/admin/marketing/audiences'
+    | '/admin/marketing/automation'
     | '/admin/marketing/campaigns'
     | '/admin/marketing/control'
     | '/admin/marketing/creatives'
@@ -608,6 +631,7 @@ export interface FileRouteTypes {
     | '/c/$category'
     | '/api/public/courier/$provider'
     | '/api/public/hooks/cleanup-old-logs'
+    | '/api/public/hooks/marketing-automation'
     | '/api/public/hooks/steadfast-payments'
   id:
     | '__root__'
@@ -640,6 +664,7 @@ export interface FileRouteTypes {
     | '/admin/combos/$id'
     | '/admin/marketing/attribution'
     | '/admin/marketing/audiences'
+    | '/admin/marketing/automation'
     | '/admin/marketing/campaigns'
     | '/admin/marketing/control'
     | '/admin/marketing/creatives'
@@ -663,6 +688,7 @@ export interface FileRouteTypes {
     | '/c/$category/'
     | '/api/public/courier/$provider'
     | '/api/public/hooks/cleanup-old-logs'
+    | '/api/public/hooks/marketing-automation'
     | '/api/public/hooks/steadfast-payments'
   fileRoutesById: FileRoutesById
 }
@@ -691,6 +717,7 @@ export interface RootRouteChildren {
   CCategoryIndexRoute: typeof CCategoryIndexRoute
   ApiPublicCourierProviderRoute: typeof ApiPublicCourierProviderRoute
   ApiPublicHooksCleanupOldLogsRoute: typeof ApiPublicHooksCleanupOldLogsRoute
+  ApiPublicHooksMarketingAutomationRoute: typeof ApiPublicHooksMarketingAutomationRoute
   ApiPublicHooksSteadfastPaymentsRoute: typeof ApiPublicHooksSteadfastPaymentsRoute
 }
 
@@ -913,6 +940,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminMarketingAudiencesRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/marketing/automation': {
+      id: '/admin/marketing/automation'
+      path: '/marketing/automation'
+      fullPath: '/admin/marketing/automation'
+      preLoaderRoute: typeof AdminMarketingAutomationRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/marketing/campaigns': {
       id: '/admin/marketing/campaigns'
       path: '/marketing/campaigns'
@@ -1060,6 +1094,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksCleanupOldLogsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/marketing-automation': {
+      id: '/api/public/hooks/marketing-automation'
+      path: '/api/public/hooks/marketing-automation'
+      fullPath: '/api/public/hooks/marketing-automation'
+      preLoaderRoute: typeof ApiPublicHooksMarketingAutomationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/steadfast-payments': {
       id: '/api/public/hooks/steadfast-payments'
       path: '/api/public/hooks/steadfast-payments'
@@ -1080,6 +1121,7 @@ interface AdminRouteChildren {
   AdminCombosIdRoute: typeof AdminCombosIdRoute
   AdminMarketingAttributionRoute: typeof AdminMarketingAttributionRoute
   AdminMarketingAudiencesRoute: typeof AdminMarketingAudiencesRoute
+  AdminMarketingAutomationRoute: typeof AdminMarketingAutomationRoute
   AdminMarketingCampaignsRoute: typeof AdminMarketingCampaignsRoute
   AdminMarketingControlRoute: typeof AdminMarketingControlRoute
   AdminMarketingCreativesRoute: typeof AdminMarketingCreativesRoute
@@ -1111,6 +1153,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminCombosIdRoute: AdminCombosIdRoute,
   AdminMarketingAttributionRoute: AdminMarketingAttributionRoute,
   AdminMarketingAudiencesRoute: AdminMarketingAudiencesRoute,
+  AdminMarketingAutomationRoute: AdminMarketingAutomationRoute,
   AdminMarketingCampaignsRoute: AdminMarketingCampaignsRoute,
   AdminMarketingControlRoute: AdminMarketingControlRoute,
   AdminMarketingCreativesRoute: AdminMarketingCreativesRoute,
@@ -1159,6 +1202,8 @@ const rootRouteChildren: RootRouteChildren = {
   CCategoryIndexRoute: CCategoryIndexRoute,
   ApiPublicCourierProviderRoute: ApiPublicCourierProviderRoute,
   ApiPublicHooksCleanupOldLogsRoute: ApiPublicHooksCleanupOldLogsRoute,
+  ApiPublicHooksMarketingAutomationRoute:
+    ApiPublicHooksMarketingAutomationRoute,
   ApiPublicHooksSteadfastPaymentsRoute: ApiPublicHooksSteadfastPaymentsRoute,
 }
 export const routeTree = rootRouteImport

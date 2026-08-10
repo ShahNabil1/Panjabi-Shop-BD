@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import {
   BadgePercent,
+  Bot,
   Boxes,
   ChevronDown,
   ChevronLeft,
@@ -107,6 +108,7 @@ const sections: Array<{ title: string; items: NavItem[] }> = [
       { to: "/admin/marketing/attribution", label: "Attribution", icon: Boxes },
       { to: "/admin/marketing/audiences", label: "Audiences", icon: Users2 },
       { to: "/admin/marketing/control", label: "Control Center", icon: SlidersHorizontal },
+      { to: "/admin/marketing/automation", label: "Automation", icon: Bot },
     ],
   },
   {
