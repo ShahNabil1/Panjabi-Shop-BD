@@ -14,6 +14,14 @@ export const orderLineSchema = z.object({
   })).max(50).default([]),
 });
 
+/** Marketing attribution captured in the browser (UTM, fbclid/fbc/fbp, …). */
+export const attributionSchema = z
+  .object({
+    first: z.record(z.string().max(40), z.string().max(300)).optional(),
+    last: z.record(z.string().max(40), z.string().max(300)).optional(),
+  })
+  .optional();
+
 export const placeOrderSchema = z.object({
   customerName: z.string().trim().min(2).max(80),
   customerPhone: z
@@ -27,6 +35,7 @@ export const placeOrderSchema = z.object({
   note: z.string().trim().max(500).optional().or(z.literal("")),
   couponCode: z.string().trim().max(40).optional().or(z.literal("")),
   source: z.enum(["website", "landing"]).default("website"),
+  attribution: attributionSchema,
   items: z.array(orderLineSchema).min(1).max(30),
 });
 
@@ -51,6 +60,7 @@ export const incompleteOrderSchema = z.object({
   upazila: z.string().trim().max(80).optional().default(""),
   note: z.string().trim().max(500).optional().default(""),
   source: z.enum(["website", "landing"]).default("website"),
+  attribution: attributionSchema,
   items: z.array(orderLineSchema).min(1).max(30),
 });
 

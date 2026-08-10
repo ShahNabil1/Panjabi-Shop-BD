@@ -208,6 +208,7 @@ export const placeOrder = createServerFn({ method: "POST" })
         total,
         source: data.source,
         customer_ip: clientIp,
+        attribution: data.attribution ?? {},
       },
       _items: lines.map((l) => ({
         product_id: l.product.id,
@@ -423,6 +424,7 @@ export const captureIncompleteOrder = createServerFn({ method: "POST" })
       note: data.note || null,
       subtotal,
       source: data.source,
+      attribution: data.attribution ?? {},
     };
 
     if (existing) {
