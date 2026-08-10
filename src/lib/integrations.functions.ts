@@ -103,8 +103,28 @@ export const adminSaveIntegration = createServerFn({ method: "POST" })
       await supabaseAdmin.from("integration_credentials").delete().in("key", removals);
     }
     clearIntegrationCache();
-    return { ok: true };
+
+    // Switched to a different bucket → remember the old one so media can be migrated.
+    let migrationPending = false;
+    if (data.group === "r2" && beforeR2) {
+      const afterR2 = await readR2Config();
+      if (afterR2) {
+        const { sameBucket, savePreviousR2, readPreviousR2 } = await import(
+          "./r2-migration.server"
+        );
+        if (!sameBucket(beforeR2, afterR2)) {
+          const existing = await readPreviousR2();
+          // Keep the original source if a migration was already pending.
+          if (!existing || sameBucket(existing, afterR2)) await savePreviousR2(beforeR2);
+          migrationPending = true;
+        } else {
+          migrationPending = (await readPreviousR2()) !== null;
+        }
+      }
+    }
+    return { ok: true, migrationPending };
   });
+
 
 /** Admin-only: wipes the group's stored credentials completely. */
 export const adminRemoveIntegration = createServerFn({ method: "POST" })
