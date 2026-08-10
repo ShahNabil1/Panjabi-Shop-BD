@@ -17,6 +17,7 @@ import {
   MessageSquareText,
   BarChart3,
   Clapperboard,
+  Users2,
   Megaphone,
 
   Package,
@@ -102,6 +103,7 @@ const sections: Array<{ title: string; items: NavItem[] }> = [
       { to: "/admin/marketing", label: "Overview", icon: Megaphone, exact: true },
       { to: "/admin/marketing/campaigns", label: "Campaigns", icon: BarChart3 },
       { to: "/admin/marketing/creatives", label: "Creatives", icon: Clapperboard },
+      { to: "/admin/marketing/audiences", label: "Audiences", icon: Users2 },
     ],
   },
   {

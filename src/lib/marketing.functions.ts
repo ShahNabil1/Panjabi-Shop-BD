@@ -6,11 +6,13 @@ import { requireAdmin } from "./admin.server";
 import {
   CAMPAIGN_LEVELS,
   MARKETING_PRESETS,
+  type AudienceHealth,
   type CampaignPerformance,
   type CreativePerformance,
   type MarketingOverview,
 } from "./marketing-shared";
 import {
+  buildAudienceHealth,
   buildCampaignPerformance,
   buildCreativePerformance,
   buildMarketingOverview,
@@ -64,4 +66,16 @@ export const marketingCreatives = createServerFn({ method: "POST" })
     await requireAdmin(context.supabase, context.userId);
     if (data.refresh) clearMarketingCache();
     return buildCreativePerformance(data.preset);
+  });
+
+const refreshSchema = z.object({ refresh: z.boolean().optional() });
+
+/** Admin-only: custom audience, catalog and pixel health snapshot. */
+export const marketingAudiences = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => refreshSchema.parse(input ?? {}))
+  .handler(async ({ data, context }): Promise<AudienceHealth> => {
+    await requireAdmin(context.supabase, context.userId);
+    if (data.refresh) clearMarketingCache();
+    return buildAudienceHealth();
   });
