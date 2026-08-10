@@ -312,6 +312,7 @@ function R2MigrationCard() {
   const [log, setLog] = useState<string[]>([]);
   const [blocked, setBlocked] = useState<string | null>(null);
   const [progress, setProgress] = useState({ copied: 0, skipped: 0, failed: 0 });
+  const [skipOpen, setSkipOpen] = useState(false);
 
   if (!state.data?.pending || !state.data.from || !state.data.to) return null;
   const { from, to } = state.data;
