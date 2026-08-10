@@ -814,12 +814,8 @@ export function FulfillmentCard({
         </div>
       </Panel>
 
-      <Panel className="space-y-3">
-        <h2 className="text-sm font-bold">Order Source</h2>
-        <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-3 py-1 text-xs font-semibold text-foreground">
-          {source}
-        </span>
-      </Panel>
+      <OrderSourcePanel source={source} attribution={attribution} />
+
     </div>
   );
 }
