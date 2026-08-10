@@ -53,7 +53,7 @@ function Section({
         ) : null}
       </div>
       {children}
-    </Section>
+    </Panel>
   );
 }
 
