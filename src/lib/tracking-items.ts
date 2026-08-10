@@ -6,8 +6,10 @@
  * That is the variant SKU when a variant is picked, else the product SKU.
  */
 
+import { useMemo } from "react";
+
 import type { CartItem } from "./cart-context";
-import type { TrackingItem } from "./tracking";
+import { ecommerce, useTrackOnce, type TrackingItem } from "./tracking";
 
 export type CatalogueLike = {
   id: string;
