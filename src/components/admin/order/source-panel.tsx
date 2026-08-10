@@ -15,7 +15,7 @@ const CHANNEL_STYLE: Record<string, string> = {
   direct: "bg-muted text-muted-foreground border-border",
 };
 
-function Row({ label, value, mono }: { label: string; value: string; mono?: boolean }) {
+function Row({ label, value, mono }: { label: string; value: string; mono?: boolean | undefined }) {
   return (
     <div className="flex items-start justify-between gap-3 py-1">
       <dt className="shrink-0 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">

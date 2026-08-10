@@ -308,6 +308,7 @@ function AdminOrderDetail() {
     courier_sent_at?: string | null;
     auto_sms_status: string;
     source: string;
+    attribution?: unknown;
     coupon?: { code: string; name: string; amount: number } | null;
     order_items: OrderItemRow[];
     order_activity?: Array<{
@@ -717,6 +718,7 @@ function AdminOrderDetail() {
         orderId={order.id}
         status={order.fulfillment_status}
         source={order.source}
+        attribution={(order.attribution ?? null) as AttributionPayload | null}
         orderStatus={order.status}
         partner={order.delivery_partner}
         courierStatus={order.courier_status ?? null}
