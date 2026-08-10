@@ -18,12 +18,16 @@ type SmartImageProps = {
   fit?: "cover" | "contain" | "scale-down";
   gravity?: "auto" | "center";
   quality?: number;
+  /** Marks the image as the LCP candidate: eager, high priority and preloaded. */
   priority?: boolean;
+  /** Overrides the auto-computed `sizes` hint. */
+  sizes?: string;
   className?: string;
   style?: React.CSSProperties;
   onClick?: (() => void) | undefined;
   onError?: (() => void) | undefined;
 };
+
 
 /**
  * Image element backed by Cloudflare Transformations.
