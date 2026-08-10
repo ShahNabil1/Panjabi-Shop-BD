@@ -151,15 +151,21 @@ function AdminOrderDetail() {
 
   const claim = async (force: boolean) => {
     if (!id) return;
-    const res = await adminClaimOrder({ data: { id, ...(force ? { force: true } : {}) } });
-    if (res.ok) {
-      ownsRef.current = true;
-      setBlockedBy(null);
-    } else {
+    try {
+      const res = await adminClaimOrder({ data: { id, ...(force ? { force: true } : {}) } });
+      if (res.ok) {
+        ownsRef.current = true;
+        setBlockedBy(null);
+      } else {
+        ownsRef.current = false;
+        setBlockedBy(res.heldBy);
+      }
+    } catch {
+      // Not signed in (or session expired) — presence simply stays unclaimed.
       ownsRef.current = false;
-      setBlockedBy(res.heldBy);
     }
   };
+
 
   useEffect(() => {
     if (!id) return;
