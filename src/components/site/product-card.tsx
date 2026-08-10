@@ -101,6 +101,18 @@ export function ProductCard({ product }: { product: ProductCardData }) {
       variantLabelEn: null,
       comboSelections,
     });
+    pushEvent(
+      "add_to_cart",
+      ecommerce([
+        {
+          id: catalogId(product.sku, product.slug, product.id),
+          name: product.nameEn || product.nameBn,
+          item_group_id: product.slug,
+          quantity: 1,
+          price: product.price,
+        },
+      ]),
+    );
   };
 
   const onAddToCart = (e: React.MouseEvent) => {
