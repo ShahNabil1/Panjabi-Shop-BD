@@ -107,7 +107,7 @@ const num = (v: number | string | null | undefined) => Number(v ?? 0) || 0;
 const TAXONOMY: Record<string, { google: string; fb: string }> = {
   "gift-combo": {
     google: "Arts & Entertainment > Party & Celebration > Gift Giving > Gift Baskets",
-    fb: "apparel & accessories > handbag & wallet accessories",
+    fb: "arts & entertainment > party & celebration > gift giving",
   },
   saree: { google: "Apparel & Accessories > Clothing > Dresses", fb: "apparel & accessories > clothing > dresses" },
   panjabi: { google: "Apparel & Accessories > Clothing > Shirts & Tops", fb: "apparel & accessories > clothing > shirts & tops" },
