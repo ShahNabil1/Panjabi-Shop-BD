@@ -2,12 +2,16 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { CheckCircle2, Loader2, PlugZap, Trash2, XCircle } from "lucide-react";
+import { ArrowRightLeft, CheckCircle2, Loader2, PlugZap, Trash2, XCircle } from "lucide-react";
 
 import { AdminHeading, Panel, TextField } from "@/components/admin/kit";
 import { Button } from "@/components/ui/button";
 import {
   adminListIntegrations,
+  adminR2DiscardMigration,
+  adminR2FinishMigration,
+  adminR2MigrateBatch,
+  adminR2MigrationState,
   adminRemoveIntegration,
   adminSaveIntegration,
   adminTestIntegration,
@@ -369,6 +373,8 @@ function ApiSettingsAdmin() {
         Secret values are never shown again after saving — the {API_SECRET_MASK} placeholder means
         the stored value stays untouched. Clearing a field and saving deletes that value.
       </p>
+
+      <R2MigrationCard />
 
       {INTEGRATION_GROUPS.map((group) => (
         <GroupCard
