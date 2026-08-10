@@ -40,6 +40,7 @@ import { Route as AdminCombosIdRouteImport } from './routes/admin.combos.$id'
 import { Route as AdminMarketingIndexRouteImport } from './routes/admin.marketing.index'
 import { Route as AdminMarketingAttributionRouteImport } from './routes/admin.marketing.attribution'
 import { Route as AdminMarketingAudiencesRouteImport } from './routes/admin.marketing.audiences'
+import { Route as AdminMarketingAutomationRouteImport } from './routes/admin.marketing.automation'
 import { Route as AdminMarketingCampaignsRouteImport } from './routes/admin.marketing.campaigns'
 import { Route as AdminMarketingControlRouteImport } from './routes/admin.marketing.control'
 import { Route as AdminMarketingCreativesRouteImport } from './routes/admin.marketing.creatives'
@@ -220,6 +221,12 @@ const AdminMarketingAudiencesRoute = AdminMarketingAudiencesRouteImport.update({
   path: '/marketing/audiences',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminMarketingAutomationRoute =
+  AdminMarketingAutomationRouteImport.update({
+    id: '/marketing/automation',
+    path: '/marketing/automation',
+    getParentRoute: () => AdminRoute,
+  } as any)
 const AdminMarketingCampaignsRoute = AdminMarketingCampaignsRouteImport.update({
   id: '/marketing/campaigns',
   path: '/marketing/campaigns',
@@ -371,6 +378,7 @@ export interface FileRoutesByFullPath {
   '/admin/combos/$id': typeof AdminCombosIdRoute
   '/admin/marketing/attribution': typeof AdminMarketingAttributionRoute
   '/admin/marketing/audiences': typeof AdminMarketingAudiencesRoute
+  '/admin/marketing/automation': typeof AdminMarketingAutomationRoute
   '/admin/marketing/campaigns': typeof AdminMarketingCampaignsRoute
   '/admin/marketing/control': typeof AdminMarketingControlRoute
   '/admin/marketing/creatives': typeof AdminMarketingCreativesRoute
@@ -426,6 +434,7 @@ export interface FileRoutesByTo {
   '/admin/combos/$id': typeof AdminCombosIdRoute
   '/admin/marketing/attribution': typeof AdminMarketingAttributionRoute
   '/admin/marketing/audiences': typeof AdminMarketingAudiencesRoute
+  '/admin/marketing/automation': typeof AdminMarketingAutomationRoute
   '/admin/marketing/campaigns': typeof AdminMarketingCampaignsRoute
   '/admin/marketing/control': typeof AdminMarketingControlRoute
   '/admin/marketing/creatives': typeof AdminMarketingCreativesRoute
@@ -483,6 +492,7 @@ export interface FileRoutesById {
   '/admin/combos/$id': typeof AdminCombosIdRoute
   '/admin/marketing/attribution': typeof AdminMarketingAttributionRoute
   '/admin/marketing/audiences': typeof AdminMarketingAudiencesRoute
+  '/admin/marketing/automation': typeof AdminMarketingAutomationRoute
   '/admin/marketing/campaigns': typeof AdminMarketingCampaignsRoute
   '/admin/marketing/control': typeof AdminMarketingControlRoute
   '/admin/marketing/creatives': typeof AdminMarketingCreativesRoute
@@ -541,6 +551,7 @@ export interface FileRouteTypes {
     | '/admin/combos/$id'
     | '/admin/marketing/attribution'
     | '/admin/marketing/audiences'
+    | '/admin/marketing/automation'
     | '/admin/marketing/campaigns'
     | '/admin/marketing/control'
     | '/admin/marketing/creatives'
@@ -596,6 +607,7 @@ export interface FileRouteTypes {
     | '/admin/combos/$id'
     | '/admin/marketing/attribution'
     | '/admin/marketing/audiences'
+    | '/admin/marketing/automation'
     | '/admin/marketing/campaigns'
     | '/admin/marketing/control'
     | '/admin/marketing/creatives'
@@ -652,6 +664,7 @@ export interface FileRouteTypes {
     | '/admin/combos/$id'
     | '/admin/marketing/attribution'
     | '/admin/marketing/audiences'
+    | '/admin/marketing/automation'
     | '/admin/marketing/campaigns'
     | '/admin/marketing/control'
     | '/admin/marketing/creatives'
@@ -927,6 +940,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminMarketingAudiencesRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/marketing/automation': {
+      id: '/admin/marketing/automation'
+      path: '/marketing/automation'
+      fullPath: '/admin/marketing/automation'
+      preLoaderRoute: typeof AdminMarketingAutomationRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/marketing/campaigns': {
       id: '/admin/marketing/campaigns'
       path: '/marketing/campaigns'
@@ -1101,6 +1121,7 @@ interface AdminRouteChildren {
   AdminCombosIdRoute: typeof AdminCombosIdRoute
   AdminMarketingAttributionRoute: typeof AdminMarketingAttributionRoute
   AdminMarketingAudiencesRoute: typeof AdminMarketingAudiencesRoute
+  AdminMarketingAutomationRoute: typeof AdminMarketingAutomationRoute
   AdminMarketingCampaignsRoute: typeof AdminMarketingCampaignsRoute
   AdminMarketingControlRoute: typeof AdminMarketingControlRoute
   AdminMarketingCreativesRoute: typeof AdminMarketingCreativesRoute
@@ -1132,6 +1153,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminCombosIdRoute: AdminCombosIdRoute,
   AdminMarketingAttributionRoute: AdminMarketingAttributionRoute,
   AdminMarketingAudiencesRoute: AdminMarketingAudiencesRoute,
+  AdminMarketingAutomationRoute: AdminMarketingAutomationRoute,
   AdminMarketingCampaignsRoute: AdminMarketingCampaignsRoute,
   AdminMarketingControlRoute: AdminMarketingControlRoute,
   AdminMarketingCreativesRoute: AdminMarketingCreativesRoute,
