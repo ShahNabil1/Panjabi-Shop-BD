@@ -13,6 +13,8 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { getLayoutData } from "../lib/catalog.functions";
 import { getLang } from "../lib/lang.functions";
+import { getGtmContainerId } from "../lib/tracking.functions";
+
 import { LanguageProvider, useLang } from "../lib/language-context";
 import { tr } from "../lib/i18n";
 import { SiteHeader } from "../components/site/site-header";
