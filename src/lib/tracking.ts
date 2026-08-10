@@ -54,7 +54,7 @@ export function newEventId(event: string): string {
 /** Funnel events that also get a server-side (CAPI) twin. */
 const SERVER_TWIN = new Set(["view_item", "add_to_cart", "begin_checkout"]);
 
-type TwinContent = { id: string; name?: string; category?: string; quantity: number; price: number };
+type TwinContent = { id: string; name?: string | undefined; category?: string | undefined; quantity: number; price: number };
 
 /**
  * Replays a funnel event to Meta CAPI / TikTok Events API with the *same*
