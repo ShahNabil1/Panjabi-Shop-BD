@@ -2,6 +2,10 @@ import r2Asset from "@/assets/cloudflare-r2.png.asset.json";
 import bulksmsbdAsset from "@/assets/bulksmsbd.png.asset.json";
 import bdCourierAsset from "@/assets/bd-courier.png.asset.json";
 import metaAsset from "@/assets/meta.png.asset.json";
+import gtmAsset from "@/assets/gtm.png.asset.json";
+import ga4Asset from "@/assets/ga4.png.asset.json";
+import tiktokAsset from "@/assets/tiktok-ads.jpg.asset.json";
+
 import { cn } from "@/lib/utils";
 import type { IntegrationGroup } from "@/lib/integrations-shared";
 
