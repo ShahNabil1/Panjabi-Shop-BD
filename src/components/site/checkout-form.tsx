@@ -24,6 +24,8 @@ import { ProductThumb } from "@/components/site/product-card";
 import { QuantityStepper } from "@/components/site/add-to-cart";
 import { cn } from "@/lib/utils";
 import { normalizePhoneInput } from "@/lib/phone";
+import { ecommerce, pushEvent, useTrackOnce } from "@/lib/tracking";
+import { cartTrackingItems } from "@/lib/tracking-items";
 
 export type DeliveryRates = {
   inside_dhaka: number;
