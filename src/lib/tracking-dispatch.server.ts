@@ -46,10 +46,16 @@ type OrderRow = {
     product_id: string | null;
     product_name: string;
     product_slug: string | null;
+    variant_label: string | null;
     sku: string | null;
     unit_price: number;
     quantity: number;
     line_total: number;
+    products?: {
+      sku: string | null;
+      brand: string | null;
+      categories?: { name_en: string } | null;
+    } | null;
   }>;
 };
 
