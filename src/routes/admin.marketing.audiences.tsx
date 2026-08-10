@@ -35,6 +35,28 @@ const subtypeLabel: Record<string, string> = {
   VIDEO: "Video viewers",
 };
 
+function Section({
+  title,
+  description,
+  children,
+}: {
+  title: string;
+  description?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <Panel>
+      <div className="mb-3">
+        <h2 className="text-sm font-bold tracking-tight">{title}</h2>
+        {description ? (
+          <p className="mt-0.5 text-xs text-muted-foreground">{description}</p>
+        ) : null}
+      </div>
+      {children}
+    </Section>
+  );
+}
+
 function AudienceCard({ row }: { row: AudienceRow }) {
   return (
     <div className="rounded-xl border border-border/70 bg-card/60 p-4 transition-colors hover:border-primary/40">
@@ -84,7 +106,7 @@ function MarketingAudiencesPage() {
   if (!data) {
     return (
       <div className="space-y-6">
-        <AdminHeading title="Audiences & Catalog" subtitle="Retargeting pools, catalog and pixel health" />
+        <AdminHeading title="Audiences & Catalog" description="Retargeting pools, catalog and pixel health" />
         <BrandLoader />
       </div>
     );
@@ -98,7 +120,7 @@ function MarketingAudiencesPage() {
       <div className="flex flex-wrap items-start justify-between gap-3">
         <AdminHeading
           title="Audiences & Catalog"
-          subtitle="Retargeting pools, catalog and pixel health"
+          description="Retargeting pools, catalog and pixel health"
         />
         <Button
           variant="outline"
@@ -113,16 +135,16 @@ function MarketingAudiencesPage() {
       </div>
 
       {!data.connected ? (
-        <Panel title="Not connected">
+        <Section title="Not connected">
           <div className="flex items-start gap-3 text-sm text-muted-foreground">
             <TriangleAlert className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
             <p>{data.message ?? "Meta Marketing API is unavailable."}</p>
           </div>
-        </Panel>
+        </Section>
       ) : (
         <>
           {data.recommendations.length ? (
-            <Panel title="What to fix next">
+            <Section title="What to fix next">
               <ul className="space-y-2">
                 {data.recommendations.map((r, i) => (
                   <li key={i} className="flex items-start gap-2.5 text-sm">
@@ -140,11 +162,11 @@ function MarketingAudiencesPage() {
                   </li>
                 ))}
               </ul>
-            </Panel>
+            </Section>
           ) : null}
 
           <div className="grid gap-4 lg:grid-cols-2">
-            <Panel title="Pixel / dataset health">
+            <Section title="Pixel / dataset health">
               {pixel ? (
                 <div className="space-y-4">
                   <div className="flex items-center gap-3">
@@ -181,9 +203,9 @@ function MarketingAudiencesPage() {
               ) : (
                 <p className="text-sm text-muted-foreground">Pixel data unavailable.</p>
               )}
-            </Panel>
+            </Section>
 
-            <Panel title="Catalog health">
+            <Section title="Catalog health">
               {catalog.configured ? (
                 <div className="space-y-4">
                   <div className="flex items-center gap-3">
@@ -232,10 +254,10 @@ function MarketingAudiencesPage() {
                   Add a Catalog ID in API &amp; Integrations to monitor Dynamic Product Ads.
                 </p>
               )}
-            </Panel>
+            </Section>
           </div>
 
-          <Panel
+          <Section
             title="Custom audiences"
             description={`${data.audiences.length} audience(s) on this ad account`}
           >
@@ -255,9 +277,9 @@ function MarketingAudiencesPage() {
                 </p>
               </div>
             )}
-          </Panel>
+          </Section>
 
-          <Panel title="Playbook" description="How to use these pools">
+          <Section title="Playbook" description="How to use these pools">
             <div className="grid gap-3 text-sm md:grid-cols-3">
               {[
                 {
@@ -283,7 +305,7 @@ function MarketingAudiencesPage() {
                 </div>
               ))}
             </div>
-          </Panel>
+          </Section>
         </>
       )}
     </div>
