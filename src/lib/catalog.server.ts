@@ -444,13 +444,26 @@ export async function fetchPromotionList() {
 
 export async function fetchFaqs() {
   const db = createPublicServerClient();
-  const { data } = await db
-    .from("faqs")
-    .select("id, question_bn, question_en, answer_bn, answer_en")
-    .eq("is_active", true)
-    .order("sort_order");
-  return data ?? [];
+  const [faqRes, seoRes] = await Promise.all([
+    db
+      .from("faqs")
+      .select("id, question_bn, question_en, answer_bn, answer_en")
+      .eq("is_active", true)
+      .order("sort_order"),
+    db.from("site_settings").select("value").eq("key", "faq_seo").maybeSingle(),
+  ]);
+  const seoRaw = (seoRes.data?.value ?? {}) as Record<string, unknown>;
+  const str = (v: unknown) => (typeof v === "string" && v.trim() ? v.trim() : "");
+  return {
+    items: faqRes.data ?? [],
+    seo: {
+      metaTitle: str(seoRaw["meta_title"]),
+      metaDescription: str(seoRaw["meta_description"]),
+      ogImage: str(seoRaw["og_image"]),
+    },
+  };
 }
+
 
 export async function fetchSearch(query: string) {
   const term = query.trim();
