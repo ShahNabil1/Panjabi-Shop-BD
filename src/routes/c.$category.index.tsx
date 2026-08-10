@@ -81,6 +81,7 @@ function CategoryPage() {
   const { category, subcategories, products } = Route.useLoaderData() as CategoryPageData;
   const name = pick(lang, category.name_bn, category.name_en);
   const description = pick(lang, category.description_bn, category.description_en);
+  useViewItemList(category.name_en, products, category.name_en);
 
   return (
     <Section>
