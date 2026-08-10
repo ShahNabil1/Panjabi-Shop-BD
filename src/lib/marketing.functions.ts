@@ -3,12 +3,8 @@ import { z } from "zod";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { requireAdmin } from "./admin.server";
-import {
-  MARKETING_PRESETS,
-  buildMarketingOverview,
-  clearMarketingCache,
-  type MarketingOverview,
-} from "./marketing.server";
+import { MARKETING_PRESETS, type MarketingOverview } from "./marketing-shared";
+import { buildMarketingOverview, clearMarketingCache } from "./marketing.server";
 
 const overviewSchema = z.object({
   preset: z.enum(MARKETING_PRESETS).default("7d"),
