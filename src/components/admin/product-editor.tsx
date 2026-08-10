@@ -134,6 +134,8 @@ export function ProductEditor({ id, kind }: { id: string; kind: ProductKind }) {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const [draft, setDraft] = useState<Draft>(emptyDraft(kind));
+  const { removeImage } = useImageRemover();
+
 
   const taxonomy = useQuery({
     queryKey: ["admin", "taxonomy"],
