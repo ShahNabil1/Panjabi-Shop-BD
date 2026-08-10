@@ -200,7 +200,7 @@ function TrackingDebugPage() {
       <AdminHeading
         title="Tracking Debug"
         description="Server-side conversions sent to Meta CAPI, TikTok Events API and GA4 Measurement Protocol — what was sent, what came back, and how strong the identity match was."
-        actions={
+        action={
           <Button variant="outline" size="sm" onClick={() => void q.refetch()} disabled={q.isFetching}>
             <RefreshCw className={cn("mr-2 size-4", q.isFetching && "animate-spin")} /> Refresh
           </Button>
@@ -264,7 +264,7 @@ function TrackingDebugPage() {
         </div>
 
         {q.isLoading ? (
-          <BrandLoader label="Loading tracking events" />
+          <BrandLoader message="Loading tracking events" />
         ) : q.isError ? (
           <p className="py-8 text-center text-sm text-rose-600">
             {q.error instanceof Error ? q.error.message : "Could not load events"}
