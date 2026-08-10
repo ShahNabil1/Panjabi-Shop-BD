@@ -139,7 +139,7 @@ function GroupCard({
           <IntegrationMark group={group} />
           <div>
             <h2 className="text-base font-bold text-foreground">{meta.title}</h2>
-            <p className="text-xs text-muted-foreground">{meta.description}</p>
+            <p className="text-[10px] font-bold tracking-wider text-muted-foreground uppercase">{meta.description}</p>
           </div>
         </div>
         <span

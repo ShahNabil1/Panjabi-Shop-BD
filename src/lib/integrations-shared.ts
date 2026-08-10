@@ -19,7 +19,7 @@ export const integrationMeta: Record<
 > = {
   r2: {
     title: "Cloudflare R2",
-    description: "Media storage — product images, banners and invoice PDFs.",
+    description: ",MEDIA STORAGE - IMAGES, VIDEOS, INVOICE PDF, BANNERS",
     docs: "https://dash.cloudflare.com/?to=/:account/r2",
     fields: [
       { key: "R2_ACCOUNT_ID", label: "Account ID", secret: false },
@@ -36,7 +36,7 @@ export const integrationMeta: Record<
   },
   bulksmsbd: {
     title: "BulkSMSBD",
-    description: "Order SMS gateway — automatic and manual messages.",
+    description: "AUTOMATIC & DYNAMIC SMS GATEWAY",
     docs: "http://bulksmsbd.net",
     fields: [
       { key: "BULKSMSBD_API_KEY", label: "API Key", secret: true },
@@ -45,7 +45,7 @@ export const integrationMeta: Record<
   },
   bdcourier: {
     title: "BD Courier",
-    description: "Customer courier fraud check used across order pages.",
+    description: "CUSTOMER COURIER FRAUD CHECK",
     docs: "https://bdcourier.com",
     fields: [{ key: "BDCOURIER_API_KEY", label: "API Key", secret: true }],
   },
