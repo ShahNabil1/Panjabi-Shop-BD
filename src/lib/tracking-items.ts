@@ -50,3 +50,17 @@ export function listTrackingItems(
     price: p.price,
   }));
 }
+
+/** Fires `view_item_list` once for a listing page (category / search / offer). */
+export function useViewItemList(
+  listName: string,
+  products: CatalogueLike[],
+  category?: string | undefined,
+) {
+  const items = useMemo(() => listTrackingItems(products, category), [products, category]);
+  const payload = useMemo(
+    () => ({ ...ecommerce(items), item_list_name: listName }),
+    [items, listName],
+  );
+  useTrackOnce("view_item_list", payload, items.length > 0);
+}
