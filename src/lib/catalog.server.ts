@@ -189,6 +189,8 @@ export async function fetchSubcategoryPage(categorySlug: string, subcategorySlug
 export type ComboContentItem = {
   id: string;
   itemId: string;
+  /** Component product's own SKU — catalogue rows for variant-less items use it. */
+  itemSku: string | null;
   quantity: number;
   isFree: boolean;
   nameBn: string;
@@ -213,7 +215,7 @@ async function fetchComboContents(
     .select(
       `id, quantity, is_free, sort_order, label_bn, label_en,
        products!combo_items_item_id_fkey(
-         id, name_bn, name_en,
+         id, name_bn, name_en, sku,
          product_images(url, sort_order),
           product_variants(id, group_name_bn, group_name_en, value_bn, value_en, sku, is_active, sort_order)
        )`,
@@ -226,6 +228,7 @@ async function fetchComboContents(
       id: string;
       name_bn: string;
       name_en: string;
+      sku: string | null;
       product_images: Array<{ url: string; sort_order: number }> | null;
       product_variants: Array<{
         id: string;
@@ -244,6 +247,7 @@ async function fetchComboContents(
     return {
       id: row.id,
       itemId: item?.id ?? "",
+      itemSku: item?.sku ?? null,
       quantity: row.quantity,
       isFree: row.is_free,
       nameBn: row.label_bn || item?.name_bn || "",

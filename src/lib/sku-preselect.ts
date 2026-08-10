@@ -11,6 +11,7 @@
 type VariantLike = { id: string; sku?: string | null; group_name_bn: string; group_name_en: string };
 type ComboLike = {
   id: string;
+  itemSku?: string | null;
   variants: Array<{ id: string; sku?: string | null }>;
 };
 
@@ -58,6 +59,8 @@ export function comboItemIdBySku(
   comboItems: ComboLike[],
 ): string | null {
   if (!sku) return null;
-  const hit = comboItems.find((item) => item.variants.some((v) => v.sku && v.sku === sku));
+  const hit = comboItems.find(
+    (item) => item.itemSku === sku || item.variants.some((v) => v.sku && v.sku === sku),
+  );
   return hit?.id ?? null;
 }
