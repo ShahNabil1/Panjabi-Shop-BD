@@ -84,7 +84,9 @@ function GroupCard({
     onSuccess: async () => {
       toast.success(`${meta.title} saved`);
       setSavedSnapshot(JSON.stringify(values));
+      setUnlocked(false);
       setResult(null);
+
       await onSaved();
     },
     onError: (e: Error) => toast.error(e.message),
