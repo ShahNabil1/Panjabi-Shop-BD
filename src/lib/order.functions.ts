@@ -241,6 +241,22 @@ export const placeOrder = createServerFn({ method: "POST" })
     const order = placed as { id?: string; order_number?: string } | null;
     if (orderError || !order?.order_number) throw new Error("ORDER_FAILED");
 
+    // Server-side conversion twin (Meta CAPI / TikTok / GA4). Shares the same
+    // `<order_number>.<event>` id as the browser event, so it de-duplicates.
+    if (order.id) {
+      try {
+        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+        const { dispatchOrderEvents } = await import("./tracking-dispatch.server");
+        await dispatchOrderEvents(
+          supabaseAdmin as unknown as Parameters<typeof dispatchOrderEvents>[0],
+          order.id,
+          "processing",
+        );
+      } catch {
+        /* tracking must never break checkout */
+      }
+    }
+
     return { orderNumber: order.order_number, subtotal, deliveryCharge, discount, total };
   });
 
