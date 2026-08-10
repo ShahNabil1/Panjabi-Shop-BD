@@ -1,5 +1,5 @@
-import { Link, createFileRoute, notFound } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { Link, createFileRoute, notFound, useSearch } from "@tanstack/react-router";
+import { useEffect, useMemo, useState } from "react";
 
 import { getLandingPage } from "@/lib/catalog.functions";
 import { getDeliveryRates } from "@/lib/order.functions";
@@ -14,6 +14,7 @@ import { CheckoutForm } from "@/components/site/checkout-form";
 import { Prose } from "@/components/site/ui";
 import { SpecShowcase } from "@/components/site/spec-showcase";
 import { ComboContents } from "@/components/site/combo-contents";
+import { comboItemIdBySku, comboSelectionBySku, resolveVariantBySku } from "@/lib/sku-preselect";
 import type { CartItem } from "@/lib/cart-context";
 import { cn } from "@/lib/utils";
 import logoMark from "@/assets/upoharkabbo-logo.png";
@@ -114,11 +115,24 @@ function LandingPage() {
     rates: { inside_dhaka: number; outside_dhaka: number; freeAbove: number; freeAll?: boolean };
   };
 
-  const [variantId, setVariantId] = useState<string | null>(variants[0]?.id ?? null);
+  // Catalogue ads deep-link with ?sku=… — preselect the advertised variant and,
+  // for combo rows, the advertised option inside the package.
+  const search = useSearch({ strict: false }) as { sku?: string };
+  const skuParam = typeof search.sku === "string" ? search.sku : undefined;
+  const [variantId, setVariantId] = useState<string | null>(
+    resolveVariantBySku(skuParam, variants)?.id ?? variants[0]?.id ?? null,
+  );
   const [qty, setQty] = useState(1);
   const [comboSelected, setComboSelected] = useState<Record<string, string>>(() =>
-    Object.fromEntries(comboItems.flatMap((item) => item.variants[0] ? [[item.id, item.variants[0].id]] : [])),
+    comboSelectionBySku(skuParam, comboItems),
   );
+  const highlightedComboId = comboItemIdBySku(skuParam, comboItems);
+  useEffect(() => {
+    const match = resolveVariantBySku(skuParam, variants);
+    if (match) setVariantId(match.id);
+    setComboSelected(comboSelectionBySku(skuParam, comboItems));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [skuParam, product.id]);
   const lightbox = useLightbox();
   const galleryImages = images.map((img) => ({
     src: img.url,
@@ -300,6 +314,7 @@ function LandingPage() {
       <ComboContents
         items={comboItems}
         selected={comboSelected}
+        highlightId={highlightedComboId}
         onSelect={(itemId, selectedVariantId) =>
           setComboSelected((current) => ({ ...current, [itemId]: selectedVariantId }))
         }

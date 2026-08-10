@@ -564,7 +564,7 @@ export async function fetchLandingPage(slug: string) {
        kind, description_bn, description_en, specs, faq, price, compare_at_price, stock, sku, brand,
        rating, review_count,
        product_images(id, url, alt_bn, alt_en, sort_order),
-       product_variants(id, group_name_bn, group_name_en, value_bn, value_en, price_delta, stock, sort_order, is_active)`,
+       product_variants(id, group_name_bn, group_name_en, value_bn, value_en, sku, price_delta, stock, sort_order, is_active)`,
     )
     .eq("id", landing.product_id)
     .eq("is_active", true)

@@ -427,7 +427,7 @@ function ProductPage() {
           </div>
         </div>
 
-        <ComboContents items={comboItems} selected={comboSelected} onSelect={(itemId, variantId) =>
+        <ComboContents items={comboItems} selected={comboSelected} highlightId={highlightedComboId} onSelect={(itemId, variantId) =>
           setComboSelected((current) => ({ ...current, [itemId]: variantId }))
         } />
 
