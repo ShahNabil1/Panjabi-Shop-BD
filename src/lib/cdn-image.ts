@@ -34,8 +34,11 @@ export function canTransform(src: string | null | undefined): src is string {
   if (!src) return false;
   if (src.includes("/cdn-cgi/")) return false;
   if (src.startsWith("data:") || src.startsWith("blob:")) return false;
+  // Only absolute URLs on the zone can be transformed. Relative paths (bundled
+  // assets, preview/dev hosts) must be served as-is.
+  if (!/^https?:\/\//i.test(src)) return false;
   try {
-    const host = new URL(src, ZONE_ORIGIN).hostname;
+    const host = new URL(src).hostname;
     return host === ZONE_HOST || host.endsWith(`.${ZONE_HOST}`);
   } catch {
     return false;
