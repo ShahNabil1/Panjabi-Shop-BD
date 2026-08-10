@@ -1,5 +1,7 @@
 import { AwsClient } from "aws4fetch";
 
+import { getIntegrationValues } from "./integration-secrets.server";
+
 export type R2Config = {
   accountId: string;
   accessKeyId: string;
@@ -8,12 +10,14 @@ export type R2Config = {
   publicBaseUrl: string;
 };
 
-export function readR2Config(): R2Config | null {
-  const accountId = process.env["R2_ACCOUNT_ID"];
-  const accessKeyId = process.env["R2_ACCESS_KEY_ID"];
-  const secretAccessKey = process.env["R2_SECRET_ACCESS_KEY"];
-  const bucket = process.env["R2_BUCKET"];
-  const publicBaseUrl = process.env["R2_PUBLIC_BASE_URL"];
+/** Reads R2 settings from the admin panel, falling back to environment vars. */
+export async function readR2Config(): Promise<R2Config | null> {
+  const v = await getIntegrationValues();
+  const accountId = v["R2_ACCOUNT_ID"];
+  const accessKeyId = v["R2_ACCESS_KEY_ID"];
+  const secretAccessKey = v["R2_SECRET_ACCESS_KEY"];
+  const bucket = v["R2_BUCKET"];
+  const publicBaseUrl = v["R2_PUBLIC_BASE_URL"];
   if (!accountId || !accessKeyId || !secretAccessKey || !bucket || !publicBaseUrl) return null;
   return {
     accountId,
@@ -23,6 +27,7 @@ export function readR2Config(): R2Config | null {
     publicBaseUrl: publicBaseUrl.replace(/\/+$/, ""),
   };
 }
+
 
 function client(cfg: R2Config) {
   return new AwsClient({
@@ -110,4 +115,48 @@ export async function putObject(
   });
   if (!res.ok) throw new Error(`R2 upload failed (${res.status})`);
   return publicUrlFor(cfg, key);
+}
+
+export type R2Probe = {
+  ok: boolean;
+  message: string;
+  bucket: string;
+  publicBaseUrl: string;
+  objects: number | null;
+  truncated: boolean;
+  latestKey: string | null;
+};
+
+/** Live bucket check — lists a page of objects with the stored credentials. */
+export async function probeR2(cfg: R2Config): Promise<R2Probe> {
+  const base: Omit<R2Probe, "ok" | "message"> = {
+    bucket: cfg.bucket,
+    publicBaseUrl: cfg.publicBaseUrl,
+    objects: null,
+    truncated: false,
+    latestKey: null,
+  };
+  try {
+    const url = new URL(`https://${cfg.accountId}.r2.cloudflarestorage.com/${cfg.bucket}`);
+    url.searchParams.set("list-type", "2");
+    url.searchParams.set("max-keys", "1000");
+    const res = await client(cfg).fetch(url.toString(), { method: "GET" });
+    const text = await res.text();
+    if (!res.ok) {
+      const msg = /<Message>([^<]+)<\/Message>/.exec(text)?.[1];
+      return { ...base, ok: false, message: msg ?? `Bucket request failed (${res.status})` };
+    }
+    const keys = [...text.matchAll(/<Key>([^<]+)<\/Key>/g)].map((m) => m[1] ?? "");
+    const truncated = /<IsTruncated>true<\/IsTruncated>/.test(text);
+    return {
+      ...base,
+      ok: true,
+      message: "Bucket reachable",
+      objects: keys.length,
+      truncated,
+      latestKey: keys.at(-1) ?? null,
+    };
+  } catch (err) {
+    return { ...base, ok: false, message: err instanceof Error ? err.message : "Unknown error" };
+  }
 }

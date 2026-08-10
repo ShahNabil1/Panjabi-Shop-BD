@@ -1,0 +1,89 @@
+/**
+ * Integration credentials (server-only).
+ *
+ * Values live in `public.integration_credentials` (admin-only via RLS) and are
+ * read here with the service-role client. Anything missing from the database
+ * falls back to the matching environment variable, so existing deployments
+ * keep working unchanged while the values are migrated into the admin panel.
+ */
+
+export const INTEGRATION_KEYS = [
+  "R2_ACCOUNT_ID",
+  "R2_ACCESS_KEY_ID",
+  "R2_SECRET_ACCESS_KEY",
+  "R2_BUCKET",
+  "R2_PUBLIC_BASE_URL",
+  "BULKSMSBD_API_KEY",
+  "BULKSMSBD_SENDER_ID",
+  "BDCOURIER_API_KEY",
+] as const;
+
+export type IntegrationKey = (typeof INTEGRATION_KEYS)[number];
+
+type CacheEntry = { values: Record<string, string>; at: number };
+
+const TTL_MS = 30_000;
+let cache: CacheEntry | null = null;
+
+/** Drops the in-memory cache — called right after an admin saves or removes. */
+export function clearIntegrationCache() {
+  cache = null;
+}
+
+async function loadFromDb(): Promise<Record<string, string>> {
+  try {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data, error } = await supabaseAdmin
+      .from("integration_credentials")
+      .select("key, value");
+    if (error) return {};
+    const out: Record<string, string> = {};
+    for (const row of data ?? []) {
+      const value = (row.value ?? "").trim();
+      if (value) out[row.key] = value;
+    }
+    return out;
+  } catch {
+    return {};
+  }
+}
+
+/** All managed values, database first with environment-variable fallback. */
+export async function getIntegrationValues(): Promise<Record<string, string>> {
+  const now = Date.now();
+  if (!cache || now - cache.at > TTL_MS) {
+    cache = { values: await loadFromDb(), at: now };
+  }
+  const out: Record<string, string> = {};
+  for (const key of INTEGRATION_KEYS) {
+    const fromDb = cache.values[key];
+    const fromEnv = process.env[key];
+    const value = (fromDb ?? fromEnv ?? "").trim();
+    if (value) out[key] = value;
+  }
+  return out;
+}
+
+/** Where each managed key currently resolves from. */
+export async function getIntegrationSources(): Promise<
+  Record<IntegrationKey, "database" | "environment" | "missing">
+> {
+  const now = Date.now();
+  if (!cache || now - cache.at > TTL_MS) {
+    cache = { values: await loadFromDb(), at: now };
+  }
+  const out = {} as Record<IntegrationKey, "database" | "environment" | "missing">;
+  for (const key of INTEGRATION_KEYS) {
+    out[key] = cache.values[key]
+      ? "database"
+      : (process.env[key] ?? "").trim()
+        ? "environment"
+        : "missing";
+  }
+  return out;
+}
+
+export async function getIntegrationValue(key: IntegrationKey): Promise<string | null> {
+  const values = await getIntegrationValues();
+  return values[key] ?? null;
+}

@@ -45,6 +45,7 @@ import { Route as AdminOrdersSearchRouteImport } from './routes/admin.orders.sea
 import { Route as AdminProductsIndexRouteImport } from './routes/admin.products.index'
 import { Route as AdminProductsIdRouteImport } from './routes/admin.products.$id'
 import { Route as AdminSettingsIndexRouteImport } from './routes/admin.settings.index'
+import { Route as AdminSettingsApiRouteImport } from './routes/admin.settings.api'
 import { Route as AdminSettingsDeliveryRouteImport } from './routes/admin.settings.delivery'
 import { Route as AdminSettingsRetentionRouteImport } from './routes/admin.settings.retention'
 import { Route as AdminSettingsSmsTemplatesRouteImport } from './routes/admin.settings.sms-templates'
@@ -236,6 +237,11 @@ const AdminSettingsIndexRoute = AdminSettingsIndexRouteImport.update({
   path: '/settings/',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminSettingsApiRoute = AdminSettingsApiRouteImport.update({
+  id: '/settings/api',
+  path: '/settings/api',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminSettingsDeliveryRoute = AdminSettingsDeliveryRouteImport.update({
   id: '/settings/delivery',
   path: '/settings/delivery',
@@ -324,6 +330,7 @@ export interface FileRoutesByFullPath {
   '/admin/orders/list': typeof AdminOrdersListRoute
   '/admin/orders/search': typeof AdminOrdersSearchRoute
   '/admin/products/$id': typeof AdminProductsIdRoute
+  '/admin/settings/api': typeof AdminSettingsApiRoute
   '/admin/settings/delivery': typeof AdminSettingsDeliveryRoute
   '/admin/settings/retention': typeof AdminSettingsRetentionRoute
   '/admin/settings/sms-templates': typeof AdminSettingsSmsTemplatesRoute
@@ -371,6 +378,7 @@ export interface FileRoutesByTo {
   '/admin/orders/list': typeof AdminOrdersListRoute
   '/admin/orders/search': typeof AdminOrdersSearchRoute
   '/admin/products/$id': typeof AdminProductsIdRoute
+  '/admin/settings/api': typeof AdminSettingsApiRoute
   '/admin/settings/delivery': typeof AdminSettingsDeliveryRoute
   '/admin/settings/retention': typeof AdminSettingsRetentionRoute
   '/admin/settings/sms-templates': typeof AdminSettingsSmsTemplatesRoute
@@ -420,6 +428,7 @@ export interface FileRoutesById {
   '/admin/orders/list': typeof AdminOrdersListRoute
   '/admin/orders/search': typeof AdminOrdersSearchRoute
   '/admin/products/$id': typeof AdminProductsIdRoute
+  '/admin/settings/api': typeof AdminSettingsApiRoute
   '/admin/settings/delivery': typeof AdminSettingsDeliveryRoute
   '/admin/settings/retention': typeof AdminSettingsRetentionRoute
   '/admin/settings/sms-templates': typeof AdminSettingsSmsTemplatesRoute
@@ -470,6 +479,7 @@ export interface FileRouteTypes {
     | '/admin/orders/list'
     | '/admin/orders/search'
     | '/admin/products/$id'
+    | '/admin/settings/api'
     | '/admin/settings/delivery'
     | '/admin/settings/retention'
     | '/admin/settings/sms-templates'
@@ -517,6 +527,7 @@ export interface FileRouteTypes {
     | '/admin/orders/list'
     | '/admin/orders/search'
     | '/admin/products/$id'
+    | '/admin/settings/api'
     | '/admin/settings/delivery'
     | '/admin/settings/retention'
     | '/admin/settings/sms-templates'
@@ -565,6 +576,7 @@ export interface FileRouteTypes {
     | '/admin/orders/list'
     | '/admin/orders/search'
     | '/admin/products/$id'
+    | '/admin/settings/api'
     | '/admin/settings/delivery'
     | '/admin/settings/retention'
     | '/admin/settings/sms-templates'
@@ -863,6 +875,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminSettingsIndexRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/settings/api': {
+      id: '/admin/settings/api'
+      path: '/settings/api'
+      fullPath: '/admin/settings/api'
+      preLoaderRoute: typeof AdminSettingsApiRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/settings/delivery': {
       id: '/admin/settings/delivery'
       path: '/settings/delivery'
@@ -949,6 +968,7 @@ interface AdminRouteChildren {
   AdminOrdersListRoute: typeof AdminOrdersListRoute
   AdminOrdersSearchRoute: typeof AdminOrdersSearchRoute
   AdminProductsIdRoute: typeof AdminProductsIdRoute
+  AdminSettingsApiRoute: typeof AdminSettingsApiRoute
   AdminSettingsDeliveryRoute: typeof AdminSettingsDeliveryRoute
   AdminSettingsRetentionRoute: typeof AdminSettingsRetentionRoute
   AdminSettingsSmsTemplatesRoute: typeof AdminSettingsSmsTemplatesRoute
@@ -973,6 +993,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminOrdersListRoute: AdminOrdersListRoute,
   AdminOrdersSearchRoute: AdminOrdersSearchRoute,
   AdminProductsIdRoute: AdminProductsIdRoute,
+  AdminSettingsApiRoute: AdminSettingsApiRoute,
   AdminSettingsDeliveryRoute: AdminSettingsDeliveryRoute,
   AdminSettingsRetentionRoute: AdminSettingsRetentionRoute,
   AdminSettingsSmsTemplatesRoute: AdminSettingsSmsTemplatesRoute,
@@ -1016,13 +1037,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

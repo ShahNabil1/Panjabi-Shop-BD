@@ -9,6 +9,8 @@
  * first lookup for a phone number or on an explicit manual refresh.
  */
 
+import { getIntegrationValues } from "./integration-secrets.server";
+
 const BASE_URL = "https://api.bdcourier.com";
 
 export type CourierEntry = {
@@ -44,8 +46,8 @@ export type CourierCheckResult = {
   cached: boolean;
 };
 
-function apiKey(): string {
-  const key = process.env["BDCOURIER_API_KEY"];
+async function apiKey(): Promise<string> {
+  const key = (await getIntegrationValues())["BDCOURIER_API_KEY"];
   if (!key) throw new Error("BDCOURIER_API_KEY is not configured");
   return key;
 }
@@ -54,7 +56,7 @@ async function request(path: string, init?: RequestInit) {
   const res = await fetch(`${BASE_URL}${path}`, {
     ...init,
     headers: {
-      Authorization: `Bearer ${apiKey()}`,
+      Authorization: `Bearer ${await apiKey()}`,
       "Content-Type": "application/json",
       Accept: "application/json",
       ...(init?.headers ?? {}),
