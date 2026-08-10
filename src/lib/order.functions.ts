@@ -90,6 +90,17 @@ export const placeOrder = createServerFn({ method: "POST" })
       clientIp = null;
     }
 
+    // The customer's own user-agent is snapshotted here because server-side
+    // conversion events (Meta CAPI / TikTok) fire later from the admin panel,
+    // where the request headers would belong to staff instead of the buyer.
+    let userAgent: string | null = null;
+    try {
+      userAgent = (getRequestHeader("user-agent") ?? "").slice(0, 500) || null;
+    } catch {
+      userAgent = null;
+    }
+
+
 
     const productIds = [...new Set(data.items.map((i) => i.productId))];
     const variantIds = [...new Set([
