@@ -2,7 +2,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Crop as CropIcon, ImagePlus, Loader2, Upload, X } from "lucide-react";
 
-import { compressImage, formatBytes } from "@/lib/image-compress";
 import { createUploadTicket } from "@/lib/media.functions";
 import { ImageCropperDialog } from "@/components/admin/image-cropper";
 import { cn } from "@/lib/utils";
@@ -17,25 +16,44 @@ type Folder =
   | "popup"
   | "hero";
 
+const UPLOAD_TYPES = new Set([
+  "image/webp",
+  "image/jpeg",
+  "image/png",
+  "image/svg+xml",
+  "image/gif",
+]);
+
+function safeName(name: string): string {
+  const dot = name.lastIndexOf(".");
+  const ext = dot > 0 ? name.slice(dot).toLowerCase() : "";
+  const base =
+    name
+      .slice(0, dot > 0 ? dot : undefined)
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 60) || "image";
+  return `${base}${ext || ".jpg"}`;
+}
+
+/**
+ * Originals go straight to R2 — Cloudflare Image Transformations handle
+ * resizing, format and quality at delivery time.
+ */
 async function uploadOne(file: File, folder: Folder): Promise<string> {
-  const compressed = await compressImage(file);
+  if (!UPLOAD_TYPES.has(file.type)) throw new Error("এই ফরম্যাটটি সাপোর্ট করে না");
+  const contentType = file.type as "image/webp";
   const ticket = await createUploadTicket({
-    data: {
-      folder,
-      fileName: compressed.fileName,
-      contentType: compressed.contentType as "image/webp",
-      size: compressed.size,
-    },
+    data: { folder, fileName: safeName(file.name), contentType, size: file.size },
   });
   const res = await fetch(ticket.uploadUrl, {
     method: "PUT",
-    headers: { "content-type": compressed.contentType },
-    body: compressed.blob,
+    headers: { "content-type": contentType },
+    body: file,
   });
   if (!res.ok) throw new Error(`Upload failed (${res.status})`);
-  toast.success(
-    `Uploaded — ${formatBytes(compressed.originalSize)} → ${formatBytes(compressed.size)}`,
-  );
+  toast.success("Uploaded");
   return ticket.publicUrl;
 }
 

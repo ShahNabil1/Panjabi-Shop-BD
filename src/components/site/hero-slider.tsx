@@ -1,3 +1,4 @@
+import { SmartImage } from "@/components/site/smart-image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "@tanstack/react-router";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -90,11 +91,11 @@ export function HeroSlider({ slides }: { slides: HeroSlide[] }) {
           >
             {slides.map((slide, i) => {
               const img = (
-                <img
+                <SmartImage
                   src={slide.url}
                   alt={slide.alt ?? "উপহারকাব্য ব্যানার"}
-                  loading={i === 0 ? "eager" : "lazy"}
-                  fetchPriority={i === 0 ? "high" : undefined}
+                  baseWidth={1200}
+                  priority={i === 0}
                   className="aspect-4/3 w-full object-cover sm:aspect-[21/9]"
                 />
               );

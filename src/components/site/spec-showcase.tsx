@@ -1,3 +1,4 @@
+import { SmartImage } from "@/components/site/smart-image";
 import { cn } from "@/lib/utils";
 
 export type SpecItem = {
@@ -69,10 +70,10 @@ export function SpecShowcase({ heading, items, imageUrl, imageAlt, className }: 
               className="absolute inset-0 rounded-full bg-linear-to-br from-primary/10 via-transparent to-accent/15"
             />
             <span aria-hidden className="absolute inset-1.5 rounded-full border border-primary/15" />
-            <img
+            <SmartImage
               src={imageUrl}
               alt={imageAlt}
-              loading="lazy"
+              baseWidth={320}
               className="relative h-full w-full rounded-full object-cover p-2.5"
             />
           </div>

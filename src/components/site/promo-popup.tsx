@@ -1,3 +1,4 @@
+import { SmartImage } from "@/components/site/smart-image";
 import { useEffect, useState } from "react";
 import { useRouter } from "@tanstack/react-router";
 import { X } from "lucide-react";
@@ -137,9 +138,11 @@ export function PromoPopup({ config }: { config: PromoPopup }) {
   };
 
   const image = (
-    <img
+    <SmartImage
       src={config.url}
       alt={config.alt ?? "অফার"}
+      baseWidth={768}
+      fit="contain"
       className="block h-auto max-h-[82vh] w-full rounded-2xl object-contain"
     />
   );
