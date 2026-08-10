@@ -157,6 +157,13 @@ function GroupCard({
         </span>
       </div>
 
+      {locked ? (
+        <p className="flex items-center gap-2 rounded-xl border border-border/70 bg-muted/40 px-3 py-2 text-[11px] font-medium text-muted-foreground">
+          <Lock className="size-3.5" />
+          Credentials are locked. Click Edit to change them.
+        </p>
+      ) : null}
+
       <div className="grid gap-3 sm:grid-cols-2">
         {meta.fields.map((field) => (
           <div key={field.key} className="space-y-1.5">
@@ -166,6 +173,7 @@ function GroupCard({
             <TextField
               label={field.label}
               value={values[field.key] ?? ""}
+              disabled={locked}
               placeholder={field.placeholder ?? (field.secret ? "Paste the value" : "")}
               onChange={(v: string) => setValues((prev) => ({ ...prev, [field.key]: v }))}
               {...(field.hint ? { hint: field.hint } : {})}
@@ -183,14 +191,67 @@ function GroupCard({
       ) : null}
 
       <div className="flex flex-wrap items-center gap-2">
-        <Button type="button" disabled={busy || !isDirty} onClick={() => save.mutate()}>
-          {save.isPending ? (
-            <Loader2 className="mr-1.5 size-4 animate-spin" />
-          ) : !isDirty ? (
-            <CheckCircle2 className="mr-1.5 size-4" />
-          ) : null}
-          {!isDirty && !save.isPending ? "Saved" : "Save"}
-        </Button>
+        {locked ? (
+          <>
+            <Button type="button" onClick={() => setEditOpen(true)}>
+              <Pencil className="mr-1.5 size-4" />
+              Edit credentials
+            </Button>
+            <AlertDialog open={editOpen} onOpenChange={setEditOpen}>
+              <AlertDialogContent className="rounded-2xl">
+                <AlertDialogHeader>
+                  <AlertDialogTitle className="flex items-center gap-2 text-amber-600">
+                    <TriangleAlert className="size-5" />
+                    Edit {meta.title} credentials?
+                  </AlertDialogTitle>
+                  <AlertDialogDescription>
+                    These credentials are live. A wrong or incomplete value will immediately break
+                    this integration — uploads, SMS or courier calls can stop working across the
+                    whole site. Only continue if you have the correct values at hand, and run “Test
+                    connection” right after saving.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel className="rounded-xl">Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    className="rounded-xl bg-amber-600 text-white hover:bg-amber-700"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setEditOpen(false);
+                      setUnlocked(true);
+                    }}
+                  >
+                    I understand, let me edit
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </>
+        ) : (
+          <>
+            <Button type="button" disabled={busy || !isDirty} onClick={() => save.mutate()}>
+              {save.isPending ? (
+                <Loader2 className="mr-1.5 size-4 animate-spin" />
+              ) : !isDirty ? (
+                <CheckCircle2 className="mr-1.5 size-4" />
+              ) : null}
+              {!isDirty && !save.isPending ? "Saved" : "Save"}
+            </Button>
+            {state?.configured ? (
+              <Button
+                type="button"
+                variant="outline"
+                disabled={busy}
+                onClick={() => {
+                  setValues(state?.values ?? {});
+                  setUnlocked(false);
+                }}
+              >
+                Cancel
+              </Button>
+            ) : null}
+          </>
+        )}
         <Button
           type="button"
           variant="secondary"
@@ -204,20 +265,23 @@ function GroupCard({
           )}
           Test connection
         </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          className="text-destructive hover:bg-destructive/10"
-          disabled={busy}
-          onClick={() => {
-            if (!window.confirm(`Remove all ${meta.title} credentials?`)) return;
-            remove.mutate();
-          }}
-        >
-          <Trash2 className="mr-1.5 size-4" />
-          Remove
-        </Button>
+        {locked ? null : (
+          <Button
+            type="button"
+            variant="ghost"
+            className="text-destructive hover:bg-destructive/10"
+            disabled={busy}
+            onClick={() => {
+              if (!window.confirm(`Remove all ${meta.title} credentials?`)) return;
+              remove.mutate();
+            }}
+          >
+            <Trash2 className="mr-1.5 size-4" />
+            Remove
+          </Button>
+        )}
       </div>
+
 
       {result ? (
         <div
