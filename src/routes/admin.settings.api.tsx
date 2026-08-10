@@ -155,9 +155,13 @@ function GroupCard({
       ) : null}
 
       <div className="flex flex-wrap items-center gap-2">
-        <Button type="button" disabled={busy} onClick={() => save.mutate()}>
-          {save.isPending ? <Loader2 className="mr-1.5 size-4 animate-spin" /> : null}
-          Save
+        <Button type="button" disabled={busy || !isDirty} onClick={() => save.mutate()}>
+          {save.isPending ? (
+            <Loader2 className="mr-1.5 size-4 animate-spin" />
+          ) : !isDirty ? (
+            <CheckCircle2 className="mr-1.5 size-4" />
+          ) : null}
+          {!isDirty && !save.isPending ? "Saved" : "Save"}
         </Button>
         <Button
           type="button"
