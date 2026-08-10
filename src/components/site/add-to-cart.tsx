@@ -2,9 +2,11 @@ import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
 
-import { useCart, type NewCartItem } from "@/lib/cart-context";
+import { useCart, type CartItem, type NewCartItem } from "@/lib/cart-context";
 import { useLang } from "@/lib/language-context";
 import { formatNumber, pick, tr } from "@/lib/i18n";
+import { ecommerce, pushEvent } from "@/lib/tracking";
+import { cartTrackingItems } from "@/lib/tracking-items";
 import { cn } from "@/lib/utils";
 
 export function QuantityStepper({
