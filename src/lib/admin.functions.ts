@@ -627,7 +627,7 @@ export const adminDeleteFaq = createServerFn({ method: "POST" })
 export const adminGetCleanupStats = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) =>
-    z.object({ days: z.number().int().min(7).max(730).default(90) }).parse(input ?? {}),
+    z.object({ days: z.number().int().min(7).max(730).default(45) }).parse(input ?? {}),
   )
   .handler(async ({ data, context }) => {
     const db = await requireAdmin(context.supabase, context.userId);
@@ -673,7 +673,7 @@ export const adminGetCleanupStats = createServerFn({ method: "POST" })
 export const adminRunCleanup = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) =>
-    z.object({ days: z.number().int().min(7).max(730).default(90) }).parse(input ?? {}),
+    z.object({ days: z.number().int().min(7).max(730).default(45) }).parse(input ?? {}),
   )
   .handler(async ({ data, context }) => {
     const db = await requireAdmin(context.supabase, context.userId);
