@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 
 import { AdminHeading, Panel, TextField } from "@/components/admin/kit";
+import { IntegrationMark } from "@/components/admin/integration-logo";
 import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
