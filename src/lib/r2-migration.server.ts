@@ -155,8 +155,16 @@ async function collectKeys(from: R2Config): Promise<KeyRef[]> {
   {
     let page = 0;
     while (true) {
-      const { data, error } = await db
-        .from("landing_pages")
+      const { data, error } = await (db.from("landing_pages") as unknown as {
+        select: (columns: string) => {
+          filter: (column: string, operator: string, value: string) => {
+            range: (from: number, to: number) => Promise<{
+              data: { content: unknown }[] | null;
+              error: { message: string } | null;
+            }>;
+          };
+        };
+      })
         .select("content")
         .filter("content::text", "like", `%${prefix}%`)
         .range(page * 1000, (page + 1) * 1000 - 1);
