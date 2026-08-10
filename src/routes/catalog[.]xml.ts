@@ -45,6 +45,14 @@ export const Route = createFileRoute("/catalog.xml")({
             `      <g:mpn>${esc(p.mpn)}</g:mpn>`,
             `      <g:identifier_exists>no</g:identifier_exists>`,
             `      <g:product_type>${esc(p.productType)}</g:product_type>`,
+            p.categoryLink ? `      <g:product_detail><g:section_name>Category</g:section_name><g:attribute_name>Collection</g:attribute_name><g:attribute_value>${esc(p.productType)}</g:attribute_value></g:product_detail>` : null,
+            p.categoryLink ? `      <g:custom_label_2>${esc(p.categorySlug ?? "")}</g:custom_label_2>` : null,
+            p.promotionSlugs.length > 0
+              ? `      <g:custom_label_3>${esc(p.promotionSlugs.join("|"))}</g:custom_label_3>`
+              : null,
+            p.salePriceEffectiveDate
+              ? `      <g:sale_price_effective_date>${esc(p.salePriceEffectiveDate)}</g:sale_price_effective_date>`
+              : null,
             p.variantLabel ? `      <g:custom_label_0>${esc(p.variantLabel)}</g:custom_label_0>` : null,
             `      <g:custom_label_1>${esc(p.kind)}</g:custom_label_1>`,
             "    </item>",

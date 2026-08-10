@@ -27,6 +27,10 @@ const HEADER = [
   "quantity_to_sell_on_facebook",
   "custom_label_0",
   "custom_label_1",
+  "custom_label_2",
+  "custom_label_3",
+  "sale_price_effective_date",
+  "product_category_link",
 ];
 
 /** Same rows as /catalog.xml in the CSV shape TikTok & Google also accept. */
@@ -58,6 +62,10 @@ export const Route = createFileRoute("/catalog.csv")({
               p.quantity,
               p.variantLabel ?? "",
               p.kind,
+              p.categorySlug ?? "",
+              p.promotionSlugs.join("|"),
+              p.salePriceEffectiveDate ?? "",
+              p.categoryLink ?? "",
             ]
               .map(cell)
               .join(","),
