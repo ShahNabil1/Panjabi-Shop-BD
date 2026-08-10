@@ -114,6 +114,7 @@ export function TextField({
   placeholder,
   type = "text",
   className,
+  disabled,
 }: {
   label: string;
   value: string;
@@ -123,6 +124,7 @@ export function TextField({
   placeholder?: string;
   type?: string;
   className?: string;
+  disabled?: boolean;
 }) {
   return (
     <Field label={label} {...(hint ? { hint } : {})} {...(className ? { className } : {})}>
@@ -130,6 +132,7 @@ export function TextField({
         className={inputClass}
         type={type}
         value={value}
+        disabled={disabled ?? false}
         placeholder={placeholder ?? ""}
         onChange={(e) => onChange(e.target.value)}
         onBlur={onBlur}
@@ -137,6 +140,7 @@ export function TextField({
     </Field>
   );
 }
+
 
 export function NumberField({
   label,
