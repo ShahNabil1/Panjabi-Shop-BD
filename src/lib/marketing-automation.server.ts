@@ -99,6 +99,7 @@ function candidates(rows: ControlRow[], s: AutomationSettings): ControlRow[] {
 
 export type AutomationResult = {
   skipped: boolean;
+  currency?: string;
   message: string;
   evaluated: number;
   applied: number;
@@ -116,7 +117,13 @@ export async function runMarketingAutomation(
   const settings = opts.settings ?? (await readAutomationSettings(db));
 
   if (!settings.enabled && !opts.preview) {
-    return { skipped: true, message: "Automation is turned off.", evaluated: 0, applied: 0, actions: [] };
+    return {
+      skipped: true,
+      message: "Automation is turned off.",
+      evaluated: 0,
+      applied: 0,
+      actions: [],
+    };
   }
 
   const control = await buildControlCenter(settings.preset, settings.level, settings.thresholds);
@@ -193,6 +200,7 @@ export async function runMarketingAutomation(
 
   return {
     skipped: false,
+    currency: control.currency,
     message: settings.dryRun
       ? `Dry run — ${logs.length} action(s) planned.`
       : `${applied} action(s) applied.`,
