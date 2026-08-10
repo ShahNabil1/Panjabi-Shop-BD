@@ -144,6 +144,21 @@ function parseCurrent(): Attribution {
   }
   out.fbp = fbp;
 
+  // TikTok browser id — only read, never faked (TikTok rejects invented ids).
+  const ttp = readCookie("_ttp");
+  if (ttp) out.ttp = ttp;
+
+  // GA4 client id lives in the _ga cookie: GA1.1.<clientId>.
+  const ga = readCookie("_ga");
+  const gaParts = ga?.split(".") ?? [];
+  if (gaParts.length >= 4) out.ga_client_id = `${gaParts[2]}.${gaParts[3]}`;
+  const gaSession = gaSessionId();
+  if (gaSession) out.ga_session_id = gaSession;
+
+  out.external_id = visitorId();
+
+
+
   const referrer = clean(document.referrer);
   if (referrer && !referrer.includes(window.location.host)) out.referrer = referrer;
   out.landing_page = clean(window.location.pathname + window.location.search);
