@@ -146,8 +146,14 @@ function ProductPage() {
   const { lang } = useLang();
   const { product, images, variants, comboItems, category, subcategory, related } =
     Route.useLoaderData() as ProductPageData;
+  // Catalogue ads deep-link with ?sku=… so the advertised variant is preselected.
+  const search = useSearch({ strict: false }) as { sku?: string };
   const [active, setActive] = useState(0);
-  const [selected, setSelected] = useState<Record<string, string>>({});
+  const [selected, setSelected] = useState<Record<string, string>>(() => {
+    const sku = typeof search.sku === "string" ? search.sku : "";
+    const match = sku ? variants.find((v) => v.sku === sku) : undefined;
+    return match ? { [`${match.group_name_bn}`]: match.id } : {};
+  });
   const [comboSelected, setComboSelected] = useState<Record<string, string>>(() =>
     Object.fromEntries(
       comboItems.flatMap((item) => item.variants[0] ? [[item.id, item.variants[0].id]] : []),
