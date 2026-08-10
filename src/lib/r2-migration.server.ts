@@ -224,6 +224,19 @@ export async function migrateBatch(offset = 0): Promise<R2MigrateBatchResult> {
   const total = all.length;
   const batch = all.slice(offset, offset + BATCH_SIZE);
 
+  // Pre-flight: confirm we can read from the old bucket before copying everything.
+  if (batch.length > 0) {
+    const { readR2Config, probeObjectRead } = await import("./r2.server");
+    const probe = await probeObjectRead(from, batch[0].key);
+    if (!probe.ok && (probe.status === 403 || probe.status === 401)) {
+      throw new Error(
+        `Cannot read the old bucket "${from.bucket}" (${probe.status} ${probe.message}). ` +
+          "The saved old R2 credentials lack GetObject permission, so files cannot be copied. " +
+          "Fix the old bucket's API token, or press “Skip migration” to forget it.",
+      );
+    }
+  }
+
   let copied = 0;
   let skipped = 0;
   let failed = 0;
