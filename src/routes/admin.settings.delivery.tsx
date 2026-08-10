@@ -7,6 +7,9 @@ import {
   Copy,
   Link2,
   Loader2,
+  Lock,
+  Pencil,
+
   Plug,
   Plus,
   Radio,
@@ -190,9 +193,13 @@ function PartnerCard({
   })();
 
   const [removeOpen, setRemoveOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
+  const [unlocked, setUnlocked] = useState(false);
+  const locked = Boolean(row) && !unlocked;
   const [testing, setTesting] = useState(false);
   const [saving, setSaving] = useState(false);
   const [removing, setRemoving] = useState(false);
+
   const [result, setResult] = useState<{ ok: boolean; message: string } | null>(
     row ? { ok: row.connection_ok, message: row.connection_message ?? "" } : null,
   );
@@ -255,7 +262,9 @@ function PartnerCard({
       });
       setResult({ ok: true, message: res.message });
       setSavedSnapshot(JSON.stringify(values));
+      setUnlocked(false);
       setNoteTemplate(noteTemplate.trim()); setSavedTemplate(noteTemplate.trim());
+
       toast.success(`${providerLabels[provider]} saved`);
       onDone();
     } catch (error) {
@@ -364,6 +373,13 @@ function PartnerCard({
         </div>
       </div>
 
+      {locked ? (
+        <p className="flex items-center gap-2 rounded-xl border border-border/70 bg-muted/40 px-3 py-2 text-[11px] font-medium text-muted-foreground">
+          <Lock className="size-3.5" />
+          Credentials are locked. Click “Edit credentials” to change them.
+        </p>
+      ) : null}
+
       <div className="grid gap-4 sm:grid-cols-2">
         {fields.map((f) => (
           <div key={f.key} className="space-y-1.5">
@@ -376,6 +392,7 @@ function PartnerCard({
               value={values[f.key] ?? ""}
               placeholder={f.placeholder ?? ""}
               autoComplete="off"
+              disabled={locked}
               onFocus={() => {
                 if (values[f.key] === SECRET_MASK) setValues((v) => ({ ...v, [f.key]: "" }));
               }}
@@ -395,6 +412,7 @@ function PartnerCard({
         <Textarea
           rows={3}
           maxLength={noteMax}
+          disabled={locked}
           aria-invalid={noteError ? true : undefined}
           className={`rounded-xl ${noteError ? "border-destructive focus-visible:ring-destructive/40" : ""}`}
           placeholder="e.g. Please call before delivery. Fragile item — handle with care."
@@ -402,6 +420,7 @@ function PartnerCard({
           onChange={(e) => setNoteTemplate(e.target.value)}
           onBlur={() => setNoteTemplate((v) => v.replace(/[ \t]+\n/g, "\n").trim())}
         />
+
         {noteError ? (
           <p className="text-[11px] font-medium text-destructive">{noteError}</p>
         ) : null}
@@ -533,28 +552,85 @@ function PartnerCard({
           {testing ? <Loader2 className="size-4 animate-spin" /> : <Plug className="size-4" />}
           Test connection
         </Button>
-        <Button
-          type="button"
-          onClick={save}
-          disabled={saving || !result?.ok || !isDirty || !!noteError}
-          className="bg-emerald-600 text-white hover:bg-emerald-700 active:scale-95 disabled:opacity-60"
-        >
-          {saving ? (
-            <Loader2 className="size-4 animate-spin" />
-          ) : !isDirty ? (
-            <CheckCircle2 className="size-4" />
-          ) : (
-            <Save className="size-4" />
-          )}
-          {!isDirty && !saving ? "Saved" : "Save partner"}
-        </Button>
-        {!result?.ok ? (
-          <span className="text-xs text-muted-foreground">
-            Run a successful connection test before saving.
-          </span>
-        ) : !isDirty ? (
-          <span className="text-xs text-muted-foreground">No unsaved changes.</span>
-        ) : null}
+        {locked ? (
+          <>
+            <Button type="button" onClick={() => setEditOpen(true)} className="active:scale-95">
+              <Pencil className="size-4" />
+              Edit credentials
+            </Button>
+            <AlertDialog open={editOpen} onOpenChange={setEditOpen}>
+              <AlertDialogContent className="rounded-2xl">
+                <AlertDialogHeader>
+                  <AlertDialogTitle className="flex items-center gap-2 text-amber-600">
+                    <TriangleAlert className="size-5" />
+                    Edit {providerLabels[provider]} credentials?
+                  </AlertDialogTitle>
+                  <AlertDialogDescription>
+                    These credentials are live. A wrong or incomplete value will immediately break
+                    this courier — order dispatch, tracking and webhooks can stop working. Only
+                    continue if you have the correct values at hand, and run “Test connection”
+                    before saving.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel className="rounded-xl">Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    className="rounded-xl bg-amber-600 text-white hover:bg-amber-700 active:scale-95"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setEditOpen(false);
+                      setUnlocked(true);
+                    }}
+                  >
+                    I understand, let me edit
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </>
+        ) : (
+          <>
+            <Button
+              type="button"
+              onClick={save}
+              disabled={saving || !result?.ok || !isDirty || !!noteError}
+              className="bg-emerald-600 text-white hover:bg-emerald-700 active:scale-95 disabled:opacity-60"
+            >
+              {saving ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : !isDirty ? (
+                <CheckCircle2 className="size-4" />
+              ) : (
+                <Save className="size-4" />
+              )}
+              {!isDirty && !saving ? "Saved" : "Save partner"}
+            </Button>
+            {row ? (
+              <Button
+                type="button"
+                variant="outline"
+                className="active:scale-95"
+                onClick={() => {
+                  const init: Record<string, string> = {};
+                  for (const f of fields) init[f.key] = row.credentials?.[f.key] ?? "";
+                  setValues(init);
+                  setNoteTemplate(savedTemplate);
+                  setUnlocked(false);
+                }}
+              >
+                Cancel
+              </Button>
+            ) : null}
+            {!result?.ok ? (
+              <span className="text-xs text-muted-foreground">
+                Run a successful connection test before saving.
+              </span>
+            ) : !isDirty ? (
+              <span className="text-xs text-muted-foreground">No unsaved changes.</span>
+            ) : null}
+          </>
+        )}
+
         {row ? (
           <AlertDialog open={removeOpen} onOpenChange={setRemoveOpen}>
             <AlertDialogTrigger asChild>
