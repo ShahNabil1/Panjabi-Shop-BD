@@ -124,37 +124,62 @@ export type R2Probe = {
   publicBaseUrl: string;
   objects: number | null;
   truncated: boolean;
-  latestKey: string | null;
+  totalBytes: number | null;
 };
 
-/** Live bucket check — lists a page of objects with the stored credentials. */
+export function formatBytes(bytes: number) {
+  if (bytes < 1024) return `${bytes} B`;
+  const units = ["KB", "MB", "GB", "TB"];
+  let value = bytes / 1024;
+  let i = 0;
+  while (value >= 1024 && i < units.length - 1) {
+    value /= 1024;
+    i += 1;
+  }
+  return `${value.toFixed(value >= 100 ? 0 : value >= 10 ? 1 : 2)} ${units[i]}`;
+}
+
+/** Live bucket check — lists objects with the stored credentials and sums their size. */
 export async function probeR2(cfg: R2Config): Promise<R2Probe> {
   const base: Omit<R2Probe, "ok" | "message"> = {
     bucket: cfg.bucket,
     publicBaseUrl: cfg.publicBaseUrl,
     objects: null,
     truncated: false,
-    latestKey: null,
+    totalBytes: null,
   };
   try {
-    const url = new URL(`https://${cfg.accountId}.r2.cloudflarestorage.com/${cfg.bucket}`);
-    url.searchParams.set("list-type", "2");
-    url.searchParams.set("max-keys", "1000");
-    const res = await client(cfg).fetch(url.toString(), { method: "GET" });
-    const text = await res.text();
-    if (!res.ok) {
-      const msg = /<Message>([^<]+)<\/Message>/.exec(text)?.[1];
-      return { ...base, ok: false, message: msg ?? `Bucket request failed (${res.status})` };
+    let token: string | null = null;
+    let count = 0;
+    let bytes = 0;
+    let truncated = false;
+    for (let page = 0; page < 20; page += 1) {
+      const url = new URL(`https://${cfg.accountId}.r2.cloudflarestorage.com/${cfg.bucket}`);
+      url.searchParams.set("list-type", "2");
+      url.searchParams.set("max-keys", "1000");
+      if (token) url.searchParams.set("continuation-token", token);
+      const res = await client(cfg).fetch(url.toString(), { method: "GET" });
+      const text = await res.text();
+      if (!res.ok) {
+        const msg = /<Message>([^<]+)<\/Message>/.exec(text)?.[1];
+        return { ...base, ok: false, message: msg ?? `Bucket request failed (${res.status})` };
+      }
+      count += [...text.matchAll(/<Key>([^<]+)<\/Key>/g)].length;
+      for (const m of text.matchAll(/<Size>(\d+)<\/Size>/g)) bytes += Number(m[1] ?? 0);
+      const isTruncated = /<IsTruncated>true<\/IsTruncated>/.test(text);
+      token = isTruncated
+        ? (/<NextContinuationToken>([^<]+)<\/NextContinuationToken>/.exec(text)?.[1] ?? null)
+        : null;
+      if (!token) break;
+      if (page === 19) truncated = true;
     }
-    const keys = [...text.matchAll(/<Key>([^<]+)<\/Key>/g)].map((m) => m[1] ?? "");
-    const truncated = /<IsTruncated>true<\/IsTruncated>/.test(text);
     return {
       ...base,
       ok: true,
       message: "Bucket reachable",
-      objects: keys.length,
+      objects: count,
       truncated,
-      latestKey: keys.at(-1) ?? null,
+      totalBytes: bytes,
     };
   } catch (err) {
     return { ...base, ok: false, message: err instanceof Error ? err.message : "Unknown error" };
