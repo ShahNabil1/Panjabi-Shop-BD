@@ -283,6 +283,15 @@ export const adminTestIntegration = createServerFn({ method: "POST" })
     } catch (error) {
       return fail(error instanceof Error ? error.message : "Unknown error");
     }
+    })();
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    await supabaseAdmin
+      .from("integration_credentials")
+      .upsert([{ key: testKey(data.group), value: JSON.stringify(result) }], {
+        onConflict: "key",
+      });
+    return result;
   });
 
 export type R2MigrationState = {
