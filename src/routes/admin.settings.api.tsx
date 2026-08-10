@@ -287,8 +287,9 @@ function R2MigrationCard() {
             Bucket change detected
           </h2>
           <p className="mt-1 text-xs text-muted-foreground">
-            All existing images, invoices and videos still live in the old bucket. Migrate copies
-            every file into the new bucket and updates every stored link.
+            All images, invoices and videos referenced in the database still point to the old
+            bucket. Migrate copies those referenced files into the new bucket and updates every
+            stored link. The old token only needs read permission; bucket listing is not required.
           </p>
         </div>
       </div>
