@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Crop as CropIcon, ImagePlus, Loader2, Upload, X } from "lucide-react";
 
@@ -85,80 +85,17 @@ export function useImageUpload(folder: Folder) {
   return { busy, upload };
 }
 
-/**
- * Sequential crop queue — every picked file passes through the crop dialog
- * before it is compressed and uploaded.
- */
-function useCropQueue(onReady: (files: File[]) => void | Promise<void>, preset?: string) {
-  const [queue, setQueue] = useState<File[]>([]);
-  const [src, setSrc] = useState<string | null>(null);
-  const doneRef = useRef<File[]>([]);
-
-  const current = queue[0] ?? null;
-
-  useEffect(() => {
-    if (!current) {
-      setSrc(null);
-      return;
-    }
-    const url = URL.createObjectURL(current);
-    setSrc(url);
-    return () => URL.revokeObjectURL(url);
-  }, [current]);
-
-  const start = (files: File[]) => {
-    const images = files.filter((f) => f.type.startsWith("image/"));
-    if (!images.length) return;
-    doneRef.current = [];
-    setQueue(images);
-  };
-
-  const advance = (file?: File) => {
-    if (file) doneRef.current.push(file);
-    setQueue((q) => {
-      const rest = q.slice(1);
-      if (rest.length === 0) {
-        const out = doneRef.current;
-        doneRef.current = [];
-        if (out.length) void onReady(out);
-      }
-      return rest;
-    });
-  };
-
-  const dialog =
-    current && src ? (
-      <ImageCropperDialog
-        src={src}
-        fileName={current.name}
-        initialPreset={preset}
-        onCancel={() => {
-          doneRef.current = [];
-          setQueue([]);
-        }}
-        onCropped={(file) => advance(file)}
-      />
-    ) : null;
-
-  return { start, dialog, remaining: queue.length };
-}
-
 export function ImageUploadButton({
   folder,
   multiple = false,
   label = "Upload",
   className,
-  crop = false,
-  cropPreset,
   onUploaded,
 }: {
   folder: Folder;
   multiple?: boolean;
   label?: string;
   className?: string | undefined;
-  /** Route files through the advanced crop dialog first. */
-  crop?: boolean;
-  cropPreset?: string | undefined;
   onUploaded: (urls: string[]) => void;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -168,7 +105,6 @@ export function ImageUploadButton({
     const urls = await upload(files);
     if (urls.length) onUploaded(urls);
   };
-  const cropper = useCropQueue(run, cropPreset);
 
   return (
     <>
@@ -193,11 +129,9 @@ export function ImageUploadButton({
         onChange={async (e) => {
           const files = Array.from(e.target.files ?? []);
           e.target.value = "";
-          if (crop) cropper.start(files);
-          else await run(files);
+          await run(files);
         }}
       />
-      {cropper.dialog}
     </>
   );
 }
@@ -209,15 +143,46 @@ export function CropExistingButton({
   cropPreset,
   onCropped,
   className,
+  children,
 }: {
   folder: Folder;
   url: string;
   cropPreset?: string | undefined;
   onCropped: (newUrl: string) => void;
   className?: string | undefined;
+  /** Custom trigger (e.g. the image thumbnail itself). */
+  children?: React.ReactNode;
 }) {
   const [open, setOpen] = useState(false);
   const { busy, upload } = useImageUpload(folder);
+
+  if (children) {
+    return (
+      <>
+        <button
+          type="button"
+          disabled={!url || busy}
+          onClick={() => setOpen(true)}
+          title="ক্রপ করুন"
+          className={cn("block cursor-zoom-in disabled:cursor-default", className)}
+        >
+          {children}
+        </button>
+        {open ? (
+          <ImageCropperDialog
+            src={url}
+            initialPreset={cropPreset}
+            onCancel={() => setOpen(false)}
+            onCropped={async (file) => {
+              setOpen(false);
+              const urls = await upload([file]);
+              if (urls[0]) onCropped(urls[0]);
+            }}
+          />
+        ) : null}
+      </>
+    );
+  }
 
   return (
     <>
@@ -257,7 +222,6 @@ export function ImageField({
   value,
   onChange,
   hint,
-  crop = true,
   cropPreset,
 }: {
   label: string;
@@ -265,7 +229,6 @@ export function ImageField({
   value: string | null;
   onChange: (url: string | null) => void;
   hint?: string;
-  crop?: boolean;
   cropPreset?: string | undefined;
 }) {
   const { busy, upload } = useImageUpload(folder);
@@ -276,11 +239,9 @@ export function ImageField({
     const urls = await upload(files.slice(0, 1));
     if (urls[0]) onChange(urls[0]);
   };
-  const cropper = useCropQueue(run, cropPreset);
 
   const handleFiles = async (files: File[]) => {
-    if (crop) cropper.start(files.slice(0, 1));
-    else await run(files);
+    await run(files);
   };
 
   return (
@@ -306,7 +267,15 @@ export function ImageField({
       >
         <div className="flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-border/80 bg-card">
           {value ? (
-            <img src={value} alt="" className="size-full object-cover" />
+            <CropExistingButton
+              folder={folder}
+              url={value}
+              cropPreset={cropPreset}
+              onCropped={(u) => onChange(u)}
+              className="size-full"
+            >
+              <img src={value} alt="" className="size-full object-cover" />
+            </CropExistingButton>
           ) : (
             <ImagePlus className="size-5 text-muted-foreground" />
           )}
@@ -365,7 +334,6 @@ export function ImageField({
           await handleFiles(files);
         }}
       />
-      {cropper.dialog}
     </label>
   );
 }

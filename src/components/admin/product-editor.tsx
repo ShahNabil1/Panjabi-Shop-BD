@@ -568,8 +568,6 @@ export function ProductEditor({ id, kind }: { id: string; kind: ProductKind }) {
               <ImageUploadButton
                 folder={mediaFolder}
                 multiple
-                crop
-                cropPreset={isComponent ? "square" : "card"}
                 label="Upload images"
                 onUploaded={(urls) =>
                   set("images", [
@@ -600,7 +598,7 @@ export function ProductEditor({ id, kind }: { id: string; kind: ProductKind }) {
           }
         />
         <p className="mb-3 text-[11px] text-muted-foreground">
-          ছবি ব্রাউজারেই WebP-তে কমপ্রেস হয় (সর্বোচ্চ 2000px)। প্রথম ছবিটিই OG/সোশ্যাল প্রিভিউ
+          আসল ছবি সরাসরি আপলোড হয়, সাইজ/ফরম্যাট এজ-এ অটো অপটিমাইজ হয়। ছবির উপর ক্লিক করে ক্রপ করা যায়। প্রথম ছবিটিই OG/সোশ্যাল প্রিভিউ
           হিসেবে যায়।
         </p>
 
@@ -618,7 +616,20 @@ export function ProductEditor({ id, kind }: { id: string; kind: ProductKind }) {
               >
                 <div className="size-14 shrink-0 overflow-hidden rounded-lg bg-muted transition-transform duration-300 group-hover:scale-105">
                   {img.url ? (
-                    <img src={img.url} alt="" className="size-full object-cover" />
+                    <CropExistingButton
+                      folder={mediaFolder}
+                      url={img.url}
+                      cropPreset={i === 0 && !isComponent ? "card" : "square"}
+                      className="size-full"
+                      onCropped={(u) =>
+                        set(
+                          "images",
+                          draft.images.map((x, j) => (j === i ? { ...x, url: u } : x)),
+                        )
+                      }
+                    >
+                      <img src={img.url} alt="" className="size-full object-cover" />
+                    </CropExistingButton>
                   ) : (
                     <div className="flex size-full items-center justify-center text-muted-foreground">
                       <Upload className="size-4" />

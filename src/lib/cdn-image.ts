@@ -7,8 +7,14 @@
  */
 
 /** Zone that has Transformations enabled. Sources must live on this zone. */
-const ZONE_ORIGIN = "https://upoharkabbo.com";
 const ZONE_HOST = "upoharkabbo.com";
+/**
+ * Hosts that serve the app itself — their `/cdn-cgi/image/…` path is swallowed
+ * by the app worker, so transformations must be requested on the asset host
+ * (e.g. cdn.upoharkabbo.com) instead.
+ */
+const APP_HOSTS = new Set([ZONE_HOST, `www.${ZONE_HOST}`]);
+
 
 /** Bucketed widths — fewer distinct variants means fewer billable transforms. */
 export const IMAGE_WIDTHS = [160, 240, 320, 400, 480, 640, 768, 960, 1200, 1600, 1920] as const;
@@ -29,7 +35,11 @@ export function bucketWidth(px: number): number {
   return IMAGE_WIDTHS.find((w) => w >= px) ?? last;
 }
 
-/** Only same-zone sources may be transformed (Sources = "This zone only"). */
+/**
+ * Only assets hosted on a zone subdomain (e.g. cdn.upoharkabbo.com) can be
+ * transformed — the apex/www hosts run the app worker and never expose
+ * /cdn-cgi/image/.
+ */
 export function canTransform(src: string | null | undefined): src is string {
   if (!src) return false;
   if (src.includes("/cdn-cgi/")) return false;
@@ -39,7 +49,8 @@ export function canTransform(src: string | null | undefined): src is string {
   if (!/^https?:\/\//i.test(src)) return false;
   try {
     const host = new URL(src).hostname;
-    return host === ZONE_HOST || host.endsWith(`.${ZONE_HOST}`);
+    if (APP_HOSTS.has(host)) return false;
+    return host.endsWith(`.${ZONE_HOST}`);
   } catch {
     return false;
   }
@@ -60,8 +71,11 @@ export function cdnImage(src: string, opts: TransformOptions): string {
   ]
     .filter(Boolean)
     .join(",");
-  return `${ZONE_ORIGIN}/cdn-cgi/image/${params}/${src}`;
+  // Requested on the asset host itself, using a path-relative source.
+  const url = new URL(src);
+  return `${url.origin}/cdn-cgi/image/${params}${url.pathname}${url.search}`;
 }
+
 
 /* ------------------------------------------------------------------ */
 /* Per-device width memory                                             */
