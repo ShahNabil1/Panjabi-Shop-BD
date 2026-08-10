@@ -59,6 +59,43 @@ export const deleteUpload = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+/**
+ * Admin-only: permanently deletes an uploaded image from R2 using its public
+ * URL. Foreign URLs (not on the configured public base) are skipped so the
+ * caller can still drop the link from the database.
+ */
+export const deleteUploadByUrl = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: unknown) => z.object({ url: z.string().min(1) }).parse(data))
+  .handler(async ({ data, context }): Promise<{ deleted: boolean; reason?: string }> => {
+    await requireAdmin(context.supabase, context.userId);
+    const { readR2Config, deleteObject } = await import("@/lib/r2.server");
+    const cfg = await readR2Config();
+    if (!cfg) throw new Error("R2 কনফিগার করা নেই।");
+
+    let key: string | null = null;
+    try {
+      const base = new URL(cfg.publicBaseUrl);
+      const target = new URL(data.url, cfg.publicBaseUrl);
+      if (target.host === base.host) {
+        const basePath = base.pathname.replace(/\/+$/, "");
+        const path = target.pathname.startsWith(`${basePath}/`)
+          ? target.pathname.slice(basePath.length)
+          : target.pathname;
+        // Transformed delivery URLs (/cdn-cgi/image/…/key) still point at the original object.
+        const cleaned = path.replace(/^\/cdn-cgi\/image\/[^/]+/, "");
+        key = decodeURIComponent(cleaned.replace(/^\/+/, "")) || null;
+      }
+    } catch {
+      key = null;
+    }
+
+    if (!key) return { deleted: false, reason: "not-an-r2-url" };
+    await deleteObject(cfg, key);
+    return { deleted: true };
+  });
+
+
 /** Admin-only: tells the UI whether media uploads are available yet. */
 export const getMediaStatus = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
