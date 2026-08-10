@@ -1,5 +1,5 @@
 import { Link, createFileRoute, notFound, useSearch } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ArrowRight } from "lucide-react";
 
 import { getProductPage } from "@/lib/catalog.functions";
