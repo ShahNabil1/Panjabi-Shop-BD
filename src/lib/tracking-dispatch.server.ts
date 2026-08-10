@@ -495,7 +495,7 @@ async function logEvent(
       match_keys: entry.keys,
       emq: entry.emq,
       request: { event: entry.event, platform: entry.platform },
-      response: (entry.response ?? {}) as Record<string, unknown>,
+      response: JSON.parse(JSON.stringify(entry.response ?? {})) as never,
     });
   } catch {
     // Logging must never break the order flow.
