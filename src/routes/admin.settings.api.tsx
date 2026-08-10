@@ -216,6 +216,136 @@ function GroupCard({
   );
 }
 
+function R2MigrationCard() {
+  const qc = useQueryClient();
+  const state = useQuery({
+    queryKey: ["admin", "r2-migration"],
+    queryFn: () => adminR2MigrationState(),
+  });
+  const [running, setRunning] = useState(false);
+  const [log, setLog] = useState<string[]>([]);
+  const [progress, setProgress] = useState({ copied: 0, skipped: 0, failed: 0 });
+
+  if (!state.data?.pending || !state.data.from || !state.data.to) return null;
+  const { from, to } = state.data;
+
+  const run = async () => {
+    setRunning(true);
+    setLog([]);
+    setProgress({ copied: 0, skipped: 0, failed: 0 });
+    let token: string | null = null;
+    let copied = 0;
+    let skipped = 0;
+    let failed = 0;
+    const errors: string[] = [];
+    try {
+      for (let page = 0; page < 500; page += 1) {
+        const res: Awaited<ReturnType<typeof adminR2MigrateBatch>> = await adminR2MigrateBatch({
+          data: { token },
+        });
+        copied += res.copied;
+        skipped += res.skipped;
+        failed += res.failed;
+        errors.push(...res.errors);
+        setProgress({ copied, skipped, failed });
+        setLog((prev) => [
+          `Batch ${page + 1}: ${res.copied} copied, ${res.skipped} already there${
+            res.failed ? `, ${res.failed} failed` : ""
+          }`,
+          ...prev,
+        ]);
+        token = res.nextToken;
+        if (!token) break;
+      }
+      if (failed > 0) {
+        toast.error(`${failed} file(s) failed — run migrate again to retry them.`);
+        setLog((prev) => [...errors.slice(0, 5), ...prev]);
+        return;
+      }
+      const done = await adminR2FinishMigration();
+      toast.success(`Migration complete — ${copied} file(s) copied, ${done.rewritten} link(s) updated.`);
+      await qc.invalidateQueries({ queryKey: ["admin", "r2-migration"] });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Migration failed");
+    } finally {
+      setRunning(false);
+    }
+  };
+
+  return (
+    <Panel className="space-y-4 border-amber-200 bg-amber-50/40">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h2 className="ig-text flex items-center gap-2 text-sm font-bold">
+            <ArrowRightLeft className="size-4 text-amber-700" />
+            Bucket change detected
+          </h2>
+          <p className="mt-1 text-xs text-muted-foreground">
+            All existing images, invoices and videos still live in the old bucket. Migrate copies
+            every file into the new bucket and updates every stored link.
+          </p>
+        </div>
+      </div>
+
+      <dl className="grid gap-x-4 gap-y-1.5 text-xs sm:grid-cols-2">
+        <div className="flex items-center justify-between gap-3">
+          <dt className="text-muted-foreground">From</dt>
+          <dd className="ig-text truncate font-semibold">{from.bucket}</dd>
+        </div>
+        <div className="flex items-center justify-between gap-3">
+          <dt className="text-muted-foreground">To</dt>
+          <dd className="ig-text truncate font-semibold">{to.bucket}</dd>
+        </div>
+        <div className="flex items-center justify-between gap-3">
+          <dt className="text-muted-foreground">Old URL</dt>
+          <dd className="ig-text truncate font-semibold">{from.publicBaseUrl}</dd>
+        </div>
+        <div className="flex items-center justify-between gap-3">
+          <dt className="text-muted-foreground">New URL</dt>
+          <dd className="ig-text truncate font-semibold">{to.publicBaseUrl}</dd>
+        </div>
+      </dl>
+
+      <div className="flex flex-wrap items-center gap-2">
+        <Button type="button" disabled={running} onClick={run}>
+          {running ? (
+            <Loader2 className="mr-1.5 size-4 animate-spin" />
+          ) : (
+            <ArrowRightLeft className="mr-1.5 size-4" />
+          )}
+          {running ? "Migrating…" : "Migrate media"}
+        </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          disabled={running}
+          className="text-destructive hover:bg-destructive/10"
+          onClick={async () => {
+            if (!window.confirm("Skip migration and forget the old bucket?")) return;
+            await adminR2DiscardMigration();
+            await qc.invalidateQueries({ queryKey: ["admin", "r2-migration"] });
+          }}
+        >
+          Skip
+        </Button>
+        {running || progress.copied || progress.skipped || progress.failed ? (
+          <span className="text-xs font-semibold text-muted-foreground">
+            {progress.copied} copied · {progress.skipped} skipped · {progress.failed} failed
+          </span>
+        ) : null}
+      </div>
+
+      {log.length ? (
+        <div className="max-h-40 space-y-1 overflow-auto rounded-xl border border-border/70 bg-background/70 px-3 py-2 text-[11px] text-muted-foreground">
+          {log.map((line, i) => (
+            <p key={i}>{line}</p>
+          ))}
+        </div>
+      ) : null}
+    </Panel>
+  );
+}
+
 function ApiSettingsAdmin() {
   const qc = useQueryClient();
   const q = useQuery({
@@ -225,7 +355,9 @@ function ApiSettingsAdmin() {
 
   const refresh = async () => {
     await qc.invalidateQueries({ queryKey: ["admin", "integrations"] });
+    await qc.invalidateQueries({ queryKey: ["admin", "r2-migration"] });
   };
+
 
   return (
     <div className="space-y-6 pb-16">
