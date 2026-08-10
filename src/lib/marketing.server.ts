@@ -932,7 +932,7 @@ export async function buildControlCenter(
 
   return {
     connected: perf.connected,
-    message: perf.message,
+    ...(perf.message ? { message: perf.message } : {}),
     currency: perf.currency,
     range: perf.range,
     level,
