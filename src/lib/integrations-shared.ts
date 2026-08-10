@@ -2,8 +2,24 @@
 
 export const API_SECRET_MASK = "••••••••";
 
-export const INTEGRATION_GROUPS = ["r2", "meta", "bulksmsbd", "bdcourier"] as const;
+export const INTEGRATION_GROUPS = [
+  "r2",
+  "meta",
+  "bulksmsbd",
+  "bdcourier",
+  "gtm",
+  "metacapi",
+  "tiktok",
+  "ga4",
+] as const;
 export type IntegrationGroup = (typeof INTEGRATION_GROUPS)[number];
+
+/** Groups shown under the "Analytics & Tracking" heading of the admin page. */
+export const TRACKING_GROUPS = ["gtm", "metacapi", "tiktok", "ga4"] as const;
+export const PLATFORM_GROUPS = INTEGRATION_GROUPS.filter(
+  (g) => !(TRACKING_GROUPS as readonly string[]).includes(g),
+);
+
 
 export type IntegrationField = {
   key: string;
