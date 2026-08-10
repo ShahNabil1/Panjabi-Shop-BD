@@ -96,8 +96,28 @@ function attrOf(order: OrderRow): Attribution {
   return { ...(a.first ?? {}), ...(a.last ?? {}) };
 }
 
-function contentIdOf(item: OrderRow["order_items"][number]): string {
+type OrderItem = OrderRow["order_items"][number];
+
+function contentIdOf(item: OrderItem): string {
   return item.sku || item.product_slug || item.product_id || item.product_name;
+}
+
+function categoryOf(item: OrderItem): string | undefined {
+  return item.products?.categories?.name_en ?? undefined;
+}
+
+/** Catalogue-shaped line, so Meta/TikTok/GA4 can match products & variants. */
+function lineOf(item: OrderItem) {
+  return {
+    id: contentIdOf(item),
+    name: item.product_name,
+    category: categoryOf(item),
+    variant: item.variant_label ?? undefined,
+    group: item.products?.sku ?? item.product_slug ?? undefined,
+    brand: item.products?.brand ?? undefined,
+    quantity: item.quantity,
+    price: Number(item.unit_price),
+  };
 }
 
 function landingUrl(order: OrderRow): string {
