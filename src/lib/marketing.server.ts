@@ -13,6 +13,7 @@ import { actId, metaGet, readMetaConfig, type MetaConfig } from "./meta.server";
 import type {
   CampaignLevel,
   CampaignPerformance,
+  CreativePerformance,
   DateRange,
   MarketingOverview,
   MarketingPreset,
@@ -493,6 +494,160 @@ export async function buildCampaignPerformance(
     return {
       ...empty,
       message: error instanceof Error ? error.message : "Meta insights unavailable",
+    };
+  }
+}
+
+/* ------------------------------------------------------------------ *
+ * Creative performance (hook / hold / retention)
+ * ------------------------------------------------------------------ */
+
+const VIDEO_FIELDS = [
+  "video_play_actions",
+  "video_thruplay_watched_actions",
+  "video_p25_watched_actions",
+  "video_p50_watched_actions",
+  "video_p75_watched_actions",
+  "video_p100_watched_actions",
+  "video_avg_time_watched_actions",
+].join(",");
+
+type VideoRow = InsightRow & {
+  ad_id?: string;
+  ad_name?: string;
+  campaign_name?: string;
+  video_play_actions?: InsightAction[];
+  video_thruplay_watched_actions?: InsightAction[];
+  video_p25_watched_actions?: InsightAction[];
+  video_p50_watched_actions?: InsightAction[];
+  video_p75_watched_actions?: InsightAction[];
+  video_p100_watched_actions?: InsightAction[];
+  video_avg_time_watched_actions?: InsightAction[];
+};
+
+const sumAction = (list: InsightAction[] | undefined) =>
+  (list ?? []).reduce((acc, a) => acc + num(a.value), 0);
+
+type AdCreativeRow = {
+  id: string;
+  name?: string;
+  effective_status?: string;
+  preview_shareable_link?: string;
+  creative?: {
+    thumbnail_url?: string;
+    video_id?: string;
+    body?: string;
+    object_story_spec?: { video_data?: unknown; link_data?: { message?: string } };
+  };
+};
+
+async function loadAdCreatives(cfg: MetaConfig) {
+  return cached(`creatives:${cfg.adAccountId}:${cfg.version}`, async () => {
+    const res = await metaGet<{ data?: AdCreativeRow[] }>(
+      cfg,
+      `${actId(cfg.adAccountId)}/ads`,
+      {
+        fields:
+          "id,name,effective_status,preview_shareable_link,creative{thumbnail_url,video_id,body,object_story_spec}",
+        limit: 200,
+      },
+    );
+    const map = new Map<string, AdCreativeRow>();
+    for (const row of res.data ?? []) map.set(row.id, row);
+    return map;
+  });
+}
+
+/** Builds the Marketing → Creatives payload. */
+export async function buildCreativePerformance(
+  preset: MarketingPreset,
+): Promise<CreativePerformance> {
+  const range = resolveRange(preset);
+  const cfg = await readMetaConfig();
+  if (!cfg) {
+    return {
+      connected: false,
+      message: "Meta Marketing API is not configured yet.",
+      currency: "USD",
+      range,
+      rows: [],
+    };
+  }
+
+  try {
+    const [acct, rows, creatives] = await Promise.all([
+      cached(`acct:${cfg.adAccountId}:${cfg.version}`, () =>
+        metaGet<{ name?: string; currency?: string }>(cfg, actId(cfg.adAccountId), {
+          fields: "name,currency",
+        }),
+      ),
+      fetchInsights(cfg, range, {
+        level: "ad",
+        fields: `${INSIGHT_FIELDS},ad_id,ad_name,campaign_name,${VIDEO_FIELDS}`,
+      }) as Promise<VideoRow[]>,
+      loadAdCreatives(cfg),
+    ]);
+
+    const built = rows.map((raw) => {
+      const m = toMetrics([raw]);
+      const ad = creatives.get(raw.ad_id ?? "");
+      const views3s = sumAction(raw.video_play_actions);
+      const thru = sumAction(raw.video_thruplay_watched_actions);
+      const p25 = sumAction(raw.video_p25_watched_actions);
+      const p50 = sumAction(raw.video_p50_watched_actions);
+      const p75 = sumAction(raw.video_p75_watched_actions);
+      const p100 = sumAction(raw.video_p100_watched_actions);
+      const avg = sumAction(raw.video_avg_time_watched_actions);
+      const spec = ad?.creative?.object_story_spec;
+      return {
+        adId: raw.ad_id ?? "",
+        name: raw.ad_name ?? ad?.name ?? raw.ad_id ?? "Untitled ad",
+        campaignName: raw.campaign_name ?? null,
+        status: ad?.effective_status ?? null,
+        thumbnailUrl: ad?.creative?.thumbnail_url ?? null,
+        permalink: ad?.preview_shareable_link ?? null,
+        body: ad?.creative?.body ?? spec?.link_data?.message ?? null,
+        isVideo: Boolean(ad?.creative?.video_id || spec?.video_data || views3s > 0),
+        spend: m.spend,
+        impressions: m.impressions,
+        reach: m.reach,
+        frequency: m.frequency,
+        clicks: m.clicks,
+        ctr: m.ctr,
+        cpc: m.cpc,
+        cpm: m.cpm,
+        purchases: m.purchases,
+        purchaseValue: m.purchaseValue,
+        roas: m.roas,
+        hookRate: m.impressions > 0 ? (views3s / m.impressions) * 100 : 0,
+        holdRate: views3s > 0 ? (thru / views3s) * 100 : 0,
+        videoViews3s: views3s,
+        thruPlays: thru,
+        avgWatchSeconds: avg,
+        retention: {
+          p25: views3s > 0 ? (p25 / views3s) * 100 : 0,
+          p50: views3s > 0 ? (p50 / views3s) * 100 : 0,
+          p75: views3s > 0 ? (p75 / views3s) * 100 : 0,
+          p100: views3s > 0 ? (p100 / views3s) * 100 : 0,
+        },
+      };
+    });
+
+    built.sort((a, b) => b.spend - a.spend);
+
+    return {
+      connected: true,
+      currency: acct.currency || "USD",
+      range,
+      rows: built,
+    };
+  } catch (error) {
+    return {
+      connected: false,
+      message: error instanceof Error ? error.message : "Meta insights unavailable",
+      currency: "USD",
+      range,
+      rows: [],
     };
   }
 }

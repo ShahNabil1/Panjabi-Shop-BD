@@ -118,3 +118,41 @@ export type CampaignPerformance = {
   rows: CampaignRow[];
   totals: MetaMetrics;
 };
+
+export type CreativeRow = {
+  adId: string;
+  name: string;
+  campaignName: string | null;
+  status: string | null;
+  thumbnailUrl: string | null;
+  permalink: string | null;
+  body: string | null;
+  isVideo: boolean;
+  spend: number;
+  impressions: number;
+  reach: number;
+  frequency: number;
+  clicks: number;
+  ctr: number;
+  cpc: number;
+  cpm: number;
+  purchases: number;
+  purchaseValue: number;
+  roas: number;
+  /** 3-second video views ÷ impressions (attention grabbed). */
+  hookRate: number;
+  /** ThruPlays ÷ 3-second views (attention held). */
+  holdRate: number;
+  videoViews3s: number;
+  thruPlays: number;
+  avgWatchSeconds: number;
+  retention: { p25: number; p50: number; p75: number; p100: number };
+};
+
+export type CreativePerformance = {
+  connected: boolean;
+  message?: string;
+  currency: string;
+  range: DateRange;
+  rows: CreativeRow[];
+};
