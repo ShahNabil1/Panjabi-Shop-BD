@@ -15,6 +15,7 @@ import {
   LogOut,
   Menu,
   MessageSquareText,
+  BarChart3,
   Megaphone,
 
   Package,
