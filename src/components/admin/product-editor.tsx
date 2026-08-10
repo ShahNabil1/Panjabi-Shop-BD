@@ -680,14 +680,17 @@ export function ProductEditor({ id, kind }: { id: string; kind: ProductKind }) {
                   variant="ghost"
                   className="rounded-lg text-muted-foreground hover:text-destructive"
                   onClick={() =>
-                    set(
-                      "images",
-                      draft.images.filter((_, j) => j !== i),
+                    void removeImage(img.url, () =>
+                      set(
+                        "images",
+                        draft.images.filter((_, j) => j !== i),
+                      ),
                     )
                   }
                 >
                   <Trash2 className="size-4" />
                 </Button>
+
               </div>
             ))}
           </div>
