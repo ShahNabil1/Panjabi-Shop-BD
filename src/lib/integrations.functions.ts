@@ -262,3 +262,55 @@ export const adminTestIntegration = createServerFn({ method: "POST" })
       return fail(error instanceof Error ? error.message : "Unknown error");
     }
   });
+
+export type R2MigrationState = {
+  pending: boolean;
+  from: { bucket: string; publicBaseUrl: string } | null;
+  to: { bucket: string; publicBaseUrl: string } | null;
+};
+
+/** Admin-only: is there an old bucket waiting to be migrated? */
+export const adminR2MigrationState = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<R2MigrationState> => {
+    await requireAdmin(context.supabase, context.userId);
+    const { readPreviousR2 } = await import("./r2-migration.server");
+    const { readR2Config } = await import("./r2.server");
+    const [prev, cur] = await Promise.all([readPreviousR2(), readR2Config()]);
+    return {
+      pending: Boolean(prev && cur),
+      from: prev ? { bucket: prev.bucket, publicBaseUrl: prev.publicBaseUrl } : null,
+      to: cur ? { bucket: cur.bucket, publicBaseUrl: cur.publicBaseUrl } : null,
+    };
+  });
+
+/** Admin-only: copies one page of objects from the old bucket to the new one. */
+export const adminR2MigrateBatch = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z.object({ token: z.string().nullable().default(null) }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    await requireAdmin(context.supabase, context.userId);
+    const { migrateBatch } = await import("./r2-migration.server");
+    return migrateBatch(data.token);
+  });
+
+/** Admin-only: rewrites every stored media link and closes the migration. */
+export const adminR2FinishMigration = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await requireAdmin(context.supabase, context.userId);
+    const { finishMigration } = await import("./r2-migration.server");
+    return finishMigration();
+  });
+
+/** Admin-only: forgets the old bucket without migrating anything. */
+export const adminR2DiscardMigration = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await requireAdmin(context.supabase, context.userId);
+    const { clearPreviousR2 } = await import("./r2-migration.server");
+    await clearPreviousR2();
+    return { ok: true };
+  });
