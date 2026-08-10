@@ -1,6 +1,6 @@
 import { useCallback, useRef, useState } from "react";
 import { toast } from "sonner";
-import { Crop as CropIcon, ImagePlus, Loader2, Trash2, Upload, X } from "lucide-react";
+import { Crop as CropIcon, ImagePlus, Loader2, Trash2, Upload } from "lucide-react";
 
 import { createUploadTicket, deleteUploadByUrl } from "@/lib/media.functions";
 import { ImageCropperDialog } from "@/components/admin/image-cropper";
