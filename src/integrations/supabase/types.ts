@@ -1590,6 +1590,10 @@ export type Database = {
         Returns: Json
       }
       promote_scheduled_orders: { Args: never; Returns: Json }
+      r2_rewrite_media_urls: {
+        Args: { new_base: string; old_base: string }
+        Returns: number
+      }
       validate_coupon: {
         Args: {
           _code: string
