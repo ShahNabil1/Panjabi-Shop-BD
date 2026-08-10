@@ -197,3 +197,49 @@ export async function probeMeta(cfg: MetaConfig): Promise<MetaProbe> {
     };
   }
 }
+
+/** Write call against the Graph API (status changes, budget updates). */
+export async function metaPost<T = unknown>(
+  cfg: MetaConfig,
+  path: string,
+  body: Record<string, string | number>,
+): Promise<T> {
+  const url = new URL(`https://graph.facebook.com/${cfg.version}/${path.replace(/^\//, "")}`);
+  const form = new URLSearchParams();
+  for (const [k, v] of Object.entries(body)) form.set(k, String(v));
+  form.set("access_token", cfg.accessToken);
+
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { "content-type": "application/x-www-form-urlencoded", accept: "application/json" },
+    body: form.toString(),
+  });
+  const text = await res.text();
+  let parsed: unknown = null;
+  try {
+    parsed = text ? JSON.parse(text) : null;
+  } catch {
+    /* non-JSON body */
+  }
+  if (!res.ok) {
+    const err = (
+      parsed as {
+        error?: {
+          message?: string;
+          error_user_msg?: string;
+          code?: number;
+          error_subcode?: number;
+          fbtrace_id?: string;
+        };
+      } | null
+    )?.error;
+    const bits = [
+      err?.error_user_msg || err?.message || `HTTP ${res.status}`,
+      err?.code !== undefined ? `code ${err.code}` : null,
+      err?.error_subcode ? `subcode ${err.error_subcode}` : null,
+      err?.fbtrace_id ? `trace ${err.fbtrace_id}` : null,
+    ].filter(Boolean);
+    throw new MetaApiError(`${path.split("?")[0]} → ${bits.join(" · ")}`, res.status, err?.code);
+  }
+  return parsed as T;
+}

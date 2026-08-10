@@ -201,3 +201,54 @@ export type AudienceHealth = {
   /** Warnings we generate ourselves from the payload above. */
   recommendations: { tone: "critical" | "warning" | "good"; text: string }[];
 };
+
+export const RULE_ACTIONS = ["pause", "scale", "reduce", "watch"] as const;
+export type RuleAction = (typeof RULE_ACTIONS)[number];
+
+export type ControlThresholds = {
+  /** Minimum spend before a rule is allowed to judge an entity. */
+  minSpend: number;
+  /** ROAS at or above this is a scaling candidate. */
+  scaleRoas: number;
+  /** ROAS below this (with enough spend) is a pause candidate. */
+  pauseRoas: number;
+  /** Budget change applied by the quick scale / reduce buttons, in %. */
+  budgetStep: number;
+};
+
+export const DEFAULT_THRESHOLDS: ControlThresholds = {
+  minSpend: 10,
+  scaleRoas: 2.5,
+  pauseRoas: 1,
+  budgetStep: 20,
+};
+
+export type ControlRow = {
+  id: string;
+  name: string;
+  level: CampaignLevel;
+  status: string | null;
+  effectiveStatus: string | null;
+  dailyBudget: number | null;
+  lifetimeBudget: number | null;
+  spend: number;
+  purchases: number;
+  purchaseValue: number;
+  roas: number;
+  costPerPurchase: number;
+  ctr: number;
+  frequency: number;
+  action: RuleAction;
+  reason: string;
+};
+
+export type ControlCenter = {
+  connected: boolean;
+  message?: string;
+  currency: string;
+  range: DateRange;
+  level: CampaignLevel;
+  thresholds: ControlThresholds;
+  rows: ControlRow[];
+  summary: { spend: number; revenue: number; roas: number; activeCount: number };
+};

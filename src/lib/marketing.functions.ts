@@ -5,18 +5,23 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { requireAdmin } from "./admin.server";
 import {
   CAMPAIGN_LEVELS,
+  DEFAULT_THRESHOLDS,
   MARKETING_PRESETS,
   type AudienceHealth,
   type CampaignPerformance,
+  type ControlCenter,
   type CreativePerformance,
   type MarketingOverview,
 } from "./marketing-shared";
 import {
   buildAudienceHealth,
   buildCampaignPerformance,
+  buildControlCenter,
   buildCreativePerformance,
   buildMarketingOverview,
   clearMarketingCache,
+  setDailyBudget,
+  setEntityStatus,
 } from "./marketing.server";
 
 const overviewSchema = z.object({
@@ -78,4 +83,57 @@ export const marketingAudiences = createServerFn({ method: "POST" })
     await requireAdmin(context.supabase, context.userId);
     if (data.refresh) clearMarketingCache();
     return buildAudienceHealth();
+  });
+
+const thresholdSchema = z.object({
+  minSpend: z.number().min(0).max(100000).default(DEFAULT_THRESHOLDS.minSpend),
+  scaleRoas: z.number().min(0).max(100).default(DEFAULT_THRESHOLDS.scaleRoas),
+  pauseRoas: z.number().min(0).max(100).default(DEFAULT_THRESHOLDS.pauseRoas),
+  budgetStep: z.number().min(1).max(200).default(DEFAULT_THRESHOLDS.budgetStep),
+});
+
+const controlSchema = z.object({
+  preset: z.enum(MARKETING_PRESETS).default("7d"),
+  level: z.enum(CAMPAIGN_LEVELS).default("campaign"),
+  thresholds: thresholdSchema.default(DEFAULT_THRESHOLDS),
+  refresh: z.boolean().optional(),
+});
+
+/** Admin-only: rule-scored campaign list for the control center. */
+export const marketingControl = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => controlSchema.parse(input ?? {}))
+  .handler(async ({ data, context }): Promise<ControlCenter> => {
+    await requireAdmin(context.supabase, context.userId);
+    if (data.refresh) clearMarketingCache();
+    return buildControlCenter(data.preset, data.level, data.thresholds);
+  });
+
+const statusSchema = z.object({
+  id: z.string().min(1).max(64),
+  status: z.enum(["ACTIVE", "PAUSED"]),
+});
+
+/** Admin-only: pause or resume a Meta campaign / ad set / ad. */
+export const marketingSetStatus = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => statusSchema.parse(input))
+  .handler(async ({ data, context }) => {
+    await requireAdmin(context.supabase, context.userId);
+    return setEntityStatus(data.id, data.status);
+  });
+
+const budgetSchema = z.object({
+  id: z.string().min(1).max(64),
+  amount: z.number().positive().max(1_000_000),
+  level: z.enum(CAMPAIGN_LEVELS).default("campaign"),
+});
+
+/** Admin-only: update the daily budget of a campaign or ad set. */
+export const marketingSetBudget = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => budgetSchema.parse(input))
+  .handler(async ({ data, context }) => {
+    await requireAdmin(context.supabase, context.userId);
+    return setDailyBudget(data.id, data.amount, data.level);
   });
