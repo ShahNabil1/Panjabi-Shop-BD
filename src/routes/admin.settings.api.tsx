@@ -134,9 +134,12 @@ function GroupCard({
   return (
     <Panel className="space-y-4">
       <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h2 className="ig-text text-sm font-bold">{meta.title}</h2>
-          <p className="mt-1 text-xs text-muted-foreground">{meta.description}</p>
+        <div className="flex items-center gap-3">
+          <IntegrationMark group={group} />
+          <div>
+            <h2 className="text-base font-bold text-foreground">{meta.title}</h2>
+            <p className="text-xs text-muted-foreground">{meta.description}</p>
+          </div>
         </div>
         <span
           className={cn(
