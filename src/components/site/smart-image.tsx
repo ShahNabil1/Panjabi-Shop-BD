@@ -46,6 +46,7 @@ export function SmartImage({
   gravity = "auto",
   quality,
   priority = false,
+  sizes,
   className,
   style,
   onClick,
@@ -53,6 +54,7 @@ export function SmartImage({
 }: SmartImageProps) {
   const ref = useRef<HTMLImageElement>(null);
   const [width, setWidth] = useState(() => getCachedWidth(src) ?? bucketWidth(baseWidth));
+  const [cssWidth, setCssWidth] = useState<number | null>(null);
 
   useEffect(() => {
     setWidth((prev) => Math.max(prev, getCachedWidth(src) ?? 0));
@@ -64,6 +66,7 @@ export function SmartImage({
     const measure = () => {
       const css = el.clientWidth || el.parentElement?.clientWidth || 0;
       if (!css) return;
+      setCssWidth(css);
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
       const next = bucketWidth(css * dpr);
       setWidth((prev) => {
@@ -88,18 +91,28 @@ export function SmartImage({
     ...(quality ? { quality } : {}),
   });
 
+  /** Single fixed-width variant is served, so the hint mirrors the rendered box. */
+  const autoSizes = sizes ?? `${Math.round(cssWidth ?? baseWidth)}px`;
+
   return (
-    <img
-      ref={ref}
-      src={finalSrc}
-      alt={alt}
-      loading={priority ? "eager" : "lazy"}
-      decoding={priority ? "sync" : "async"}
-      fetchPriority={priority ? "high" : undefined}
-      onClick={onClick}
-      onError={onError}
-      style={style}
-      className={cn(className)}
-    />
+    <>
+      {priority ? (
+        <link rel="preload" as="image" href={finalSrc} fetchPriority="high" />
+      ) : null}
+      <img
+        ref={ref}
+        src={finalSrc}
+        alt={alt}
+        sizes={autoSizes}
+        loading={priority ? "eager" : "lazy"}
+        decoding={priority ? "sync" : "async"}
+        fetchPriority={priority ? "high" : "auto"}
+        onClick={onClick}
+        onError={onError}
+        style={style}
+        className={cn(className)}
+      />
+    </>
   );
+
 }
