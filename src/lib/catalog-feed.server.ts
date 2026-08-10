@@ -33,6 +33,14 @@ export type FeedItem = {
   quantity: number;
   variantLabel: string | null;
   kind: "single" | "combo" | "component";
+  categoryName: string;
+  categorySlug: string | null;
+  subcategoryName: string | null;
+  subcategorySlug: string | null;
+  categoryLink: string | null;
+  promotionSlugs: string[];
+  /** ISO window of the running offer, e.g. "2026-08-01T00:00+06:00/2026-08-10T00:00+06:00". */
+  salePriceEffectiveDate: string | null;
 };
 
 type RawVariant = {
@@ -64,8 +72,8 @@ type RawProduct = {
   sku: string | null;
   brand: string | null;
   is_active: boolean;
-  categories: { name_en: string; name_bn: string } | null;
-  subcategories: { name_en: string } | null;
+  categories: { slug: string; name_en: string; name_bn: string } | null;
+  subcategories: { slug: string; name_en: string; name_bn: string } | null;
   product_images: Array<{ url: string; sort_order: number }> | null;
   product_variants: RawVariant[] | null;
 };
@@ -94,7 +102,7 @@ export async function fetchCatalogFeed(): Promise<FeedItem[]> {
       .select(
         `id, slug, kind, name_bn, name_en, short_description_bn, short_description_en,
          description_bn, description_en, price, compare_at_price, stock, sku, brand, is_active,
-         categories(name_en, name_bn), subcategories(name_en),
+         categories(slug, name_en, name_bn), subcategories(slug, name_en, name_bn),
          product_images(url, sort_order),
          product_variants(id, group_name_bn, group_name_en, value_bn, value_en, sku, price_delta, stock, sort_order, is_active)`,
       )
@@ -102,6 +110,33 @@ export async function fetchCatalogFeed(): Promise<FeedItem[]> {
       .order("sort_order"),
     db.from("combo_items").select("combo_id, item_id, sort_order"),
   ]);
+
+  // Offer/promotion membership → feed labels + sale window (storefront reads the
+  // same rows on /offers, so catalogue and site never disagree).
+  const { data: promoRows } = await db
+    .from("promotions")
+    .select("slug, starts_at, ends_at, is_active, promotion_products(product_id)")
+    .eq("is_active", true);
+
+  const nowMs = Date.now();
+  const promoBySlug = new Map<string, { starts_at: string | null; ends_at: string | null }>();
+  const promosOf = new Map<string, string[]>();
+  for (const promo of (promoRows ?? []) as Array<{
+    slug: string;
+    starts_at: string | null;
+    ends_at: string | null;
+    promotion_products: Array<{ product_id: string }> | null;
+  }>) {
+    const started = !promo.starts_at || new Date(promo.starts_at).getTime() <= nowMs;
+    const ended = promo.ends_at ? new Date(promo.ends_at).getTime() < nowMs : false;
+    if (!started || ended) continue;
+    promoBySlug.set(promo.slug, { starts_at: promo.starts_at, ends_at: promo.ends_at });
+    for (const link of promo.promotion_products ?? []) {
+      const list = promosOf.get(link.product_id) ?? [];
+      list.push(promo.slug);
+      promosOf.set(link.product_id, list);
+    }
+  }
 
   const products = (productRows ?? []) as unknown as RawProduct[];
   const bySlug = new Map(products.map((p) => [p.id, p]));
@@ -134,9 +169,23 @@ export async function fetchCatalogFeed(): Promise<FeedItem[]> {
       clean(p.description_en) ||
       clean(p.name_bn);
 
-    const productType = [p.categories?.name_en, p.subcategories?.name_en]
-      .filter(Boolean)
-      .join(" > ");
+    // Components inherit their combo's taxonomy so every feed row is browsable.
+    const taxonomy = p.categories ? p : landing;
+    const categorySlug = taxonomy.categories?.slug ?? null;
+    const subcategorySlug = taxonomy.subcategories?.slug ?? null;
+    const categoryName = taxonomy.categories?.name_en || taxonomy.categories?.name_bn || "Gifts";
+    const subcategoryName = taxonomy.subcategories?.name_en || null;
+    const productType = [categoryName, subcategoryName].filter(Boolean).join(" > ");
+    const categoryLink = categorySlug
+      ? `${SITE_URL}/c/${categorySlug}${subcategorySlug ? `/${subcategorySlug}` : ""}`
+      : null;
+
+    const promotionSlugs = promosOf.get(p.id) ?? promosOf.get(landing.id) ?? [];
+    const window = promotionSlugs.map((s) => promoBySlug.get(s)).find(Boolean);
+    const salePriceEffectiveDate =
+      window && (window.starts_at || window.ends_at)
+        ? `${window.starts_at ?? new Date().toISOString()}/${window.ends_at ?? "2099-12-31T23:59:59Z"}`
+        : null;
 
     const listPrice = num(p.compare_at_price);
     const brand = p.brand || "Upoharkabbo";
@@ -175,6 +224,13 @@ export async function fetchCatalogFeed(): Promise<FeedItem[]> {
         quantity: Math.max(0, row.stock),
         variantLabel: row.variantLabel,
         kind: p.kind,
+        categoryName,
+        categorySlug,
+        subcategoryName,
+        subcategorySlug,
+        categoryLink,
+        promotionSlugs,
+        salePriceEffectiveDate,
       });
     };
 
