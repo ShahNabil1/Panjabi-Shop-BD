@@ -44,8 +44,10 @@ import {
 } from "@/lib/integrations.functions";
 import {
   
-  INTEGRATION_GROUPS,
+  PLATFORM_GROUPS,
+  TRACKING_GROUPS,
   integrationMeta,
+
   type IntegrationGroup,
 } from "@/lib/integrations-shared";
 import { cn } from "@/lib/utils";
