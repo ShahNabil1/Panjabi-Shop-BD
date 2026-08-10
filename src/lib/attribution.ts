@@ -10,31 +10,31 @@
 
 export type Attribution = {
   /** utm_source / utm_medium / … */
-  utm_source?: string;
-  utm_medium?: string;
-  utm_campaign?: string;
-  utm_content?: string;
-  utm_term?: string;
+  utm_source?: string | undefined;
+  utm_medium?: string | undefined;
+  utm_campaign?: string | undefined;
+  utm_content?: string | undefined;
+  utm_term?: string | undefined;
   /** Meta dynamic-URL parameters ({{campaign.id}} etc.) */
-  campaign_id?: string;
-  adset_id?: string;
-  ad_id?: string;
-  campaign_name?: string;
-  adset_name?: string;
-  ad_name?: string;
-  placement?: string;
-  site_source_name?: string;
+  campaign_id?: string | undefined;
+  adset_id?: string | undefined;
+  ad_id?: string | undefined;
+  campaign_name?: string | undefined;
+  adset_name?: string | undefined;
+  ad_name?: string | undefined;
+  placement?: string | undefined;
+  site_source_name?: string | undefined;
   /** Click identifiers */
-  fbclid?: string;
-  fbc?: string;
-  fbp?: string;
-  ttclid?: string;
-  gclid?: string;
+  fbclid?: string | undefined;
+  fbc?: string | undefined;
+  fbp?: string | undefined;
+  ttclid?: string | undefined;
+  gclid?: string | undefined;
   /** Context */
-  referrer?: string;
-  landing_page?: string;
-  channel?: string;
-  captured_at?: string;
+  referrer?: string | undefined;
+  landing_page?: string | undefined;
+  channel?: string | undefined;
+  captured_at?: string | undefined;
 };
 
 export type AttributionPayload = {
