@@ -61,6 +61,7 @@ import { Route as CCategoryIndexRouteImport } from './routes/c.$category.index'
 import { Route as CCategorySubcategoryRouteImport } from './routes/c.$category.$subcategory'
 import { Route as ApiPublicCourierProviderRouteImport } from './routes/api/public/courier.$provider'
 import { Route as ApiPublicHooksCleanupOldLogsRouteImport } from './routes/api/public/hooks/cleanup-old-logs'
+import { Route as ApiPublicHooksMarketingAutomationRouteImport } from './routes/api/public/hooks/marketing-automation'
 import { Route as ApiPublicHooksSteadfastPaymentsRouteImport } from './routes/api/public/hooks/steadfast-payments'
 
 const IndexRoute = IndexRouteImport.update({
@@ -327,6 +328,12 @@ const ApiPublicHooksCleanupOldLogsRoute =
     path: '/api/public/hooks/cleanup-old-logs',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksMarketingAutomationRoute =
+  ApiPublicHooksMarketingAutomationRouteImport.update({
+    id: '/api/public/hooks/marketing-automation',
+    path: '/api/public/hooks/marketing-automation',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksSteadfastPaymentsRoute =
   ApiPublicHooksSteadfastPaymentsRouteImport.update({
     id: '/api/public/hooks/steadfast-payments',
@@ -387,6 +394,7 @@ export interface FileRoutesByFullPath {
   '/c/$category/': typeof CCategoryIndexRoute
   '/api/public/courier/$provider': typeof ApiPublicCourierProviderRoute
   '/api/public/hooks/cleanup-old-logs': typeof ApiPublicHooksCleanupOldLogsRoute
+  '/api/public/hooks/marketing-automation': typeof ApiPublicHooksMarketingAutomationRoute
   '/api/public/hooks/steadfast-payments': typeof ApiPublicHooksSteadfastPaymentsRoute
 }
 export interface FileRoutesByTo {
@@ -441,6 +449,7 @@ export interface FileRoutesByTo {
   '/c/$category': typeof CCategoryIndexRoute
   '/api/public/courier/$provider': typeof ApiPublicCourierProviderRoute
   '/api/public/hooks/cleanup-old-logs': typeof ApiPublicHooksCleanupOldLogsRoute
+  '/api/public/hooks/marketing-automation': typeof ApiPublicHooksMarketingAutomationRoute
   '/api/public/hooks/steadfast-payments': typeof ApiPublicHooksSteadfastPaymentsRoute
 }
 export interface FileRoutesById {
@@ -497,6 +506,7 @@ export interface FileRoutesById {
   '/c/$category/': typeof CCategoryIndexRoute
   '/api/public/courier/$provider': typeof ApiPublicCourierProviderRoute
   '/api/public/hooks/cleanup-old-logs': typeof ApiPublicHooksCleanupOldLogsRoute
+  '/api/public/hooks/marketing-automation': typeof ApiPublicHooksMarketingAutomationRoute
   '/api/public/hooks/steadfast-payments': typeof ApiPublicHooksSteadfastPaymentsRoute
 }
 export interface FileRouteTypes {
@@ -554,6 +564,7 @@ export interface FileRouteTypes {
     | '/c/$category/'
     | '/api/public/courier/$provider'
     | '/api/public/hooks/cleanup-old-logs'
+    | '/api/public/hooks/marketing-automation'
     | '/api/public/hooks/steadfast-payments'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -608,6 +619,7 @@ export interface FileRouteTypes {
     | '/c/$category'
     | '/api/public/courier/$provider'
     | '/api/public/hooks/cleanup-old-logs'
+    | '/api/public/hooks/marketing-automation'
     | '/api/public/hooks/steadfast-payments'
   id:
     | '__root__'
@@ -663,6 +675,7 @@ export interface FileRouteTypes {
     | '/c/$category/'
     | '/api/public/courier/$provider'
     | '/api/public/hooks/cleanup-old-logs'
+    | '/api/public/hooks/marketing-automation'
     | '/api/public/hooks/steadfast-payments'
   fileRoutesById: FileRoutesById
 }
@@ -691,6 +704,7 @@ export interface RootRouteChildren {
   CCategoryIndexRoute: typeof CCategoryIndexRoute
   ApiPublicCourierProviderRoute: typeof ApiPublicCourierProviderRoute
   ApiPublicHooksCleanupOldLogsRoute: typeof ApiPublicHooksCleanupOldLogsRoute
+  ApiPublicHooksMarketingAutomationRoute: typeof ApiPublicHooksMarketingAutomationRoute
   ApiPublicHooksSteadfastPaymentsRoute: typeof ApiPublicHooksSteadfastPaymentsRoute
 }
 
@@ -1060,6 +1074,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksCleanupOldLogsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/marketing-automation': {
+      id: '/api/public/hooks/marketing-automation'
+      path: '/api/public/hooks/marketing-automation'
+      fullPath: '/api/public/hooks/marketing-automation'
+      preLoaderRoute: typeof ApiPublicHooksMarketingAutomationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/steadfast-payments': {
       id: '/api/public/hooks/steadfast-payments'
       path: '/api/public/hooks/steadfast-payments'
@@ -1159,6 +1180,8 @@ const rootRouteChildren: RootRouteChildren = {
   CCategoryIndexRoute: CCategoryIndexRoute,
   ApiPublicCourierProviderRoute: ApiPublicCourierProviderRoute,
   ApiPublicHooksCleanupOldLogsRoute: ApiPublicHooksCleanupOldLogsRoute,
+  ApiPublicHooksMarketingAutomationRoute:
+    ApiPublicHooksMarketingAutomationRoute,
   ApiPublicHooksSteadfastPaymentsRoute: ApiPublicHooksSteadfastPaymentsRoute,
 }
 export const routeTree = rootRouteImport
