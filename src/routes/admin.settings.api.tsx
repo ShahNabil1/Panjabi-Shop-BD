@@ -2,10 +2,31 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { ArrowRightLeft, CheckCircle2, Loader2, PlugZap, Trash2, XCircle } from "lucide-react";
+import {
+  ArrowRightLeft,
+  CheckCircle2,
+  Loader2,
+  Lock,
+  Pencil,
+  PlugZap,
+  Trash2,
+  TriangleAlert,
+  XCircle,
+} from "lucide-react";
 
 import { AdminHeading, Panel, TextField } from "@/components/admin/kit";
 import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+
 import {
   adminListIntegrations,
   adminR2DiscardMigration,
