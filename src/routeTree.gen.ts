@@ -37,6 +37,7 @@ import { Route as OrderOrderNumberRouteImport } from './routes/order.$orderNumbe
 import { Route as PProductRouteImport } from './routes/p.$product'
 import { Route as AdminCombosIndexRouteImport } from './routes/admin.combos.index'
 import { Route as AdminCombosIdRouteImport } from './routes/admin.combos.$id'
+import { Route as AdminMarketingIndexRouteImport } from './routes/admin.marketing.index'
 import { Route as AdminOrdersIndexRouteImport } from './routes/admin.orders.index'
 import { Route as AdminOrdersIdRouteImport } from './routes/admin.orders.$id'
 import { Route as AdminOrdersCreateRouteImport } from './routes/admin.orders.create'
@@ -197,6 +198,11 @@ const AdminCombosIdRoute = AdminCombosIdRouteImport.update({
   path: '/combos/$id',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminMarketingIndexRoute = AdminMarketingIndexRouteImport.update({
+  id: '/marketing/',
+  path: '/marketing/',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminOrdersIndexRoute = AdminOrdersIndexRouteImport.update({
   id: '/orders/',
   path: '/orders/',
@@ -337,6 +343,7 @@ export interface FileRoutesByFullPath {
   '/admin/sub-products/$id': typeof AdminSubProductsIdRoute
   '/c/$category/$subcategory': typeof CCategorySubcategoryRoute
   '/admin/combos/': typeof AdminCombosIndexRoute
+  '/admin/marketing/': typeof AdminMarketingIndexRoute
   '/admin/orders/': typeof AdminOrdersIndexRoute
   '/admin/products/': typeof AdminProductsIndexRoute
   '/admin/settings/': typeof AdminSettingsIndexRoute
@@ -385,6 +392,7 @@ export interface FileRoutesByTo {
   '/admin/sub-products/$id': typeof AdminSubProductsIdRoute
   '/c/$category/$subcategory': typeof CCategorySubcategoryRoute
   '/admin/combos': typeof AdminCombosIndexRoute
+  '/admin/marketing': typeof AdminMarketingIndexRoute
   '/admin/orders': typeof AdminOrdersIndexRoute
   '/admin/products': typeof AdminProductsIndexRoute
   '/admin/settings': typeof AdminSettingsIndexRoute
@@ -435,6 +443,7 @@ export interface FileRoutesById {
   '/admin/sub-products/$id': typeof AdminSubProductsIdRoute
   '/c/$category/$subcategory': typeof CCategorySubcategoryRoute
   '/admin/combos/': typeof AdminCombosIndexRoute
+  '/admin/marketing/': typeof AdminMarketingIndexRoute
   '/admin/orders/': typeof AdminOrdersIndexRoute
   '/admin/products/': typeof AdminProductsIndexRoute
   '/admin/settings/': typeof AdminSettingsIndexRoute
@@ -486,6 +495,7 @@ export interface FileRouteTypes {
     | '/admin/sub-products/$id'
     | '/c/$category/$subcategory'
     | '/admin/combos/'
+    | '/admin/marketing/'
     | '/admin/orders/'
     | '/admin/products/'
     | '/admin/settings/'
@@ -534,6 +544,7 @@ export interface FileRouteTypes {
     | '/admin/sub-products/$id'
     | '/c/$category/$subcategory'
     | '/admin/combos'
+    | '/admin/marketing'
     | '/admin/orders'
     | '/admin/products'
     | '/admin/settings'
@@ -583,6 +594,7 @@ export interface FileRouteTypes {
     | '/admin/sub-products/$id'
     | '/c/$category/$subcategory'
     | '/admin/combos/'
+    | '/admin/marketing/'
     | '/admin/orders/'
     | '/admin/products/'
     | '/admin/settings/'
@@ -819,6 +831,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminCombosIdRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/marketing/': {
+      id: '/admin/marketing/'
+      path: '/marketing'
+      fullPath: '/admin/marketing/'
+      preLoaderRoute: typeof AdminMarketingIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/orders/': {
       id: '/admin/orders/'
       path: '/orders'
@@ -974,6 +993,7 @@ interface AdminRouteChildren {
   AdminSettingsSmsTemplatesRoute: typeof AdminSettingsSmsTemplatesRoute
   AdminSubProductsIdRoute: typeof AdminSubProductsIdRoute
   AdminCombosIndexRoute: typeof AdminCombosIndexRoute
+  AdminMarketingIndexRoute: typeof AdminMarketingIndexRoute
   AdminOrdersIndexRoute: typeof AdminOrdersIndexRoute
   AdminProductsIndexRoute: typeof AdminProductsIndexRoute
   AdminSettingsIndexRoute: typeof AdminSettingsIndexRoute
@@ -999,6 +1019,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminSettingsSmsTemplatesRoute: AdminSettingsSmsTemplatesRoute,
   AdminSubProductsIdRoute: AdminSubProductsIdRoute,
   AdminCombosIndexRoute: AdminCombosIndexRoute,
+  AdminMarketingIndexRoute: AdminMarketingIndexRoute,
   AdminOrdersIndexRoute: AdminOrdersIndexRoute,
   AdminProductsIndexRoute: AdminProductsIndexRoute,
   AdminSettingsIndexRoute: AdminSettingsIndexRoute,
