@@ -30,7 +30,12 @@ import {
   TextField,
   ToggleField,
 } from "@/components/admin/kit";
-import { CropExistingButton, ImageUploadButton } from "@/components/admin/image-upload";
+import {
+  CropExistingButton,
+  ImageUploadButton,
+  useImageRemover,
+} from "@/components/admin/image-upload";
+
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
