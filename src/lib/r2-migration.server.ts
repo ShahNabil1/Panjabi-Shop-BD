@@ -123,30 +123,32 @@ async function collectKeys(from: R2Config): Promise<KeyRef[]> {
     let page = 0;
     while (true) {
       const cols = `${urlCol}${keyCol ? `, ${keyCol}` : ""}`;
-      const { data, error } = await (db.from(table) as unknown as {
+      const builder = db.from(table) as unknown as {
         select: (columns: string) => {
           not: (column: string, operator: string, value: null) => {
             like: (column: string, pattern: string) => {
-              range: (from: number, to: number) => Promise<{
-                data: Record<string, string | null>[] | null;
-                error: { message: string } | null;
-              }>;
+              range: (from: number, to: number) => Promise<unknown>;
             };
           };
         };
-      })
+      };
+      const res = (await builder
         .select(cols)
         .not(urlCol, "is", null)
         .like(urlCol, `${prefix}%`)
-        .range(page * 1000, (page + 1) * 1000 - 1);
+        .range(page * 1000, (page + 1) * 1000 - 1)) as {
+        data: Record<string, string | null>[] | null;
+        error: { message: string } | null;
+      };
 
-      if (error) {
+      if (res.error) {
         // Non-fatal: log and continue so one broken table does not block the rest.
-        console.warn(`[r2-migration] could not read ${table}.${urlCol}:`, error.message);
+        console.warn(`[r2-migration] could not read ${table}.${urlCol}:`, res.error.message);
         break;
       }
 
-      if (!data?.length) break;
+      const data = res.data ?? [];
+      if (!data.length) break;
 
       for (const row of data) {
         const url = row[urlCol];
@@ -166,26 +168,28 @@ async function collectKeys(from: R2Config): Promise<KeyRef[]> {
   {
     let page = 0;
     while (true) {
-      const { data, error } = await (db.from("landing_pages") as unknown as {
+      const builder = db.from("landing_pages") as unknown as {
         select: (columns: string) => {
           filter: (column: string, operator: string, value: string) => {
-            range: (from: number, to: number) => Promise<{
-              data: { content: unknown }[] | null;
-              error: { message: string } | null;
-            }>;
+            range: (from: number, to: number) => Promise<unknown>;
           };
         };
-      })
+      };
+      const res = (await builder
         .select("content")
         .filter("content::text", "like", `%${prefix}%`)
-        .range(page * 1000, (page + 1) * 1000 - 1);
+        .range(page * 1000, (page + 1) * 1000 - 1)) as {
+        data: { content: unknown }[] | null;
+        error: { message: string } | null;
+      };
 
-      if (error) {
-        console.warn("[r2-migration] could not read landing_pages.content:", error.message);
+      if (res.error) {
+        console.warn("[r2-migration] could not read landing_pages.content:", res.error.message);
         break;
       }
 
-      if (!data?.length) break;
+      const data = res.data ?? [];
+      if (!data.length) break;
 
       const urlPattern = new RegExp(
         `${escapeRegExp(prefix)}([^"'\\s<>|{}\\\\^\`\[\]]+)`,
