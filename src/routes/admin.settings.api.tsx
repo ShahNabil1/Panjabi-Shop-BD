@@ -133,8 +133,9 @@ function GroupCard({
               value={values[field.key] ?? ""}
               placeholder={field.placeholder ?? (field.secret ? "Paste the value" : "")}
               onChange={(v: string) => setValues((prev) => ({ ...prev, [field.key]: v }))}
-              hint={field.hint}
+              {...(field.hint ? { hint: field.hint } : {})}
             />
+
           </div>
         ))}
       </div>
