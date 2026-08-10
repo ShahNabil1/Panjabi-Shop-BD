@@ -28,9 +28,9 @@ type Obj = Record<string, unknown>;
 
 function readRetention(value: unknown): { days: number; enabled: boolean; lastRun: string | null } {
   const v = (value ?? {}) as Obj;
-  const days = typeof v["days"] === "number" ? v["days"] : 90;
+  const days = typeof v["days"] === "number" ? v["days"] : 45;
   return {
-    days: Number.isFinite(days) ? days : 90,
+    days: Number.isFinite(days) ? days : 45,
     enabled: v["enabled"] !== false,
     lastRun: typeof v["last_run"] === "string" ? v["last_run"] : null,
   };

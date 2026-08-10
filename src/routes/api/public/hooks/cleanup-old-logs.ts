@@ -29,8 +29,8 @@ export const Route = createFileRoute("/api/public/hooks/cleanup-old-logs")({
           return Response.json({ success: true, message: "Cleanup disabled" });
         }
 
-        const days = Number(value["days"] ?? 90);
-        const safeDays = Number.isFinite(days) && days > 0 ? Math.min(days, 730) : 90;
+        const days = Number(value["days"] ?? 45);
+        const safeDays = Number.isFinite(days) && days > 0 ? Math.min(days, 730) : 45;
 
         const { data, error } = await supabaseAdmin.rpc("cleanup_old_order_logs", {
           _retention_days: safeDays,
