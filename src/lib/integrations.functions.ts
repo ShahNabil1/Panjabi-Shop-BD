@@ -348,3 +348,104 @@ export const adminR2DiscardMigration = createServerFn({ method: "POST" })
     await clearPreviousR2();
     return { ok: true };
   });
+
+export type ImageTransformUsage = {
+  /** Unique transformations counted for the current calendar month. */
+  count: number | null;
+  /** Free-plan allowance. */
+  limit: number;
+  /** Which Cloudflare dataset answered. */
+  source: "account-unique" | "zone-requests" | null;
+  periodStart: string;
+  checkedAt: string;
+  message: string;
+  configured: boolean;
+};
+
+/** Admin-only: live Cloudflare image transformation usage for this month. */
+export const adminImageTransformUsage = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<ImageTransformUsage> => {
+    await requireAdmin(context.supabase, context.userId);
+    const { getIntegrationValues } = await import("./integration-secrets.server");
+    const values = await getIntegrationValues();
+    const token = values["CLOUDFLARE_ANALYTICS_API_TOKEN"];
+    const accountId = values["R2_ACCOUNT_ID"];
+    const now = new Date();
+    const periodStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1)).toISOString();
+    const base: ImageTransformUsage = {
+      count: null,
+      limit: 5000,
+      source: null,
+      periodStart,
+      checkedAt: now.toISOString(),
+      message: "",
+      configured: Boolean(token),
+    };
+    if (!token) return { ...base, message: "Add the Analytics API Token to see usage." };
+
+    const gql = async (query: string, variables: Record<string, unknown>) => {
+      const res = await fetch("https://api.cloudflare.com/client/v4/graphql", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}`, "content-type": "application/json" },
+        body: JSON.stringify({ query, variables }),
+      });
+      return (await res.json()) as {
+        data?: { viewer?: Record<string, unknown[]> };
+        errors?: { message: string }[];
+      };
+    };
+
+    const sum = (rows: unknown): number =>
+      Array.isArray(rows)
+        ? rows.reduce((acc: number, row) => acc + Number((row as { count?: number })?.count ?? 0), 0)
+        : 0;
+
+    try {
+      if (accountId) {
+        const out = await gql(
+          `query($acct:String!,$start:Date!){viewer{accounts(filter:{accountTag:$acct}){imagesUniqueTransformationsAdaptiveGroups(filter:{date_geq:$start},limit:10000){count}}}}`,
+          { acct: accountId, start: periodStart.slice(0, 10) },
+        );
+        const acct = (out.data?.viewer?.["accounts"] ?? [])[0] as
+          | { imagesUniqueTransformationsAdaptiveGroups?: unknown }
+          | undefined;
+        if (acct?.imagesUniqueTransformationsAdaptiveGroups) {
+          return {
+            ...base,
+            count: sum(acct.imagesUniqueTransformationsAdaptiveGroups),
+            source: "account-unique",
+            message: "Unique transformations this month",
+          };
+        }
+      }
+
+      // Fallback: zone-level resizing requests (token is zone-scoped).
+      const zoneRes = await fetch(
+        "https://api.cloudflare.com/client/v4/zones?name=upoharkabbo.com",
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+      const zoneJson = (await zoneRes.json()) as { result?: { id: string }[] };
+      const zoneTag = zoneJson.result?.[0]?.id;
+      if (!zoneTag) return { ...base, message: "Token cannot read this zone's analytics." };
+
+      const out = await gql(
+        `query($zone:String!,$start:Time!){viewer{zones(filter:{zoneTag:$zone}){imageResizingRequests1mGroups(filter:{datetime_geq:$start},limit:10000){count}}}}`,
+        { zone: zoneTag, start: periodStart },
+      );
+      const zone = (out.data?.viewer?.["zones"] ?? [])[0] as
+        | { imageResizingRequests1mGroups?: unknown }
+        | undefined;
+      if (!zone?.imageResizingRequests1mGroups) {
+        return { ...base, message: out.errors?.[0]?.message ?? "No analytics returned." };
+      }
+      return {
+        ...base,
+        count: sum(zone.imageResizingRequests1mGroups),
+        source: "zone-requests",
+        message: "Transformation requests this month",
+      };
+    } catch (error) {
+      return { ...base, message: error instanceof Error ? error.message : "Analytics call failed" };
+    }
+  });
