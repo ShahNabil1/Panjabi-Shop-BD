@@ -165,15 +165,18 @@ function AdminOrderDetail() {
     if (!id) return;
     void claim(takeover === 1);
     const beat = setInterval(() => {
-      if (ownsRef.current) void adminHeartbeatOrder({ data: { id } });
+      // Presence is best-effort: after sign-out these calls 401, which must
+      // not surface as an unhandled rejection (blank screen).
+      if (ownsRef.current) void adminHeartbeatOrder({ data: { id } }).catch(() => {});
     }, 25_000);
     return () => {
       clearInterval(beat);
-      if (ownsRef.current) void adminReleaseOrder({ data: { id } });
+      if (ownsRef.current) void adminReleaseOrder({ data: { id } }).catch(() => {});
       ownsRef.current = false;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
+
 
   // Someone else claimed the order while we were inside it.
   useEffect(() => {
