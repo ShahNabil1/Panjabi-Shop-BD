@@ -90,6 +90,8 @@ export type R2MigrateBatchResult = {
   /** Total number of unique referenced objects to migrate. */
   total: number;
   lastKey: string | null;
+  /** Set when the old bucket cannot be read at all — migration is impossible. */
+  blocked: string | null;
 };
 
 type KeyRef = { key: string; sourceUrl: string };
@@ -230,13 +232,22 @@ export async function migrateBatch(offset = 0): Promise<R2MigrateBatchResult> {
     const { probeObjectRead } = await import("./r2.server");
     const probe = await probeObjectRead(from, firstRef.key);
     if (!probe.ok && (probe.status === 403 || probe.status === 401)) {
-      throw new Error(
-        `Cannot read the old bucket "${from.bucket}" (${probe.status} ${probe.message}). ` +
+      return {
+        copied: 0,
+        skipped: 0,
+        failed: 0,
+        errors: [],
+        nextOffset: null,
+        total,
+        lastKey: null,
+        blocked:
+          `Cannot read the old bucket "${from.bucket}" (${probe.status} ${probe.message}). ` +
           "The saved old R2 credentials lack GetObject permission, so files cannot be copied. " +
-          "Fix the old bucket's API token, or press “Skip migration” to forget it.",
-      );
+          "Fix the old bucket's API token, or press “Skip” to forget it.",
+      };
     }
   }
+
 
   let copied = 0;
   let skipped = 0;
@@ -268,6 +279,7 @@ export async function migrateBatch(offset = 0): Promise<R2MigrateBatchResult> {
     nextOffset: nextOffset < total ? nextOffset : null,
     total,
     lastKey: batch.at(-1)?.key ?? null,
+    blocked: null,
   };
 }
 

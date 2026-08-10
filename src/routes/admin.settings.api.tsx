@@ -327,6 +327,7 @@ function R2MigrationCard() {
   });
   const [running, setRunning] = useState(false);
   const [log, setLog] = useState<string[]>([]);
+  const [blocked, setBlocked] = useState<string | null>(null);
   const [progress, setProgress] = useState({ copied: 0, skipped: 0, failed: 0 });
 
   if (!state.data?.pending || !state.data.from || !state.data.to) return null;
@@ -335,6 +336,7 @@ function R2MigrationCard() {
   const run = async () => {
     setRunning(true);
     setLog([]);
+    setBlocked(null);
     setProgress({ copied: 0, skipped: 0, failed: 0 });
     let offset = 0;
     let copied = 0;
@@ -347,6 +349,11 @@ function R2MigrationCard() {
         const res: Awaited<ReturnType<typeof adminR2MigrateBatch>> = await adminR2MigrateBatch({
           data: { offset },
         });
+        if (res.blocked) {
+          setBlocked(res.blocked);
+          toast.error("Old bucket is not readable");
+          return;
+        }
         copied += res.copied;
         skipped += res.skipped;
         failed += res.failed;
@@ -411,6 +418,14 @@ function R2MigrationCard() {
           <dd className="ig-text truncate font-semibold">{to.publicBaseUrl}</dd>
         </div>
       </dl>
+
+      {blocked ? (
+        <p className="rounded-xl border border-destructive/30 bg-destructive/10 px-3 py-2 text-xs font-medium text-destructive">
+          {blocked}
+        </p>
+      ) : null}
+
+
 
       <div className="flex flex-wrap items-center gap-2">
         <Button type="button" disabled={running} onClick={run}>
