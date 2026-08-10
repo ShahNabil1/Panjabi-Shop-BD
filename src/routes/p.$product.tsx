@@ -154,7 +154,9 @@ function ProductPage() {
     ),
   );
   const lightbox = useLightbox();
-  const galleryImages = images.map((img) => ({
+  const galleryImages = images
+    .filter((img) => Boolean(img.url))
+    .map((img) => ({
     src: img.url,
     alt: pick(lang, img.alt_bn, img.alt_en) || pick(lang, product.nameBn, product.nameEn),
   }));
@@ -215,7 +217,11 @@ function ProductPage() {
                 src={images[active]?.url ?? null}
                 alt={pick(lang, images[active]?.alt_bn, images[active]?.alt_en) || name}
                 label={name}
-                onClick={() => lightbox.open(galleryImages, active)}
+                onClick={
+                  images[active]?.url
+                    ? () => lightbox.open(galleryImages, active)
+                    : undefined
+                }
               />
             </div>
             {images.length > 1 ? (
