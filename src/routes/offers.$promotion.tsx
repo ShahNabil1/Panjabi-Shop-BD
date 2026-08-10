@@ -1,3 +1,4 @@
+import { SmartImage } from "@/components/site/smart-image";
 import { createFileRoute, notFound } from "@tanstack/react-router";
 
 import { getPromotionPage } from "@/lib/catalog.functions";
@@ -59,9 +60,10 @@ function PromotionPage() {
       {subtitle ? <p className="mt-2 text-sm text-muted-foreground">{subtitle}</p> : null}
 
       {promotion.bannerUrl ? (
-        <img
+        <SmartImage
           src={promotion.bannerUrl}
           alt={title}
+          baseWidth={1200}
           className="mt-5 aspect-16/6 w-full rounded-lg border border-border object-cover"
         />
       ) : null}

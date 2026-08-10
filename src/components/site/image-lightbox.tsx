@@ -1,3 +1,4 @@
+import { cdnImage } from "@/lib/cdn-image";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
@@ -197,7 +198,7 @@ export function ImageLightbox({
           <div className="relative overflow-hidden rounded-xl bg-card shadow-2xl ring-1 ring-border/40">
             <img
               key={current.src}
-              src={current.src}
+              src={cdnImage(current.src, { width: 1600, fit: "contain", quality: 88 })}
               alt={current.alt || ""}
               onClick={toggleZoom}
               className={cn(
