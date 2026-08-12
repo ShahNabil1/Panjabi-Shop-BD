@@ -185,3 +185,72 @@ export type PackagingRow = {
 
 export const money = (n: number) =>
   `৳ ${Math.round(n).toLocaleString("en-US")}`;
+
+/* ------------------------- reporting ------------------------- */
+
+export const reportQuerySchema = z.object({
+  days: z.coerce.number().int().min(7).max(365).default(30),
+});
+
+export type ValuationBucket = {
+  units: number;
+  cost: number;
+  retail: number;
+  skus: number;
+};
+
+export type InventoryReport = {
+  days: number;
+  generatedAt: string;
+  valuation: {
+    product: ValuationBucket;
+    packaging: ValuationBucket;
+    outOfStock: number;
+    lowStock: number;
+  };
+  flow: {
+    purchaseQty: number;
+    purchaseValue: number;
+    soldQty: number;
+    cogs: number;
+    returnQty: number;
+    returnValue: number;
+    writeOffQty: number;
+    writeOffValue: number;
+    packagingQty: number;
+    packagingValue: number;
+    adjustNetQty: number;
+  };
+  topMovers: Array<{
+    key: string;
+    name: string;
+    variantLabel: string | null;
+    sku: string;
+    qty: number;
+    cogs: number;
+    onHand: number;
+    daysCover: number | null;
+  }>;
+  deadStock: Array<{
+    key: string;
+    name: string;
+    variantLabel: string | null;
+    sku: string;
+    onHand: number;
+    costValue: number;
+    lastMovementAt: string | null;
+    idleDays: number | null;
+  }>;
+  reorderPlan: Array<{
+    key: string;
+    name: string;
+    variantLabel: string | null;
+    sku: string;
+    kind: "product" | "packaging";
+    onHand: number;
+    reorderPoint: number;
+    suggestQty: number;
+    estimatedCost: number;
+    daysCover: number | null;
+  }>;
+};

@@ -17,8 +17,10 @@ import {
   packagingSchema,
   receiveSchema,
   reorderSchema,
+  reportQuerySchema,
   supplierSchema,
   type BatchRow,
+  type InventoryReport,
   type InventoryRow,
   type LedgerRow,
   type PackagingRow,
@@ -412,4 +414,14 @@ export const syncComboStock = createServerFn({ method: "POST" })
       await db.from("products").update({ stock: Math.max(c.buildable, 0) }).eq("id", c.id);
     }
     return { synced: rows.length };
+  });
+
+/** Period report: valuation, COGS, movers, dead stock, reorder plan. */
+export const inventoryReport = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => reportQuerySchema.parse(input ?? {}))
+  .handler(async ({ data, context }): Promise<InventoryReport> => {
+    const db = await requireAdmin(context.supabase, context.userId);
+    const { buildInventoryReport } = await import("./inventory-report.server");
+    return buildInventoryReport(db, data.days);
   });
