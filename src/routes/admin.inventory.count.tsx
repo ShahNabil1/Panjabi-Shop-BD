@@ -78,7 +78,7 @@ function CountList({
     <div className="space-y-5">
       <AdminHeading
         title="Stock audit"
-        description="ফিজিক্যাল কাউন্ট শিট খুলুন, গোনা সংখ্যা বসান — পোস্ট করলেই পার্থক্য লেজারে কারেকশন হিসেবে যাবে।"
+        description="Open a physical count sheet, enter the counted numbers — posting sends the difference to the ledger as a correction."
       />
 
       <Panel className="space-y-3">
@@ -117,7 +117,7 @@ function CountList({
         {isLoading ? (
           <p className="py-10 text-center text-xs text-muted-foreground">Loading…</p>
         ) : rows.length === 0 ? (
-          <EmptyState title="No stock count yet" hint="উপরের ফর্ম থেকে প্রথম অডিট শুরু করুন।" />
+          <EmptyState title="No stock count yet" hint="Start your first audit from the form above." />
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full min-w-[760px] text-sm">
@@ -241,12 +241,12 @@ function CountSheet({ id, onBack }: { id: string; onBack: () => void }) {
 
       <AdminHeading
         title={head?.name ?? "Count sheet"}
-        description="প্রতিটি আইটেমের গোনা সংখ্যা লিখুন — ফাঁকা রাখলে সেই আইটেম পোস্টে বাদ যাবে।"
+        description="Enter the counted quantity for each item — leaving it blank excludes that item from the post."
       />
 
       {head ? (
         <div className="grid gap-3 sm:grid-cols-4">
-          <StatCard label="Items" value={`${head.countedCount}/${head.lineCount}`} tip="কতগুলো লাইনে গোনা সংখ্যা বসেছে।" />
+          <StatCard label="Items" value={`${head.countedCount}/${head.lineCount}`} tip="Number of lines with a counted quantity entered." />
           <StatCard
             label="Variance units"
             value={`${head.varianceUnits > 0 ? "+" : ""}${head.varianceUnits}`}
@@ -299,7 +299,7 @@ function CountSheet({ id, onBack }: { id: string; onBack: () => void }) {
         {isLoading ? (
           <p className="py-10 text-center text-xs text-muted-foreground">Loading sheet…</p>
         ) : lines.length === 0 ? (
-          <EmptyState title="No line in this view" hint="সার্চ বা ফিল্টার বদলে দেখুন।" />
+          <EmptyState title="No line in this view" hint="Try changing the search or filter." />
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full min-w-[780px] text-sm">

@@ -85,25 +85,25 @@ function LiveInventory() {
     <div className="space-y-5">
       <AdminHeading
         title="Live inventory"
-        description="রিড-অনলি ভিউ — সার্চ করুন SKU বা নাম দিয়ে, ভ্যালু দেখুন কেনা ও বিক্রির দামে।"
+        description="Read-only view — search by SKU or name, see value at cost and retail price."
       />
 
       <div className="grid gap-3 sm:grid-cols-3">
         <StatCard
           label="Units in view"
           value={totals.units.toLocaleString("en-US")}
-          tip="বর্তমান ফিল্টার ও সার্চে যতগুলো পিস স্টকে আছে।"
+          tip="Units in stock for the current filter and search."
         />
         <StatCard
           label="Value at cost"
           value={money(totals.cost)}
-          tip="ওয়েটেড অ্যাভারেজ কেনা দামে হিসাব করা মূল্য।"
+          tip="Value calculated at weighted average purchase cost."
         />
         <StatCard
           label="Value at retail"
           value={money(totals.retail)}
           tone="good"
-          tip="আজকের সেলিং প্রাইসে হিসাব করা সম্ভাব্য বিক্রয়মূল্য।"
+          tip="Potential sale value calculated at today's selling price."
         />
       </div>
 
@@ -141,7 +141,7 @@ function LiveInventory() {
         ) : visible.length === 0 ? (
           <EmptyState
             title="No item matches this view"
-            hint="সার্চ বা ফিল্টার বদলে দেখুন, অথবা নতুন ইনভেন্টরি যোগ করুন।"
+            hint="Try changing the search or filter, or add new inventory."
           />
         ) : (
           <div className="overflow-x-auto">
@@ -157,7 +157,7 @@ function LiveInventory() {
                   <th className="px-2 py-2 text-right font-semibold">
                     <span className="inline-flex items-center gap-1">
                       Reorder
-                      <InfoTip text="রি-অর্ডার পয়েন্টে নামলে ড্যাশবোর্ডে অ্যালার্ট আসবে। কোয়ান্টিটি = সাজেস্টেড অর্ডার সাইজ।" />
+                      <InfoTip text="An alert appears on the dashboard when stock drops to the reorder point. Quantity = suggested order size." />
                     </span>
                   </th>
                 </tr>
