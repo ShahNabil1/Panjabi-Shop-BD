@@ -1821,6 +1821,125 @@ export type Database = {
         }
         Relationships: []
       }
+      stock_count_lines: {
+        Row: {
+          count_id: string
+          counted_qty: number | null
+          created_at: string
+          id: string
+          item_name: string
+          note: string | null
+          packaging_id: string | null
+          product_id: string | null
+          sku: string | null
+          system_qty: number
+          unit_cost: number
+          updated_at: string
+          variant_id: string | null
+        }
+        Insert: {
+          count_id: string
+          counted_qty?: number | null
+          created_at?: string
+          id?: string
+          item_name?: string
+          note?: string | null
+          packaging_id?: string | null
+          product_id?: string | null
+          sku?: string | null
+          system_qty?: number
+          unit_cost?: number
+          updated_at?: string
+          variant_id?: string | null
+        }
+        Update: {
+          count_id?: string
+          counted_qty?: number | null
+          created_at?: string
+          id?: string
+          item_name?: string
+          note?: string | null
+          packaging_id?: string | null
+          product_id?: string | null
+          sku?: string | null
+          system_qty?: number
+          unit_cost?: number
+          updated_at?: string
+          variant_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stock_count_lines_count_id_fkey"
+            columns: ["count_id"]
+            isOneToOne: false
+            referencedRelation: "stock_counts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stock_count_lines_packaging_id_fkey"
+            columns: ["packaging_id"]
+            isOneToOne: false
+            referencedRelation: "packaging_materials"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stock_count_lines_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stock_count_lines_variant_id_fkey"
+            columns: ["variant_id"]
+            isOneToOne: false
+            referencedRelation: "product_variants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      stock_counts: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          created_by_name: string | null
+          id: string
+          name: string
+          note: string | null
+          posted_at: string | null
+          posted_by: string | null
+          posted_by_name: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          created_by_name?: string | null
+          id?: string
+          name: string
+          note?: string | null
+          posted_at?: string | null
+          posted_by?: string | null
+          posted_by_name?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          created_by_name?: string | null
+          id?: string
+          name?: string
+          note?: string | null
+          posted_at?: string | null
+          posted_by?: string | null
+          posted_by_name?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       stock_ledger: {
         Row: {
           actor_id: string | null

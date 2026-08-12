@@ -26,6 +26,7 @@ import {
   Package,
   PackagePlus,
   Warehouse,
+  ClipboardCheck,
   ClipboardList,
   AlertOctagon,
   Scale,
@@ -108,6 +109,7 @@ const sections: Array<{ title: string; items: NavItem[] }> = [
       { to: "/admin/inventory/rto", label: "RTO Inspection", icon: Undo2 },
       { to: "/admin/inventory/reconcile", label: "Reconciliation", icon: Scale },
       { to: "/admin/inventory/adjust", label: "Loss & Damage", icon: AlertOctagon },
+      { to: "/admin/inventory/count", label: "Stock Audit", icon: ClipboardCheck },
       { to: "/admin/inventory/reports", label: "Reports", icon: BarChart3 },
 
       { to: "/admin/inventory/suppliers", label: "Suppliers & Packaging", icon: Boxes },
