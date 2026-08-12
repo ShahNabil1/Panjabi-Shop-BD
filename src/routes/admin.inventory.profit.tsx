@@ -204,8 +204,8 @@ function ProfitAndLoss() {
                   >
                     <div className="min-w-0">
                       <Link
-                        to="/admin/orders/$orderId"
-                        params={{ orderId: r.id }}
+                        to="/admin/orders/$id"
+                        params={{ id: r.id }}
                         className="font-en truncate text-sm font-semibold hover:text-primary"
                       >
                         {r.orderNumber}
@@ -266,8 +266,8 @@ function ProfitAndLoss() {
                         <tr key={r.id} className="border-b border-border/60 hover:bg-accent/50">
                           <td className="px-2 py-2.5">
                             <Link
-                              to="/admin/orders/$orderId"
-                              params={{ orderId: r.id }}
+                              to="/admin/orders/$id"
+                              params={{ id: r.id }}
                               className="font-en font-semibold hover:text-primary"
                             >
                               {r.orderNumber}
