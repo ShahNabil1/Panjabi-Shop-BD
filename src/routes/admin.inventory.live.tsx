@@ -98,9 +98,9 @@ function LiveInventory() {
         <Panel className="space-y-2">
           <p className="text-sm font-semibold">No SKU is tracked yet</p>
           <p className="text-xs text-muted-foreground">
-            Inventory starts empty until your catalog is registered in the ledger. Click{" "}
-            <strong>Import catalog stock</strong> once — every product, variant and packaging item
-            is added, and existing catalog stock is posted as opening balance.
+            Inventory starts empty until your products are registered in the ledger. Click{" "}
+            <strong>Sync products from database</strong> once — every product, variant and packaging
+            item from your product tables is added, and its current stock is posted as opening balance.
           </p>
         </Panel>
       ) : null}
