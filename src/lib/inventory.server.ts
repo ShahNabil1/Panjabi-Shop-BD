@@ -163,6 +163,8 @@ export type ComboAvailability = {
     buildable: number;
     isFree: boolean;
     bottleneck: boolean;
+    /** Variant-level SKUs of this sub-product with their own stock. */
+    variants: Array<{ id: string; sku: string | null; label: string; onHand: number }>;
   }>;
 };
 
