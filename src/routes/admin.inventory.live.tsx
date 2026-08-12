@@ -90,7 +90,20 @@ function LiveInventory() {
         accent="sky"
         title="Live inventory"
         description="Read-only view — search by SKU or name, see value at cost and retail price."
+        action={<ImportCatalogStockButton />}
       />
+
+      {!isLoading && rows.length === 0 ? (
+        <Panel className="space-y-2">
+          <p className="text-sm font-semibold">No SKU is tracked yet</p>
+          <p className="text-xs text-muted-foreground">
+            Inventory starts empty until your catalog is registered in the ledger. Click{" "}
+            <strong>Import catalog stock</strong> once — every product, variant and packaging item
+            is added, and existing catalog stock is posted as opening balance.
+          </p>
+        </Panel>
+      ) : null}
+
 
       <div className="grid gap-3 sm:grid-cols-3">
         <StatCard
