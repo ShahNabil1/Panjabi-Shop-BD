@@ -19,6 +19,7 @@ import {
   StatusPill,
   TipTitle,
 } from "@/components/admin/kit";
+import { ModuleHero } from "@/components/admin/module-hero";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
@@ -144,7 +145,10 @@ function ReconcilePage() {
 
   return (
     <div className="space-y-5">
-      <AdminHeading
+      <ModuleHero
+        eyebrow="Inventory · Settlement"
+        icon={Scale}
+        accent="emerald"
         title="Partial Delivery Reconciliation"
         description="For partially delivered parcels, reconcile which items the customer kept, what was returned, and how much the courier paid."
         backTo="/admin/inventory"

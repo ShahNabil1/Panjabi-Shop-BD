@@ -1,4 +1,6 @@
 import type { LucideIcon } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
@@ -76,6 +78,8 @@ export function ModuleHero({
   accent = "indigo",
   action,
   meta,
+  backTo,
+  backLabel = "Back",
   className,
 }: {
   eyebrow?: string;
@@ -85,6 +89,8 @@ export function ModuleHero({
   accent?: HeroAccent;
   action?: ReactNode;
   meta?: ReactNode;
+  backTo?: string;
+  backLabel?: string;
   className?: string;
 }) {
   const a = accents[accent];
@@ -111,6 +117,15 @@ export function ModuleHero({
             </span>
           ) : null}
           <div className="min-w-0">
+            {backTo ? (
+              <Link
+                to={backTo}
+                className="mb-2 inline-flex items-center gap-1.5 rounded-full border border-border bg-background/70 px-2.5 py-1 text-[11px] font-semibold text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground"
+              >
+                <ArrowLeft className="size-3" />
+                {backLabel}
+              </Link>
+            ) : null}
             {eyebrow ? (
               <p className="font-en text-[10px] font-bold uppercase tracking-[0.16em] text-muted-foreground">
                 {eyebrow}

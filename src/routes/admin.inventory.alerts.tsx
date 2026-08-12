@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Download, RefreshCw } from "lucide-react";
+import { BellRing, Download, RefreshCw } from "lucide-react";
 
 import { stockAlerts } from "@/lib/stock-alert.functions";
 import { money } from "@/lib/inventory.shared";
@@ -11,7 +11,8 @@ import {
   type AlertKind,
   type AlertSeverity,
 } from "@/lib/stock-alert.shared";
-import { AdminHeading, EmptyState, InfoTip, Panel, StatCard } from "@/components/admin/kit";
+import { EmptyState, InfoTip, Panel, StatCard } from "@/components/admin/kit";
+import { ModuleHero } from "@/components/admin/module-hero";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/admin/inventory/alerts")({
@@ -87,7 +88,10 @@ function StockAlertsPage() {
 
   return (
     <div className="space-y-5">
-      <AdminHeading
+      <ModuleHero
+        eyebrow="Inventory · Health"
+        icon={BellRing}
+        accent="amber"
         title="Stock alerts"
         description="Stock-outs, reorders, negative stock, unbuilt combos, dead stock and late POs — all in one place, sorted by priority."
       />

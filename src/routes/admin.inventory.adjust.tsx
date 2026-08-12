@@ -7,7 +7,8 @@ import { AlertOctagon, RotateCcw } from "lucide-react";
 import { adjustStock, inventoryMovements, reverseMovement } from "@/lib/inventory.functions";
 import { money, movementLabels, type WriteOffType } from "@/lib/inventory.shared";
 import { ItemPicker, type PickableItem } from "@/components/admin/inventory/item-picker";
-import { AdminHeading, EmptyState, InfoTip, Panel, TipTitle } from "@/components/admin/kit";
+import { EmptyState, InfoTip, Panel, TipTitle } from "@/components/admin/kit";
+import { ModuleHero } from "@/components/admin/module-hero";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -118,7 +119,10 @@ function AdjustInventory() {
 
   return (
     <div className="space-y-5">
-      <AdminHeading
+      <ModuleHero
+        eyebrow="Inventory · Adjustments"
+        icon={AlertOctagon}
+        accent="rose"
         title="Loss, damage & corrections"
         description="Write off damaged, lost or expired stock — or correct a counting error."
         backTo="/admin/inventory"

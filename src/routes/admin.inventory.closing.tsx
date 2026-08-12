@@ -1,13 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Lock, RotateCcw } from "lucide-react";
+import { CalendarCheck, Lock, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
 
 import { closePeriod, closingList, closingPreview, reopenPeriod } from "@/lib/closing.functions";
 import { recentPeriods } from "@/lib/closing.shared";
 import { money } from "@/lib/inventory.shared";
-import { AdminHeading, EmptyState, Panel, StatCard } from "@/components/admin/kit";
+import { EmptyState, Panel, StatCard } from "@/components/admin/kit";
+import { ModuleHero } from "@/components/admin/module-hero";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -71,7 +72,10 @@ function MonthlyClosing() {
 
   return (
     <div className="space-y-5">
-      <AdminHeading
+      <ModuleHero
+        eyebrow="Inventory · Finance"
+        icon={CalendarCheck}
+        accent="slate"
         title="Monthly closing"
         description="At month-end, calculate and lock opening/closing stock value, purchases, COGS, write-offs, packaging cost and supplier dues."
       />

@@ -11,7 +11,8 @@ import {
   saveSupplier,
 } from "@/lib/inventory.functions";
 import type { PackagingInput, SupplierInput } from "@/lib/inventory.shared";
-import { AdminHeading, EmptyState, Panel, TipTitle, ToggleField } from "@/components/admin/kit";
+import { EmptyState, Panel, TipTitle, ToggleField } from "@/components/admin/kit";
+import { ModuleHero } from "@/components/admin/module-hero";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -90,7 +91,10 @@ function SuppliersAndPackaging() {
 
   return (
     <div className="space-y-5">
-      <AdminHeading
+      <ModuleHero
+        eyebrow="Inventory · Partners"
+        icon={Truck}
+        accent="teal"
         title="Suppliers & packaging"
         description="Who you buy from and what packaging you use — both here."
         backTo="/admin/inventory"

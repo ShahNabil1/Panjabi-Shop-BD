@@ -1,11 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Download, TrendingDown, TrendingUp } from "lucide-react";
+import { BarChart3, Download, TrendingDown, TrendingUp } from "lucide-react";
 
 import { inventoryReport } from "@/lib/inventory.functions";
 import { money } from "@/lib/inventory.shared";
-import { AdminHeading, EmptyState, Panel, StatCard } from "@/components/admin/kit";
+import { EmptyState, Panel, StatCard } from "@/components/admin/kit";
+import { ModuleHero } from "@/components/admin/module-hero";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/admin/inventory/reports")({
@@ -46,7 +47,10 @@ function InventoryReports() {
 
   return (
     <div className="space-y-5">
-      <AdminHeading
+      <ModuleHero
+        eyebrow="Inventory · Analytics"
+        icon={BarChart3}
+        accent="sky"
         title="Inventory reports"
         description="COGS, write-offs, packaging cost, fast movers, dead stock and next purchase suggestions for a chosen period."
       />

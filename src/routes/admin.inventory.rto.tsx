@@ -15,6 +15,7 @@ import {
   StatusPill,
   TipTitle,
 } from "@/components/admin/kit";
+import { ModuleHero } from "@/components/admin/module-hero";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
@@ -146,7 +147,10 @@ function RtoInspection() {
 
   return (
     <div className="space-y-5">
-      <AdminHeading
+      <ModuleHero
+        eyebrow="Inventory · Returns"
+        icon={PackageX}
+        accent="violet"
         title="RTO Inspection"
         description="After opening a returned parcel, split each item into Good / Damaged / Missing — stock is restocked or written off accordingly."
         backTo="/admin/inventory"
