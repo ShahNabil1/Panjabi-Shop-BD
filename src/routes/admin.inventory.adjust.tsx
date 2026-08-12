@@ -257,7 +257,8 @@ function AdjustInventory() {
                           title: "Reverse this movement?",
                           description:
                             "একটি উল্টো এন্ট্রি যোগ হবে এবং স্টক আগের অবস্থায় ফিরে যাবে। মূল রেকর্ড মুছবে না।",
-                          confirmText: "Reverse",
+                          confirmLabel: "Reverse",
+                          tone: "brand",
                         });
                         if (ok) undo.mutate(m.id);
                       }}
