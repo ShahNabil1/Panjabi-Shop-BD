@@ -100,7 +100,7 @@ export const inventoryCatalogItems = createServerFn({ method: "GET" })
       await db
         .from("products")
         .select(
-          "id,name_en,name_bn,sku,price,kind,category_id,categories(name_en),product_variants(id,sku,group_name_en,value_en,price_delta,is_active)",
+          "id,name_en,name_bn,sku,price,kind,category_id,categories(name_en),product_images(url,sort_order),product_variants(id,sku,group_name_en,value_en,price_delta,is_active)",
         )
         .neq("kind", "combo")
         .order("name_en")
