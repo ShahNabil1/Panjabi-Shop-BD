@@ -38,6 +38,7 @@ import {
   Search as SearchIcon,
   Settings,
   Truck,
+  FileSpreadsheet,
   ShoppingCart,
   ListOrdered,
   Ticket,
@@ -103,6 +104,7 @@ const sections: Array<{ title: string; items: NavItem[] }> = [
     title: "Inventory",
     items: [
       { to: "/admin/inventory", label: "Dashboard", icon: Warehouse, exact: true },
+      { to: "/admin/inventory/purchase-orders", label: "Purchase Orders", icon: FileSpreadsheet },
       { to: "/admin/inventory/receive", label: "Add Inventory", icon: PackagePlus },
       { to: "/admin/inventory/live", label: "Live Inventory", icon: ClipboardList },
       { to: "/admin/inventory/combos", label: "Smart Combos", icon: Layers },
