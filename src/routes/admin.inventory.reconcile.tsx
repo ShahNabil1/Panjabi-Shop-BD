@@ -339,7 +339,8 @@ function ReconcilePage() {
                           label="Note"
                           value={note}
                           onChange={setNote}
-                          placeholder="কেন পার্থক্য হলো, কুরিয়ার কী বলেছে ইত্যাদি"
+                          rows={3}
+                          hint="কেন পার্থক্য হলো, কুরিয়ার কী বলেছে ইত্যাদি"
                         />
 
                         <div className="flex flex-wrap items-center justify-between gap-3">

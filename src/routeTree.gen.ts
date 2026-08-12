@@ -43,6 +43,7 @@ import { Route as AdminInventoryAdjustRouteImport } from './routes/admin.invento
 import { Route as AdminInventoryCombosRouteImport } from './routes/admin.inventory.combos'
 import { Route as AdminInventoryLiveRouteImport } from './routes/admin.inventory.live'
 import { Route as AdminInventoryReceiveRouteImport } from './routes/admin.inventory.receive'
+import { Route as AdminInventoryReconcileRouteImport } from './routes/admin.inventory.reconcile'
 import { Route as AdminInventoryRtoRouteImport } from './routes/admin.inventory.rto'
 import { Route as AdminInventorySuppliersRouteImport } from './routes/admin.inventory.suppliers'
 import { Route as AdminMarketingIndexRouteImport } from './routes/admin.marketing.index'
@@ -244,6 +245,11 @@ const AdminInventoryReceiveRoute = AdminInventoryReceiveRouteImport.update({
   path: '/inventory/receive',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminInventoryReconcileRoute = AdminInventoryReconcileRouteImport.update({
+  id: '/inventory/reconcile',
+  path: '/inventory/reconcile',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminInventoryRtoRoute = AdminInventoryRtoRouteImport.update({
   id: '/inventory/rto',
   path: '/inventory/rto',
@@ -435,6 +441,7 @@ export interface FileRoutesByFullPath {
   '/admin/inventory/combos': typeof AdminInventoryCombosRoute
   '/admin/inventory/live': typeof AdminInventoryLiveRoute
   '/admin/inventory/receive': typeof AdminInventoryReceiveRoute
+  '/admin/inventory/reconcile': typeof AdminInventoryReconcileRoute
   '/admin/inventory/rto': typeof AdminInventoryRtoRoute
   '/admin/inventory/suppliers': typeof AdminInventorySuppliersRoute
   '/admin/marketing/attribution': typeof AdminMarketingAttributionRoute
@@ -500,6 +507,7 @@ export interface FileRoutesByTo {
   '/admin/inventory/combos': typeof AdminInventoryCombosRoute
   '/admin/inventory/live': typeof AdminInventoryLiveRoute
   '/admin/inventory/receive': typeof AdminInventoryReceiveRoute
+  '/admin/inventory/reconcile': typeof AdminInventoryReconcileRoute
   '/admin/inventory/rto': typeof AdminInventoryRtoRoute
   '/admin/inventory/suppliers': typeof AdminInventorySuppliersRoute
   '/admin/marketing/attribution': typeof AdminMarketingAttributionRoute
@@ -567,6 +575,7 @@ export interface FileRoutesById {
   '/admin/inventory/combos': typeof AdminInventoryCombosRoute
   '/admin/inventory/live': typeof AdminInventoryLiveRoute
   '/admin/inventory/receive': typeof AdminInventoryReceiveRoute
+  '/admin/inventory/reconcile': typeof AdminInventoryReconcileRoute
   '/admin/inventory/rto': typeof AdminInventoryRtoRoute
   '/admin/inventory/suppliers': typeof AdminInventorySuppliersRoute
   '/admin/marketing/attribution': typeof AdminMarketingAttributionRoute
@@ -635,6 +644,7 @@ export interface FileRouteTypes {
     | '/admin/inventory/combos'
     | '/admin/inventory/live'
     | '/admin/inventory/receive'
+    | '/admin/inventory/reconcile'
     | '/admin/inventory/rto'
     | '/admin/inventory/suppliers'
     | '/admin/marketing/attribution'
@@ -700,6 +710,7 @@ export interface FileRouteTypes {
     | '/admin/inventory/combos'
     | '/admin/inventory/live'
     | '/admin/inventory/receive'
+    | '/admin/inventory/reconcile'
     | '/admin/inventory/rto'
     | '/admin/inventory/suppliers'
     | '/admin/marketing/attribution'
@@ -766,6 +777,7 @@ export interface FileRouteTypes {
     | '/admin/inventory/combos'
     | '/admin/inventory/live'
     | '/admin/inventory/receive'
+    | '/admin/inventory/reconcile'
     | '/admin/inventory/rto'
     | '/admin/inventory/suppliers'
     | '/admin/marketing/attribution'
@@ -1070,6 +1082,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminInventoryReceiveRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/inventory/reconcile': {
+      id: '/admin/inventory/reconcile'
+      path: '/inventory/reconcile'
+      fullPath: '/admin/inventory/reconcile'
+      preLoaderRoute: typeof AdminInventoryReconcileRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/inventory/rto': {
       id: '/admin/inventory/rto'
       path: '/inventory/rto'
@@ -1295,6 +1314,7 @@ interface AdminRouteChildren {
   AdminInventoryCombosRoute: typeof AdminInventoryCombosRoute
   AdminInventoryLiveRoute: typeof AdminInventoryLiveRoute
   AdminInventoryReceiveRoute: typeof AdminInventoryReceiveRoute
+  AdminInventoryReconcileRoute: typeof AdminInventoryReconcileRoute
   AdminInventoryRtoRoute: typeof AdminInventoryRtoRoute
   AdminInventorySuppliersRoute: typeof AdminInventorySuppliersRoute
   AdminMarketingAttributionRoute: typeof AdminMarketingAttributionRoute
@@ -1335,6 +1355,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminInventoryCombosRoute: AdminInventoryCombosRoute,
   AdminInventoryLiveRoute: AdminInventoryLiveRoute,
   AdminInventoryReceiveRoute: AdminInventoryReceiveRoute,
+  AdminInventoryReconcileRoute: AdminInventoryReconcileRoute,
   AdminInventoryRtoRoute: AdminInventoryRtoRoute,
   AdminInventorySuppliersRoute: AdminInventorySuppliersRoute,
   AdminMarketingAttributionRoute: AdminMarketingAttributionRoute,
