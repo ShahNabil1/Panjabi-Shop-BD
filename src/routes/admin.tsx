@@ -18,6 +18,7 @@ import {
   Menu,
   MessageSquareText,
   BarChart3,
+  BellRing,
   PiggyBank,
   Clapperboard,
   Users2,
@@ -105,6 +106,7 @@ const sections: Array<{ title: string; items: NavItem[] }> = [
     title: "Inventory",
     items: [
       { to: "/admin/inventory", label: "Dashboard", icon: Warehouse, exact: true },
+      { to: "/admin/inventory/alerts", label: "Stock Alerts", icon: BellRing },
       { to: "/admin/inventory/purchase-orders", label: "Purchase Orders", icon: FileSpreadsheet },
       { to: "/admin/inventory/receive", label: "Add Inventory", icon: PackagePlus },
       { to: "/admin/inventory/live", label: "Live Inventory", icon: ClipboardList },
