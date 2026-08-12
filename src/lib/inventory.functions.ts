@@ -390,3 +390,98 @@ export const reverseMovement = createServerFn({ method: "POST" })
     await syncCatalogStock(db, row["product_id"], row["variant_id"]);
     return { ok: true };
   });
+
+/* --------------------- smart combo availability -------------------- */
+
+export type ComboAvailability = {
+  id: string;
+  name: string;
+  sku: string | null;
+  price: number;
+  isActive: boolean;
+  buildable: number;
+  items: Array<{
+    id: string;
+    name: string;
+    sku: string | null;
+    perBox: number;
+    onHand: number;
+    buildable: number;
+    isFree: boolean;
+    bottleneck: boolean;
+  }>;
+};
+
+/**
+ * Combos hold no stock of their own — how many boxes can be built is decided
+ * by the scarcest sub-product inside the recipe.
+ */
+export const comboAvailability = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<ComboAvailability[]> => {
+    const db = await requireAdmin(context.supabase, context.userId);
+
+    const combos = unwrap(
+      await db
+        .from("products")
+        .select("id,name_en,name_bn,sku,price,is_active")
+        .eq("kind", "combo")
+        .order("name_en"),
+    ) as unknown as Array<Record<string, any>>;
+    if (combos.length === 0) return [];
+
+    const [bomRes, levelRes] = await Promise.all([
+      db
+        .from("combo_items")
+        .select("combo_id,item_id,quantity,is_free,products!combo_items_item_id_fkey(name_en,name_bn,sku)")
+        .in("combo_id", combos.map((c) => c["id"] as string)),
+      db.from("inventory_levels").select("product_id,qty_on_hand").not("product_id", "is", null),
+    ]);
+
+    const bom = (bomRes.data ?? []) as unknown as Array<Record<string, any>>;
+    const onHand = new Map<string, number>();
+    for (const r of (levelRes.data ?? []) as Array<{ product_id: string; qty_on_hand: number }>) {
+      onHand.set(r.product_id, (onHand.get(r.product_id) ?? 0) + Number(r.qty_on_hand ?? 0));
+    }
+
+    return combos.map((c) => {
+      const lines = bom.filter((b) => b["combo_id"] === c["id"]);
+      const items = lines.map((l) => {
+        const perBox = Math.max(Number(l["quantity"] ?? 1), 1);
+        const have = onHand.get(l["item_id"] as string) ?? 0;
+        return {
+          id: l["item_id"] as string,
+          name: String(l["products"]?.name_en || l["products"]?.name_bn || "Sub-product"),
+          sku: (l["products"]?.sku as string | null) ?? null,
+          perBox,
+          onHand: have,
+          buildable: Math.floor(have / perBox),
+          isFree: Boolean(l["is_free"]),
+          bottleneck: false,
+        };
+      });
+      const buildable = items.length === 0 ? 0 : Math.min(...items.map((i) => i.buildable));
+      for (const i of items) i.bottleneck = items.length > 0 && i.buildable === buildable;
+      return {
+        id: c["id"] as string,
+        name: String(c["name_en"] || c["name_bn"]),
+        sku: (c["sku"] as string | null) ?? null,
+        price: Number(c["price"] ?? 0),
+        isActive: Boolean(c["is_active"]),
+        buildable,
+        items,
+      };
+    });
+  });
+
+/** Mirrors combo buildable counts into `products.stock` so the shop stays honest. */
+export const syncComboStock = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const db = await requireAdmin(context.supabase, context.userId);
+    const rows = await comboAvailability();
+    for (const c of rows) {
+      await db.from("products").update({ stock: Math.max(c.buildable, 0) }).eq("id", c.id);
+    }
+    return { synced: rows.length };
+  });
