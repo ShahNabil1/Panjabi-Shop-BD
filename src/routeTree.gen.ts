@@ -38,6 +38,7 @@ import { Route as OrderOrderNumberRouteImport } from './routes/order.$orderNumbe
 import { Route as PProductRouteImport } from './routes/p.$product'
 import { Route as AdminCombosIndexRouteImport } from './routes/admin.combos.index'
 import { Route as AdminCombosIdRouteImport } from './routes/admin.combos.$id'
+import { Route as AdminInventoryIndexRouteImport } from './routes/admin.inventory.index'
 import { Route as AdminMarketingIndexRouteImport } from './routes/admin.marketing.index'
 import { Route as AdminMarketingAttributionRouteImport } from './routes/admin.marketing.attribution'
 import { Route as AdminMarketingAudiencesRouteImport } from './routes/admin.marketing.audiences'
@@ -210,6 +211,11 @@ const AdminCombosIndexRoute = AdminCombosIndexRouteImport.update({
 const AdminCombosIdRoute = AdminCombosIdRouteImport.update({
   id: '/combos/$id',
   path: '/combos/$id',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminInventoryIndexRoute = AdminInventoryIndexRouteImport.update({
+  id: '/inventory/',
+  path: '/inventory/',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminMarketingIndexRoute = AdminMarketingIndexRouteImport.update({
@@ -408,6 +414,7 @@ export interface FileRoutesByFullPath {
   '/admin/sub-products/$id': typeof AdminSubProductsIdRoute
   '/c/$category/$subcategory': typeof CCategorySubcategoryRoute
   '/admin/combos/': typeof AdminCombosIndexRoute
+  '/admin/inventory/': typeof AdminInventoryIndexRoute
   '/admin/marketing/': typeof AdminMarketingIndexRoute
   '/admin/orders/': typeof AdminOrdersIndexRoute
   '/admin/products/': typeof AdminProductsIndexRoute
@@ -466,6 +473,7 @@ export interface FileRoutesByTo {
   '/admin/sub-products/$id': typeof AdminSubProductsIdRoute
   '/c/$category/$subcategory': typeof CCategorySubcategoryRoute
   '/admin/combos': typeof AdminCombosIndexRoute
+  '/admin/inventory': typeof AdminInventoryIndexRoute
   '/admin/marketing': typeof AdminMarketingIndexRoute
   '/admin/orders': typeof AdminOrdersIndexRoute
   '/admin/products': typeof AdminProductsIndexRoute
@@ -526,6 +534,7 @@ export interface FileRoutesById {
   '/admin/sub-products/$id': typeof AdminSubProductsIdRoute
   '/c/$category/$subcategory': typeof CCategorySubcategoryRoute
   '/admin/combos/': typeof AdminCombosIndexRoute
+  '/admin/inventory/': typeof AdminInventoryIndexRoute
   '/admin/marketing/': typeof AdminMarketingIndexRoute
   '/admin/orders/': typeof AdminOrdersIndexRoute
   '/admin/products/': typeof AdminProductsIndexRoute
@@ -587,6 +596,7 @@ export interface FileRouteTypes {
     | '/admin/sub-products/$id'
     | '/c/$category/$subcategory'
     | '/admin/combos/'
+    | '/admin/inventory/'
     | '/admin/marketing/'
     | '/admin/orders/'
     | '/admin/products/'
@@ -645,6 +655,7 @@ export interface FileRouteTypes {
     | '/admin/sub-products/$id'
     | '/c/$category/$subcategory'
     | '/admin/combos'
+    | '/admin/inventory'
     | '/admin/marketing'
     | '/admin/orders'
     | '/admin/products'
@@ -704,6 +715,7 @@ export interface FileRouteTypes {
     | '/admin/sub-products/$id'
     | '/c/$category/$subcategory'
     | '/admin/combos/'
+    | '/admin/inventory/'
     | '/admin/marketing/'
     | '/admin/orders/'
     | '/admin/products/'
@@ -951,6 +963,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminCombosIdRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/inventory/': {
+      id: '/admin/inventory/'
+      path: '/inventory'
+      fullPath: '/admin/inventory/'
+      preLoaderRoute: typeof AdminInventoryIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/marketing/': {
       id: '/admin/marketing/'
       path: '/marketing'
@@ -1176,6 +1195,7 @@ interface AdminRouteChildren {
   AdminSettingsSmsTemplatesRoute: typeof AdminSettingsSmsTemplatesRoute
   AdminSubProductsIdRoute: typeof AdminSubProductsIdRoute
   AdminCombosIndexRoute: typeof AdminCombosIndexRoute
+  AdminInventoryIndexRoute: typeof AdminInventoryIndexRoute
   AdminMarketingIndexRoute: typeof AdminMarketingIndexRoute
   AdminOrdersIndexRoute: typeof AdminOrdersIndexRoute
   AdminProductsIndexRoute: typeof AdminProductsIndexRoute
@@ -1209,6 +1229,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminSettingsSmsTemplatesRoute: AdminSettingsSmsTemplatesRoute,
   AdminSubProductsIdRoute: AdminSubProductsIdRoute,
   AdminCombosIndexRoute: AdminCombosIndexRoute,
+  AdminInventoryIndexRoute: AdminInventoryIndexRoute,
   AdminMarketingIndexRoute: AdminMarketingIndexRoute,
   AdminOrdersIndexRoute: AdminOrdersIndexRoute,
   AdminProductsIndexRoute: AdminProductsIndexRoute,
@@ -1251,13 +1272,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
