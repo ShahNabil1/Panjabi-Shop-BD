@@ -50,14 +50,21 @@ export function ItemPicker({
   const results = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return items.slice(0, 25);
+    const score = (i: PickableItem) => {
+      const sku = i.sku.toLowerCase();
+      if (sku === q) return 0; // scanned barcode / exact SKU
+      if (sku.startsWith(q)) return 1;
+      if (sku.includes(q)) return 2;
+      if (i.label.toLowerCase().includes(q)) return 3;
+      if (i.category.toLowerCase().includes(q)) return 4;
+      return 99;
+    };
     return items
-      .filter(
-        (i) =>
-          i.label.toLowerCase().includes(q) ||
-          i.sku.toLowerCase().includes(q) ||
-          i.category.toLowerCase().includes(q),
-      )
-      .slice(0, 30);
+      .map((i) => ({ i, s: score(i) }))
+      .filter((r) => r.s < 99)
+      .sort((a, b) => a.s - b.s)
+      .slice(0, 30)
+      .map((r) => r.i);
   }, [items, query]);
 
   const pick = (item: PickableItem) => {
