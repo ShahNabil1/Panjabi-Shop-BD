@@ -245,6 +245,37 @@ export const adminUpdateOrderStatus = createServerFn({ method: "POST" })
       }
     }
 
+    // Inventory bridge: deduct stock on commitment, give it back on release.
+    if (before !== data.status) {
+      try {
+        const { applyOrderStock } = await import("./inventory-fulfilment.server");
+        const { data: onum } = await db
+          .from("orders")
+          .select("order_number")
+          .eq("id", data.id)
+          .maybeSingle();
+        const res = await applyOrderStock(db, data.id, data.status, {
+          actorName: who,
+          orderNumber: (onum as { order_number?: string } | null)?.order_number ?? null,
+        });
+        if (res.moved > 0) {
+          await logActivity(
+            db,
+            data.id,
+            "inventory",
+            res.direction === "out"
+              ? `Stock deducted for ${res.moved} item line(s)`
+              : `Stock returned for ${res.moved} item line(s)`,
+            { actor: who, meta: { direction: res.direction, lines: res.moved } },
+          );
+        }
+      } catch (err) {
+        await logActivity(db, data.id, "inventory", `Stock update failed — ${(err as Error).message}`, {
+          actor: who,
+        });
+      }
+    }
+
     // Server-side conversion fan-out (Meta CAPI · TikTok Events · GA4 MP).
     // Deduped per order+platform+event, and never allowed to break the update.
     if (before !== data.status) {

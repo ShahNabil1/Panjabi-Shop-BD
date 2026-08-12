@@ -297,6 +297,15 @@ export const adminRefreshCourierStatus = createServerFn({ method: "POST" })
         .eq("order_id", data.orderId)
         .eq("provider", provider);
 
+      if (mapped) {
+        try {
+          const { applyOrderStock } = await import("./inventory-fulfilment.server");
+          await applyOrderStock(db, data.orderId, mapped, { actorName: `${provider} sync` });
+        } catch {
+          // Inventory hiccups must never break a status refresh.
+        }
+      }
+
 
       return { ok: true, message: courierStatusLabels[status] ?? raw };
     } catch (error) {
@@ -564,6 +573,8 @@ export const adminCancelCarrybeeConsignment = createServerFn({ method: "POST" })
       try {
         const { dispatchOrderEvents } = await import("./tracking-dispatch.server");
         await dispatchOrderEvents(db, data.orderId, "cancelled");
+        const { applyOrderStock } = await import("./inventory-fulfilment.server");
+        await applyOrderStock(db, data.orderId, "cancelled", { actorName: who });
       } catch {
         // Tracking outages must not fail the cancellation.
       }

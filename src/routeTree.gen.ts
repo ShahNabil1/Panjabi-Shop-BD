@@ -40,6 +40,7 @@ import { Route as AdminCombosIndexRouteImport } from './routes/admin.combos.inde
 import { Route as AdminCombosIdRouteImport } from './routes/admin.combos.$id'
 import { Route as AdminInventoryIndexRouteImport } from './routes/admin.inventory.index'
 import { Route as AdminInventoryAdjustRouteImport } from './routes/admin.inventory.adjust'
+import { Route as AdminInventoryCombosRouteImport } from './routes/admin.inventory.combos'
 import { Route as AdminInventoryLiveRouteImport } from './routes/admin.inventory.live'
 import { Route as AdminInventoryReceiveRouteImport } from './routes/admin.inventory.receive'
 import { Route as AdminInventorySuppliersRouteImport } from './routes/admin.inventory.suppliers'
@@ -225,6 +226,11 @@ const AdminInventoryIndexRoute = AdminInventoryIndexRouteImport.update({
 const AdminInventoryAdjustRoute = AdminInventoryAdjustRouteImport.update({
   id: '/inventory/adjust',
   path: '/inventory/adjust',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminInventoryCombosRoute = AdminInventoryCombosRouteImport.update({
+  id: '/inventory/combos',
+  path: '/inventory/combos',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminInventoryLiveRoute = AdminInventoryLiveRouteImport.update({
@@ -420,6 +426,7 @@ export interface FileRoutesByFullPath {
   '/offers/': typeof OffersIndexRoute
   '/admin/combos/$id': typeof AdminCombosIdRoute
   '/admin/inventory/adjust': typeof AdminInventoryAdjustRoute
+  '/admin/inventory/combos': typeof AdminInventoryCombosRoute
   '/admin/inventory/live': typeof AdminInventoryLiveRoute
   '/admin/inventory/receive': typeof AdminInventoryReceiveRoute
   '/admin/inventory/suppliers': typeof AdminInventorySuppliersRoute
@@ -483,6 +490,7 @@ export interface FileRoutesByTo {
   '/offers': typeof OffersIndexRoute
   '/admin/combos/$id': typeof AdminCombosIdRoute
   '/admin/inventory/adjust': typeof AdminInventoryAdjustRoute
+  '/admin/inventory/combos': typeof AdminInventoryCombosRoute
   '/admin/inventory/live': typeof AdminInventoryLiveRoute
   '/admin/inventory/receive': typeof AdminInventoryReceiveRoute
   '/admin/inventory/suppliers': typeof AdminInventorySuppliersRoute
@@ -548,6 +556,7 @@ export interface FileRoutesById {
   '/offers/': typeof OffersIndexRoute
   '/admin/combos/$id': typeof AdminCombosIdRoute
   '/admin/inventory/adjust': typeof AdminInventoryAdjustRoute
+  '/admin/inventory/combos': typeof AdminInventoryCombosRoute
   '/admin/inventory/live': typeof AdminInventoryLiveRoute
   '/admin/inventory/receive': typeof AdminInventoryReceiveRoute
   '/admin/inventory/suppliers': typeof AdminInventorySuppliersRoute
@@ -614,6 +623,7 @@ export interface FileRouteTypes {
     | '/offers/'
     | '/admin/combos/$id'
     | '/admin/inventory/adjust'
+    | '/admin/inventory/combos'
     | '/admin/inventory/live'
     | '/admin/inventory/receive'
     | '/admin/inventory/suppliers'
@@ -677,6 +687,7 @@ export interface FileRouteTypes {
     | '/offers'
     | '/admin/combos/$id'
     | '/admin/inventory/adjust'
+    | '/admin/inventory/combos'
     | '/admin/inventory/live'
     | '/admin/inventory/receive'
     | '/admin/inventory/suppliers'
@@ -741,6 +752,7 @@ export interface FileRouteTypes {
     | '/offers/'
     | '/admin/combos/$id'
     | '/admin/inventory/adjust'
+    | '/admin/inventory/combos'
     | '/admin/inventory/live'
     | '/admin/inventory/receive'
     | '/admin/inventory/suppliers'
@@ -1025,6 +1037,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminInventoryAdjustRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/inventory/combos': {
+      id: '/admin/inventory/combos'
+      path: '/inventory/combos'
+      fullPath: '/admin/inventory/combos'
+      preLoaderRoute: typeof AdminInventoryCombosRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/inventory/live': {
       id: '/admin/inventory/live'
       path: '/inventory/live'
@@ -1254,6 +1273,7 @@ interface AdminRouteChildren {
   AdminIndexRoute: typeof AdminIndexRoute
   AdminCombosIdRoute: typeof AdminCombosIdRoute
   AdminInventoryAdjustRoute: typeof AdminInventoryAdjustRoute
+  AdminInventoryCombosRoute: typeof AdminInventoryCombosRoute
   AdminInventoryLiveRoute: typeof AdminInventoryLiveRoute
   AdminInventoryReceiveRoute: typeof AdminInventoryReceiveRoute
   AdminInventorySuppliersRoute: typeof AdminInventorySuppliersRoute
@@ -1292,6 +1312,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminIndexRoute: AdminIndexRoute,
   AdminCombosIdRoute: AdminCombosIdRoute,
   AdminInventoryAdjustRoute: AdminInventoryAdjustRoute,
+  AdminInventoryCombosRoute: AdminInventoryCombosRoute,
   AdminInventoryLiveRoute: AdminInventoryLiveRoute,
   AdminInventoryReceiveRoute: AdminInventoryReceiveRoute,
   AdminInventorySuppliersRoute: AdminInventorySuppliersRoute,
@@ -1356,3 +1377,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

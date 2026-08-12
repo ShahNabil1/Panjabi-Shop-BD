@@ -390,3 +390,26 @@ export const reverseMovement = createServerFn({ method: "POST" })
     await syncCatalogStock(db, row["product_id"], row["variant_id"]);
     return { ok: true };
   });
+
+/* --------------------- smart combo availability -------------------- */
+
+export const comboAvailability = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const db = await requireAdmin(context.supabase, context.userId);
+    const { computeComboAvailability } = await import("./inventory.server");
+    return computeComboAvailability(db);
+  });
+
+/** Mirrors combo buildable counts into `products.stock` so the shop stays honest. */
+export const syncComboStock = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const db = await requireAdmin(context.supabase, context.userId);
+    const { computeComboAvailability } = await import("./inventory.server");
+    const rows = await computeComboAvailability(db);
+    for (const c of rows) {
+      await db.from("products").update({ stock: Math.max(c.buildable, 0) }).eq("id", c.id);
+    }
+    return { synced: rows.length };
+  });
