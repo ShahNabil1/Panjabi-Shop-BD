@@ -39,6 +39,7 @@ import { Route as PProductRouteImport } from './routes/p.$product'
 import { Route as AdminCombosIndexRouteImport } from './routes/admin.combos.index'
 import { Route as AdminCombosIdRouteImport } from './routes/admin.combos.$id'
 import { Route as AdminInventoryIndexRouteImport } from './routes/admin.inventory.index'
+import { Route as AdminInventoryLiveRouteImport } from './routes/admin.inventory.live'
 import { Route as AdminMarketingIndexRouteImport } from './routes/admin.marketing.index'
 import { Route as AdminMarketingAttributionRouteImport } from './routes/admin.marketing.attribution'
 import { Route as AdminMarketingAudiencesRouteImport } from './routes/admin.marketing.audiences'
@@ -218,6 +219,11 @@ const AdminInventoryIndexRoute = AdminInventoryIndexRouteImport.update({
   path: '/inventory/',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminInventoryLiveRoute = AdminInventoryLiveRouteImport.update({
+  id: '/inventory/live',
+  path: '/inventory/live',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminMarketingIndexRoute = AdminMarketingIndexRouteImport.update({
   id: '/marketing/',
   path: '/marketing/',
@@ -395,6 +401,7 @@ export interface FileRoutesByFullPath {
   '/admin/': typeof AdminIndexRoute
   '/offers/': typeof OffersIndexRoute
   '/admin/combos/$id': typeof AdminCombosIdRoute
+  '/admin/inventory/live': typeof AdminInventoryLiveRoute
   '/admin/marketing/attribution': typeof AdminMarketingAttributionRoute
   '/admin/marketing/audiences': typeof AdminMarketingAudiencesRoute
   '/admin/marketing/automation': typeof AdminMarketingAutomationRoute
@@ -454,6 +461,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminIndexRoute
   '/offers': typeof OffersIndexRoute
   '/admin/combos/$id': typeof AdminCombosIdRoute
+  '/admin/inventory/live': typeof AdminInventoryLiveRoute
   '/admin/marketing/attribution': typeof AdminMarketingAttributionRoute
   '/admin/marketing/audiences': typeof AdminMarketingAudiencesRoute
   '/admin/marketing/automation': typeof AdminMarketingAutomationRoute
@@ -515,6 +523,7 @@ export interface FileRoutesById {
   '/admin/': typeof AdminIndexRoute
   '/offers/': typeof OffersIndexRoute
   '/admin/combos/$id': typeof AdminCombosIdRoute
+  '/admin/inventory/live': typeof AdminInventoryLiveRoute
   '/admin/marketing/attribution': typeof AdminMarketingAttributionRoute
   '/admin/marketing/audiences': typeof AdminMarketingAudiencesRoute
   '/admin/marketing/automation': typeof AdminMarketingAutomationRoute
@@ -577,6 +586,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/offers/'
     | '/admin/combos/$id'
+    | '/admin/inventory/live'
     | '/admin/marketing/attribution'
     | '/admin/marketing/audiences'
     | '/admin/marketing/automation'
@@ -636,6 +646,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/offers'
     | '/admin/combos/$id'
+    | '/admin/inventory/live'
     | '/admin/marketing/attribution'
     | '/admin/marketing/audiences'
     | '/admin/marketing/automation'
@@ -696,6 +707,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/offers/'
     | '/admin/combos/$id'
+    | '/admin/inventory/live'
     | '/admin/marketing/attribution'
     | '/admin/marketing/audiences'
     | '/admin/marketing/automation'
@@ -970,6 +982,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminInventoryIndexRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/inventory/live': {
+      id: '/admin/inventory/live'
+      path: '/inventory/live'
+      fullPath: '/admin/inventory/live'
+      preLoaderRoute: typeof AdminInventoryLiveRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/marketing/': {
       id: '/admin/marketing/'
       path: '/marketing'
@@ -1177,6 +1196,7 @@ interface AdminRouteChildren {
   AdminTaxonomyRoute: typeof AdminTaxonomyRoute
   AdminIndexRoute: typeof AdminIndexRoute
   AdminCombosIdRoute: typeof AdminCombosIdRoute
+  AdminInventoryLiveRoute: typeof AdminInventoryLiveRoute
   AdminMarketingAttributionRoute: typeof AdminMarketingAttributionRoute
   AdminMarketingAudiencesRoute: typeof AdminMarketingAudiencesRoute
   AdminMarketingAutomationRoute: typeof AdminMarketingAutomationRoute
@@ -1211,6 +1231,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminTaxonomyRoute: AdminTaxonomyRoute,
   AdminIndexRoute: AdminIndexRoute,
   AdminCombosIdRoute: AdminCombosIdRoute,
+  AdminInventoryLiveRoute: AdminInventoryLiveRoute,
   AdminMarketingAttributionRoute: AdminMarketingAttributionRoute,
   AdminMarketingAudiencesRoute: AdminMarketingAudiencesRoute,
   AdminMarketingAutomationRoute: AdminMarketingAutomationRoute,
