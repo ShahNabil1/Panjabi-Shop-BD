@@ -16,6 +16,14 @@ export const Route = createFileRoute("/admin/inventory/combos")({
   component: SmartCombos,
 });
 
+/** Sub-items worth restocking: the out-of-stock ones, else the bottlenecks. */
+type ComboRow = Awaited<ReturnType<typeof comboAvailability>>[number];
+function restockTargets(c: ComboRow): string[] {
+  const empty = c.items.filter((i) => i.onHand <= 0);
+  const pick = empty.length > 0 ? empty : c.items.filter((i) => i.bottleneck);
+  return pick.map((i) => i.id);
+}
+
 function SmartCombos() {
   const qc = useQueryClient();
   const [q, setQ] = useState("");
