@@ -1,8 +1,8 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Boxes, Layers, RefreshCw, Search, TriangleAlert } from "lucide-react";
+import { Boxes, Layers, PackagePlus, RefreshCw, Search, TriangleAlert } from "lucide-react";
 
 import { comboAvailability, syncComboStock } from "@/lib/inventory.functions";
 import { money } from "@/lib/inventory.shared";
