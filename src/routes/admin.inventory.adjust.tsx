@@ -23,27 +23,27 @@ const KINDS: Array<{ id: Kind; label: string; tip: string }> = [
   {
     id: "damage_out",
     label: "Damaged",
-    tip: "ভাঙা বা নষ্ট প্রোডাক্ট। ডিসকাউন্টে বিক্রি করার সুযোগ থাকলে স্যালভেজ প্রাইস দিন — লস হিসাবে সেটাই বাদ যাবে।",
+    tip: "Broken or damaged product. If it can be sold at a discount, enter the salvage price — that amount is deducted from the loss.",
   },
   {
     id: "loss_out",
     label: "Lost",
-    tip: "হারিয়ে যাওয়া বা কুরিয়ারে খোয়া যাওয়া মাল। কুরিয়ার ক্ষতিপূরণ দিলে সেটি স্যালভেজ প্রাইসে লিখুন।",
+    tip: "Stock lost or missing in courier transit. If the courier pays compensation, enter it as the salvage price.",
   },
   {
     id: "expiry_out",
     label: "Expired",
-    tip: "মেয়াদোত্তীর্ণ ব্যাচ। ড্যাশবোর্ডের Expiring তালিকা দেখে আগেই ব্যবস্থা নিন।",
+    tip: "Expired batch. Check the Expiring list on the dashboard to act ahead of time.",
   },
   {
     id: "adjust_in",
     label: "Count correction (+)",
-    tip: "ফিজিক্যাল কাউন্টে সিস্টেমের চেয়ে বেশি পাওয়া গেলে ব্যবহার করুন।",
+    tip: "Use this when a physical count finds more stock than the system shows.",
   },
   {
     id: "adjust_out",
     label: "Count correction (−)",
-    tip: "ফিজিক্যাল কাউন্টে সিস্টেমের চেয়ে কম পাওয়া গেলে ব্যবহার করুন।",
+    tip: "Use this when a physical count finds less stock than the system shows.",
   },
 ];
 
@@ -120,7 +120,7 @@ function AdjustInventory() {
     <div className="space-y-5">
       <AdminHeading
         title="Loss, damage & corrections"
-        description="নষ্ট, হারানো বা মেয়াদোত্তীর্ণ মাল বাদ দিন — অথবা গণনার ভুল সংশোধন করুন।"
+        description="Write off damaged, lost or expired stock — or correct a counting error."
         backTo="/admin/inventory"
         backLabel="Inventory"
       />
@@ -130,7 +130,7 @@ function AdjustInventory() {
           <TipTitle
             title="Record an adjustment"
             icon={<AlertOctagon className="size-4 text-amber-500" />}
-            tip="প্রতিটি এন্ট্রি স্থায়ীভাবে লগ হয়। ভুল হলে মুছে ফেলার বদলে রিভার্স করুন — হিসাব পরিষ্কার থাকে।"
+            tip="Every entry is logged permanently. If you make a mistake, reverse it instead of deleting — this keeps the record clean."
           />
 
           <div className="flex flex-wrap gap-1.5">
@@ -179,7 +179,7 @@ function AdjustInventory() {
               <div className="space-y-1.5">
                 <Label className="flex items-center gap-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
                   Salvage / compensation
-                  <InfoTip text="ডিসকাউন্টে বিক্রির দাম বা কুরিয়ারের দেওয়া ক্ষতিপূরণ। নেট লস = কস্ট − এই এমাউন্ট।" />
+                  <InfoTip text="The discounted sale price or courier compensation received. Net loss = cost − this amount." />
                 </Label>
                 <Input
                   type="number"
@@ -223,10 +223,10 @@ function AdjustInventory() {
         <Panel className="space-y-3">
           <TipTitle
             title="Recent adjustments"
-            tip="সাম্প্রতিক রাইট-অফ ও সংশোধন। ভুল হলে Reverse চাপলে ঠিক উল্টো এন্ট্রি বসে স্টক আগের অবস্থায় ফিরে যাবে।"
+            tip="Recent write-offs and corrections. If something is wrong, click Reverse to add an opposite entry and restore stock."
           />
           {writeOffs.length === 0 ? (
-            <EmptyState title="No adjustment recorded yet" hint="এখানে সব রাইট-অফ ও সংশোধন দেখা যাবে।" />
+            <EmptyState title="No adjustment recorded yet" hint="All write-offs and corrections will appear here." />
           ) : (
             <ul className="divide-y divide-border/70">
               {writeOffs.map((m) => (
@@ -256,7 +256,7 @@ function AdjustInventory() {
                         const ok = await confirm({
                           title: "Reverse this movement?",
                           description:
-                            "একটি উল্টো এন্ট্রি যোগ হবে এবং স্টক আগের অবস্থায় ফিরে যাবে। মূল রেকর্ড মুছবে না।",
+                            "An opposite entry will be added and stock will be restored. The original record won't be deleted.",
                           confirmLabel: "Reverse",
                           tone: "brand",
                         });

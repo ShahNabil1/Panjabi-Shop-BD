@@ -60,7 +60,7 @@ export async function buildStockAlerts(db: Db): Promise<StockAlertReport> {
         id: `${l.id}:negative`,
         kind: "negative_stock",
         severity: "critical",
-        detail: `হাতে দেখাচ্ছে ${l.qtyOnHand} — লেজার অডিট দরকার।`,
+        detail: `On hand shows ${l.qtyOnHand} — a ledger audit is needed.`,
         suggestQty: 0,
         valueAtRisk: Math.abs(l.qtyOnHand) * unitCost,
       });
@@ -73,7 +73,7 @@ export async function buildStockAlerts(db: Db): Promise<StockAlertReport> {
         id: `${l.id}:oos`,
         kind: "out_of_stock",
         severity: "critical",
-        detail: "স্টক শূন্য — বিক্রি বন্ধ হয়ে যাচ্ছে।",
+        detail: "Stock is zero — sales are being lost.",
         suggestQty: l.reorderQty || l.reorderPoint || 0,
         valueAtRisk: 0,
       });
@@ -83,7 +83,7 @@ export async function buildStockAlerts(db: Db): Promise<StockAlertReport> {
         id: `${l.id}:low`,
         kind: "low_stock",
         severity: "warning",
-        detail: `হাতে ${l.qtyOnHand}, রিঅর্ডার পয়েন্ট ${l.reorderPoint}।`,
+        detail: `On hand ${l.qtyOnHand}, reorder point ${l.reorderPoint}.`,
         suggestQty: Math.max(l.reorderQty || 0, l.reorderPoint - l.qtyOnHand),
         valueAtRisk: 0,
       });
@@ -95,7 +95,7 @@ export async function buildStockAlerts(db: Db): Promise<StockAlertReport> {
         id: `${l.id}:norule`,
         kind: "no_reorder_rule",
         severity: "info",
-        detail: "রিঅর্ডার পয়েন্ট সেট করা নেই।",
+        detail: "No reorder point set.",
         suggestQty: 0,
         valueAtRisk: 0,
       });
@@ -110,8 +110,8 @@ export async function buildStockAlerts(db: Db): Promise<StockAlertReport> {
         severity: "info",
         detail:
           idle == null
-            ? "কোনো মুভমেন্ট রেকর্ড নেই।"
-            : `${idle} দিন কোনো মুভমেন্ট নেই।`,
+            ? "No movement recorded."
+            : `No movement for ${idle} days.`,
         suggestQty: 0,
         valueAtRisk: l.qtyOnHand * unitCost,
       });
@@ -129,8 +129,8 @@ export async function buildStockAlerts(db: Db): Promise<StockAlertReport> {
       variantLabel: null,
       sku: c.sku ?? "—",
       detail: blocker
-        ? `${blocker.name} শেষ (হাতে ${blocker.onHand}, দরকার ${blocker.perBox}/বক্স)।`
-        : "কম্বোতে কোনো আইটেম যোগ করা নেই।",
+        ? `${blocker.name} is out of stock (on hand ${blocker.onHand}, needs ${blocker.perBox}/box).`
+        : "No item has been added to this combo.",
       onHand: 0,
       reorderPoint: null,
       suggestQty: 0,
@@ -150,7 +150,7 @@ export async function buildStockAlerts(db: Db): Promise<StockAlertReport> {
       name: `PO ${po["po_number"] ?? ""}`.trim(),
       variantLabel: null,
       sku: String(po["po_number"] ?? "—"),
-      detail: `প্রত্যাশিত ${expected} — এখনো পুরো রিসিভ হয়নি।`,
+      detail: `Expected ${expected} — not fully received yet.`,
       onHand: null,
       reorderPoint: null,
       suggestQty: 0,

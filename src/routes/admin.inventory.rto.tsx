@@ -148,7 +148,7 @@ function RtoInspection() {
     <div className="space-y-5">
       <AdminHeading
         title="RTO Inspection"
-        description="ফেরত আসা পার্সেল খোলার পর প্রতিটি আইটেম Good / Damaged / Missing ভাগ করুন — সেই অনুযায়ী স্টক ফেরত যায় বা রাইট-অফ হয়।"
+        description="After opening a returned parcel, split each item into Good / Damaged / Missing — stock is restocked or written off accordingly."
         backTo="/admin/inventory"
         backLabel="Inventory"
       />
@@ -158,21 +158,21 @@ function RtoInspection() {
           label="Return queue"
           value={String(orders.length)}
           icon={<Undo2 className="size-3.5" />}
-          tip="যেসব অর্ডার returned / awaiting return / partial delivered / exchange স্ট্যাটাসে আছে।"
+          tip="Orders with returned / awaiting return / partial delivered / exchange status."
         />
         <StatCard
           label="Awaiting inspection"
           value={String(pending)}
           tone={pending > 0 ? "bad" : "good"}
           icon={<TriangleAlert className="size-3.5" />}
-          tip="এখনো খুলে দেখা হয়নি — ইন্সপেকশন না করা পর্যন্ত এই মালগুলো স্টকে ফেরত যায়নি।"
+          tip="Not yet opened for inspection — until inspected, this stock hasn't been returned to inventory."
         />
         <StatCard
           label="Inspected"
           value={String(orders.length - pending)}
           tone="good"
           icon={<PackageCheck className="size-3.5" />}
-          tip="ইন্সপেকশন শেষ, লেজারে মুভমেন্ট বসে গেছে।"
+          tip="Inspection complete, movement recorded in the ledger."
         />
       </div>
 
@@ -181,14 +181,14 @@ function RtoInspection() {
           <TipTitle
             title="Returned parcels"
             icon={<Undo2 className="size-4 text-primary" />}
-            tip="একটি অর্ডারে ক্লিক করলে ভিতরের আইটেমগুলো (কম্বো ভেঙে) দেখা যাবে।"
+            tip="Click an order to see its items (combos broken down)."
           />
           <div className="relative w-full sm:w-72">
             <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              placeholder="Order number, নাম বা ফোন"
+              placeholder="Order number, name or phone"
               className="rounded-xl border-border/80 bg-background/70 pl-9 transition-all duration-200 focus-visible:border-primary/60 focus-visible:ring-primary/25"
             />
           </div>
@@ -203,7 +203,7 @@ function RtoInspection() {
         ) : filtered.length === 0 ? (
           <EmptyState
             title="No returned parcel"
-            hint="কোনো অর্ডার রিটার্ন স্ট্যাটাসে নেই — কুরিয়ার আপডেট এলে এখানে দেখা যাবে।"
+            hint="No orders in return status — they will appear here once the courier updates."
           />
         ) : (
           <div className="space-y-2">
@@ -250,13 +250,12 @@ function RtoInspection() {
                   <div className="space-y-3 border-t border-border/70 p-4">
                     {o.inspected ? (
                       <p className="rounded-xl bg-muted/50 px-3 py-2 text-xs text-muted-foreground">
-                        এই পার্সেল আগেই ইন্সপেক্ট করা হয়েছে। ভুল হলে Live Inventory → movement
-                        থেকে reversal দিন।
+                        This parcel has already been inspected. If something is wrong, reverse it from Live Inventory → movement.
                       </p>
                     ) : linesLoading ? (
                       <div className="h-20 animate-pulse rounded-xl bg-muted/60" />
                     ) : lines.length === 0 ? (
-                      <EmptyState title="No stock line" hint="এই অর্ডারে ট্র্যাকযোগ্য আইটেম নেই।" />
+                      <EmptyState title="No stock line" hint="No trackable items in this order." />
                     ) : (
                       <>
                         {lines.map((l) => {
@@ -323,7 +322,7 @@ function RtoInspection() {
                                       }
                                       className="size-4 accent-[hsl(var(--primary))]"
                                     />
-                                    ছাড়ে বিক্রয়যোগ্য
+                                    Sellable at discount
                                   </label>
                                   <label className="flex items-center gap-2 text-[11px] font-medium">
                                     <input
@@ -334,7 +333,7 @@ function RtoInspection() {
                                       }
                                       className="size-4 accent-[hsl(var(--primary))]"
                                     />
-                                    প্যাকেজিং নষ্ট
+                                    Packaging damaged
                                   </label>
                                   <Input
                                     inputMode="decimal"
@@ -355,15 +354,14 @@ function RtoInspection() {
                           label="Inspection note"
                           value={note}
                           onChange={setNote}
-                          hint="বক্সের অবস্থা, কুরিয়ারের ক্ষতি ইত্যাদি"
+                          hint="Box condition, courier damage, etc."
                         />
 
 
                         {mismatch && (
                           <p className="flex items-center gap-2 text-[11px] font-medium text-rose-600">
                             <TriangleAlert className="size-3.5" />
-                            প্রতিটি আইটেমের Good + Damaged + Missing মিলিয়ে পাঠানো পরিমাণের সমান
-                            হতে হবে।
+                            For each item, Good + Damaged + Missing must equal the quantity shipped.
                           </p>
                         )}
 
