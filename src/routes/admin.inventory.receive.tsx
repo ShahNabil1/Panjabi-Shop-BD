@@ -1,12 +1,16 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { PackagePlus, Plus, Trash2 } from "lucide-react";
 
 import { inventorySuppliers, receiveStock } from "@/lib/inventory.functions";
 import { money } from "@/lib/inventory.shared";
-import { ItemPicker, type PickableItem } from "@/components/admin/inventory/item-picker";
+import {
+  ItemPicker,
+  useCatalogItems,
+  type PickableItem,
+} from "@/components/admin/inventory/item-picker";
 import { InfoTip, Panel, StatCard, TipTitle } from "@/components/admin/kit";
 import { ModuleHero } from "@/components/admin/module-hero";
 import { Button } from "@/components/ui/button";
@@ -14,8 +18,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 export const Route = createFileRoute("/admin/inventory/receive")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    items: typeof search["items"] === "string" && search["items"] ? String(search["items"]) : undefined,
+  }),
   component: ReceiveInventory,
 });
+
 
 type Line = {
   uid: string;
