@@ -568,6 +568,162 @@ export type Database = {
         }
         Relationships: []
       }
+      inventory_batches: {
+        Row: {
+          batch_code: string | null
+          created_at: string
+          created_by: string | null
+          expiry_date: string | null
+          extra_cost: number
+          id: string
+          invoice_no: string | null
+          note: string | null
+          packaging_id: string | null
+          product_id: string | null
+          qty_received: number
+          qty_remaining: number
+          received_at: string
+          supplier_id: string | null
+          unit_cost: number
+          updated_at: string
+          variant_id: string | null
+        }
+        Insert: {
+          batch_code?: string | null
+          created_at?: string
+          created_by?: string | null
+          expiry_date?: string | null
+          extra_cost?: number
+          id?: string
+          invoice_no?: string | null
+          note?: string | null
+          packaging_id?: string | null
+          product_id?: string | null
+          qty_received: number
+          qty_remaining?: number
+          received_at?: string
+          supplier_id?: string | null
+          unit_cost?: number
+          updated_at?: string
+          variant_id?: string | null
+        }
+        Update: {
+          batch_code?: string | null
+          created_at?: string
+          created_by?: string | null
+          expiry_date?: string | null
+          extra_cost?: number
+          id?: string
+          invoice_no?: string | null
+          note?: string | null
+          packaging_id?: string | null
+          product_id?: string | null
+          qty_received?: number
+          qty_remaining?: number
+          received_at?: string
+          supplier_id?: string | null
+          unit_cost?: number
+          updated_at?: string
+          variant_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inventory_batches_packaging_id_fkey"
+            columns: ["packaging_id"]
+            isOneToOne: false
+            referencedRelation: "packaging_materials"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inventory_batches_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inventory_batches_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "suppliers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inventory_batches_variant_id_fkey"
+            columns: ["variant_id"]
+            isOneToOne: false
+            referencedRelation: "product_variants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      inventory_levels: {
+        Row: {
+          created_at: string
+          id: string
+          last_movement_at: string | null
+          packaging_id: string | null
+          product_id: string | null
+          qty_on_hand: number
+          qty_reserved: number
+          reorder_point: number
+          reorder_qty: number
+          updated_at: string
+          variant_id: string | null
+          wac_cost: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          last_movement_at?: string | null
+          packaging_id?: string | null
+          product_id?: string | null
+          qty_on_hand?: number
+          qty_reserved?: number
+          reorder_point?: number
+          reorder_qty?: number
+          updated_at?: string
+          variant_id?: string | null
+          wac_cost?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          last_movement_at?: string | null
+          packaging_id?: string | null
+          product_id?: string | null
+          qty_on_hand?: number
+          qty_reserved?: number
+          reorder_point?: number
+          reorder_qty?: number
+          updated_at?: string
+          variant_id?: string | null
+          wac_cost?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inventory_levels_packaging_id_fkey"
+            columns: ["packaging_id"]
+            isOneToOne: false
+            referencedRelation: "packaging_materials"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inventory_levels_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inventory_levels_variant_id_fkey"
+            columns: ["variant_id"]
+            isOneToOne: false
+            referencedRelation: "product_variants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       landing_pages: {
         Row: {
           content: Json
@@ -908,6 +1064,53 @@ export type Database = {
           },
         ]
       }
+      order_reconciliations: {
+        Row: {
+          actor_id: string | null
+          actor_name: string | null
+          collected_amount: number
+          created_at: string
+          id: string
+          lines: Json
+          note: string | null
+          order_id: string
+          settled: boolean
+          updated_at: string
+        }
+        Insert: {
+          actor_id?: string | null
+          actor_name?: string | null
+          collected_amount?: number
+          created_at?: string
+          id?: string
+          lines?: Json
+          note?: string | null
+          order_id: string
+          settled?: boolean
+          updated_at?: string
+        }
+        Update: {
+          actor_id?: string | null
+          actor_name?: string | null
+          collected_amount?: number
+          created_at?: string
+          id?: string
+          lines?: Json
+          note?: string | null
+          order_id?: string
+          settled?: boolean
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_reconciliations_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       orders: {
         Row: {
           address_line: string
@@ -1034,6 +1237,45 @@ export type Database = {
           upazila?: string | null
           updated_at?: string
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      packaging_materials: {
+        Row: {
+          consumption: string
+          created_at: string
+          id: string
+          is_active: boolean
+          name: string
+          note: string | null
+          reorder_point: number
+          sku: string | null
+          unit: string
+          updated_at: string
+        }
+        Insert: {
+          consumption?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name: string
+          note?: string | null
+          reorder_point?: number
+          sku?: string | null
+          unit?: string
+          updated_at?: string
+        }
+        Update: {
+          consumption?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          note?: string | null
+          reorder_point?: number
+          sku?: string | null
+          unit?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -1377,6 +1619,92 @@ export type Database = {
         }
         Relationships: []
       }
+      rto_inspections: {
+        Row: {
+          condition: Database["public"]["Enums"]["rto_condition"]
+          created_at: string
+          id: string
+          inspected_by: string | null
+          inspected_by_name: string | null
+          note: string | null
+          order_id: string
+          order_item_id: string | null
+          packaging_damaged: boolean
+          product_id: string | null
+          quantity: number
+          resalable: boolean
+          salvage_price: number | null
+          sku: string | null
+          updated_at: string
+          variant_id: string | null
+        }
+        Insert: {
+          condition?: Database["public"]["Enums"]["rto_condition"]
+          created_at?: string
+          id?: string
+          inspected_by?: string | null
+          inspected_by_name?: string | null
+          note?: string | null
+          order_id: string
+          order_item_id?: string | null
+          packaging_damaged?: boolean
+          product_id?: string | null
+          quantity?: number
+          resalable?: boolean
+          salvage_price?: number | null
+          sku?: string | null
+          updated_at?: string
+          variant_id?: string | null
+        }
+        Update: {
+          condition?: Database["public"]["Enums"]["rto_condition"]
+          created_at?: string
+          id?: string
+          inspected_by?: string | null
+          inspected_by_name?: string | null
+          note?: string | null
+          order_id?: string
+          order_item_id?: string | null
+          packaging_damaged?: boolean
+          product_id?: string | null
+          quantity?: number
+          resalable?: boolean
+          salvage_price?: number | null
+          sku?: string | null
+          updated_at?: string
+          variant_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rto_inspections_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rto_inspections_order_item_id_fkey"
+            columns: ["order_item_id"]
+            isOneToOne: false
+            referencedRelation: "order_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rto_inspections_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rto_inspections_variant_id_fkey"
+            columns: ["variant_id"]
+            isOneToOne: false
+            referencedRelation: "product_variants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       site_settings: {
         Row: {
           key: string
@@ -1493,6 +1821,108 @@ export type Database = {
         }
         Relationships: []
       }
+      stock_ledger: {
+        Row: {
+          actor_id: string | null
+          actor_name: string | null
+          batch_id: string | null
+          created_at: string
+          id: string
+          movement_type: Database["public"]["Enums"]["stock_movement_type"]
+          note: string | null
+          packaging_id: string | null
+          product_id: string | null
+          quantity: number
+          reason: string | null
+          reference_id: string | null
+          reference_label: string | null
+          reference_type: string | null
+          reverses_id: string | null
+          sku: string | null
+          total_cost: number
+          unit_cost: number
+          variant_id: string | null
+        }
+        Insert: {
+          actor_id?: string | null
+          actor_name?: string | null
+          batch_id?: string | null
+          created_at?: string
+          id?: string
+          movement_type: Database["public"]["Enums"]["stock_movement_type"]
+          note?: string | null
+          packaging_id?: string | null
+          product_id?: string | null
+          quantity: number
+          reason?: string | null
+          reference_id?: string | null
+          reference_label?: string | null
+          reference_type?: string | null
+          reverses_id?: string | null
+          sku?: string | null
+          total_cost?: number
+          unit_cost?: number
+          variant_id?: string | null
+        }
+        Update: {
+          actor_id?: string | null
+          actor_name?: string | null
+          batch_id?: string | null
+          created_at?: string
+          id?: string
+          movement_type?: Database["public"]["Enums"]["stock_movement_type"]
+          note?: string | null
+          packaging_id?: string | null
+          product_id?: string | null
+          quantity?: number
+          reason?: string | null
+          reference_id?: string | null
+          reference_label?: string | null
+          reference_type?: string | null
+          reverses_id?: string | null
+          sku?: string | null
+          total_cost?: number
+          unit_cost?: number
+          variant_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stock_ledger_batch_id_fkey"
+            columns: ["batch_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_batches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stock_ledger_packaging_id_fkey"
+            columns: ["packaging_id"]
+            isOneToOne: false
+            referencedRelation: "packaging_materials"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stock_ledger_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stock_ledger_reverses_id_fkey"
+            columns: ["reverses_id"]
+            isOneToOne: false
+            referencedRelation: "stock_ledger"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stock_ledger_variant_id_fkey"
+            columns: ["variant_id"]
+            isOneToOne: false
+            referencedRelation: "product_variants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       subcategories: {
         Row: {
           category_id: string
@@ -1551,6 +1981,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      suppliers: {
+        Row: {
+          address: string | null
+          created_at: string
+          id: string
+          is_active: boolean
+          name: string
+          note: string | null
+          phone: string | null
+          updated_at: string
+        }
+        Insert: {
+          address?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name: string
+          note?: string | null
+          phone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          address?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          note?: string | null
+          phone?: string | null
+          updated_at?: string
+        }
+        Relationships: []
       }
       tracking_events: {
         Row: {
@@ -1740,6 +2203,20 @@ export type Database = {
         | "exchange"
       product_kind: "single" | "component" | "combo"
       promotion_type: "offer" | "featured" | "flash" | "new_arrival"
+      rto_condition: "good" | "damaged" | "missing"
+      stock_movement_type:
+        | "purchase_in"
+        | "sale_out"
+        | "return_in"
+        | "damage_out"
+        | "loss_out"
+        | "expiry_out"
+        | "adjust_in"
+        | "adjust_out"
+        | "reversal"
+        | "exchange_out"
+        | "exchange_in"
+        | "packaging_out"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1896,6 +2373,21 @@ export const Constants = {
       ],
       product_kind: ["single", "component", "combo"],
       promotion_type: ["offer", "featured", "flash", "new_arrival"],
+      rto_condition: ["good", "damaged", "missing"],
+      stock_movement_type: [
+        "purchase_in",
+        "sale_out",
+        "return_in",
+        "damage_out",
+        "loss_out",
+        "expiry_out",
+        "adjust_in",
+        "adjust_out",
+        "reversal",
+        "exchange_out",
+        "exchange_in",
+        "packaging_out",
+      ],
     },
   },
 } as const
