@@ -11,6 +11,7 @@ import {
 import { money, movementLabels } from "@/lib/inventory.shared";
 import { EmptyState, Panel, StatCard, TipTitle } from "@/components/admin/kit";
 import { ModuleHero } from "@/components/admin/module-hero";
+import { ImportCatalogStockButton } from "@/components/admin/inventory/import-catalog";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/admin/inventory/")({

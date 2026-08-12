@@ -8,6 +8,7 @@ import { inventoryLevels, setReorderRule } from "@/lib/inventory.functions";
 import { money, type InventoryRow } from "@/lib/inventory.shared";
 import { EmptyState, InfoTip, Panel, StatCard } from "@/components/admin/kit";
 import { ModuleHero } from "@/components/admin/module-hero";
+import { ImportCatalogStockButton } from "@/components/admin/inventory/import-catalog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
