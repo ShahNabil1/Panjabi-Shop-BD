@@ -15,6 +15,7 @@ import {
 import { countScopes, type CountScope } from "@/lib/stock-count.shared";
 import { money } from "@/lib/inventory.shared";
 import { AdminHeading, EmptyState, Panel, StatCard } from "@/components/admin/kit";
+import { ModuleHero } from "@/components/admin/module-hero";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -76,7 +77,10 @@ function CountList({
 
   return (
     <div className="space-y-5">
-      <AdminHeading
+      <ModuleHero
+        eyebrow="Inventory · Audit"
+        icon={ClipboardCheck}
+        accent="amber"
         title="Stock audit"
         description="Open a physical count sheet, enter the counted numbers — posting sends the difference to the ledger as a correction."
       />

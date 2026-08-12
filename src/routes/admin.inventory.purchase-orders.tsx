@@ -36,6 +36,7 @@ import {
   type PoStatus,
 } from "@/lib/purchase-order.shared";
 import { AdminHeading, EmptyState, Panel, StatCard, TipTitle } from "@/components/admin/kit";
+import { ModuleHero } from "@/components/admin/module-hero";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -111,7 +112,10 @@ function PoList({ onOpen, onCreate }: { onOpen: (id: string) => void; onCreate: 
 
   return (
     <div className="space-y-5">
-      <AdminHeading
+      <ModuleHero
+        eyebrow="Inventory · Procurement"
+        icon={ClipboardList}
+        accent="indigo"
         title="Purchase orders"
         description="Order from suppliers, receive shipments and track dues — all in one place."
         backTo="/admin/inventory"

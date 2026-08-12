@@ -6,7 +6,8 @@ import { Boxes, Layers, RefreshCw, Search, TriangleAlert } from "lucide-react";
 
 import { comboAvailability, syncComboStock } from "@/lib/inventory.functions";
 import { money } from "@/lib/inventory.shared";
-import { AdminHeading, EmptyState, Panel, StatCard, TipTitle } from "@/components/admin/kit";
+import { EmptyState, Panel, StatCard, TipTitle } from "@/components/admin/kit";
+import { ModuleHero } from "@/components/admin/module-hero";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
@@ -54,7 +55,10 @@ function SmartCombos() {
 
   return (
     <div className="space-y-5">
-      <AdminHeading
+      <ModuleHero
+        eyebrow="Inventory · Assembly"
+        icon={Layers}
+        accent="violet"
         title="Smart Inventory · Combos"
         description="Combo boxes have no stock of their own — the stock of the sub-products inside determines how many boxes can be built."
         backTo="/admin/inventory"

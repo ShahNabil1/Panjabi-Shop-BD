@@ -2,11 +2,12 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Search, SlidersHorizontal } from "lucide-react";
+import { Radar, Search, SlidersHorizontal } from "lucide-react";
 
 import { inventoryLevels, setReorderRule } from "@/lib/inventory.functions";
 import { money, type InventoryRow } from "@/lib/inventory.shared";
-import { AdminHeading, EmptyState, InfoTip, Panel, StatCard } from "@/components/admin/kit";
+import { EmptyState, InfoTip, Panel, StatCard } from "@/components/admin/kit";
+import { ModuleHero } from "@/components/admin/module-hero";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -83,7 +84,10 @@ function LiveInventory() {
 
   return (
     <div className="space-y-5">
-      <AdminHeading
+      <ModuleHero
+        eyebrow="Inventory · Live view"
+        icon={Radar}
+        accent="sky"
         title="Live inventory"
         description="Read-only view — search by SKU or name, see value at cost and retail price."
       />

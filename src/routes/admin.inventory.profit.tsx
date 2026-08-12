@@ -5,7 +5,8 @@ import { Coins, Download, PiggyBank, Receipt, TrendingDown, TrendingUp } from "l
 
 import { profitReport } from "@/lib/profit.functions";
 import { money } from "@/lib/inventory.shared";
-import { AdminHeading, EmptyState, Panel, StatCard, StatusPill } from "@/components/admin/kit";
+import { EmptyState, Panel, StatCard, StatusPill } from "@/components/admin/kit";
+import { ModuleHero } from "@/components/admin/module-hero";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/admin/inventory/profit")({
@@ -76,7 +77,10 @@ function ProfitAndLoss() {
 
   return (
     <div className="space-y-5">
-      <AdminHeading
+      <ModuleHero
+        eyebrow="Inventory · Finance"
+        icon={PiggyBank}
+        accent="emerald"
         title="Profit & Loss"
         description="True profit per order — sales minus product cost, packaging and courier charges."
         action={

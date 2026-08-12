@@ -7,7 +7,8 @@ import { PackagePlus, Plus, Trash2 } from "lucide-react";
 import { inventorySuppliers, receiveStock } from "@/lib/inventory.functions";
 import { money } from "@/lib/inventory.shared";
 import { ItemPicker, type PickableItem } from "@/components/admin/inventory/item-picker";
-import { AdminHeading, InfoTip, Panel, StatCard, TipTitle } from "@/components/admin/kit";
+import { InfoTip, Panel, StatCard, TipTitle } from "@/components/admin/kit";
+import { ModuleHero } from "@/components/admin/module-hero";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -97,7 +98,10 @@ function ReceiveInventory() {
 
   return (
     <div className="space-y-5">
-      <AdminHeading
+      <ModuleHero
+        eyebrow="Inventory · Intake"
+        icon={PackagePlus}
+        accent="emerald"
         title="Add inventory"
         description="Add newly purchased stock — each lot is saved as a separate batch."
         backTo="/admin/inventory"

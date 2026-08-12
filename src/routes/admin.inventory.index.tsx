@@ -1,16 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
-import {
-  AlertTriangle,
-  ArrowDownRight,
-  ArrowUpRight,
-  Boxes,
-  CalendarClock,
-  Coins,
-  PackagePlus,
-  TrendingUp,
-} from "lucide-react";
+import { AlertTriangle, ArrowDownRight, ArrowUpRight, Boxes, CalendarClock, Coins, PackagePlus, TrendingUp, Warehouse } from "lucide-react";
 
 import {
   inventoryBatches,
@@ -18,7 +9,8 @@ import {
   inventoryMovements,
 } from "@/lib/inventory.functions";
 import { money, movementLabels } from "@/lib/inventory.shared";
-import { AdminHeading, EmptyState, Panel, StatCard, TipTitle } from "@/components/admin/kit";
+import { EmptyState, Panel, StatCard, TipTitle } from "@/components/admin/kit";
+import { ModuleHero } from "@/components/admin/module-hero";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/admin/inventory/")({
@@ -78,7 +70,10 @@ function InventoryDashboard() {
 
   return (
     <div className="space-y-5">
-      <AdminHeading
+      <ModuleHero
+        eyebrow="Inventory · Overview"
+        icon={Warehouse}
+        accent="indigo"
         title="Inventory"
         description="Stock, batch cost and movement — all in one place."
         action={
