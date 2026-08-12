@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Download, RefreshCw } from "lucide-react";
+import { BellRing, Download, RefreshCw } from "lucide-react";
 
 import { stockAlerts } from "@/lib/stock-alert.functions";
 import { money } from "@/lib/inventory.shared";
@@ -11,7 +11,8 @@ import {
   type AlertKind,
   type AlertSeverity,
 } from "@/lib/stock-alert.shared";
-import { AdminHeading, EmptyState, InfoTip, Panel, StatCard } from "@/components/admin/kit";
+import { EmptyState, InfoTip, Panel, StatCard } from "@/components/admin/kit";
+import { ModuleHero } from "@/components/admin/module-hero";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/admin/inventory/alerts")({
@@ -87,9 +88,12 @@ function StockAlertsPage() {
 
   return (
     <div className="space-y-5">
-      <AdminHeading
+      <ModuleHero
+        eyebrow="Inventory · Health"
+        icon={BellRing}
+        accent="amber"
         title="Stock alerts"
-        description="স্টক-আউট, রিঅর্ডার, নেগেটিভ স্টক, না-বানানো কম্বো, বসে থাকা মাল ও দেরি হওয়া PO — সব এক জায়গায়, গুরুত্ব অনুযায়ী সাজানো।"
+        description="Stock-outs, reorders, negative stock, unbuilt combos, dead stock and late POs — all in one place, sorted by priority."
       />
 
       <div className="flex flex-wrap items-center justify-between gap-2">
@@ -131,25 +135,25 @@ function StockAlertsPage() {
               label="Critical"
               value={String(data.counts.critical)}
               tone={data.counts.critical > 0 ? "bad" : "good"}
-              tip="আজই হাত দেওয়া দরকার — বিক্রি আটকে আছে বা হিসাব ভুল।"
+              tip="Needs attention today — sales are blocked or figures are wrong."
             />
             <StatCard
               label="Warning"
               value={String(data.counts.warning)}
-              tip="কয়েক দিনের মধ্যে ব্যবস্থা না নিলে স্টক-আউট হবে।"
+              tip="Will run out of stock within a few days if not addressed."
             />
-            <StatCard label="Info" value={String(data.counts.info)} tip="নজরে রাখার মতো, জরুরি নয়।" />
+            <StatCard label="Info" value={String(data.counts.info)} tip="Worth monitoring, not urgent." />
             <StatCard
               label="Capital at risk"
               value={money(data.capitalAtRisk)}
-              tip="বসে থাকা ও গোলমেলে স্টকে আটকে থাকা আনুমানিক টাকা।"
+              tip="Estimated capital tied up in dead or problematic stock."
             />
           </div>
 
           <Panel className="space-y-3">
             <div>
               <h2 className="text-sm font-bold tracking-tight">Alert types</h2>
-              <p className="text-[11px] text-muted-foreground">ধরন অনুযায়ী ফিল্টার করুন।</p>
+              <p className="text-[11px] text-muted-foreground">Filter by type.</p>
             </div>
 
             <div className="flex flex-wrap gap-2">
@@ -183,11 +187,11 @@ function StockAlertsPage() {
           <Panel className="space-y-3">
             <div>
               <h2 className="text-sm font-bold tracking-tight">Action list</h2>
-              <p className="text-[11px] text-muted-foreground">গুরুত্ব ও ঝুঁকির টাকা অনুযায়ী সাজানো।</p>
+              <p className="text-[11px] text-muted-foreground">Sorted by severity and value at risk.</p>
             </div>
 
             {rows.length === 0 ? (
-              <EmptyState title="সব ঠিক আছে" hint="এই ফিল্টারে কোনো সতর্কতা নেই।" />
+              <EmptyState title="All clear" hint="No alerts for this filter." />
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[760px] text-left text-xs">

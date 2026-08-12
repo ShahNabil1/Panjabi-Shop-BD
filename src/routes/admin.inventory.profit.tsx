@@ -5,7 +5,8 @@ import { Coins, Download, PiggyBank, Receipt, TrendingDown, TrendingUp } from "l
 
 import { profitReport } from "@/lib/profit.functions";
 import { money } from "@/lib/inventory.shared";
-import { AdminHeading, EmptyState, Panel, StatCard, StatusPill } from "@/components/admin/kit";
+import { EmptyState, Panel, StatCard, StatusPill } from "@/components/admin/kit";
+import { ModuleHero } from "@/components/admin/module-hero";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/admin/inventory/profit")({
@@ -76,9 +77,12 @@ function ProfitAndLoss() {
 
   return (
     <div className="space-y-5">
-      <AdminHeading
+      <ModuleHero
+        eyebrow="Inventory · Finance"
+        icon={PiggyBank}
+        accent="emerald"
         title="Profit & Loss"
-        description="প্রতিটি অর্ডারের আসল লাভ — বিক্রয় থেকে পণ্যের কেনা দাম, প্যাকেজিং ও কুরিয়ার চার্জ বাদ দিয়ে হিসাব।"
+        description="True profit per order — sales minus product cost, packaging and courier charges."
         action={
           <Button size="sm" variant="outline" className="rounded-xl" onClick={exportCsv}>
             <Download className="mr-1.5 size-3.5" /> Export CSV
@@ -112,14 +116,14 @@ function ProfitAndLoss() {
               label="Net revenue"
               value={money(data.totals.revenue)}
               icon={<Coins className="size-3.5" />}
-              tip="ডেলিভারি হওয়া অর্ডার থেকে কুরিয়ারের কালেক্ট করা টাকা (না থাকলে অর্ডার টোটাল)।"
+              tip="Amount collected by the courier for delivered orders (falls back to order total if unavailable)."
               sub={`${data.totals.deliveredOrders} delivered · AOV ${money(data.totals.avgOrderValue)}`}
             />
             <StatCard
               label="Cost of goods"
               value={money(data.totals.cogs)}
               icon={<Receipt className="size-3.5" />}
-              tip="লেজারে রেকর্ড হওয়া কেনা দামে পণ্যের খরচ — রিটার্ন হয়ে ফেরত আসা মাল বাদ দিয়ে।"
+              tip="Cost of goods at the purchase cost recorded in the ledger — excluding returned items."
               sub={`Gross profit ${money(data.totals.grossProfit)}`}
             />
             <StatCard
@@ -127,7 +131,7 @@ function ProfitAndLoss() {
               value={money(data.totals.courierFee + data.totals.packagingCost)}
               icon={<TrendingDown className="size-3.5" />}
               tone="warn"
-              tip="কুরিয়ার চার্জ ও ব্যবহৃত প্যাকেজিং ম্যাটেরিয়ালের মোট খরচ।"
+              tip="Total cost of courier charges and packaging material used."
               sub={`Courier ${money(data.totals.courierFee)} · Pack ${money(data.totals.packagingCost)}`}
             />
             <StatCard
@@ -135,7 +139,7 @@ function ProfitAndLoss() {
               value={money(data.totals.netProfit)}
               icon={<PiggyBank className="size-3.5" />}
               tone={data.totals.netProfit >= 0 ? "good" : "bad"}
-              tip="সব খরচ বাদ দেওয়ার পর হাতে থাকা লাভ। বিজ্ঞাপন খরচ এখানে ধরা হয়নি।"
+              tip="Profit left after deducting all costs. Ad spend is not included here."
               sub={`Margin ${pctText(data.totals.margin)} · ${money(data.totals.avgProfit)}/order`}
             />
           </div>
@@ -145,18 +149,18 @@ function ProfitAndLoss() {
               label="RTO / lost cost"
               value={money(data.totals.rtoLoss)}
               tone={data.totals.rtoLoss > 0 ? "bad" : "default"}
-              tip="ফেরত ও হারিয়ে যাওয়া অর্ডারে বসে যাওয়া কুরিয়ার, প্যাকেজিং ও পণ্যের ক্ষতি।"
+              tip="Courier, packaging and product cost lost on returned and lost orders."
               sub={`${data.totals.lostOrders} orders`}
             />
             <StatCard
               label="Discount given"
               value={money(data.totals.discount)}
-              tip="এই সময়ে কুপন ও ম্যানুয়াল ছাড়ে দেওয়া মোট টাকা।"
+              tip="Total amount given via coupons and manual discounts in this period."
             />
             <StatCard
               label="Delivery charged"
               value={money(data.totals.deliveryCharge)}
-              tip="কাস্টমারের কাছ থেকে নেওয়া ডেলিভারি চার্জ — কুরিয়ার খরচের বিপরীতে।"
+              tip="Delivery charge collected from customers — against courier cost."
             />
           </div>
 
@@ -245,7 +249,7 @@ function ProfitAndLoss() {
 
             {tab === "orders" ? (
               data.orders.length === 0 ? (
-                <EmptyState title="No orders in this period" hint="সময়সীমা বাড়িয়ে দেখুন।" />
+                <EmptyState title="No orders in this period" hint="Try extending the date range." />
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full min-w-[900px] text-sm">

@@ -1,13 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Lock, RotateCcw } from "lucide-react";
+import { CalendarCheck, Lock, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
 
 import { closePeriod, closingList, closingPreview, reopenPeriod } from "@/lib/closing.functions";
 import { recentPeriods } from "@/lib/closing.shared";
 import { money } from "@/lib/inventory.shared";
-import { AdminHeading, EmptyState, Panel, StatCard } from "@/components/admin/kit";
+import { EmptyState, Panel, StatCard } from "@/components/admin/kit";
+import { ModuleHero } from "@/components/admin/module-hero";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -51,7 +52,7 @@ function MonthlyClosing() {
   const close = useMutation({
     mutationFn: () => closePeriod({ data: { period, note } }),
     onSuccess: () => {
-      toast.success(`${period} মাস ক্লোজ হয়েছে`);
+      toast.success(`${period} closed`);
       setNote("");
       void qc.invalidateQueries({ queryKey: ["admin", "closing"] });
     },
@@ -61,7 +62,7 @@ function MonthlyClosing() {
   const reopen = useMutation({
     mutationFn: (id: string) => reopenPeriod({ data: { id } }),
     onSuccess: () => {
-      toast.success("মাস আবার খোলা হলো");
+      toast.success("Month reopened");
       void qc.invalidateQueries({ queryKey: ["admin", "closing"] });
     },
     onError: (e: Error) => toast.error(e.message),
@@ -71,9 +72,12 @@ function MonthlyClosing() {
 
   return (
     <div className="space-y-5">
-      <AdminHeading
+      <ModuleHero
+        eyebrow="Inventory · Finance"
+        icon={CalendarCheck}
+        accent="slate"
         title="Monthly closing"
-        description="মাস শেষে ওপেনিং ও ক্লোজিং স্টক ভ্যালু, ক্রয়, COGS, রাইট-অফ, প্যাকেজিং খরচ ও সাপ্লায়ার বকেয়া হিসাব করে লক করে রাখুন।"
+        description="At month-end, calculate and lock opening/closing stock value, purchases, COGS, write-offs, packaging cost and supplier dues."
       />
 
       <div className="flex flex-wrap items-center gap-2">
@@ -104,28 +108,28 @@ function MonthlyClosing() {
       ) : (
         <>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            <StatCard label="Opening value" value={money(p.openingValue)} tip="মাসের শুরুতে হাতে থাকা স্টকের কেনা-দামের মূল্য।" />
-            <StatCard label="Purchases in" value={money(p.purchaseValue)} tip="এই মাসে রিসিভ করা মালের মোট কেনা মূল্য।" />
-            <StatCard label="COGS" value={money(p.cogsValue)} tip="বিক্রি হওয়া মালের কেনা-দাম (রিটার্ন বাদ দিয়ে)।" />
+            <StatCard label="Opening value" value={money(p.openingValue)} tip="Cost value of stock on hand at the start of the month." />
+            <StatCard label="Purchases in" value={money(p.purchaseValue)} tip="Total cost of stock received this month." />
+            <StatCard label="COGS" value={money(p.cogsValue)} tip="Cost of goods sold (net of returns)." />
             <StatCard
               label="Closing value"
               value={money(p.closingValue)}
               tone="good"
-              tip="মাস শেষে হাতে থাকা স্টকের মোট মূল্য।"
+              tip="Total value of stock on hand at month-end."
             />
             <StatCard
               label="Write-offs"
               value={money(p.writeoffValue)}
               tone={p.writeoffValue > 0 ? "bad" : "default"}
-              tip="ড্যামেজ, হারানো ও মেয়াদোত্তীর্ণ পণ্যের ক্ষতি।"
+              tip="Loss from damaged, lost and expired products."
             />
-            <StatCard label="Packaging used" value={money(p.packagingValue)} tip="এই মাসে খরচ হওয়া প্যাকেজিং সামগ্রীর মূল্য।" />
-            <StatCard label="Adjustments" value={money(p.adjustmentValue)} tip="অডিট ও ম্যানুয়াল সমন্বয়ের নিট প্রভাব।" />
+            <StatCard label="Packaging used" value={money(p.packagingValue)} tip="Value of packaging materials used this month." />
+            <StatCard label="Adjustments" value={money(p.adjustmentValue)} tip="Net impact of audits and manual adjustments." />
             <StatCard
               label="Supplier due"
               value={money(p.supplierDue)}
               tone={p.supplierDue > 0 ? "bad" : "good"}
-              tip={`মাস শেষ পর্যন্ত বিল ${Math.round(p.supplierBilled)} − পরিশোধ ${Math.round(p.supplierPaid)}।`}
+              tip={`Billed ${Math.round(p.supplierBilled)} minus paid ${Math.round(p.supplierPaid)} through month-end.`}
             />
           </div>
 
@@ -136,15 +140,15 @@ function MonthlyClosing() {
               </h2>
               <p className="text-[11px] text-muted-foreground">
                 {locked
-                  ? "লক করা হিসাব সংরক্ষিত আছে। নতুন এন্ট্রি যোগ হলে আবার লক করলে আপডেট হবে।"
-                  : "লক করলে আজকের হিসাব স্ন্যাপশট হিসেবে সংরক্ষণ হবে।"}
+                  ? "The locked figures are saved. If new entries are added, re-locking will update them."
+                  : "Locking will save today's figures as a snapshot."}
               </p>
             </div>
             <div className="flex flex-wrap items-center gap-2">
               <Input
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
-                placeholder="নোট (ঐচ্ছিক)"
+                placeholder="Note (optional)"
                 className="h-9 max-w-sm text-xs"
               />
               <Button size="sm" onClick={() => close.mutate()} disabled={close.isPending}>
@@ -168,10 +172,10 @@ function MonthlyClosing() {
           <Panel className="space-y-3">
             <div>
               <h2 className="text-sm font-bold tracking-tight">Item movement ({p.periodStart} → {p.periodEnd})</h2>
-              <p className="text-[11px] text-muted-foreground">মূল্য অনুযায়ী সাজানো — ওপেনিং, ইন, আউট ও ক্লোজিং।</p>
+              <p className="text-[11px] text-muted-foreground">Sorted by value — opening, in, out and closing.</p>
             </div>
             {p.lines.length === 0 ? (
-              <EmptyState title="কোনো ডাটা নেই" hint="এই মাসে কোনো স্টক মুভমেন্ট বা ব্যালান্স নেই।" />
+              <EmptyState title="No data" hint="No stock movement or balance for this month." />
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[720px] text-left text-xs">
@@ -212,10 +216,10 @@ function MonthlyClosing() {
           <Panel className="space-y-3">
             <div>
               <h2 className="text-sm font-bold tracking-tight">Closed months</h2>
-              <p className="text-[11px] text-muted-foreground">লক করা মাসগুলোর সংরক্ষিত হিসাব।</p>
+              <p className="text-[11px] text-muted-foreground">Saved figures for locked months.</p>
             </div>
             {(list.data ?? []).length === 0 ? (
-              <EmptyState title="এখনো কোনো মাস লক করা হয়নি" />
+              <EmptyState title="No month locked yet" />
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[680px] text-left text-xs">

@@ -1,16 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
-import {
-  AlertTriangle,
-  ArrowDownRight,
-  ArrowUpRight,
-  Boxes,
-  CalendarClock,
-  Coins,
-  PackagePlus,
-  TrendingUp,
-} from "lucide-react";
+import { AlertTriangle, ArrowDownRight, ArrowUpRight, Boxes, CalendarClock, Coins, PackagePlus, TrendingUp, Warehouse } from "lucide-react";
 
 import {
   inventoryBatches,
@@ -18,7 +9,8 @@ import {
   inventoryMovements,
 } from "@/lib/inventory.functions";
 import { money, movementLabels } from "@/lib/inventory.shared";
-import { AdminHeading, EmptyState, Panel, StatCard, TipTitle } from "@/components/admin/kit";
+import { EmptyState, Panel, StatCard, TipTitle } from "@/components/admin/kit";
+import { ModuleHero } from "@/components/admin/module-hero";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/admin/inventory/")({
@@ -78,9 +70,12 @@ function InventoryDashboard() {
 
   return (
     <div className="space-y-5">
-      <AdminHeading
+      <ModuleHero
+        eyebrow="Inventory · Overview"
+        icon={Warehouse}
+        accent="indigo"
         title="Inventory"
-        description="স্টক, ব্যাচ কস্ট আর মুভমেন্ট — সব এক জায়গায়।"
+        description="Stock, batch cost and movement — all in one place."
         action={
           <div className="flex gap-2">
             <Button asChild variant="outline" className="rounded-xl">
@@ -101,14 +96,14 @@ function InventoryDashboard() {
           label="Stock value (cost)"
           value={money(kpi.costValue)}
           icon={<Coins className="size-3.5" />}
-          tip="প্রতিটি আইটেমের অন-হ্যান্ড পরিমাণ × ওয়েটেড অ্যাভারেজ কেনা দাম। এটাই আপনার আটকে থাকা টাকা।"
+          tip="On-hand quantity × weighted average purchase cost for each item. This is your capital tied up in stock."
           sub={`${kpi.units.toLocaleString("en-US")} units on hand`}
         />
         <StatCard
           label="Stock value (retail)"
           value={money(kpi.retailValue)}
           icon={<TrendingUp className="size-3.5" />}
-          tip="সব স্টক আজকের সেলিং প্রাইসে বিক্রি হলে যত টাকা আসত।"
+          tip="The amount you'd earn if all stock sold at today's selling price."
           sub={`Potential margin ${money(kpi.retailValue - kpi.costValue)}`}
           tone="good"
         />
@@ -116,14 +111,14 @@ function InventoryDashboard() {
           label="Low stock SKUs"
           value={String(kpi.low)}
           icon={<AlertTriangle className="size-3.5" />}
-          tip="যেসব SKU-এর অন-হ্যান্ড পরিমাণ তার রি-অর্ডার পয়েন্টে নেমে এসেছে — এখনই অর্ডার করার সময়।"
+          tip="SKUs whose on-hand quantity has dropped to their reorder point — time to order now."
           tone={kpi.low > 0 ? "warn" : "default"}
         />
         <StatCard
           label="Out of stock"
           value={String(kpi.out)}
           icon={<Boxes className="size-3.5" />}
-          tip={`মোট ${kpi.skus} টি ট্র্যাক করা SKU-এর মধ্যে যতগুলোর স্টক শূন্য বা তার নিচে।`}
+          tip={`Out of ${kpi.skus} tracked SKUs, the number with stock at zero or below.`}
           tone={kpi.out > 0 ? "bad" : "good"}
         />
       </div>
@@ -133,12 +128,12 @@ function InventoryDashboard() {
           <TipTitle
             title="Reorder now"
             icon={<AlertTriangle className="size-4 text-amber-500" />}
-            tip="রি-অর্ডার পয়েন্টে পৌঁছানো আইটেম। সাজেস্টেড পরিমাণ = আপনার সেট করা রি-অর্ডার কোয়ান্টিটি।"
+            tip="Items that have reached their reorder point. Suggested quantity = the reorder quantity you set."
           />
           {isLoading ? (
             <p className="py-8 text-center text-xs text-muted-foreground">Loading…</p>
           ) : lowStock.length === 0 ? (
-            <EmptyState title="Everything is above its reorder point" hint="নতুন কিছু অর্ডার করার দরকার নেই।" />
+            <EmptyState title="Everything is above its reorder point" hint="No new orders needed." />
           ) : (
             <ul className="divide-y divide-border/70">
               {lowStock.map((l) => (
@@ -163,10 +158,10 @@ function InventoryDashboard() {
           <TipTitle
             title="Expiring batches"
             icon={<CalendarClock className="size-4 text-primary" />}
-            tip="আগামী ৬০ দিনের মধ্যে মেয়াদ শেষ হবে এমন ব্যাচ। আগে যেটার মেয়াদ শেষ হবে সেটা আগে বিক্রি করুন (FEFO)।"
+            tip="Batches expiring within the next 60 days. Sell the earliest-expiring batch first (FEFO)."
           />
           {expiring.length === 0 ? (
-            <EmptyState title="No batch expires within 60 days" hint="মেয়াদ নিয়ে এখন চিন্তার কিছু নেই।" />
+            <EmptyState title="No batch expires within 60 days" hint="Nothing to worry about expiry-wise right now." />
           ) : (
             <ul className="divide-y divide-border/70">
               {expiring.map((b) => {
@@ -197,10 +192,10 @@ function InventoryDashboard() {
       <Panel className="space-y-3">
         <TipTitle
           title="Recent movements"
-          tip="প্রতিটি স্টক পরিবর্তনের স্থায়ী রেকর্ড — কেনা, বিক্রি, রিটার্ন, ড্যামেজ বা সংশোধন। এটি কখনও মোছা যায় না।"
+          tip="A permanent record of every stock change — purchase, sale, return, damage or correction. It can never be deleted."
         />
         {moves.length === 0 ? (
-          <EmptyState title="No stock movement yet" hint="প্রথম ইনভেন্টরি রিসিভ করলেই এখানে দেখা যাবে।" />
+          <EmptyState title="No stock movement yet" hint="It will appear here once you receive your first inventory." />
         ) : (
           <ul className="divide-y divide-border/70">
             {moves.map((m) => (

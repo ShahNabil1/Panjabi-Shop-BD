@@ -1,4 +1,6 @@
 import type { CSSProperties, ReactNode } from "react";
+import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { Link } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
 
@@ -8,12 +10,6 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 
 export function AdminHeading({
   title,
@@ -295,36 +291,88 @@ export function StatusPill({ status }: { status: string }) {
 }
 
 /* ------------------------------------------------------------------ */
-/* Tooltip helper — replaces long helper paragraphs under titles.      */
+/* Tooltip helper — visible on hover AND tap, escapes scroll clipping.  */
 /* ------------------------------------------------------------------ */
 
 export function InfoTip({ text, className }: { text: string; className?: string }) {
+  const [open, setOpen] = useState(false);
+  const [pos, setPos] = useState<{ top: number; left: number } | null>(null);
+  const btnRef = useRef<HTMLButtonElement | null>(null);
+
+  const place = () => {
+    const el = btnRef.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    const width = 280;
+    const left = Math.min(
+      Math.max(12, r.left + r.width / 2 - width / 2),
+      window.innerWidth - width - 12,
+    );
+    setPos({ top: r.top, left });
+  };
+
+  useEffect(() => {
+    if (!open) return;
+    const close = () => setOpen(false);
+    window.addEventListener("scroll", close, true);
+    window.addEventListener("resize", close);
+    return () => {
+      window.removeEventListener("scroll", close, true);
+      window.removeEventListener("resize", close);
+    };
+  }, [open]);
+
+  const show = () => {
+    place();
+    setOpen(true);
+  };
+
   return (
-    <TooltipProvider delayDuration={120}>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <button
-            type="button"
-            aria-label={text}
-            onClick={(e) => e.preventDefault()}
-            className={cn(
-              "inline-flex size-4 shrink-0 items-center justify-center rounded-full border border-border/70 text-[10px] font-bold text-muted-foreground transition-all duration-200 hover:scale-110 hover:border-primary/50 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30",
-              className,
-            )}
-          >
-            i
-          </button>
-        </TooltipTrigger>
-        <TooltipContent
-          side="top"
-          className="max-w-[260px] rounded-xl border border-border/70 bg-popover px-3 py-2 text-xs leading-relaxed text-popover-foreground shadow-lg"
-        >
-          {text}
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+    <>
+      <button
+        ref={btnRef}
+        type="button"
+        aria-label={text}
+        onMouseEnter={show}
+        onMouseLeave={() => setOpen(false)}
+        onFocus={show}
+        onBlur={() => setOpen(false)}
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          if (open) setOpen(false);
+          else show();
+        }}
+        className={cn(
+          "inline-flex size-4 shrink-0 items-center justify-center rounded-full border border-border/70 text-[10px] font-bold leading-none text-muted-foreground transition-all duration-200 hover:scale-110 hover:border-primary/50 hover:bg-primary/10 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30",
+          open && "border-primary/60 bg-primary/10 text-primary",
+          className,
+        )}
+      >
+        i
+      </button>
+      {open && pos && typeof document !== "undefined"
+        ? createPortal(
+            <div
+              role="tooltip"
+              style={{
+                position: "fixed",
+                top: pos.top,
+                left: pos.left,
+                width: 280,
+                transform: "translateY(-100%) translateY(-8px)",
+              }}
+              className="pointer-events-none z-[9999] rounded-xl border border-border bg-popover px-3 py-2 text-xs font-medium leading-relaxed text-popover-foreground shadow-xl ring-1 ring-black/5"
+            >
+              {text}
+            </div>,
+            document.body,
+          )
+        : null}
+    </>
   );
 }
+
 
 /** Section title with an inline tooltip instead of a description line. */
 export function TipTitle({

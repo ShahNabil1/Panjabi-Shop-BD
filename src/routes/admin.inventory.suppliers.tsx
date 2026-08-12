@@ -11,7 +11,8 @@ import {
   saveSupplier,
 } from "@/lib/inventory.functions";
 import type { PackagingInput, SupplierInput } from "@/lib/inventory.shared";
-import { AdminHeading, EmptyState, Panel, TipTitle, ToggleField } from "@/components/admin/kit";
+import { EmptyState, Panel, TipTitle, ToggleField } from "@/components/admin/kit";
+import { ModuleHero } from "@/components/admin/module-hero";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -90,9 +91,12 @@ function SuppliersAndPackaging() {
 
   return (
     <div className="space-y-5">
-      <AdminHeading
+      <ModuleHero
+        eyebrow="Inventory · Partners"
+        icon={Truck}
+        accent="teal"
         title="Suppliers & packaging"
-        description="কার কাছ থেকে কিনছেন আর কী প্যাকেজিং ব্যবহার করছেন — দুটোই এখানে।"
+        description="Who you buy from and what packaging you use — both here."
         backTo="/admin/inventory"
         backLabel="Inventory"
       />
@@ -104,7 +108,7 @@ function SuppliersAndPackaging() {
             <TipTitle
               title="Suppliers"
               icon={<Truck className="size-4 text-primary" />}
-              tip="সাপ্লায়ার যোগ করলে প্রতিটি চালান কার কাছ থেকে এসেছে তা ট্র্যাক করা যায় এবং কেনা দামের তুলনা করা সহজ হয়।"
+              tip="Adding suppliers lets you track where each shipment came from and makes comparing costs easier."
             />
             <Button
               size="sm"
@@ -163,7 +167,7 @@ function SuppliersAndPackaging() {
           ) : null}
 
           {suppliers.length === 0 ? (
-            <EmptyState title="No supplier yet" hint="প্রথম সাপ্লায়ার যোগ করুন।" />
+            <EmptyState title="No supplier yet" hint="Add your first supplier." />
           ) : (
             <ul className="divide-y divide-border/70">
               {suppliers.map((s) => (
@@ -204,7 +208,7 @@ function SuppliersAndPackaging() {
             <TipTitle
               title="Packaging materials"
               icon={<Boxes className="size-4 text-primary" />}
-              tip="বক্স, বাবল র‍্যাপ, স্টিকার ইত্যাদি। এগুলো ওয়েবসাইট বা ক্যাটালগে কখনও দেখা যায় না, শুধু খরচ ও স্টক হিসাবের জন্য।"
+              tip="Boxes, bubble wrap, stickers, etc. These never appear on the website or catalog — used only for cost and stock tracking."
             />
             <Button
               size="sm"
@@ -283,7 +287,7 @@ function SuppliersAndPackaging() {
           ) : null}
 
           {packaging.length === 0 ? (
-            <EmptyState title="No packaging item yet" hint="বক্স বা র‍্যাপিং যোগ করলে এর খরচও প্রফিটে ধরা পড়বে।" />
+            <EmptyState title="No packaging item yet" hint="Adding boxes or wrapping will factor their cost into profit." />
           ) : (
             <ul className="divide-y divide-border/70">
               {packaging.map((p) => (

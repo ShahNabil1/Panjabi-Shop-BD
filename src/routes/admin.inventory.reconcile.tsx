@@ -19,6 +19,7 @@ import {
   StatusPill,
   TipTitle,
 } from "@/components/admin/kit";
+import { ModuleHero } from "@/components/admin/module-hero";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
@@ -144,9 +145,12 @@ function ReconcilePage() {
 
   return (
     <div className="space-y-5">
-      <AdminHeading
+      <ModuleHero
+        eyebrow="Inventory · Settlement"
+        icon={Scale}
+        accent="emerald"
         title="Partial Delivery Reconciliation"
-        description="আংশিক ডেলিভারি হওয়া পার্সেলে কোন আইটেম কাস্টমার রেখেছে, কোনটা ফেরত এসেছে আর কুরিয়ার কত টাকা দিয়েছে — সব মিলিয়ে হিসাব বন্ধ করুন।"
+        description="For partially delivered parcels, reconcile which items the customer kept, what was returned, and how much the courier paid."
         backTo="/admin/inventory"
         backLabel="Inventory"
       />
@@ -156,21 +160,21 @@ function ReconcilePage() {
           label="Reconcile queue"
           value={String(orders.length)}
           icon={<Scale className="size-3.5" />}
-          tip="partial delivered / exchange স্ট্যাটাসের অর্ডার।"
+          tip="Orders with partial delivered / exchange status."
         />
         <StatCard
           label="Pending settlement"
           value={String(pendingCount)}
           tone={pendingCount > 0 ? "bad" : "good"}
           icon={<TriangleAlert className="size-3.5" />}
-          tip="এখনো হিসাব মেলানো হয়নি বা settled মার্ক করা হয়নি।"
+          tip="Not yet reconciled or marked as settled."
         />
         <StatCard
           label="Net variance"
           value={money(totalVariance)}
           tone={totalVariance < 0 ? "bad" : "good"}
           icon={<Coins className="size-3.5" />}
-          tip="কালেক্টেড টাকা বনাম প্রাপ্য টাকার পার্থক্যের যোগফল।"
+          tip="Sum of the difference between collected and expected amounts."
         />
       </div>
 
@@ -179,14 +183,14 @@ function ReconcilePage() {
           <TipTitle
             title="Partial parcels"
             icon={<Wallet className="size-4 text-primary" />}
-            tip="স্টক ফেরতের কাজ RTO Inspection স্ক্রিনে — এখানে শুধু টাকার হিসাব।"
+            tip="Stock return is handled in the RTO Inspection screen — this is only for the money reconciliation."
           />
           <div className="relative w-full sm:w-72">
             <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              placeholder="Order number, নাম বা ফোন"
+              placeholder="Order number, name or phone"
               className="rounded-xl border-border/80 bg-background/70 pl-9 transition-all duration-200 focus-visible:border-primary/60 focus-visible:ring-primary/25"
             />
           </div>
@@ -201,7 +205,7 @@ function ReconcilePage() {
         ) : filtered.length === 0 ? (
           <EmptyState
             title="Nothing to reconcile"
-            hint="কোনো আংশিক ডেলিভারি নেই — কুরিয়ার আপডেট এলে এখানে দেখা যাবে।"
+            hint="No partial deliveries — they will appear here once the courier updates."
           />
         ) : (
           <div className="space-y-2">
@@ -247,7 +251,7 @@ function ReconcilePage() {
                     {linesLoading ? (
                       <div className="h-20 animate-pulse rounded-xl bg-muted/60" />
                     ) : lines.length === 0 ? (
-                      <EmptyState title="No item" hint="এই অর্ডারে কোনো আইটেম নেই।" />
+                      <EmptyState title="No item" hint="No items in this order." />
                     ) : (
                       <>
                         {lines.map((l) => {
@@ -340,7 +344,7 @@ function ReconcilePage() {
                           value={note}
                           onChange={setNote}
                           rows={3}
-                          hint="কেন পার্থক্য হলো, কুরিয়ার কী বলেছে ইত্যাদি"
+                          hint="Why the variance occurred, what the courier said, etc."
                         />
 
                         <div className="flex flex-wrap items-center justify-between gap-3">
@@ -351,12 +355,12 @@ function ReconcilePage() {
                               onChange={(e) => setSettled(e.target.checked)}
                               className="size-4 accent-primary"
                             />
-                            হিসাব ক্লোজ (settled) হিসেবে মার্ক করুন
+                            Mark as closed (settled)
                           </label>
                           <div className="flex items-center gap-2">
                             {mismatch && (
                               <span className="text-[11px] font-semibold text-amber-700">
-                                Delivered + Returned = Ordered হতে হবে
+                                Delivered + Returned must equal Ordered
                               </span>
                             )}
                             <Button

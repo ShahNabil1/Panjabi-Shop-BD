@@ -36,6 +36,7 @@ import {
   type PoStatus,
 } from "@/lib/purchase-order.shared";
 import { AdminHeading, EmptyState, Panel, StatCard, TipTitle } from "@/components/admin/kit";
+import { ModuleHero } from "@/components/admin/module-hero";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -111,9 +112,12 @@ function PoList({ onOpen, onCreate }: { onOpen: (id: string) => void; onCreate: 
 
   return (
     <div className="space-y-5">
-      <AdminHeading
+      <ModuleHero
+        eyebrow="Inventory · Procurement"
+        icon={ClipboardList}
+        accent="indigo"
         title="Purchase orders"
-        description="সাপ্লায়ারকে অর্ডার দেওয়া, চালান বুঝে নেওয়া আর বাকি টাকার হিসাব — সব এক জায়গায়।"
+        description="Order from suppliers, receive shipments and track dues — all in one place."
         backTo="/admin/inventory"
         backLabel="Inventory"
         action={
@@ -132,26 +136,26 @@ function PoList({ onOpen, onCreate }: { onOpen: (id: string) => void; onCreate: 
           label="Open orders"
           value={String(kpi.open)}
           icon={<ClipboardList className="size-3.5" />}
-          tip="যেসব অর্ডার সাপ্লায়ারকে দেওয়া হয়েছে কিন্তু পুরো মাল এখনো আসেনি।"
+          tip="Orders placed with suppliers where the full shipment hasn't arrived yet."
         />
         <StatCard
           label="On order (value)"
           value={money(kpi.openValue)}
           icon={<Coins className="size-3.5" />}
-          tip="খোলা অর্ডারগুলোর মোট মূল্য — শিপিং যোগ ও ডিসকাউন্ট বাদ দিয়ে।"
+          tip="Total value of open orders — including shipping and after discount."
         />
         <StatCard
           label="Units pending"
           value={kpi.pendingUnits.toLocaleString("en-US")}
           icon={<PackageCheck className="size-3.5" />}
-          tip="অর্ডার করা হয়েছে কিন্তু এখনো হাতে আসেনি এমন ইউনিট সংখ্যা।"
+          tip="Number of units ordered but not yet received."
         />
         <StatCard
           label="Supplier dues"
           value={money(kpi.due)}
           icon={<Wallet className="size-3.5" />}
           tone={kpi.due > 0 ? "warn" : "good"}
-          tip="সব সাপ্লায়ারের কাছে বাকি থাকা মোট টাকা (বিল − পরিশোধ)।"
+          tip="Total amount due across all suppliers (billed − paid)."
         />
       </div>
 
@@ -159,14 +163,14 @@ function PoList({ onOpen, onCreate }: { onOpen: (id: string) => void; onCreate: 
         <TipTitle
           title="All purchase orders"
           icon={<ClipboardList className="size-4 text-primary" />}
-          tip="ড্রাফট বানিয়ে রাখুন, সাপ্লায়ারকে পাঠালে Ordered করুন, মাল এলে লাইনে-লাইনে রিসিভ করুন।"
+          tip="Save as draft, mark Ordered once sent to the supplier, then receive line by line as goods arrive."
         />
         {isLoading ? (
           <p className="py-6 text-center text-sm text-muted-foreground">Loading…</p>
         ) : rows.length === 0 ? (
           <EmptyState
             title="No purchase orders yet"
-            hint="প্রথম অর্ডার তৈরি করে সাপ্লায়ার, আইটেম আর কেনা দাম বসান।"
+            hint="Create your first order and set the supplier, items and purchase cost."
           />
         ) : (
           <div className="space-y-2">
@@ -217,7 +221,7 @@ function PoList({ onOpen, onCreate }: { onOpen: (id: string) => void; onCreate: 
         <TipTitle
           title="Supplier dues"
           icon={<Wallet className="size-4 text-primary" />}
-          tip="কোন সাপ্লায়ারকে কত বিল হয়েছে, কত দেওয়া হয়েছে আর কত বাকি আছে।"
+          tip="How much each supplier has billed, been paid, and what's still due."
         />
         {dues.length === 0 ? (
           <EmptyState title="No supplier activity yet" />
@@ -371,7 +375,7 @@ function PoEditor({
     <div className="space-y-5">
       <AdminHeading
         title={state.id ? "Edit purchase order" : "New purchase order"}
-        description="সাপ্লায়ার বেছে নিন, আইটেম যোগ করুন আর কেনা দাম বসান।"
+        description="Select a supplier, add items and set the purchase cost."
         action={
           <Button variant="ghost" className="rounded-xl" onClick={onClose}>
             <ArrowLeft className="size-4" />
@@ -445,7 +449,7 @@ function PoEditor({
         </div>
 
         {state.lines.length === 0 ? (
-          <EmptyState title="No items yet" hint="উপরের সার্চ থেকে আইটেম যোগ করুন।" />
+          <EmptyState title="No items yet" hint="Add items using the search above." />
         ) : (
           <div className="space-y-2">
             {state.lines.map((l, i) => (
@@ -766,7 +770,7 @@ function PoDetail({ id, onBack }: { id: string; onBack: () => void }) {
         <TipTitle
           title="Items & receiving"
           icon={<PackageCheck className="size-4 text-primary" />}
-          tip="যতটুকু মাল এসেছে ততটুকু বসিয়ে Receive দিন — স্টক লেজারে purchase_in যাবে আর WAC আপডেট হবে।"
+          tip="Enter the quantity received and click Receive — a purchase_in entry is added to the stock ledger and the WAC is updated."
         />
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
@@ -876,7 +880,7 @@ function PoDetail({ id, onBack }: { id: string; onBack: () => void }) {
         <TipTitle
           title="Payments"
           icon={<Wallet className="size-4 text-primary" />}
-          tip="সাপ্লায়ারকে দেওয়া টাকা এখানে রেকর্ড করুন — বাকি হিসাব নিজে থেকেই আপডেট হবে।"
+          tip="Record payments made to the supplier here — the due amount updates automatically."
         />
         {po.supplierId ? (
           <div className="flex flex-wrap items-end gap-3">
@@ -928,7 +932,7 @@ function PoDetail({ id, onBack }: { id: string; onBack: () => void }) {
           </div>
         ) : (
           <p className="text-xs text-muted-foreground">
-            পেমেন্ট রেকর্ড করতে আগে এই অর্ডারে একজন সাপ্লায়ার বেছে দিন।
+            Select a supplier for this order before recording a payment.
           </p>
         )}
 

@@ -22,13 +22,13 @@ export const alertLabels: Record<AlertKind, string> = {
 };
 
 export const alertHints: Record<AlertKind, string> = {
-  out_of_stock: "সেল-এ থাকা পণ্য, কিন্তু হাতে স্টক শূন্য — বিজ্ঞাপন চললে টাকা নষ্ট হচ্ছে।",
-  low_stock: "রিঅর্ডার পয়েন্টে নেমে এসেছে — এখনই চালান দেওয়ার সময়।",
-  negative_stock: "লেজারে হিসাব শূন্যের নিচে — অডিট বা ভুল এন্ট্রি ঠিক করা দরকার।",
-  no_reorder_rule: "চলমান পণ্যে রিঅর্ডার পয়েন্ট বসানো নেই, তাই আগাম সতর্কতা আসবে না।",
-  combo_blocked: "কম্বো অ্যাকটিভ, কিন্তু ভিতরের কোনো আইটেম শেষ — একটাও বানানো যাচ্ছে না।",
-  dead_stock: "অনেকদিন কোনো নড়াচড়া নেই — টাকা আটকে আছে।",
-  po_overdue: "অর্ডার করা চালান প্রত্যাশিত তারিখ পার করেছে, এখনো রিসিভ হয়নি।",
+  out_of_stock: "Product is listed for sale but has zero stock on hand — ad spend is being wasted.",
+  low_stock: "Stock has dropped to the reorder point — time to place an order now.",
+  negative_stock: "Ledger balance is below zero — an audit or entry correction is needed.",
+  no_reorder_rule: "An active product has no reorder point set, so no early warning will be raised.",
+  combo_blocked: "Combo is active, but an item inside it is out of stock — none can be built.",
+  dead_stock: "No movement for a long time — capital is tied up.",
+  po_overdue: "The ordered shipment is past its expected date and still not received.",
 };
 
 export type StockAlert = {

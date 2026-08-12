@@ -6,7 +6,8 @@ import { Boxes, Layers, RefreshCw, Search, TriangleAlert } from "lucide-react";
 
 import { comboAvailability, syncComboStock } from "@/lib/inventory.functions";
 import { money } from "@/lib/inventory.shared";
-import { AdminHeading, EmptyState, Panel, StatCard, TipTitle } from "@/components/admin/kit";
+import { EmptyState, Panel, StatCard, TipTitle } from "@/components/admin/kit";
+import { ModuleHero } from "@/components/admin/module-hero";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
@@ -54,9 +55,12 @@ function SmartCombos() {
 
   return (
     <div className="space-y-5">
-      <AdminHeading
+      <ModuleHero
+        eyebrow="Inventory · Assembly"
+        icon={Layers}
+        accent="violet"
         title="Smart Inventory · Combos"
-        description="কম্বো বক্সের নিজস্ব স্টক নেই — ভিতরের সাব-প্রোডাক্টের স্টকই ঠিক করে কয়টা বক্স বানানো সম্ভব।"
+        description="Combo boxes have no stock of their own — the stock of the sub-products inside determines how many boxes can be built."
         backTo="/admin/inventory"
         backLabel="Inventory"
         action={
@@ -77,21 +81,21 @@ function SmartCombos() {
           label="Combo boxes"
           value={String(combos.length)}
           icon={<Boxes className="size-3.5" />}
-          tip="মোট কতগুলো কম্বো প্রোডাক্ট আছে।"
+          tip="Total number of combo products."
         />
         <StatCard
           label="Buildable now"
           value={String(buildableTotal)}
           tone="good"
           icon={<Layers className="size-3.5" />}
-          tip="এই মুহূর্তে সব কম্বো মিলিয়ে সর্বোচ্চ কয়টি বক্স প্যাক করা যাবে (প্রতিটি আলাদাভাবে হিসাব)।"
+          tip="Maximum number of boxes that can be packed right now across all combos (calculated individually)."
         />
         <StatCard
           label="Blocked combos"
           value={String(blocked)}
           tone={blocked > 0 ? "bad" : "good"}
           icon={<TriangleAlert className="size-3.5" />}
-          tip="যেসব কম্বোর ভিতরের কোনো একটি আইটেম শেষ, তাই একটিও বানানো যাচ্ছে না।"
+          tip="Combos where one of the inner items is out of stock, so none can be built."
         />
       </div>
 
@@ -100,14 +104,14 @@ function SmartCombos() {
           <TipTitle
             title="Recipe & bottleneck"
             icon={<Layers className="size-4 text-primary" />}
-            tip="প্রতিটি কম্বোর ভিতরে কোন আইটেম কয়টি করে যায়, কার স্টক কত আর কোনটি bottleneck — সব এক নজরে।"
+            tip="See at a glance how many of each item go into a combo, their stock levels, and which is the bottleneck."
           />
           <div className="relative w-full sm:w-72">
             <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              placeholder="Combo বা সাব-আইটেম / SKU"
+              placeholder="Combo or sub-item / SKU"
               className="rounded-xl border-border/80 bg-background/70 pl-9 transition-all duration-200 focus-visible:border-primary/60 focus-visible:ring-primary/25"
             />
           </div>
@@ -122,7 +126,7 @@ function SmartCombos() {
         ) : filtered.length === 0 ? (
           <EmptyState
             title="No combo found"
-            hint="কম্বো তৈরি করুন Products → Combos থেকে, তারপর এখানে availability দেখা যাবে।"
+            hint="Create a combo from Products → Combos, then its availability will show here."
           />
         ) : (
           <div className="space-y-3">
@@ -155,7 +159,7 @@ function SmartCombos() {
 
                 {c.items.length === 0 ? (
                   <p className="mt-3 text-xs text-muted-foreground">
-                    এই কম্বোতে কোনো সাব-আইটেম যোগ করা হয়নি — রেসিপি ছাড়া স্টক হিসাব সম্ভব নয়।
+                    No sub-item has been added to this combo — stock can't be calculated without a recipe.
                   </p>
                 ) : (
                   <div className="mt-3 grid gap-2 sm:grid-cols-2 xl:grid-cols-3">

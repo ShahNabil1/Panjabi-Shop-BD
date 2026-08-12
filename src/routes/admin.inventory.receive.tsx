@@ -7,7 +7,8 @@ import { PackagePlus, Plus, Trash2 } from "lucide-react";
 import { inventorySuppliers, receiveStock } from "@/lib/inventory.functions";
 import { money } from "@/lib/inventory.shared";
 import { ItemPicker, type PickableItem } from "@/components/admin/inventory/item-picker";
-import { AdminHeading, InfoTip, Panel, StatCard, TipTitle } from "@/components/admin/kit";
+import { InfoTip, Panel, StatCard, TipTitle } from "@/components/admin/kit";
+import { ModuleHero } from "@/components/admin/module-hero";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -97,9 +98,12 @@ function ReceiveInventory() {
 
   return (
     <div className="space-y-5">
-      <AdminHeading
+      <ModuleHero
+        eyebrow="Inventory · Intake"
+        icon={PackagePlus}
+        accent="emerald"
         title="Add inventory"
-        description="নতুন কেনা মাল স্টকে তুলুন — প্রতিটি লট আলাদা ব্যাচ হিসেবে সেভ হয়।"
+        description="Add newly purchased stock — each lot is saved as a separate batch."
         backTo="/admin/inventory"
         backLabel="Inventory"
       />
@@ -109,7 +113,7 @@ function ReceiveInventory() {
           <TipTitle
             title="Items received"
             icon={<PackagePlus className="size-4 text-primary" />}
-            tip="বারকোড স্ক্যান করলেই আইটেম বসে যাবে — প্রোডাক্ট/ভেরিয়েন্টের SKU-ই বারকোড। প্রতিটি লাইনের কেনা দাম আলাদা হতে পারে; সিস্টেম নিজেই ওয়েটেড অ্যাভারেজ কস্ট হিসাব করবে।"
+            tip="Scan a barcode to add an item — the product/variant SKU is the barcode. Each line can have a different cost; the system computes the weighted average cost automatically."
           />
 
           <div className="space-y-3">
@@ -161,7 +165,7 @@ function ReceiveInventory() {
                   <div className="space-y-1">
                     <Label className="flex items-center gap-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
                       Buying price
-                      <InfoTip text="এইবারের প্রতি পিস কেনা দাম। আগের বারের দামের সাথে মিলিয়ে গড় কস্ট আপডেট হবে।" />
+                      <InfoTip text="Cost per unit for this purchase. It will be blended with previous costs to update the average cost." />
                     </Label>
                     <Input
                       type="number"
@@ -174,7 +178,7 @@ function ReceiveInventory() {
                   <div className="space-y-1">
                     <Label className="flex items-center gap-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
                       Batch code
-                      <InfoTip text="ঐচ্ছিক। একই প্রোডাক্টের আলাদা লট আলাদা করে চিনতে ব্যবহার করুন।" />
+                      <InfoTip text="Optional. Use it to distinguish separate lots of the same product." />
                     </Label>
                     <Input
                       value={line.batchCode}
@@ -185,7 +189,7 @@ function ReceiveInventory() {
                   <div className="space-y-1">
                     <Label className="flex items-center gap-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
                       Expiry
-                      <InfoTip text="মেয়াদ থাকলে দিন — আগে মেয়াদ শেষ হওয়া ব্যাচ আগে বিক্রির জন্য ড্যাশবোর্ডে অ্যালার্ট আসবে।" />
+                      <InfoTip text="Add an expiry date if applicable — the dashboard will alert you to sell earlier-expiring batches first." />
                     </Label>
                     <Input
                       type="date"
@@ -219,7 +223,7 @@ function ReceiveInventory() {
           <Panel className="space-y-3">
             <TipTitle
               title="Purchase details"
-              tip="সাপ্লায়ার ও ইনভয়েস নম্বর দিলে পরে কোন লট কার কাছ থেকে এসেছিল তা ট্র্যাক করা যাবে।"
+              tip="Adding a supplier and invoice number lets you trace which lot came from whom later."
             />
             <div className="space-y-1.5">
               <Label className="text-[10px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
@@ -251,7 +255,7 @@ function ReceiveInventory() {
             <div className="space-y-1.5">
               <Label className="flex items-center gap-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
                 Freight / other cost
-                <InfoTip text="পুরো চালানের ট্রান্সপোর্ট বা অন্যান্য খরচ। পিস অনুপাতে প্রতিটি আইটেমের কস্টে যোগ হবে (landed cost)।" />
+                <InfoTip text="Transport or other costs for the whole shipment. Added to each item's cost proportionally (landed cost)." />
               </Label>
               <Input
                 type="number"
@@ -273,18 +277,18 @@ function ReceiveInventory() {
             <StatCard
               label="Units"
               value={totals.units.toLocaleString("en-US")}
-              tip="এই চালানে মোট কত পিস ঢুকছে।"
+              tip="Total units entering stock in this receipt."
             />
             <StatCard
               label="Goods value"
               value={money(totals.goods)}
-              tip="সব লাইনের কেনা দামের যোগফল (ফ্রেইট ছাড়া)।"
+              tip="Sum of purchase cost across all lines (excluding freight)."
             />
             <StatCard
               label="Landed total"
               value={money(totals.grand)}
               tone="good"
-              tip="ফ্রেইট ও অন্যান্য খরচসহ চালানের প্রকৃত খরচ।"
+              tip="Actual cost of the shipment including freight and other charges."
             />
           </div>
 
@@ -296,7 +300,7 @@ function ReceiveInventory() {
             Receive into stock
           </Button>
           <p className="text-center text-[11px] text-muted-foreground">
-            স্টক রেকর্ড কখনও মুছে যায় না — ভুল হলে রিভার্সাল এন্ট্রি দিয়ে ঠিক করা হয়।
+            Stock records are never deleted — mistakes are corrected with a reversal entry.
           </p>
         </div>
       </div>

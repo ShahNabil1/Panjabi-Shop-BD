@@ -1,11 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Download, TrendingDown, TrendingUp } from "lucide-react";
+import { BarChart3, Download, TrendingDown, TrendingUp } from "lucide-react";
 
 import { inventoryReport } from "@/lib/inventory.functions";
 import { money } from "@/lib/inventory.shared";
-import { AdminHeading, EmptyState, Panel, StatCard } from "@/components/admin/kit";
+import { EmptyState, Panel, StatCard } from "@/components/admin/kit";
+import { ModuleHero } from "@/components/admin/module-hero";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/admin/inventory/reports")({
@@ -46,9 +47,12 @@ function InventoryReports() {
 
   return (
     <div className="space-y-5">
-      <AdminHeading
+      <ModuleHero
+        eyebrow="Inventory · Analytics"
+        icon={BarChart3}
+        accent="sky"
         title="Inventory reports"
-        description="নির্দিষ্ট সময়ের COGS, রাইট-অফ, প্যাকেজিং খরচ, দ্রুত-চলা ও বসে থাকা স্টক এবং পরের চালানের সাজেশন।"
+        description="COGS, write-offs, packaging cost, fast movers, dead stock and next purchase suggestions for a chosen period."
       />
 
       <div className="flex flex-wrap items-center gap-2">
@@ -76,35 +80,35 @@ function InventoryReports() {
             <StatCard
               label="Stock value (cost)"
               value={money(data.valuation.product.cost + data.valuation.packaging.cost)}
-              tip="পণ্য ও প্যাকেজিং মিলিয়ে আজকের ওয়েটেড অ্যাভারেজ কেনা দামে মোট মূল্য।"
+              tip="Combined product and packaging value at today's weighted average cost."
             />
             <StatCard
               label="COGS in period"
               value={money(data.flow.cogs)}
-              tip="এই সময়ে বিক্রি হয়ে বেরিয়ে যাওয়া পণ্যের কেনা-দামের হিসাব।"
+              tip="Cost of goods sold and dispatched during this period."
             />
             <StatCard
               label="Write-offs"
               value={money(data.flow.writeOffValue)}
               tone={data.flow.writeOffValue > 0 ? "bad" : "default"}
-              tip="ড্যামেজ, হারানো ও মেয়াদোত্তীর্ণ পণ্যের ক্ষতি।"
+              tip="Loss from damaged, lost and expired products."
             />
             <StatCard
               label="Packaging cost"
               value={money(data.flow.packagingValue)}
-              tip={`এই সময়ে ব্যবহৃত ${num(data.flow.packagingQty)} পিস প্যাকেজিং ম্যাটেরিয়ালের খরচ।`}
+              tip={`Cost of ${num(data.flow.packagingQty)} pieces of packaging material used in this period.`}
             />
           </div>
 
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <StatCard label="Purchased in" value={`${num(data.flow.purchaseQty)} pcs`} tip={money(data.flow.purchaseValue)} />
-            <StatCard label="Sold out" value={`${num(data.flow.soldQty)} pcs`} tip="বিক্রি ও এক্সচেঞ্জে বেরোনো ইউনিট।" />
+            <StatCard label="Sold out" value={`${num(data.flow.soldQty)} pcs`} tip="Units gone out via sales and exchanges." />
             <StatCard label="Returned in" value={`${num(data.flow.returnQty)} pcs`} tip={money(data.flow.returnValue)} />
             <StatCard
               label="Low / out of stock"
               value={`${num(data.valuation.lowStock)} / ${num(data.valuation.outOfStock)}`}
               tone={data.valuation.outOfStock > 0 ? "bad" : "default"}
-              tip="রি-অর্ডার পয়েন্টে নেমে আসা ও শূন্য হয়ে যাওয়া SKU সংখ্যা।"
+              tip="Number of SKUs at reorder point and out of stock."
             />
           </div>
 
@@ -118,7 +122,7 @@ function InventoryReports() {
               </Button>
             </div>
             {data.reorderPlan.length === 0 ? (
-              <EmptyState title="No item is below its reorder point" hint="সব SKU নিরাপদ স্টকে আছে।" />
+              <EmptyState title="No item is below its reorder point" hint="All SKUs are at safe stock levels." />
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[760px] text-sm">
@@ -164,7 +168,7 @@ function InventoryReports() {
                 <TrendingUp className="size-4 text-primary" /> Top movers
               </h3>
               {data.topMovers.length === 0 ? (
-                <EmptyState title="No sales movement in this period" hint="সময়সীমা বাড়িয়ে দেখুন।" />
+                <EmptyState title="No sales movement in this period" hint="Try a longer time range." />
               ) : (
                 <ul className="space-y-2">
                   {data.topMovers.map((r) => (
@@ -193,7 +197,7 @@ function InventoryReports() {
                 <TrendingDown className="size-4 text-amber-600" /> Dead stock
               </h3>
               {data.deadStock.length === 0 ? (
-                <EmptyState title="Everything moved at least once" hint="কোনো পণ্য বসে নেই।" />
+                <EmptyState title="Everything moved at least once" hint="No product is sitting idle." />
               ) : (
                 <ul className="space-y-2">
                   {data.deadStock.map((r) => (
