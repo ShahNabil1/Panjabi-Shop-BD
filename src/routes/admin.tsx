@@ -19,6 +19,7 @@ import {
   MessageSquareText,
   BarChart3,
   BellRing,
+  CalendarCheck,
   PiggyBank,
   Clapperboard,
   Users2,
@@ -117,6 +118,7 @@ const sections: Array<{ title: string; items: NavItem[] }> = [
       { to: "/admin/inventory/count", label: "Stock Audit", icon: ClipboardCheck },
       { to: "/admin/inventory/reports", label: "Reports", icon: BarChart3 },
       { to: "/admin/inventory/profit", label: "Profit & Loss", icon: PiggyBank },
+      { to: "/admin/inventory/closing", label: "Monthly Closing", icon: CalendarCheck },
 
       { to: "/admin/inventory/suppliers", label: "Suppliers & Packaging", icon: Boxes },
     ],
