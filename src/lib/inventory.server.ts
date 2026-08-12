@@ -92,14 +92,6 @@ export async function syncCatalogStock(
   variantId: string | null,
 ): Promise<void> {
   if (!productId) return;
-  const { data } = await db
-    .from("inventory_levels")
-    .select("qty_on_hand")
-    .eq("product_id", productId)
-    .is("variant_id", variantId ? undefined : null)
-    .maybeSingle();
-
-  let qty = Number((data as { qty_on_hand?: number } | null)?.qty_on_hand ?? 0);
 
   if (variantId) {
     const { data: vrow } = await db
@@ -107,7 +99,7 @@ export async function syncCatalogStock(
       .select("qty_on_hand")
       .eq("variant_id", variantId)
       .maybeSingle();
-    qty = Number((vrow as { qty_on_hand?: number } | null)?.qty_on_hand ?? 0);
+    const qty = Number((vrow as { qty_on_hand?: number } | null)?.qty_on_hand ?? 0);
     await db.from("product_variants").update({ stock: Math.max(qty, 0) }).eq("id", variantId);
 
     // Product-level stock = sum of its variants.
@@ -123,8 +115,16 @@ export async function syncCatalogStock(
     return;
   }
 
+  const { data } = await db
+    .from("inventory_levels")
+    .select("qty_on_hand")
+    .eq("product_id", productId)
+    .is("variant_id", null)
+    .maybeSingle();
+  const qty = Number((data as { qty_on_hand?: number } | null)?.qty_on_hand ?? 0);
   await db.from("products").update({ stock: Math.max(qty, 0) }).eq("id", productId);
 }
+
 
 /** Current weighted-average cost for an item (0 when never stocked). */
 export async function currentWac(
