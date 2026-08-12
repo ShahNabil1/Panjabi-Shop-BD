@@ -355,8 +355,9 @@ function RtoInspection() {
                           label="Inspection note"
                           value={note}
                           onChange={setNote}
-                          placeholder="বক্সের অবস্থা, কুরিয়ারের ক্ষতি ইত্যাদি"
+                          hint="বক্সের অবস্থা, কুরিয়ারের ক্ষতি ইত্যাদি"
                         />
+
 
                         {mismatch && (
                           <p className="flex items-center gap-2 text-[11px] font-medium text-rose-600">
