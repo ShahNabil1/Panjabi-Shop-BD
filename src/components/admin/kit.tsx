@@ -8,6 +8,12 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export function AdminHeading({
   title,
@@ -285,5 +291,100 @@ export function StatusPill({ status }: { status: string }) {
     >
       {statusLabels[status] ?? status}
     </span>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Tooltip helper — replaces long helper paragraphs under titles.      */
+/* ------------------------------------------------------------------ */
+
+export function InfoTip({ text, className }: { text: string; className?: string }) {
+  return (
+    <TooltipProvider delayDuration={120}>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <button
+            type="button"
+            aria-label={text}
+            onClick={(e) => e.preventDefault()}
+            className={cn(
+              "inline-flex size-4 shrink-0 items-center justify-center rounded-full border border-border/70 text-[10px] font-bold text-muted-foreground transition-all duration-200 hover:scale-110 hover:border-primary/50 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30",
+              className,
+            )}
+          >
+            i
+          </button>
+        </TooltipTrigger>
+        <TooltipContent
+          side="top"
+          className="max-w-[260px] rounded-xl border border-border/70 bg-popover px-3 py-2 text-xs leading-relaxed text-popover-foreground shadow-lg"
+        >
+          {text}
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+}
+
+/** Section title with an inline tooltip instead of a description line. */
+export function TipTitle({
+  title,
+  tip,
+  icon,
+  className,
+}: {
+  title: string;
+  tip: string;
+  icon?: ReactNode;
+  className?: string;
+}) {
+  return (
+    <h2 className={cn("flex items-center gap-2 text-sm font-bold", className)}>
+      {icon}
+      {title}
+      <InfoTip text={tip} />
+    </h2>
+  );
+}
+
+/** Compact KPI tile used across the Inventory module. */
+export function StatCard({
+  label,
+  value,
+  sub,
+  tip,
+  icon,
+  tone = "default",
+}: {
+  label: string;
+  value: string;
+  sub?: string;
+  tip?: string;
+  icon?: ReactNode;
+  tone?: "default" | "good" | "warn" | "bad";
+}) {
+  const tones: Record<string, string> = {
+    default: "text-foreground",
+    good: "text-emerald-600",
+    warn: "text-amber-600",
+    bad: "text-rose-600",
+  };
+  return (
+    <div className="admin-rise group rounded-2xl border border-border bg-card p-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md">
+      <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+        {icon}
+        <span className="truncate">{label}</span>
+        {tip ? <InfoTip text={tip} /> : null}
+      </div>
+      <p
+        className={cn(
+          "font-en mt-2 text-2xl font-bold tabular-nums tracking-tight transition-colors",
+          tones[tone],
+        )}
+      >
+        {value}
+      </p>
+      {sub ? <p className="mt-1 text-xs text-muted-foreground">{sub}</p> : null}
+    </div>
   );
 }
