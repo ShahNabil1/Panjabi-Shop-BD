@@ -61,6 +61,23 @@ function ReceiveInventory() {
     staleTime: 5 * 60 * 1000,
   });
 
+  // Deep-link from Smart Combos: ?items=<productId,productId> preselects the
+  // out-of-stock sub-items so the receipt is ready to fill in.
+  const { items: itemsParam } = Route.useSearch();
+  const { data: catalog = [] } = useCatalogItems();
+  const prefilled = useRef(false);
+
+  useEffect(() => {
+    if (prefilled.current || !itemsParam || catalog.length === 0) return;
+    const ids = itemsParam.split(",").filter(Boolean);
+    const picked = ids
+      .map((id) => catalog.find((c) => c.productId === id && !c.variantId))
+      .filter((c): c is PickableItem => Boolean(c));
+    if (picked.length === 0) return;
+    prefilled.current = true;
+    setLines(picked.map((item) => ({ ...newLine(), item, unitCost: item.price || 0 })));
+  }, [itemsParam, catalog]);
+
   const totals = useMemo(() => {
     const units = lines.reduce((s, l) => s + (l.item ? l.quantity : 0), 0);
     const goods = lines.reduce((s, l) => s + (l.item ? l.quantity * l.unitCost : 0), 0);
