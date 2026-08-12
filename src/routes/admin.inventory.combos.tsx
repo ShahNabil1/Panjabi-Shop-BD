@@ -161,7 +161,10 @@ function SmartCombos() {
                     variant={c.buildable === 0 ? "default" : "outline"}
                     className="rounded-xl"
                   >
-                    <Link to="/admin/inventory/receive">
+                    <Link
+                      to="/admin/inventory/receive"
+                      search={{ items: restockTargets(c).join(",") || undefined }}
+                    >
                       <PackagePlus className="size-4" />
                       Add stock
                     </Link>
