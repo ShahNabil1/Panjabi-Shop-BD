@@ -76,7 +76,7 @@ function ReceiveInventory() {
       .filter((c): c is PickableItem => Boolean(c));
     if (picked.length === 0) return;
     prefilled.current = true;
-    setLines(picked.map((item: PickableItem) => ({ ...newLine(), item, unitCost: item.price || 0 })));
+    setLines(picked.map((item: PickableItem) => ({ ...newLine(), item })));
   }, [itemsParam, catalog]);
 
   const totals = useMemo(() => {
