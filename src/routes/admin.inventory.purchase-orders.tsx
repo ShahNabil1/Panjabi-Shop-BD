@@ -758,7 +758,7 @@ function PoDetail({ id, onBack }: { id: string; onBack: () => void }) {
           label="Received"
           value={`${po.unitsReceived}/${po.unitsOrdered}`}
           icon={<PackageCheck className="size-3.5" />}
-          sub={po.expectedAt ? `Expected ${new Date(po.expectedAt).toLocaleDateString("en-GB")}` : undefined}
+          sub={po.expectedAt ? `Expected ${new Date(po.expectedAt).toLocaleDateString("en-GB")}` : ""}
         />
       </div>
 
