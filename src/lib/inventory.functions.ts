@@ -124,11 +124,16 @@ export const inventoryCatalogItems = createServerFn({ method: "GET" })
       sku: string;
       category: string;
       price: number;
+      imageUrl: string | null;
     }> = [];
 
     for (const p of products) {
       const variants = (p["product_variants"] ?? []).filter((v: any) => v.is_active);
       const category = p["categories"]?.name_en ?? "Uncategorised";
+      const imageUrl =
+        [...((p["product_images"] ?? []) as Array<Record<string, any>>)].sort(
+          (a, b) => Number(a["sort_order"] ?? 0) - Number(b["sort_order"] ?? 0),
+        )[0]?.["url"] ?? null;
       if (variants.length === 0) {
         items.push({
           key: `p:${p["id"]}`,
@@ -139,6 +144,7 @@ export const inventoryCatalogItems = createServerFn({ method: "GET" })
           sku: p["sku"] || "—",
           category,
           price: Number(p["price"] ?? 0),
+          imageUrl,
         });
         continue;
       }
@@ -152,6 +158,7 @@ export const inventoryCatalogItems = createServerFn({ method: "GET" })
           sku: v.sku || p["sku"] || "—",
           category,
           price: Number(p["price"] ?? 0) + Number(v.price_delta ?? 0),
+          imageUrl,
         });
       }
     }
@@ -166,6 +173,7 @@ export const inventoryCatalogItems = createServerFn({ method: "GET" })
         sku: m["sku"] || "—",
         category: "Packaging",
         price: 0,
+        imageUrl: null,
       });
     }
 
