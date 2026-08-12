@@ -64,7 +64,7 @@ function ReceiveInventory() {
   // Deep-link from Smart Combos: ?items=<productId,productId> preselects the
   // out-of-stock sub-items so the receipt is ready to fill in.
   const { items: itemsParam } = Route.useSearch();
-  const { data: catalog = [] } = useCatalogItems();
+  const { data: catalog = [] as PickableItem[] } = useCatalogItems();
   const prefilled = useRef(false);
 
   useEffect(() => {
