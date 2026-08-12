@@ -71,9 +71,11 @@ function ReceiveInventory() {
   useEffect(() => {
     if (prefilled.current || !itemsParam || catalog.length === 0) return;
     const ids: string[] = itemsParam.split(",").filter(Boolean);
-    const picked = ids
-      .map((id: string) => catalog.find((c: PickableItem) => c.productId === id && !c.variantId))
-      .filter((c): c is PickableItem => Boolean(c));
+    // A sub-product with variants has one catalog row per variant SKU — every
+    // one of them gets its own receipt line.
+    const picked = ids.flatMap((id: string) =>
+      catalog.filter((c: PickableItem) => c.productId === id),
+    );
     if (picked.length === 0) return;
     prefilled.current = true;
     setLines(picked.map((item: PickableItem) => ({ ...newLine(), item })));

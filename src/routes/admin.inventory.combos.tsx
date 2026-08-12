@@ -215,6 +215,19 @@ function SmartCombos() {
                           {i.sku || "—"} · {i.perBox}/box · stock {i.onHand} → {i.buildable} box
                           {i.isFree ? " · free" : ""}
                         </p>
+                        {i.variants.length > 0 ? (
+                          <div className="mt-1.5 flex flex-wrap gap-1">
+                            {i.variants.map((v) => (
+                              <span
+                                key={v.id}
+                                className="font-en rounded-md bg-muted/70 px-1.5 py-0.5 text-[10px] tabular-nums text-muted-foreground"
+                                title={v.label}
+                              >
+                                {v.sku || v.label} · {v.onHand}
+                              </span>
+                            ))}
+                          </div>
+                        ) : null}
                       </div>
                     ))}
                   </div>

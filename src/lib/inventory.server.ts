@@ -163,6 +163,8 @@ export type ComboAvailability = {
     buildable: number;
     isFree: boolean;
     bottleneck: boolean;
+    /** Variant-level SKUs of this sub-product with their own stock. */
+    variants: Array<{ id: string; sku: string | null; label: string; onHand: number }>;
   }>;
 };
 
@@ -184,13 +186,31 @@ export async function computeComboAvailability(db: Db): Promise<ComboAvailabilit
       .from("combo_items")
       .select("combo_id,item_id,quantity,is_free,products!combo_items_item_id_fkey(name_en,name_bn,sku)")
       .in("combo_id", combos.map((c) => c["id"] as string)),
-    db.from("inventory_levels").select("product_id,qty_on_hand").not("product_id", "is", null),
+    db
+      .from("inventory_levels")
+      .select("product_id,variant_id,qty_on_hand")
+      .not("product_id", "is", null),
   ]);
 
   const bom = (bomRes.data ?? []) as unknown as Array<Record<string, any>>;
+  const itemIds = Array.from(new Set(bom.map((b) => b["item_id"] as string)));
+  const { data: variantData } = itemIds.length
+    ? await db
+        .from("product_variants")
+        .select("id,product_id,sku,group_name_en,value_en,is_active")
+        .in("product_id", itemIds)
+    : { data: [] as unknown[] };
+  const variants = (variantData ?? []) as unknown as Array<Record<string, any>>;
+
   const onHand = new Map<string, number>();
-  for (const r of (levelRes.data ?? []) as Array<{ product_id: string; qty_on_hand: number }>) {
+  const variantOnHand = new Map<string, number>();
+  for (const r of (levelRes.data ?? []) as Array<{
+    product_id: string;
+    variant_id: string | null;
+    qty_on_hand: number;
+  }>) {
     onHand.set(r.product_id, (onHand.get(r.product_id) ?? 0) + Number(r.qty_on_hand ?? 0));
+    if (r.variant_id) variantOnHand.set(r.variant_id, Number(r.qty_on_hand ?? 0));
   }
 
   return combos.map((c) => {
@@ -207,6 +227,14 @@ export async function computeComboAvailability(db: Db): Promise<ComboAvailabilit
         buildable: Math.floor(have / perBox),
         isFree: Boolean(l["is_free"]),
         bottleneck: false,
+        variants: variants
+          .filter((v) => v["product_id"] === l["item_id"] && v["is_active"] !== false)
+          .map((v) => ({
+            id: v["id"] as string,
+            sku: (v["sku"] as string | null) ?? null,
+            label: `${v["group_name_en"]}: ${v["value_en"]}`,
+            onHand: variantOnHand.get(v["id"] as string) ?? 0,
+          })),
       };
     });
     const buildable = items.length === 0 ? 0 : Math.min(...items.map((i) => i.buildable));
