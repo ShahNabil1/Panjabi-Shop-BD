@@ -116,7 +116,7 @@ export function ItemPicker({
                     <SmartImage
                       src={item.imageUrl}
                       alt={item.label}
-                      width={80}
+                      baseWidth={80}
                       height={80}
                       fit="contain"
                       className="size-full object-contain"
