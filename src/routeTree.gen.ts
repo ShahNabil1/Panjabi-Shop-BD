@@ -40,6 +40,7 @@ import { Route as AdminCombosIndexRouteImport } from './routes/admin.combos.inde
 import { Route as AdminCombosIdRouteImport } from './routes/admin.combos.$id'
 import { Route as AdminInventoryIndexRouteImport } from './routes/admin.inventory.index'
 import { Route as AdminInventoryAdjustRouteImport } from './routes/admin.inventory.adjust'
+import { Route as AdminInventoryAlertsRouteImport } from './routes/admin.inventory.alerts'
 import { Route as AdminInventoryCombosRouteImport } from './routes/admin.inventory.combos'
 import { Route as AdminInventoryCountRouteImport } from './routes/admin.inventory.count'
 import { Route as AdminInventoryLiveRouteImport } from './routes/admin.inventory.live'
@@ -232,6 +233,11 @@ const AdminInventoryIndexRoute = AdminInventoryIndexRouteImport.update({
 const AdminInventoryAdjustRoute = AdminInventoryAdjustRouteImport.update({
   id: '/inventory/adjust',
   path: '/inventory/adjust',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminInventoryAlertsRoute = AdminInventoryAlertsRouteImport.update({
+  id: '/inventory/alerts',
+  path: '/inventory/alerts',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminInventoryCombosRoute = AdminInventoryCombosRouteImport.update({
@@ -463,6 +469,7 @@ export interface FileRoutesByFullPath {
   '/offers/': typeof OffersIndexRoute
   '/admin/combos/$id': typeof AdminCombosIdRoute
   '/admin/inventory/adjust': typeof AdminInventoryAdjustRoute
+  '/admin/inventory/alerts': typeof AdminInventoryAlertsRoute
   '/admin/inventory/combos': typeof AdminInventoryCombosRoute
   '/admin/inventory/count': typeof AdminInventoryCountRoute
   '/admin/inventory/live': typeof AdminInventoryLiveRoute
@@ -533,6 +540,7 @@ export interface FileRoutesByTo {
   '/offers': typeof OffersIndexRoute
   '/admin/combos/$id': typeof AdminCombosIdRoute
   '/admin/inventory/adjust': typeof AdminInventoryAdjustRoute
+  '/admin/inventory/alerts': typeof AdminInventoryAlertsRoute
   '/admin/inventory/combos': typeof AdminInventoryCombosRoute
   '/admin/inventory/count': typeof AdminInventoryCountRoute
   '/admin/inventory/live': typeof AdminInventoryLiveRoute
@@ -605,6 +613,7 @@ export interface FileRoutesById {
   '/offers/': typeof OffersIndexRoute
   '/admin/combos/$id': typeof AdminCombosIdRoute
   '/admin/inventory/adjust': typeof AdminInventoryAdjustRoute
+  '/admin/inventory/alerts': typeof AdminInventoryAlertsRoute
   '/admin/inventory/combos': typeof AdminInventoryCombosRoute
   '/admin/inventory/count': typeof AdminInventoryCountRoute
   '/admin/inventory/live': typeof AdminInventoryLiveRoute
@@ -678,6 +687,7 @@ export interface FileRouteTypes {
     | '/offers/'
     | '/admin/combos/$id'
     | '/admin/inventory/adjust'
+    | '/admin/inventory/alerts'
     | '/admin/inventory/combos'
     | '/admin/inventory/count'
     | '/admin/inventory/live'
@@ -748,6 +758,7 @@ export interface FileRouteTypes {
     | '/offers'
     | '/admin/combos/$id'
     | '/admin/inventory/adjust'
+    | '/admin/inventory/alerts'
     | '/admin/inventory/combos'
     | '/admin/inventory/count'
     | '/admin/inventory/live'
@@ -819,6 +830,7 @@ export interface FileRouteTypes {
     | '/offers/'
     | '/admin/combos/$id'
     | '/admin/inventory/adjust'
+    | '/admin/inventory/alerts'
     | '/admin/inventory/combos'
     | '/admin/inventory/count'
     | '/admin/inventory/live'
@@ -1110,6 +1122,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminInventoryAdjustRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/inventory/alerts': {
+      id: '/admin/inventory/alerts'
+      path: '/inventory/alerts'
+      fullPath: '/admin/inventory/alerts'
+      preLoaderRoute: typeof AdminInventoryAlertsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/inventory/combos': {
       id: '/admin/inventory/combos'
       path: '/inventory/combos'
@@ -1388,6 +1407,7 @@ interface AdminRouteChildren {
   AdminIndexRoute: typeof AdminIndexRoute
   AdminCombosIdRoute: typeof AdminCombosIdRoute
   AdminInventoryAdjustRoute: typeof AdminInventoryAdjustRoute
+  AdminInventoryAlertsRoute: typeof AdminInventoryAlertsRoute
   AdminInventoryCombosRoute: typeof AdminInventoryCombosRoute
   AdminInventoryCountRoute: typeof AdminInventoryCountRoute
   AdminInventoryLiveRoute: typeof AdminInventoryLiveRoute
@@ -1433,6 +1453,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminIndexRoute: AdminIndexRoute,
   AdminCombosIdRoute: AdminCombosIdRoute,
   AdminInventoryAdjustRoute: AdminInventoryAdjustRoute,
+  AdminInventoryAlertsRoute: AdminInventoryAlertsRoute,
   AdminInventoryCombosRoute: AdminInventoryCombosRoute,
   AdminInventoryCountRoute: AdminInventoryCountRoute,
   AdminInventoryLiveRoute: AdminInventoryLiveRoute,
