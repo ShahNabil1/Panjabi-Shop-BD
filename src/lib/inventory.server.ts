@@ -222,3 +222,129 @@ export async function computeComboAvailability(db: Db): Promise<ComboAvailabilit
     };
   });
 }
+
+/* ------------------------------------------------------------------ */
+/* First-run onboarding                                                */
+/* ------------------------------------------------------------------ */
+
+export type OnboardResult = { created: number; opened: number; units: number };
+
+/**
+ * Brings every catalog SKU into the inventory system: creates the missing
+ * `inventory_levels` rows and, for items that already carry a catalog stock
+ * number, posts a one-time `adjust_in` opening-stock movement so the ledger,
+ * WAC and the shop agree from day one. Safe to run repeatedly.
+ */
+export async function onboardCatalogStock(
+  db: Db,
+  actor: { id: string; name: string },
+): Promise<OnboardResult> {
+  const { data: productData } = await db
+    .from("products")
+    .select("id,sku,stock,cost_price,kind,product_variants(id,sku,stock,cost_price,is_active)")
+    .neq("kind", "combo")
+    .limit(2000);
+  const { data: packData } = await db.from("packaging_materials").select("id").eq("is_active", true);
+  const { data: levelData } = await db
+    .from("inventory_levels")
+    .select("id,product_id,variant_id,packaging_id")
+    .limit(5000);
+
+  type Target = {
+    productId: string | null;
+    variantId: string | null;
+    packagingId: string | null;
+    sku: string | null;
+    stock: number;
+    cost: number;
+  };
+
+  const targets: Target[] = [];
+  for (const p of (productData ?? []) as Array<Record<string, any>>) {
+    const variants = (p["product_variants"] ?? []).filter((v: any) => v.is_active);
+    if (variants.length === 0) {
+      targets.push({
+        productId: p["id"],
+        variantId: null,
+        packagingId: null,
+        sku: p["sku"] ?? null,
+        stock: Number(p["stock"] ?? 0),
+        cost: Number(p["cost_price"] ?? 0),
+      });
+      continue;
+    }
+    for (const v of variants) {
+      targets.push({
+        productId: p["id"],
+        variantId: v.id,
+        packagingId: null,
+        sku: v.sku ?? p["sku"] ?? null,
+        stock: Number(v.stock ?? 0),
+        cost: Number(v.cost_price ?? p["cost_price"] ?? 0),
+      });
+    }
+  }
+  for (const m of (packData ?? []) as Array<Record<string, any>>) {
+    targets.push({
+      productId: null,
+      variantId: null,
+      packagingId: m["id"],
+      sku: null,
+      stock: 0,
+      cost: 0,
+    });
+  }
+
+  const key = (t: { productId: string | null; variantId: string | null; packagingId: string | null }) =>
+    t.packagingId ? `k:${t.packagingId}` : `p:${t.productId}:${t.variantId ?? "-"}`;
+  const existing = new Set(
+    ((levelData ?? []) as Array<Record<string, any>>).map((l) =>
+      key({
+        productId: l["product_id"] ?? null,
+        variantId: l["variant_id"] ?? null,
+        packagingId: l["packaging_id"] ?? null,
+      }),
+    ),
+  );
+
+  let created = 0;
+  let opened = 0;
+  let units = 0;
+
+  for (const t of targets) {
+    if (existing.has(key(t))) continue;
+
+    if (t.stock > 0 && t.productId) {
+      const { error } = await db.from("stock_ledger").insert({
+        product_id: t.productId,
+        variant_id: t.variantId,
+        packaging_id: null,
+        sku: t.sku,
+        movement_type: "adjust_in",
+        quantity: t.stock,
+        unit_cost: t.cost,
+        total_cost: t.cost * t.stock,
+        reference_type: "opening",
+        reference_label: "Opening stock import",
+        reason: "Opening stock",
+        note: "Imported from catalog stock",
+        actor_id: actor.id,
+        actor_name: actor.name,
+      });
+      if (error) throw new Error(error.message);
+      opened += 1;
+      units += t.stock;
+      created += 1; // the ledger trigger creates the level row
+    } else {
+      const { error } = await db.from("inventory_levels").insert({
+        product_id: t.productId,
+        variant_id: t.variantId,
+        packaging_id: t.packagingId,
+      });
+      if (!error) created += 1;
+    }
+    existing.add(key(t));
+  }
+
+  return { created, opened, units };
+}
