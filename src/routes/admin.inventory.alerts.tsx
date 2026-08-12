@@ -146,7 +146,12 @@ function StockAlertsPage() {
             />
           </div>
 
-          <Panel title="Alert types" description="ধরন অনুযায়ী ফিল্টার করুন।">
+          <Panel className="space-y-3">
+            <div>
+              <h2 className="text-sm font-bold tracking-tight">Alert types</h2>
+              <p className="text-[11px] text-muted-foreground">ধরন অনুযায়ী ফিল্টার করুন।</p>
+            </div>
+
             <div className="flex flex-wrap gap-2">
               <button
                 type="button"
