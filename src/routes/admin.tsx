@@ -24,6 +24,10 @@ import {
   Megaphone,
 
   Package,
+  PackagePlus,
+  Warehouse,
+  ClipboardList,
+  AlertOctagon,
   PlusCircle,
 
   Rocket,
@@ -89,6 +93,16 @@ const sections: Array<{ title: string; items: NavItem[] }> = [
       { to: "/admin/orders", label: "Web Orders", icon: ShoppingCart, exact: true },
       { to: "/admin/orders/list", label: "Order List", icon: ListOrdered },
       { to: "/admin/orders/search", label: "Search Orders", icon: SearchIcon },
+    ],
+  },
+  {
+    title: "Inventory",
+    items: [
+      { to: "/admin/inventory", label: "Dashboard", icon: Warehouse, exact: true },
+      { to: "/admin/inventory/receive", label: "Add Inventory", icon: PackagePlus },
+      { to: "/admin/inventory/live", label: "Live Inventory", icon: ClipboardList },
+      { to: "/admin/inventory/adjust", label: "Loss & Damage", icon: AlertOctagon },
+      { to: "/admin/inventory/suppliers", label: "Suppliers & Packaging", icon: Boxes },
     ],
   },
   {
