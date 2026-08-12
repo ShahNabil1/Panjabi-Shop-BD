@@ -1,12 +1,16 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { PackagePlus, Plus, Trash2 } from "lucide-react";
 
 import { inventorySuppliers, receiveStock } from "@/lib/inventory.functions";
 import { money } from "@/lib/inventory.shared";
-import { ItemPicker, type PickableItem } from "@/components/admin/inventory/item-picker";
+import {
+  ItemPicker,
+  useCatalogItems,
+  type PickableItem,
+} from "@/components/admin/inventory/item-picker";
 import { InfoTip, Panel, StatCard, TipTitle } from "@/components/admin/kit";
 import { ModuleHero } from "@/components/admin/module-hero";
 import { Button } from "@/components/ui/button";
@@ -14,8 +18,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 export const Route = createFileRoute("/admin/inventory/receive")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    items: typeof search["items"] === "string" && search["items"] ? String(search["items"]) : undefined,
+  }),
   component: ReceiveInventory,
 });
+
 
 type Line = {
   uid: string;
@@ -52,6 +60,24 @@ function ReceiveInventory() {
     queryFn: () => inventorySuppliers(),
     staleTime: 5 * 60 * 1000,
   });
+
+  // Deep-link from Smart Combos: ?items=<productId,productId> preselects the
+  // out-of-stock sub-items so the receipt is ready to fill in.
+  const search = Route.useSearch() as { items?: string };
+  const itemsParam = search.items;
+  const { data: catalog = [] as PickableItem[] } = useCatalogItems();
+  const prefilled = useRef(false);
+
+  useEffect(() => {
+    if (prefilled.current || !itemsParam || catalog.length === 0) return;
+    const ids: string[] = itemsParam.split(",").filter(Boolean);
+    const picked = ids
+      .map((id: string) => catalog.find((c: PickableItem) => c.productId === id && !c.variantId))
+      .filter((c): c is PickableItem => Boolean(c));
+    if (picked.length === 0) return;
+    prefilled.current = true;
+    setLines(picked.map((item: PickableItem) => ({ ...newLine(), item })));
+  }, [itemsParam, catalog]);
 
   const totals = useMemo(() => {
     const units = lines.reduce((s, l) => s + (l.item ? l.quantity : 0), 0);
