@@ -52,7 +52,7 @@ export async function listRtoOrders(db: Db): Promise<RtoOrderRow[]> {
     .select(
       "id,order_number,status,customer_name,customer_phone,total,courier_provider,created_at",
     )
-    .in("status", RTO_STATUSES as unknown as string[])
+    .in("status", [...RTO_STATUSES])
     .order("created_at", { ascending: false })
     .limit(300);
   if (error) throw new Error(error.message);
