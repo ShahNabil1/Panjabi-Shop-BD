@@ -155,7 +155,31 @@ function SmartCombos() {
                   >
                     {c.buildable} buildable
                   </span>
+                  <Button
+                    asChild
+                    size="sm"
+                    variant={c.buildable === 0 ? "default" : "outline"}
+                    className="rounded-xl"
+                  >
+                    <Link to="/admin/inventory/receive">
+                      <PackagePlus className="size-4" />
+                      Add stock
+                    </Link>
+                  </Button>
                 </div>
+
+                {c.buildable === 0 && c.items.length > 0 ? (
+                  <p className="mt-2 rounded-xl bg-rose-50 px-3 py-2 text-[11px] text-rose-900">
+                    Blocked by:{" "}
+                    {c.items
+                      .filter((i) => i.buildable === 0)
+                      .map((i) => `${i.name} (${i.sku || "no SKU"})`)
+                      .join(", ")}{" "}
+                    — receive stock for these sub-items in Add inventory, then this combo becomes
+                    buildable automatically.
+                  </p>
+                ) : null}
+
 
                 {c.items.length === 0 ? (
                   <p className="mt-3 text-xs text-muted-foreground">
