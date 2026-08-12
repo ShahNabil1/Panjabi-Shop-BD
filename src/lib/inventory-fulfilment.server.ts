@@ -200,5 +200,88 @@ export async function applyOrderStock(
     await syncCatalogStock(db, line.productId, line.variantId);
   }
 
+  await applyOrderPackaging(db, orderId, {
+    consume: committed,
+    units: lines.reduce((s, l) => s + l.quantity, 0),
+    orderNumber: label,
+    actorName: who,
+    status,
+  });
+
   return { moved: lines.length, direction: committed ? "out" : "in" };
 }
+
+/**
+ * Packaging consumption.
+ *
+ * A parcel eats real money in boxes, tape and bubble wrap. Each active
+ * packaging material declares how it is used:
+ *   per_order → 1 unit per parcel
+ *   per_unit  → 1 unit per physical item inside the parcel
+ *
+ * Consumption is written as `packaging_out` keyed by the order, and released
+ * with `adjust_in` when the parcel is cancelled before dispatch. Idempotent:
+ * a parcel can never burn the same box twice.
+ */
+export async function applyOrderPackaging(
+  db: Db,
+  orderId: string,
+  args: {
+    consume: boolean;
+    units: number;
+    orderNumber: string | null;
+    actorName: string;
+    status: string;
+  },
+): Promise<{ used: number }> {
+  const { data: existing } = await db
+    .from("stock_ledger")
+    .select("movement_type, packaging_id")
+    .eq("reference_id", orderId)
+    .eq("reference_type", "packaging")
+    .not("packaging_id", "is", null);
+  const rows = (existing ?? []) as Array<{ movement_type: string }>;
+  const outCount = rows.filter((r) => r.movement_type === "packaging_out").length;
+  const backCount = rows.filter((r) => r.movement_type === "adjust_in").length;
+  const applied = outCount > backCount;
+
+  if (args.consume === applied) return { used: 0 };
+
+  const { data: materials } = await db
+    .from("packaging_materials")
+    .select("id, name, sku, consumption")
+    .eq("is_active", true);
+  const list = (materials ?? []) as Array<Record<string, any>>;
+  if (list.length === 0) return { used: 0 };
+
+  let used = 0;
+  for (const m of list) {
+    const qty = m["consumption"] === "per_unit" ? Math.max(args.units, 0) : 1;
+    if (qty <= 0) continue;
+    const wac = await currentWac(db, {
+      productId: null,
+      variantId: null,
+      packagingId: m["id"],
+    });
+    const { error } = await db.from("stock_ledger").insert({
+      packaging_id: m["id"],
+      sku: m["sku"] ?? null,
+      movement_type: args.consume ? "packaging_out" : "adjust_in",
+      quantity: args.consume ? -qty : qty,
+      unit_cost: wac,
+      total_cost: wac * qty,
+      reference_type: "packaging",
+      reference_id: orderId,
+      reference_label: args.orderNumber,
+      reason: args.consume
+        ? `Packaging used for order ${args.orderNumber ?? ""} (${m["name"]})`
+        : `Packaging returned — order ${args.orderNumber ?? ""} released (${args.status})`,
+      actor_name: args.actorName,
+    });
+    if (error) throw new Error(error.message);
+    used += qty;
+  }
+
+  return { used };
+}
+
