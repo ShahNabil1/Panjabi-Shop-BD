@@ -15,6 +15,7 @@ export type PickableItem = {
   sku: string;
   category: string;
   price: number;
+  imageUrl?: string | null;
 };
 
 /** Cached catalog list — every inventory screen reuses this single query. */
