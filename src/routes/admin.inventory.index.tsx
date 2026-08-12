@@ -78,10 +78,12 @@ function InventoryDashboard() {
         title="Inventory"
         description="Stock, batch cost and movement — all in one place."
         action={
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
+            <ImportCatalogStockButton />
             <Button asChild variant="outline" className="rounded-xl">
               <Link to="/admin/inventory/live">Live inventory</Link>
             </Button>
+
             <Button asChild className="ig-gradient rounded-xl transition-transform duration-300 hover:scale-[1.02]">
               <Link to="/admin/inventory/receive">
                 <PackagePlus className="size-4" />
