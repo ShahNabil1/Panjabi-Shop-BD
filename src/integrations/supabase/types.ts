@@ -667,6 +667,72 @@ export type Database = {
           },
         ]
       }
+      inventory_closings: {
+        Row: {
+          adjustment_value: number
+          closed_by: string | null
+          closed_by_name: string | null
+          closing_qty: number
+          closing_value: number
+          cogs_value: number
+          created_at: string
+          id: string
+          note: string | null
+          opening_value: number
+          packaging_value: number
+          period: string
+          period_end: string
+          period_start: string
+          purchase_value: number
+          snapshot: Json
+          supplier_due: number
+          updated_at: string
+          writeoff_value: number
+        }
+        Insert: {
+          adjustment_value?: number
+          closed_by?: string | null
+          closed_by_name?: string | null
+          closing_qty?: number
+          closing_value?: number
+          cogs_value?: number
+          created_at?: string
+          id?: string
+          note?: string | null
+          opening_value?: number
+          packaging_value?: number
+          period: string
+          period_end: string
+          period_start: string
+          purchase_value?: number
+          snapshot?: Json
+          supplier_due?: number
+          updated_at?: string
+          writeoff_value?: number
+        }
+        Update: {
+          adjustment_value?: number
+          closed_by?: string | null
+          closed_by_name?: string | null
+          closing_qty?: number
+          closing_value?: number
+          cogs_value?: number
+          created_at?: string
+          id?: string
+          note?: string | null
+          opening_value?: number
+          packaging_value?: number
+          period?: string
+          period_end?: string
+          period_start?: string
+          purchase_value?: number
+          snapshot?: Json
+          supplier_due?: number
+          updated_at?: string
+          writeoff_value?: number
+        }
+        Relationships: []
+      }
       inventory_levels: {
         Row: {
           created_at: string
