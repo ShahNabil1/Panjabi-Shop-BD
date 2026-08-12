@@ -297,7 +297,7 @@ export function StatusPill({ status }: { status: string }) {
 export function InfoTip({ text, className }: { text: string; className?: string }) {
   const [open, setOpen] = useState(false);
   const [pos, setPos] = useState<{ top: number; left: number } | null>(null);
-  const btnRef = useRef<HTMLButtonElement | null>(null);
+  const btnRef = useRef<HTMLSpanElement | null>(null);
 
   const place = () => {
     const el = btnRef.current;
