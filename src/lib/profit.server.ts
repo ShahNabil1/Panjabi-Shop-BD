@@ -23,7 +23,9 @@ const pct = (part: number, whole: number) => (whole > 0 ? round2((part / whole) 
  */
 export async function buildProfitReport(db: Db, days: number): Promise<ProfitReport> {
   const since = new Date(Date.now() - days * 86_400_000).toISOString();
-  const statuses = [...profitStatuses, ...lossStatuses];
+  const statuses = [...profitStatuses, ...lossStatuses] as unknown as Array<
+    "delivered" | "partial_delivered" | "exchange" | "returned" | "lost_damaged"
+  >;
 
   const orders = unwrap(
     await db
@@ -32,7 +34,7 @@ export async function buildProfitReport(db: Db, days: number): Promise<ProfitRep
         "id,order_number,created_at,status,customer_name,total,subtotal,discount,delivery_charge",
       )
       .gte("created_at", since)
-      .in("status", statuses as unknown as string[])
+      .in("status", statuses)
       .order("created_at", { ascending: false })
       .limit(2000),
   ) as unknown as Row[];
