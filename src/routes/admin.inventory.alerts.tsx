@@ -180,7 +180,12 @@ function StockAlertsPage() {
             </div>
           </Panel>
 
-          <Panel title="Action list" description="গুরুত্ব ও ঝুঁকির টাকা অনুযায়ী সাজানো।">
+          <Panel className="space-y-3">
+            <div>
+              <h2 className="text-sm font-bold tracking-tight">Action list</h2>
+              <p className="text-[11px] text-muted-foreground">গুরুত্ব ও ঝুঁকির টাকা অনুযায়ী সাজানো।</p>
+            </div>
+
             {rows.length === 0 ? (
               <EmptyState title="সব ঠিক আছে" hint="এই ফিল্টারে কোনো সতর্কতা নেই।" />
             ) : (
