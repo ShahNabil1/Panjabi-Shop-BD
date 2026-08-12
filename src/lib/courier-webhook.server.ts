@@ -282,4 +282,14 @@ async function dispatchCourierConversions(
 
   await dispatchOrderEvents(supabaseAdmin as unknown as Db, orderId, orderStatus);
 
+  // Courier-driven status changes move stock too (e.g. cancelled → back in).
+  try {
+    const { applyOrderStock } = await import("./inventory-fulfilment.server");
+    await applyOrderStock(supabaseAdmin as unknown as Db, orderId, orderStatus, {
+      actorName: `${provider} webhook`,
+    });
+  } catch {
+    // Inventory hiccups must never break webhook processing.
+  }
+
 }
