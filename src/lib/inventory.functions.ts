@@ -21,6 +21,8 @@ import {
   type BatchRow,
   type InventoryRow,
   type LedgerRow,
+  type PackagingRow,
+  type SupplierRow,
 } from "./inventory.shared";
 
 /* ----------------------------- reads ----------------------------- */
@@ -170,20 +172,20 @@ export const inventoryCatalogItems = createServerFn({ method: "GET" })
 
 export const inventorySuppliers = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .handler(async ({ context }) => {
+  .handler(async ({ context }): Promise<SupplierRow[]> => {
     const db = await requireAdmin(context.supabase, context.userId);
     return unwrap(
       await db.from("suppliers").select("*").order("name"),
-    ) as unknown as Array<Record<string, unknown>>;
+    ) as unknown as SupplierRow[];
   });
 
 export const inventoryPackaging = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .handler(async ({ context }) => {
+  .handler(async ({ context }): Promise<PackagingRow[]> => {
     const db = await requireAdmin(context.supabase, context.userId);
     return unwrap(
       await db.from("packaging_materials").select("*").order("name"),
-    ) as unknown as Array<Record<string, unknown>>;
+    ) as unknown as PackagingRow[];
   });
 
 /* ----------------------------- writes ---------------------------- */

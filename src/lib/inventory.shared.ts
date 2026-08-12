@@ -161,5 +161,27 @@ export type BatchRow = {
   supplierName: string | null;
 };
 
+export type SupplierRow = {
+  id: string;
+  name: string;
+  phone: string | null;
+  address: string | null;
+  note: string | null;
+  is_active: boolean;
+  created_at: string;
+};
+
+export type PackagingRow = {
+  id: string;
+  name: string;
+  sku: string | null;
+  unit: string;
+  consumption: string;
+  reorder_point: number;
+  note: string | null;
+  is_active: boolean;
+  created_at: string;
+};
+
 export const money = (n: number) =>
   `৳ ${Math.round(n).toLocaleString("en-US")}`;
