@@ -44,14 +44,6 @@ function InventoryReports() {
     URL.revokeObjectURL(url);
   };
 
-  const grossMargin =
-    data && data.flow.cogs > 0
-      ? data.valuation.product.retail > 0
-        ? null
-        : null
-      : null;
-  void grossMargin;
-
   return (
     <div className="space-y-5">
       <AdminHeading
@@ -94,7 +86,7 @@ function InventoryReports() {
             <StatCard
               label="Write-offs"
               value={money(data.flow.writeOffValue)}
-              tone={data.flow.writeOffValue > 0 ? "bad" : undefined}
+              tone={data.flow.writeOffValue > 0 ? "bad" : "default"}
               tip="ড্যামেজ, হারানো ও মেয়াদোত্তীর্ণ পণ্যের ক্ষতি।"
             />
             <StatCard
@@ -111,7 +103,7 @@ function InventoryReports() {
             <StatCard
               label="Low / out of stock"
               value={`${num(data.valuation.lowStock)} / ${num(data.valuation.outOfStock)}`}
-              tone={data.valuation.outOfStock > 0 ? "bad" : undefined}
+              tone={data.valuation.outOfStock > 0 ? "bad" : "default"}
               tip="রি-অর্ডার পয়েন্টে নেমে আসা ও শূন্য হয়ে যাওয়া SKU সংখ্যা।"
             />
           </div>
