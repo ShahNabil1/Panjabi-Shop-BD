@@ -297,7 +297,7 @@ export function StatusPill({ status }: { status: string }) {
 export function InfoTip({ text, className }: { text: string; className?: string }) {
   const [open, setOpen] = useState(false);
   const [pos, setPos] = useState<{ top: number; left: number } | null>(null);
-  const btnRef = useRef<HTMLButtonElement | null>(null);
+  const btnRef = useRef<HTMLSpanElement | null>(null);
 
   const place = () => {
     const el = btnRef.current;
@@ -329,9 +329,10 @@ export function InfoTip({ text, className }: { text: string; className?: string 
 
   return (
     <>
-      <button
+      <span
         ref={btnRef}
-        type="button"
+        role="button"
+        tabIndex={0}
         aria-label={text}
         onMouseEnter={show}
         onMouseLeave={() => setOpen(false)}
@@ -344,13 +345,14 @@ export function InfoTip({ text, className }: { text: string; className?: string 
           else show();
         }}
         className={cn(
-          "inline-flex size-4 shrink-0 items-center justify-center rounded-full border border-border/70 text-[10px] font-bold leading-none text-muted-foreground transition-all duration-200 hover:scale-110 hover:border-primary/50 hover:bg-primary/10 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30",
+          "inline-flex size-4 shrink-0 cursor-help items-center justify-center rounded-full border border-border/70 text-[10px] font-bold leading-none text-muted-foreground transition-all duration-200 hover:scale-110 hover:border-primary/50 hover:bg-primary/10 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30",
           open && "border-primary/60 bg-primary/10 text-primary",
           className,
         )}
       >
         i
-      </button>
+      </span>
+
       {open && pos && typeof document !== "undefined"
         ? createPortal(
             <div

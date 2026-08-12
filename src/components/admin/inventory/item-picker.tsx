@@ -47,7 +47,7 @@ export function ItemPicker({
 
   const results = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return items.slice(0, 12);
+    if (!q) return items.slice(0, 25);
     return items
       .filter(
         (i) =>

@@ -425,3 +425,17 @@ export const inventoryReport = createServerFn({ method: "GET" })
     const { buildInventoryReport } = await import("./inventory-report.server");
     return buildInventoryReport(db, data.days);
   });
+
+/**
+ * First-run onboarding: pulls every catalog SKU into inventory and posts the
+ * opening-stock movements. Idempotent — already-tracked items are skipped.
+ */
+export const importCatalogStock = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const db = await requireAdmin(context.supabase, context.userId);
+    const who = await actorName(db, context.userId);
+    const { onboardCatalogStock } = await import("./inventory.server");
+    const result = await onboardCatalogStock(db, { id: context.userId, name: who });
+    return result;
+  });

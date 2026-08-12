@@ -11,6 +11,7 @@ import {
 import { money, movementLabels } from "@/lib/inventory.shared";
 import { EmptyState, Panel, StatCard, TipTitle } from "@/components/admin/kit";
 import { ModuleHero } from "@/components/admin/module-hero";
+import { ImportCatalogStockButton } from "@/components/admin/inventory/import-catalog";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/admin/inventory/")({
@@ -77,10 +78,12 @@ function InventoryDashboard() {
         title="Inventory"
         description="Stock, batch cost and movement — all in one place."
         action={
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
+            <ImportCatalogStockButton />
             <Button asChild variant="outline" className="rounded-xl">
               <Link to="/admin/inventory/live">Live inventory</Link>
             </Button>
+
             <Button asChild className="ig-gradient rounded-xl transition-transform duration-300 hover:scale-[1.02]">
               <Link to="/admin/inventory/receive">
                 <PackagePlus className="size-4" />
