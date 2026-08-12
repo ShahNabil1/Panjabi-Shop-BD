@@ -1,10 +1,11 @@
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Check, Search } from "lucide-react";
+import { Check, ImageOff, Search } from "lucide-react";
 
 import { inventoryCatalogItems } from "@/lib/inventory.functions";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
+import { SmartImage } from "@/components/site/smart-image";
 
 export type PickableItem = {
   key: string;
@@ -110,6 +111,20 @@ export function ItemPicker({
                   value?.key === item.key && "bg-accent",
                 )}
               >
+                <span className="flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-md border border-border/70 bg-muted/40">
+                  {item.imageUrl ? (
+                    <SmartImage
+                      src={item.imageUrl}
+                      alt={item.label}
+                      width={80}
+                      height={80}
+                      fit="contain"
+                      className="size-full object-contain"
+                    />
+                  ) : (
+                    <ImageOff className="size-4 text-muted-foreground/70" />
+                  )}
+                </span>
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-medium">{item.label}</p>
                   <p className="font-en truncate text-[11px] text-muted-foreground">
