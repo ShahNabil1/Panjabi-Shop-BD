@@ -102,7 +102,9 @@ const sections: Array<{ title: string; items: NavItem[] }> = [
       { to: "/admin/inventory/receive", label: "Add Inventory", icon: PackagePlus },
       { to: "/admin/inventory/live", label: "Live Inventory", icon: ClipboardList },
       { to: "/admin/inventory/combos", label: "Smart Combos", icon: Layers },
+      { to: "/admin/inventory/rto", label: "RTO Inspection", icon: Undo2 },
       { to: "/admin/inventory/adjust", label: "Loss & Damage", icon: AlertOctagon },
+
       { to: "/admin/inventory/suppliers", label: "Suppliers & Packaging", icon: Boxes },
     ],
   },
