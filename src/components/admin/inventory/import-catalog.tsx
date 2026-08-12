@@ -38,7 +38,7 @@ export function ImportCatalogStockButton({
       onClick={() => run.mutate()}
     >
       <DownloadCloud className="size-4" />
-      Import catalog stock
+      Sync products from database
     </Button>
   );
 }
