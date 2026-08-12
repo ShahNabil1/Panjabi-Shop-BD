@@ -25,7 +25,6 @@ import {
 
   Package,
   PackagePlus,
-  Layers,
   Warehouse,
   ClipboardList,
   AlertOctagon,
