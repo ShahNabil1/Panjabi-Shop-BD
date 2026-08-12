@@ -18,6 +18,7 @@ import {
   Menu,
   MessageSquareText,
   BarChart3,
+  PiggyBank,
   Clapperboard,
   Users2,
   SlidersHorizontal,
