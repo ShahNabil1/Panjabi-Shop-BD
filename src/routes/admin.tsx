@@ -18,6 +18,7 @@ import {
   Menu,
   MessageSquareText,
   BarChart3,
+  PiggyBank,
   Clapperboard,
   Users2,
   SlidersHorizontal,
@@ -113,6 +114,7 @@ const sections: Array<{ title: string; items: NavItem[] }> = [
       { to: "/admin/inventory/adjust", label: "Loss & Damage", icon: AlertOctagon },
       { to: "/admin/inventory/count", label: "Stock Audit", icon: ClipboardCheck },
       { to: "/admin/inventory/reports", label: "Reports", icon: BarChart3 },
+      { to: "/admin/inventory/profit", label: "Profit & Loss", icon: PiggyBank },
 
       { to: "/admin/inventory/suppliers", label: "Suppliers & Packaging", icon: Boxes },
     ],
