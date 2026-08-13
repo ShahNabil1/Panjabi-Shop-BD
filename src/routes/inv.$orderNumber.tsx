@@ -114,16 +114,16 @@ function InvoicePage() {
               className="h-14 w-auto object-contain sm:h-20"
             />
             {site.contact.address ? (
-              <p className="mt-2 text-sm font-semibold text-foreground/80">{site.contact.address}</p>
+              <p className="mt-2 text-xs font-semibold text-foreground/80 sm:text-sm">{site.contact.address}</p>
             ) : null}
             {site.contact.phone ? (
-              <p className="text-sm font-semibold text-foreground/80 font-en">{site.contact.phone}</p>
+              <p className="text-xs font-semibold text-foreground/80 font-en sm:text-sm">{site.contact.phone}</p>
             ) : null}
             {site.contact.email ? (
-              <p className="text-sm font-semibold text-foreground/80 font-en">{site.contact.email}</p>
+              <p className="break-all text-xs font-semibold text-foreground/80 font-en sm:text-sm">{site.contact.email}</p>
             ) : null}
           </div>
-          <div className="text-right font-en">
+          <div className="font-en sm:text-right">
             <p className="text-base font-bold uppercase tracking-wide">Invoice</p>
             <p className="mt-1 text-lg font-bold text-primary">{data.orderNumber}</p>
             <p className="text-xs font-medium text-foreground/70">
