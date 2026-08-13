@@ -85,7 +85,7 @@ function InventoryDashboard() {
             </Button>
 
             <Button asChild className="ig-gradient rounded-xl transition-transform duration-300 hover:scale-[1.02]">
-              <Link to="/admin/inventory/receive">
+              <Link to="/admin/inventory/receive" search={{ items: undefined }}>
                 <PackagePlus className="size-4" />
                 Add inventory
               </Link>
