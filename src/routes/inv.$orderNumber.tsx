@@ -286,7 +286,7 @@ function InvoicePage() {
         </table>
 
         <div className="mt-4 flex justify-end font-en">
-          <dl className="w-full max-w-xs space-y-1.5 text-base font-bold">
+          <dl className="w-full space-y-1.5 text-sm font-bold sm:max-w-xs sm:text-base">
             <div className="flex justify-between">
               <dt className="text-foreground/70">Subtotal</dt>
               <dd className="tabular-nums">{formatPrice("en", data.subtotal)}</dd>
