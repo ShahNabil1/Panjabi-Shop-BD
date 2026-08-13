@@ -91,39 +91,39 @@ function InvoicePage() {
   );
 
   return (
-    <div className="mx-auto max-w-[820px] px-4 py-8 print:px-0 print:py-0">
-      <div className="mb-5 flex items-center justify-between gap-3 print:hidden">
-        <Link to="/" className="text-sm font-semibold text-primary">
+    <div className="mx-auto max-w-[820px] px-3 py-5 sm:px-4 sm:py-8 print:px-0 print:py-0">
+      <div className="mb-4 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 sm:mb-5 print:hidden">
+        <Link to="/" className="truncate text-sm font-semibold text-primary">
           ← {site.brand}
         </Link>
         <button
           type="button"
           onClick={() => window.print()}
-          className="rounded-sm bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground"
+          className="shrink-0 rounded-sm bg-primary px-4 py-2.5 text-xs font-semibold text-primary-foreground sm:px-5 sm:text-sm"
         >
           Print / Save PDF
         </button>
       </div>
 
-      <article className="rounded-sm border border-border bg-card p-8 print:border-0 print:p-0">
-        <header className="flex flex-wrap items-start justify-between gap-4 border-b-2 border-border pb-5">
-          <div>
+      <article className="rounded-sm border border-border bg-card p-4 sm:p-8 print:border-0 print:p-0">
+        <header className="grid gap-3 border-b-2 border-border pb-4 sm:flex sm:flex-wrap sm:items-start sm:justify-between sm:gap-4 sm:pb-5">
+          <div className="min-w-0">
             <img
               src={logoMark}
               alt={`${site.brand} logo`}
-              className="h-20 w-auto object-contain"
+              className="h-14 w-auto object-contain sm:h-20"
             />
             {site.contact.address ? (
-              <p className="mt-2 text-sm font-semibold text-foreground/80">{site.contact.address}</p>
+              <p className="mt-2 text-xs font-semibold text-foreground/80 sm:text-sm">{site.contact.address}</p>
             ) : null}
             {site.contact.phone ? (
-              <p className="text-sm font-semibold text-foreground/80 font-en">{site.contact.phone}</p>
+              <p className="text-xs font-semibold text-foreground/80 font-en sm:text-sm">{site.contact.phone}</p>
             ) : null}
             {site.contact.email ? (
-              <p className="text-sm font-semibold text-foreground/80 font-en">{site.contact.email}</p>
+              <p className="break-all text-xs font-semibold text-foreground/80 font-en sm:text-sm">{site.contact.email}</p>
             ) : null}
           </div>
-          <div className="text-right font-en">
+          <div className="font-en sm:text-right">
             <p className="text-base font-bold uppercase tracking-wide">Invoice</p>
             <p className="mt-1 text-lg font-bold text-primary">{data.orderNumber}</p>
             <p className="text-xs font-medium text-foreground/70">
@@ -186,7 +186,51 @@ function InvoicePage() {
           </div>
         ) : null}
 
-        <table className="mt-6 w-full border-collapse font-en text-base">
+        {/* Mobile: stacked item cards */}
+        <ul className="mt-5 space-y-3 font-en sm:hidden print:hidden">
+          {data.items.map((item, index) => (
+            <li key={index} className="rounded-sm border border-border p-3">
+              <div className="flex items-start gap-3">
+                {item.imageUrl ? (
+                  <img
+                    src={item.imageUrl}
+                    alt={item.name}
+                    loading="lazy"
+                    className="size-14 shrink-0 rounded-sm border border-border object-cover"
+                  />
+                ) : null}
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-extrabold leading-snug break-words">{item.name}</p>
+                  {item.variantLabel ? (
+                    <p className="text-xs font-bold text-foreground/70">{item.variantLabel}</p>
+                  ) : null}
+                  {item.comboSelections.length > 0 ? (
+                    <ul className="mt-1 space-y-0.5 text-xs font-semibold text-foreground/70">
+                      {item.comboSelections.map((selection, selectionIndex) => (
+                        <li key={selectionIndex}>
+                          {selection.itemNameEn}
+                          {selection.variantLabelEn ? ` — ${selection.variantLabelEn}` : ""}
+                          {selection.quantity > 1 ? ` × ${selection.quantity}` : ""}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : null}
+                </div>
+              </div>
+              <div className="mt-2 flex items-center justify-between gap-2 border-t border-border/60 pt-2 text-xs font-bold tabular-nums text-foreground/80">
+                <span>
+                  {item.quantity} × {formatPrice("en", item.unitPrice)}
+                </span>
+                <span className="text-sm font-extrabold text-foreground">
+                  {formatPrice("en", item.lineTotal)}
+                </span>
+              </div>
+            </li>
+          ))}
+        </ul>
+
+        {/* Desktop / print: table */}
+        <table className="mt-6 hidden w-full border-collapse font-en text-base sm:table print:table">
           <thead>
             <tr className="border-y-2 border-border text-left">
               <th className="py-2.5 text-base font-extrabold">Item</th>
@@ -208,7 +252,7 @@ function InvoicePage() {
                         className="h-16 w-16 shrink-0 rounded-sm border border-border object-cover"
                       />
                     ) : null}
-                    <div>
+                    <div className="min-w-0">
                       <p className="text-base font-extrabold leading-snug">{item.name}</p>
                       {item.variantLabel ? (
                         <p className="text-sm font-bold text-foreground/70">{item.variantLabel}</p>
@@ -221,7 +265,6 @@ function InvoicePage() {
                               {selection.variantLabelEn ? ` — ${selection.variantLabelEn}` : ""}
                               {selection.quantity > 1 ? ` × ${selection.quantity}` : ""}
                             </li>
-
                           ))}
                         </ul>
                       ) : null}
@@ -243,7 +286,7 @@ function InvoicePage() {
         </table>
 
         <div className="mt-4 flex justify-end font-en">
-          <dl className="w-full max-w-xs space-y-1.5 text-base font-bold">
+          <dl className="w-full space-y-1.5 text-sm font-bold sm:max-w-xs sm:text-base">
             <div className="flex justify-between">
               <dt className="text-foreground/70">Subtotal</dt>
               <dd className="tabular-nums">{formatPrice("en", data.subtotal)}</dd>
