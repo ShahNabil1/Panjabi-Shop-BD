@@ -91,7 +91,7 @@ function InvoicePage() {
   );
 
   return (
-    <div className="mx-auto max-w-[820px] px-3 py-5 sm:px-4 sm:py-8 print:px-0 print:py-0">
+    <div className="print-sheet mx-auto max-w-[820px] px-3 py-5 sm:px-4 sm:py-8 print:px-0 print:py-0">
       <div className="mb-4 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 sm:mb-5 print:hidden">
         <Link to="/" className="truncate text-sm font-semibold text-primary">
           ← {site.brand}
