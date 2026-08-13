@@ -421,7 +421,7 @@ export const adminSendSms = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const db = await requireAdmin(context.supabase, context.userId);
     const { deliverSms, renderSmsTemplate } = await import("./sms.server");
-    const { SITE_URL } = await import("./site");
+    const { receiptUrl } = await import("./sms-template");
     const { data: profile } = await db
       .from("profiles")
       .select("full_name")
@@ -441,7 +441,7 @@ export const adminSendSms = createServerFn({ method: "POST" })
       order_no: orderNo,
       amount: String(Number(o["total"] ?? 0)),
       phone: String(o["customer_phone"] ?? data.phone),
-      receipt_url: orderNo ? `${SITE_URL}/inv/${orderNo}?p=${String(o["customer_phone"] ?? data.phone).replace(/\D/g, "").slice(-4)}` : "",
+      receipt_url: receiptUrl(orderNo, String(o["customer_phone"] ?? data.phone)),
     });
 
     const who = (profile?.full_name as string | null) ?? "Staff";
