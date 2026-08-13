@@ -360,6 +360,7 @@
   html,
   body {
     background: #fff;
+    scrollbar-gutter: auto !important;
     width: auto !important;
     height: auto !important;
     min-height: 0 !important;
