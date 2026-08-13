@@ -421,7 +421,7 @@ export const adminSendSms = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const db = await requireAdmin(context.supabase, context.userId);
     const { deliverSms, renderSmsTemplate } = await import("./sms.server");
-    const { SITE_URL } = await import("./site");
+    const { receiptUrl } = await import("./sms-template");
     const { data: profile } = await db
       .from("profiles")
       .select("full_name")

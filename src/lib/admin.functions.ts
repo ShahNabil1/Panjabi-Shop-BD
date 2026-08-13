@@ -216,7 +216,7 @@ export const adminUpdateOrderStatus = createServerFn({ method: "POST" })
 
       if (o && autoEnabled && o["auto_sms_status"] !== "sent") {
         const { deliverSms, renderSmsTemplate } = await import("./sms.server");
-        const { SITE_URL } = await import("./site");
+        const { receiptUrl } = await import("./sms-template");
         const tpl = tplData?.body ?? "";
         const orderNo = String(o["order_number"] ?? "");
         const message = renderSmsTemplate(tpl, {
@@ -224,7 +224,7 @@ export const adminUpdateOrderStatus = createServerFn({ method: "POST" })
           order_no: orderNo,
           amount: String(Number(o["total"] ?? 0)),
           phone: String(o["customer_phone"] ?? ""),
-          receipt_url: orderNo ? `${SITE_URL}/inv/${orderNo}?p=${String(o["customer_phone"] ?? "").replace(/\D/g, "").slice(-4)}` : "",
+          receipt_url: receiptUrl(orderNo, String(o["customer_phone"] ?? "")),
         });
         const result = await deliverSms(db, {
           orderId: data.id,
