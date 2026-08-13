@@ -1,10 +1,12 @@
-import { SITE_URL } from "./site";
 import { phoneLast4 } from "./order-receipt";
 
-/** Short invoice link used in SMS: /inv/UK-03?p=6863 */
+/** Short receipt domain (Cloudflare-redirected to /inv/*) — keeps SMS segments low. */
+export const RECEIPT_SHORT_URL = "https://upkb.ink";
+
+/** Short invoice link used in SMS: https://upkb.ink/UK-03?p=6863 */
 export function receiptUrl(orderNo: string, phone: string | null | undefined) {
   const code = phoneLast4(phone);
-  return orderNo && code ? `${SITE_URL}/inv/${orderNo}?p=${code}` : "";
+  return orderNo && code ? `${RECEIPT_SHORT_URL}/${orderNo}?p=${code}` : "";
 }
 
 /** Fills {{variables}} in an SMS template. Client-safe (no server-only imports). */
