@@ -186,7 +186,51 @@ function InvoicePage() {
           </div>
         ) : null}
 
-        <table className="mt-6 w-full border-collapse font-en text-base">
+        {/* Mobile: stacked item cards */}
+        <ul className="mt-5 space-y-3 font-en sm:hidden print:hidden">
+          {data.items.map((item, index) => (
+            <li key={index} className="rounded-sm border border-border p-3">
+              <div className="flex items-start gap-3">
+                {item.imageUrl ? (
+                  <img
+                    src={item.imageUrl}
+                    alt={item.name}
+                    loading="lazy"
+                    className="size-14 shrink-0 rounded-sm border border-border object-cover"
+                  />
+                ) : null}
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-extrabold leading-snug break-words">{item.name}</p>
+                  {item.variantLabel ? (
+                    <p className="text-xs font-bold text-foreground/70">{item.variantLabel}</p>
+                  ) : null}
+                  {item.comboSelections.length > 0 ? (
+                    <ul className="mt-1 space-y-0.5 text-xs font-semibold text-foreground/70">
+                      {item.comboSelections.map((selection, selectionIndex) => (
+                        <li key={selectionIndex}>
+                          {selection.itemNameEn}
+                          {selection.variantLabelEn ? ` — ${selection.variantLabelEn}` : ""}
+                          {selection.quantity > 1 ? ` × ${selection.quantity}` : ""}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : null}
+                </div>
+              </div>
+              <div className="mt-2 flex items-center justify-between gap-2 border-t border-border/60 pt-2 text-xs font-bold tabular-nums text-foreground/80">
+                <span>
+                  {item.quantity} × {formatPrice("en", item.unitPrice)}
+                </span>
+                <span className="text-sm font-extrabold text-foreground">
+                  {formatPrice("en", item.lineTotal)}
+                </span>
+              </div>
+            </li>
+          ))}
+        </ul>
+
+        {/* Desktop / print: table */}
+        <table className="mt-6 hidden w-full border-collapse font-en text-base sm:table print:table">
           <thead>
             <tr className="border-y-2 border-border text-left">
               <th className="py-2.5 text-base font-extrabold">Item</th>
@@ -208,7 +252,7 @@ function InvoicePage() {
                         className="h-16 w-16 shrink-0 rounded-sm border border-border object-cover"
                       />
                     ) : null}
-                    <div>
+                    <div className="min-w-0">
                       <p className="text-base font-extrabold leading-snug">{item.name}</p>
                       {item.variantLabel ? (
                         <p className="text-sm font-bold text-foreground/70">{item.variantLabel}</p>
@@ -221,7 +265,6 @@ function InvoicePage() {
                               {selection.variantLabelEn ? ` — ${selection.variantLabelEn}` : ""}
                               {selection.quantity > 1 ? ` × ${selection.quantity}` : ""}
                             </li>
-
                           ))}
                         </ul>
                       ) : null}
