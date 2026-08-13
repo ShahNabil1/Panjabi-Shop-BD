@@ -106,7 +106,7 @@ function InvoicePage() {
       </div>
 
       <article className="rounded-sm border border-border bg-card p-4 sm:p-8 print:border-0 print:p-0">
-        <header className="grid gap-3 border-b-2 border-border pb-4 sm:flex sm:flex-wrap sm:items-start sm:justify-between sm:gap-4 sm:pb-5">
+        <header className="invoice-branding grid grid-cols-[minmax(0,1fr)_auto] items-start gap-4 border-b-2 border-border pb-5">
           <div className="min-w-0">
             <img
               src={logoMark}
@@ -123,7 +123,7 @@ function InvoicePage() {
               <p className="break-all text-xs font-semibold text-foreground/80 font-en sm:text-sm">{site.contact.email}</p>
             ) : null}
           </div>
-          <div className="font-en sm:text-right">
+          <div className="shrink-0 font-en text-right">
             <p className="text-base font-bold uppercase tracking-wide">Invoice</p>
             <p className="mt-1 text-lg font-bold text-primary">{data.orderNumber}</p>
             <p className="text-xs font-medium text-foreground/70">
@@ -230,7 +230,13 @@ function InvoicePage() {
         </ul>
 
         {/* Desktop / print: table */}
-        <table className="mt-6 hidden w-full border-collapse font-en text-base sm:table print:table">
+        <table className="invoice-items mt-6 hidden w-full border-collapse font-en text-base sm:table print:table">
+          <colgroup>
+            <col className="invoice-item-column" />
+            <col className="invoice-qty-column" />
+            <col className="invoice-rate-column" />
+            <col className="invoice-amount-column" />
+          </colgroup>
           <thead>
             <tr className="border-y-2 border-border text-left">
               <th className="py-2.5 text-base font-extrabold">Item</th>
@@ -252,8 +258,8 @@ function InvoicePage() {
                         className="h-16 w-16 shrink-0 rounded-sm border border-border object-cover"
                       />
                     ) : null}
-                    <div className="min-w-0">
-                      <p className="text-base font-extrabold leading-snug">{item.name}</p>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-base font-extrabold leading-snug break-normal">{item.name}</p>
                       {item.variantLabel ? (
                         <p className="text-sm font-bold text-foreground/70">{item.variantLabel}</p>
                       ) : null}

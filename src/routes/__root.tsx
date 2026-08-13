@@ -210,12 +210,12 @@ function Chrome({ children, brand }: { children: ReactNode; brand: string }) {
   }
 
   return (
-    <div className="flex min-h-screen flex-col">
-      <div className={bareOnMobile ? "hidden md:block" : ""}>
+    <div className="flex min-h-screen flex-col" data-site-shell>
+      <div className={bareOnMobile ? "hidden md:block" : ""} data-site-chrome>
         <SiteHeader />
       </div>
       <main className="flex-1">{children}</main>
-      <div className={bareOnMobile ? "hidden md:block" : ""}>
+      <div className={bareOnMobile ? "hidden md:block" : ""} data-site-chrome>
         {isLanding ? (
           <LandingFooter brand={brand} />
         ) : isProduct ? (
