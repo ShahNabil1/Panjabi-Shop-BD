@@ -360,6 +360,7 @@
   html,
   body {
     background: #fff;
+    scrollbar-gutter: auto !important;
     width: auto !important;
     height: auto !important;
     min-height: 0 !important;
@@ -376,13 +377,17 @@
     margin: 12mm;
   }
 
-  /* Receipt sheet: never wider than the printable page, no stray blank page. */
-  body:has(.print-sheet) header,
-  body:has(.print-sheet) footer,
+  /* Hide only the storefront chrome; invoice branding must stay visible. */
+  body:has(.print-sheet) [data-site-chrome],
   body:has(.print-sheet) [data-sonner-toaster] {
     display: none !important;
   }
-  body:has(.print-sheet) .min-h-screen {
+  body:has(.print-sheet) [data-site-shell] {
+    display: block !important;
+    min-height: 0 !important;
+  }
+  body:has(.print-sheet) [data-site-shell] > main {
+    display: block !important;
     min-height: 0 !important;
   }
   .print-sheet,
@@ -398,11 +403,26 @@
   }
   .print-sheet table {
     width: 100% !important;
-    table-layout: fixed;
+    table-layout: auto;
+  }
+  .print-sheet .invoice-item-column {
+    width: 62%;
+  }
+  .print-sheet .invoice-qty-column {
+    width: 8%;
+  }
+  .print-sheet .invoice-rate-column,
+  .print-sheet .invoice-amount-column {
+    width: 15%;
   }
   .print-sheet td,
   .print-sheet th {
-    overflow-wrap: anywhere;
+    overflow-wrap: normal;
+    word-break: normal;
+  }
+  .print-sheet .invoice-branding {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto !important;
   }
   .print-sheet tr,
   .print-sheet li {
