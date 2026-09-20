@@ -390,7 +390,7 @@ function CreateOrderPage() {
     !create.isPending;
 
   return (
-    <div className="space-y-5">
+    <div className="min-w-0 space-y-5 overflow-x-clip">
       <AdminHeading
         backTo="/admin/orders"
         backLabel="Order list"
@@ -400,8 +400,8 @@ function CreateOrderPage() {
 
       <CustomerOrdersDialog phone={phone.trim()} open={historyOpen} onOpenChange={setHistoryOpen} />
 
-      <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_320px]">
-        <div className="space-y-5">
+      <div className="grid min-w-0 gap-5 lg:grid-cols-[minmax(0,1fr)_320px]">
+        <div className="min-w-0 space-y-5">
           <Panel>
             <h2 className="text-sm font-bold">Customer</h2>
 
@@ -411,10 +411,10 @@ function CreateOrderPage() {
               </div>
             ) : null}
 
-            <div className="mt-3 grid gap-4 sm:grid-cols-2">
-              <label className="block">
+            <div className="mt-3 grid min-w-0 gap-4 sm:grid-cols-2">
+              <label className="block min-w-0">
                 <Label>Phone number</Label>
-                <div className="flex gap-2">
+                <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] gap-2">
                   <input
                     className={input}
                     value={phone}
@@ -444,7 +444,7 @@ function CreateOrderPage() {
                 ) : null}
               </label>
 
-              <label className="block">
+              <label className="block min-w-0">
                 <Label>Customer name</Label>
                 <input
                   className={input}
@@ -465,8 +465,8 @@ function CreateOrderPage() {
               />
             </label>
 
-            <div className="mt-4 grid gap-4 sm:grid-cols-3">
-              <label className="block">
+            <div className="mt-4 grid min-w-0 gap-4 sm:grid-cols-3">
+              <label className="block min-w-0">
                 <Label>Division</Label>
                 <select
                   className={input}
@@ -485,7 +485,7 @@ function CreateOrderPage() {
                   ))}
                 </select>
               </label>
-              <label className="block">
+              <label className="block min-w-0">
                 <Label>District</Label>
                 <select
                   className={cn(input, !divisionObj && "opacity-60")}
@@ -504,7 +504,7 @@ function CreateOrderPage() {
                   ))}
                 </select>
               </label>
-              <label className="block">
+              <label className="block min-w-0">
                 <Label>Upazila / Thana</Label>
                 <select
                   className={cn(input, !districtObj && "opacity-60")}
@@ -551,7 +551,7 @@ function CreateOrderPage() {
             {products.isLoading ? (
               <BrandLoader size="sm" className="py-6" />
             ) : (
-              <ul className="mt-3 max-h-64 space-y-1.5 overflow-y-auto">
+              <ul className="mt-3 max-h-72 min-w-0 space-y-2 overflow-y-auto overscroll-contain pr-0.5">
                 {(products.data ?? []).map((rawProduct) => {
                   const p = rawProduct as unknown as SearchProduct;
                   const variants = (p.product_variants ?? []).filter((v) => v.is_active);
@@ -567,8 +567,8 @@ function CreateOrderPage() {
                       key={p.id}
                       className="rounded-xl border border-border/70 bg-background px-3 py-2"
                     >
-                      <div className="flex flex-wrap items-center justify-between gap-2">
-                        <div className="flex min-w-0 items-center gap-3">
+                       <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-start gap-2 sm:items-center">
+                         <div className="flex min-w-0 items-start gap-2.5 sm:items-center sm:gap-3">
                           {thumb ? (
                             <img
                               src={thumb}
@@ -581,31 +581,32 @@ function CreateOrderPage() {
                               No img
                             </div>
                           )}
-                          <div className="min-w-0">
-                            <p className="truncate text-sm font-semibold">{p.name_bn}</p>
-                            <p className="text-xs text-muted-foreground">
+                           <div className="min-w-0 flex-1">
+                             <p className="break-words text-sm font-semibold leading-5 sm:line-clamp-2">{p.name_bn}</p>
+                             <p className="mt-0.5 break-words text-xs leading-4 text-muted-foreground">
                               {p.sku ?? "—"} · {money(Number(p.price))} · stock {p.stock}
                             </p>
                           </div>
                         </div>
                         {variants.length === 0 ? (
-                          <Button
+                           <Button
                             type="button"
                             size="sm"
-                            variant="outline"
+                             variant="outline"
+                             className="shrink-0"
                             onClick={() => addLine(p, null, comboDefaults)}
                           >
                             <Plus className="size-4" />
                             Add
                           </Button>
                         ) : (
-                          <div className="flex flex-wrap gap-1.5">
+                           <div className="flex max-w-[8.5rem] flex-wrap justify-end gap-1.5 sm:max-w-none">
                             {variants.map((v) => (
                               <button
                                 key={v.id}
                                 type="button"
                                 onClick={() => addLine(p, v.id)}
-                                className="rounded-full border border-border px-2.5 py-1 text-xs font-semibold transition-colors hover:border-primary/50 hover:bg-accent"
+                                 className="min-h-8 rounded-full border border-border px-2.5 py-1 text-xs font-semibold transition-colors hover:border-primary/50 hover:bg-accent"
                               >
                                 + {v.value_bn}
                               </button>
@@ -614,14 +615,14 @@ function CreateOrderPage() {
                         )}
                       </div>
                       {(p.combo_items ?? []).some((item) => item.products?.product_variants.some((variant) => variant.is_active)) ? (
-                        <div className="mt-2 grid gap-2 border-t border-border/70 pt-2 sm:grid-cols-2">
+                         <div className="mt-2 grid min-w-0 gap-2 border-t border-border/70 pt-2 sm:grid-cols-2">
                           {(p.combo_items ?? []).map((comboItem) => {
                             const child = comboItem.products;
                             const options = child?.product_variants.filter((variant) => variant.is_active) ?? [];
                             if (!child || options.length === 0) return null;
                             return (
-                              <label key={comboItem.id} className="text-xs font-semibold">
-                                {comboItem.label_bn || child.name_bn}
+                               <label key={comboItem.id} className="min-w-0 text-xs font-semibold">
+                                 <span className="block break-words">{comboItem.label_bn || child.name_bn}</span>
                                 <select
                                   className="mt-1 w-full rounded-lg border border-border bg-background px-2 py-1.5"
                                   defaultValue={options[0]?.id}
@@ -653,7 +654,7 @@ function CreateOrderPage() {
 
             <ul className="mt-4 divide-y divide-border border-t border-border">
               {lines.map((l) => (
-                <li key={l.key} className="flex flex-wrap items-center gap-3 py-2.5">
+                <li key={l.key} className="grid min-w-0 grid-cols-[auto_minmax(0,1fr)_auto] items-start gap-x-2.5 gap-y-2 py-3 sm:grid-cols-[auto_minmax(0,1fr)_5rem_6rem_auto] sm:items-center sm:gap-3">
                   {l.imageUrl ? (
                     <img
                       src={l.imageUrl}
@@ -667,7 +668,7 @@ function CreateOrderPage() {
                     </div>
                   )}
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-semibold">
+                    <p className="break-words text-sm font-semibold leading-5 sm:line-clamp-2">
                       {l.name}
                       {l.variantLabel ? (
                         <span className="text-muted-foreground"> · {l.variantLabel}</span>
@@ -686,32 +687,35 @@ function CreateOrderPage() {
                       </ul>
                     ) : null}
                   </div>
-                  <input
-                    type="number"
-                    min={1}
-                    max={99}
-                    value={l.quantity}
-                    onChange={(e) =>
-                      setLines((prev) =>
-                        prev.map((x) =>
-                          x.key === l.key
-                            ? { ...x, quantity: Math.max(1, Number(e.target.value) || 1) }
-                            : x,
-                        ),
-                      )
-                    }
-                    className={cn(input, "w-20 text-center")}
-                  />
-                  <span className="w-24 text-right text-sm font-bold tabular-nums">
-                    {money(l.unitPrice * l.quantity)}
-                  </span>
+                  <div className="col-span-2 col-start-2 flex min-w-0 items-center justify-between gap-2 sm:col-span-1 sm:col-start-auto sm:contents">
+                    <input
+                      type="number"
+                      min={1}
+                      max={99}
+                      aria-label={`Quantity for ${l.name}`}
+                      value={l.quantity}
+                      onChange={(e) =>
+                        setLines((prev) =>
+                          prev.map((x) =>
+                            x.key === l.key
+                              ? { ...x, quantity: Math.max(1, Number(e.target.value) || 1) }
+                              : x,
+                          ),
+                        )
+                      }
+                      className={cn(input, "h-10 w-20 shrink-0 text-center")}
+                    />
+                    <span className="min-w-0 text-right text-sm font-bold tabular-nums sm:w-24">
+                      {money(l.unitPrice * l.quantity)}
+                    </span>
+                  </div>
                   <button
                     type="button"
                     onClick={() => {
                       setLines((prev) => prev.filter((x) => x.key !== l.key));
                       toast.success(`${l.name} removed`);
                     }}
-                    className="grid size-9 shrink-0 place-items-center rounded-lg border border-border/70 text-muted-foreground transition-all duration-150 hover:border-destructive/40 hover:bg-destructive/10 hover:text-destructive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-destructive/40 active:scale-90 active:bg-destructive active:text-white"
+                    className="col-start-3 row-start-1 grid size-9 shrink-0 place-items-center rounded-lg border border-border/70 text-muted-foreground transition-all duration-150 hover:border-destructive/40 hover:bg-destructive/10 hover:text-destructive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-destructive/40 active:scale-90 active:bg-destructive active:text-white sm:col-start-auto sm:row-start-auto"
                     aria-label="Remove item"
                     title="Remove item"
                   >
@@ -729,7 +733,7 @@ function CreateOrderPage() {
           </Panel>
         </div>
 
-        <div className="space-y-5">
+        <div className="min-w-0 space-y-5">
           {/* Creation mode: Manual → Web Orders/Processing, Approved → Order List/Pending. */}
           <div className="grid grid-cols-2 gap-1.5 rounded-xl border border-border bg-muted/40 p-1.5 shadow-sm">
             {(["manual", "approved"] as const).map((m) => (
@@ -764,7 +768,7 @@ function CreateOrderPage() {
           </div>
 
           <Collapse open={mode === "manual"}>
-            <div className="grid min-w-0 grid-cols-2 gap-2">
+            <div className="grid min-w-0 gap-2 sm:grid-cols-2 lg:grid-cols-2">
               <label className="grid min-w-0 cursor-pointer grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 shadow-sm">
                 <span className="truncate text-xs font-semibold text-foreground">Pre-Order</span>
                 <Switch
@@ -798,7 +802,7 @@ function CreateOrderPage() {
                 />
               </label>
 
-              <div className="col-span-2">
+              <div className="sm:col-span-2">
                 <Collapse open={scheduleOn && !preOrder} gapClass="">
                   <input
                     type="date"
