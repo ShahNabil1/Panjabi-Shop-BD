@@ -225,9 +225,9 @@ function SettingsAdmin() {
             onChange={(e) => setPopup({ ...popup, enabled: e.target.checked })}
             className="peer sr-only"
           />
-          <span className="relative inline-flex h-6 w-11 shrink-0 items-center rounded-full bg-muted transition-colors duration-200 peer-checked:bg-emerald-500 peer-focus-visible:ring-2 peer-focus-visible:ring-emerald-500/40">
+          <span className="relative inline-flex h-6 w-11 shrink-0 touch-manipulation items-center rounded-full bg-muted shadow-sm transition-[background-color,box-shadow,transform] duration-300 ease-out peer-active:scale-95 peer-checked:bg-primary peer-focus-visible:ring-2 peer-focus-visible:ring-ring/40 motion-reduce:transition-none">
             <span
-              className={`absolute left-0.5 size-5 rounded-full bg-white shadow transition-transform duration-200 ${
+              className={`absolute left-0.5 size-5 rounded-full bg-background shadow-md transition-transform duration-300 ease-out motion-reduce:transition-none ${
                 popup.enabled ? "translate-x-5" : "translate-x-0"
               }`}
             />
@@ -377,9 +377,9 @@ function SettingsAdmin() {
             onChange={(e) => setDelivery({ ...delivery, free_all: e.target.checked })}
             className="peer sr-only"
           />
-          <span className="relative inline-flex h-6 w-11 shrink-0 items-center rounded-full bg-muted transition-colors duration-200 peer-checked:bg-emerald-500 peer-focus-visible:ring-2 peer-focus-visible:ring-emerald-500/40">
+          <span className="relative inline-flex h-6 w-11 shrink-0 touch-manipulation items-center rounded-full bg-muted shadow-sm transition-[background-color,box-shadow,transform] duration-300 ease-out peer-active:scale-95 peer-checked:bg-primary peer-focus-visible:ring-2 peer-focus-visible:ring-ring/40 motion-reduce:transition-none">
             <span
-              className={`absolute left-0.5 size-5 rounded-full bg-white shadow transition-transform duration-200 ${
+              className={`absolute left-0.5 size-5 rounded-full bg-background shadow-md transition-transform duration-300 ease-out motion-reduce:transition-none ${
                 freeAll ? "translate-x-5" : "translate-x-0"
               }`}
             />
