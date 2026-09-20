@@ -96,7 +96,7 @@ export function HeroSlider({ slides }: { slides: HeroSlide[] }) {
                   alt={slide.alt ?? "Panjabi Shop BD ব্যানার"}
                   baseWidth={1200}
                   priority={i === 0}
-                  className="aspect-4/3 w-full object-cover sm:aspect-[21/9]"
+                  className="h-auto w-full object-contain sm:aspect-[21/9] sm:object-cover"
                 />
               );
               return (
