@@ -17,6 +17,8 @@ import { cn } from "@/lib/utils";
 import { ecommerce, useTrackOnce } from "@/lib/tracking";
 import { catalogId } from "@/lib/tracking-items";
 import { ImageLightbox, useLightbox } from "@/components/site/image-lightbox";
+import { RichText } from "@/components/site/rich-text";
+import { richTextToPlain } from "@/lib/rich-text";
 
 export const Route = createFileRoute("/p/$product")({
   loader: async ({ params }): Promise<ProductPageData> => {
@@ -33,7 +35,7 @@ export const Route = createFileRoute("/p/$product")({
     const title = p.metaTitle || pageTitle(p.nameBn);
     const description =
       p.metaDescription ||
-      p.shortBn ||
+      richTextToPlain(p.shortBn).slice(0, 300) ||
       `${p.nameBn} — ${formatPrice("bn", p.price)}. সারা দেশে ক্যাশ অন ডেলিভারি।`;
     const url = `/p/${params.product}`;
 
@@ -314,7 +316,7 @@ function ProductPage() {
               ) : null}
             </div>
 
-            {short ? <p className="mt-4 text-[15px] leading-7 text-foreground/90">{short}</p> : null}
+            <RichText html={short} className="mt-4" />
 
             {product.specs.length > 0 ? (
               <dl className="mt-4 divide-y divide-border overflow-hidden rounded-lg border border-border bg-card">

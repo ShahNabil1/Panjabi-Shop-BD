@@ -107,6 +107,28 @@ export function Field({
 const inputClass =
   "rounded-xl border-border/80 bg-background/70 transition-all duration-200 focus-visible:border-primary/60 focus-visible:ring-primary/25";
 
+/** Live "42 / 60" counter shown under length-capped fields. */
+function CharCount({ value, max }: { value: string; max: number }) {
+  const len = [...value].length;
+  return (
+    <p
+      className={cn(
+        "text-right text-[11px] font-semibold tabular-nums",
+        len >= max ? "text-amber-600" : "text-muted-foreground",
+      )}
+    >
+      {len} / {max}
+    </p>
+  );
+}
+
+/** Hard-trims to `max` characters (handles paste + emoji safely). */
+function clamp(value: string, max?: number) {
+  if (!max) return value;
+  const chars = [...value];
+  return chars.length > max ? chars.slice(0, max).join("") : value;
+}
+
 export function TextField({
   label,
   value,
@@ -117,6 +139,7 @@ export function TextField({
   type = "text",
   className,
   disabled,
+  maxLength,
 }: {
   label: string;
   value: string;
@@ -127,6 +150,7 @@ export function TextField({
   type?: string;
   className?: string;
   disabled?: boolean;
+  maxLength?: number;
 }) {
   return (
     <Field label={label} {...(hint ? { hint } : {})} {...(className ? { className } : {})}>
@@ -136,9 +160,11 @@ export function TextField({
         value={value}
         disabled={disabled ?? false}
         placeholder={placeholder ?? ""}
-        onChange={(e) => onChange(e.target.value)}
+        {...(maxLength ? { maxLength } : {})}
+        onChange={(e) => onChange(clamp(e.target.value, maxLength))}
         onBlur={onBlur}
       />
+      {maxLength ? <CharCount value={value} max={maxLength} /> : null}
     </Field>
   );
 }
@@ -176,12 +202,14 @@ export function AreaField({
   onChange,
   rows = 4,
   hint,
+  maxLength,
 }: {
   label: string;
   value: string;
   onChange: (value: string) => void;
   rows?: number;
   hint?: string;
+  maxLength?: number;
 }) {
   return (
     <Field label={label} {...(hint ? { hint } : {})}>
@@ -189,8 +217,10 @@ export function AreaField({
         className={inputClass}
         rows={rows}
         value={value}
-        onChange={(e) => onChange(e.target.value)}
+        {...(maxLength ? { maxLength } : {})}
+        onChange={(e) => onChange(clamp(e.target.value, maxLength))}
       />
+      {maxLength ? <CharCount value={value} max={maxLength} /> : null}
     </Field>
   );
 }
