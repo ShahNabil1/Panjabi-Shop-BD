@@ -192,7 +192,7 @@ function ProductPage() {
   const selectedIds = Object.values(selected);
   const activeVariant =
     variants.find((v) => selectedIds.includes(v.id)) ??
-    (groups.size === 1 ? (variants[0] ?? null) : null);
+    (groups.size === 1 ? (variants.find((variant) => variant.stock > 0) ?? variants[0] ?? null) : null);
   const unitPrice = product.price + Number(activeVariant?.price_delta ?? 0);
   // Catalogue id: variant SKU when a variant is picked, else the product SKU.
   const activeSku = activeVariant?.sku ?? product.sku;

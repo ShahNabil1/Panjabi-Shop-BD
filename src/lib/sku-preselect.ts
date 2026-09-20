@@ -8,7 +8,7 @@
  *     the "what's inside" picker
  */
 
-type VariantLike = { id: string; sku?: string | null; group_name_bn: string; group_name_en: string };
+type VariantLike = { id: string; sku?: string | null; stock?: number; group_name_bn: string; group_name_en: string };
 type ComboLike = {
   id: string;
   itemSku?: string | null;
@@ -35,7 +35,8 @@ export function variantSelectionBySku(
   sku: string | undefined,
   variants: VariantLike[],
 ): Record<string, string> {
-  const match = resolveVariantBySku(sku, variants);
+  const requested = resolveVariantBySku(sku, variants);
+  const match = requested && (requested.stock ?? 1) > 0 ? requested : variants.find((variant) => (variant.stock ?? 1) > 0);
   return match ? { [match.group_name_bn]: match.id, [match.group_name_en]: match.id } : {};
 }
 
