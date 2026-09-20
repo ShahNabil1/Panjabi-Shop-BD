@@ -28,6 +28,7 @@ import { Route as AdminCouponsRouteImport } from './routes/admin.coupons'
 import { Route as AdminFaqsRouteImport } from './routes/admin.faqs'
 import { Route as AdminLandingRouteImport } from './routes/admin.landing'
 import { Route as AdminPromotionsRouteImport } from './routes/admin.promotions'
+import { Route as AdminStaffRouteImport } from './routes/admin.staff'
 import { Route as AdminTaxonomyRouteImport } from './routes/admin.taxonomy'
 import { Route as InvOrderNumberRouteImport } from './routes/inv.$orderNumber'
 import { Route as InvoiceOrderNumberRouteImport } from './routes/invoice.$orderNumber'
@@ -174,6 +175,11 @@ const AdminLandingRoute = AdminLandingRouteImport.update({
 const AdminPromotionsRoute = AdminPromotionsRouteImport.update({
   id: '/promotions',
   path: '/promotions',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminStaffRoute = AdminStaffRouteImport.update({
+  id: '/staff',
+  path: '/staff',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminTaxonomyRoute = AdminTaxonomyRouteImport.update({
@@ -464,6 +470,7 @@ export interface FileRoutesByFullPath {
   '/admin/faqs': typeof AdminFaqsRoute
   '/admin/landing': typeof AdminLandingRoute
   '/admin/promotions': typeof AdminPromotionsRoute
+  '/admin/staff': typeof AdminStaffRoute
   '/admin/taxonomy': typeof AdminTaxonomyRoute
   '/inv/$orderNumber': typeof InvOrderNumberRoute
   '/invoice/$orderNumber': typeof InvoiceOrderNumberRoute
@@ -536,6 +543,7 @@ export interface FileRoutesByTo {
   '/admin/faqs': typeof AdminFaqsRoute
   '/admin/landing': typeof AdminLandingRoute
   '/admin/promotions': typeof AdminPromotionsRoute
+  '/admin/staff': typeof AdminStaffRoute
   '/admin/taxonomy': typeof AdminTaxonomyRoute
   '/inv/$orderNumber': typeof InvOrderNumberRoute
   '/invoice/$orderNumber': typeof InvoiceOrderNumberRoute
@@ -610,6 +618,7 @@ export interface FileRoutesById {
   '/admin/faqs': typeof AdminFaqsRoute
   '/admin/landing': typeof AdminLandingRoute
   '/admin/promotions': typeof AdminPromotionsRoute
+  '/admin/staff': typeof AdminStaffRoute
   '/admin/taxonomy': typeof AdminTaxonomyRoute
   '/inv/$orderNumber': typeof InvOrderNumberRoute
   '/invoice/$orderNumber': typeof InvoiceOrderNumberRoute
@@ -685,6 +694,7 @@ export interface FileRouteTypes {
     | '/admin/faqs'
     | '/admin/landing'
     | '/admin/promotions'
+    | '/admin/staff'
     | '/admin/taxonomy'
     | '/inv/$orderNumber'
     | '/invoice/$orderNumber'
@@ -757,6 +767,7 @@ export interface FileRouteTypes {
     | '/admin/faqs'
     | '/admin/landing'
     | '/admin/promotions'
+    | '/admin/staff'
     | '/admin/taxonomy'
     | '/inv/$orderNumber'
     | '/invoice/$orderNumber'
@@ -830,6 +841,7 @@ export interface FileRouteTypes {
     | '/admin/faqs'
     | '/admin/landing'
     | '/admin/promotions'
+    | '/admin/staff'
     | '/admin/taxonomy'
     | '/inv/$orderNumber'
     | '/invoice/$orderNumber'
@@ -1048,6 +1060,13 @@ declare module '@tanstack/react-router' {
       path: '/promotions'
       fullPath: '/admin/promotions'
       preLoaderRoute: typeof AdminPromotionsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/staff': {
+      id: '/admin/staff'
+      path: '/staff'
+      fullPath: '/admin/staff'
+      preLoaderRoute: typeof AdminStaffRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/taxonomy': {
@@ -1422,6 +1441,7 @@ interface AdminRouteChildren {
   AdminFaqsRoute: typeof AdminFaqsRoute
   AdminLandingRoute: typeof AdminLandingRoute
   AdminPromotionsRoute: typeof AdminPromotionsRoute
+  AdminStaffRoute: typeof AdminStaffRoute
   AdminTaxonomyRoute: typeof AdminTaxonomyRoute
   AdminIndexRoute: typeof AdminIndexRoute
   AdminCombosIdRoute: typeof AdminCombosIdRoute
@@ -1469,6 +1489,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminFaqsRoute: AdminFaqsRoute,
   AdminLandingRoute: AdminLandingRoute,
   AdminPromotionsRoute: AdminPromotionsRoute,
+  AdminStaffRoute: AdminStaffRoute,
   AdminTaxonomyRoute: AdminTaxonomyRoute,
   AdminIndexRoute: AdminIndexRoute,
   AdminCombosIdRoute: AdminCombosIdRoute,
