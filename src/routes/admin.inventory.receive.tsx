@@ -431,6 +431,26 @@ function ReceiveInventory() {
           </p>
         </div>
       </div>
+
+      <Dialog open={Boolean(preview)} onOpenChange={(o) => !o && setPreview(null)}>
+        <DialogContent className="max-w-lg">
+          <DialogTitle className="text-sm">{preview?.label}</DialogTitle>
+          <div className="grid place-items-center overflow-hidden rounded-xl border border-border/70 bg-muted/20 p-3">
+            {preview?.imageUrl ? (
+              <SmartImage
+                src={preview.imageUrl}
+                alt={preview.label}
+                baseWidth={720}
+                height={720}
+                fit="contain"
+                className="max-h-[60vh] w-full object-contain"
+              />
+            ) : (
+              <p className="py-10 text-xs text-muted-foreground">No image for this item.</p>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
