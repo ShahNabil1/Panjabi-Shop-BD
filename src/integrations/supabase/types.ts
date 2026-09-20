@@ -1238,6 +1238,8 @@ export type Database = {
           courier_status: string | null
           courier_tracking_code: string | null
           created_at: string
+          created_by: string | null
+          created_by_name: string | null
           customer_email: string | null
           customer_ip: string | null
           customer_ip_location: Json
@@ -1281,6 +1283,8 @@ export type Database = {
           courier_status?: string | null
           courier_tracking_code?: string | null
           created_at?: string
+          created_by?: string | null
+          created_by_name?: string | null
           customer_email?: string | null
           customer_ip?: string | null
           customer_ip_location?: Json
@@ -1324,6 +1328,8 @@ export type Database = {
           courier_status?: string | null
           courier_tracking_code?: string | null
           created_at?: string
+          created_by?: string | null
+          created_by_name?: string | null
           customer_email?: string | null
           customer_ip?: string | null
           customer_ip_location?: Json
