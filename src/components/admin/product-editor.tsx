@@ -400,9 +400,9 @@ export function ProductEditor({ id, kind }: { id: string; kind: ProductKind }) {
 
         {isComponent ? null : (
           <div className="mt-5">
-            <AreaField
+            <RichTextEditor
               label="Short description"
-              rows={3}
+              hint="যেভাবে লিখবেন — কালার, বোল্ড, লিস্ট, ইমোজি — ঠিক সেভাবেই প্রোডাক্ট পেজে দেখাবে।"
               value={draft.short_description_bn ?? ""}
               onChange={(v) =>
                 setDraft((d) => ({
