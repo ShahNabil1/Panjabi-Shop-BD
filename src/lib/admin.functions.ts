@@ -555,6 +555,65 @@ export const adminDeleteProduct = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+/** Drag-and-drop ordering on the product list pages. */
+export const adminReorderProducts = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => z.object({ ids: z.array(z.string().uuid()).max(500) }).parse(input))
+  .handler(async ({ data, context }) => {
+    const db = await requireAdmin(context.supabase, context.userId);
+    for (let i = 0; i < data.ids.length; i += 1) {
+      const { error } = await db
+        .from("products")
+        .update({ sort_order: i })
+        .eq("id", data.ids[i] as string);
+      if (error) throw new Error(error.message);
+    }
+    return { ok: true, count: data.ids.length };
+  });
+
+/** Bulk delete — full-access staff and admins only. */
+export const adminBulkDeleteProducts = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z.object({ ids: z.array(z.string().uuid()).min(1).max(200) }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const db = await requireAdmin(context.supabase, context.userId);
+
+    const { data: isAdmin } = await context.supabase.rpc("has_role", {
+      _user_id: context.userId,
+      _role: "admin",
+    });
+    if (!isAdmin) {
+      const staff = await db
+        .from("staff_accounts")
+        .select("full_access, is_active")
+        .eq("user_id", context.userId)
+        .maybeSingle();
+      if (!staff.data?.full_access || !staff.data.is_active) {
+        throw new Error("এই কাজটি করার অনুমতি নেই।");
+      }
+    }
+
+    const blocked = unwrap(
+      await db.from("combo_items").select("item_id").in("item_id", data.ids),
+    ) as Array<{ item_id: string }>;
+    const blockedIds = new Set(blocked.map((b) => b.item_id));
+    const ids = data.ids.filter((id) => !blockedIds.has(id));
+
+    if (ids.length > 0) {
+      await db.from("combo_items").delete().in("combo_id", ids);
+      await db.from("product_images").delete().in("product_id", ids);
+      await db.from("product_variants").delete().in("product_id", ids);
+      await db.from("promotion_products").delete().in("product_id", ids);
+      await db.from("landing_pages").delete().in("product_id", ids);
+      const { error } = await db.from("products").delete().in("id", ids);
+      if (error) throw new Error(error.message);
+    }
+
+    return { deleted: ids.length, skipped: blockedIds.size };
+  });
+
 export const adminListPromotions = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
