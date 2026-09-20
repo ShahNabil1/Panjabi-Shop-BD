@@ -593,7 +593,22 @@ function AdminLayout() {
 
 
         <main className="admin-page mx-auto w-full max-w-6xl space-y-6 px-4 py-6 lg:px-10 lg:py-10">
-          <Outlet />
+          {pageAllowed ? (
+            <Outlet />
+          ) : (
+            <div className="mx-auto max-w-md rounded-2xl border border-border bg-card p-8 text-center">
+              <h2 className="ig-text text-xl font-bold">This page is locked</h2>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Your account does not have permission for this page. Ask the owner to grant it in
+                Staff &amp; Access.
+              </p>
+              <div className="mt-6 flex justify-center">
+                <Button asChild variant="outline">
+                  <Link to="/admin">Back to dashboard</Link>
+                </Button>
+              </div>
+            </div>
+          )}
         </main>
       </div>
 
