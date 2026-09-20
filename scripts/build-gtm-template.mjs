@@ -1,6 +1,6 @@
 /**
  * Generates a reusable Google Tag Manager container export
- * (public/gtm/upoharkabbo-gtm-template.json).
+ * (public/gtm/panjabishopbd-gtm-template.json).
  *
  * Import it into ANY GTM container (Admin → Import Container), then only
  * edit the 4 constant variables (GA4 ID, Meta Pixel, TikTok Pixel, Clarity).
@@ -350,9 +350,9 @@ const container = {
 
 mkdirSync("public/gtm", { recursive: true });
 writeFileSync(
-  "public/gtm/upoharkabbo-gtm-template.json",
+  "public/gtm/panjabishopbd-gtm-template.json",
   JSON.stringify(container, null, 2) + "\n",
 );
 console.log(
-  `Wrote public/gtm/upoharkabbo-gtm-template.json — ${tag.length} tags, ${trigger.length} triggers, ${variable.length} variables.`,
+  `Wrote public/gtm/panjabishopbd-gtm-template.json — ${tag.length} tags, ${trigger.length} triggers, ${variable.length} variables.`,
 );

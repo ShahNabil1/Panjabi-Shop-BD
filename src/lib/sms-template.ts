@@ -1,9 +1,9 @@
 import { phoneLast4 } from "./order-receipt";
 
-/** Short receipt domain (Cloudflare-redirected to /inv/*) — keeps SMS segments low. */
-export const RECEIPT_SHORT_URL = "https://upkb.ink";
+/** Receipt link base on the main domain — invoices live at /inv/*. */
+export const RECEIPT_SHORT_URL = "https://panjabishopbd.com/inv";
 
-/** Short invoice link used in SMS: https://upkb.ink/UK-03?p=6863 */
+/** Invoice link used in SMS: https://panjabishopbd.com/inv/PS-03?p=6863 */
 export function receiptUrl(orderNo: string, phone: string | null | undefined) {
   const code = phoneLast4(phone);
   return orderNo && code ? `${RECEIPT_SHORT_URL}/${orderNo}?p=${code}` : "";

@@ -329,7 +329,7 @@ export const adminTestCourierWebhook = createServerFn({ method: "POST" })
 
     // Always probe the real, branded public endpoint that couriers actually call —
     // never a local self-request, so the result can't be falsely optimistic.
-    const url = `https://upoharkabbo.com/api/public/courier/${data.provider}`;
+    const url = `https://panjabishopbd.com/api/public/courier/${data.provider}`;
 
     const headerName =
       data.provider === "pathao"

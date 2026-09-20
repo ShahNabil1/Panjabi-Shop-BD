@@ -468,7 +468,7 @@ export const adminImageTransformUsage = createServerFn({ method: "GET" })
 
       // Fallback: zone-level resizing requests (token is zone-scoped).
       const zoneRes = await fetch(
-        "https://api.cloudflare.com/client/v4/zones?name=upoharkabbo.com",
+        "https://api.cloudflare.com/client/v4/zones?name=panjabishopbd.com",
         { headers: { Authorization: `Bearer ${token}` } },
       );
       const zoneJson = (await zoneRes.json()) as { result?: { id: string }[] };

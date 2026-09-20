@@ -7,11 +7,11 @@
  */
 
 /** Zone that has Transformations enabled. Sources must live on this zone. */
-const ZONE_HOST = "upoharkabbo.com";
+const ZONE_HOST = "panjabishopbd.com";
 /**
  * Hosts that serve the app itself — their `/cdn-cgi/image/…` path is swallowed
  * by the app worker, so transformations must be requested on the asset host
- * (e.g. cdn.upoharkabbo.com) instead.
+ * (e.g. cdn.panjabishopbd.com) instead.
  */
 const APP_HOSTS = new Set([ZONE_HOST, `www.${ZONE_HOST}`]);
 
@@ -36,7 +36,7 @@ export function bucketWidth(px: number): number {
 }
 
 /**
- * Only assets hosted on a zone subdomain (e.g. cdn.upoharkabbo.com) can be
+ * Only assets hosted on a zone subdomain (e.g. cdn.panjabishopbd.com) can be
  * transformed — the apex/www hosts run the app worker and never expose
  * /cdn-cgi/image/.
  */

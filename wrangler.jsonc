@@ -3,7 +3,7 @@
   // Only used by `wrangler deploy` / Cloudflare Workers Builds.
   // Lovable preview + Lovable hosting ignore this file completely.
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "upoharkabbo",
+  "name": "panjabishopbd",
   "main": "./dist/server/index.mjs",
   "compatibility_date": "2025-09-01",
   "compatibility_flags": ["nodejs_compat"],

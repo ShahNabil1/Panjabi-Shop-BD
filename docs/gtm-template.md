@@ -1,9 +1,9 @@
 # GTM Template — এক ক্লিকে সেটআপ
 
-`public/gtm/upoharkabbo-gtm-template.json` হলো একটা **রি-ইউজেবল GTM কন্টেইনার এক্সপোর্ট**।
+`public/gtm/panjabishopbd-gtm-template.json` হলো একটা **রি-ইউজেবল GTM কন্টেইনার এক্সপোর্ট**।
 যেকোনো নতুন GTM অ্যাকাউন্ট/কন্টেইনারে ইমপোর্ট করলেই পুরো ট্র্যাকিং সেটআপ দাঁড়িয়ে যায়।
 
-লিংক: `https://<your-domain>/gtm/upoharkabbo-gtm-template.json`
+লিংক: `https://<your-domain>/gtm/panjabishopbd-gtm-template.json`
 
 ## ভিতরে কী আছে
 
