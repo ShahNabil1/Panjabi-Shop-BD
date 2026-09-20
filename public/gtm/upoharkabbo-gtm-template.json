@@ -5,12 +5,12 @@
     "accountId": "0",
     "containerId": "0",
     "containerVersionId": "0",
-    "name": "Upoharkabbo Tracking Template",
+    "name": "Panjabi Shop BD Tracking Template",
     "description": "GA4 + Meta Pixel + TikTok Pixel + Microsoft Clarity, wired to the dataLayer events pushed by src/lib/tracking.ts. Edit only the four CFG - * constant variables after import.",
     "container": {
       "accountId": "0",
       "containerId": "0",
-      "name": "Upoharkabbo Tracking Template",
+      "name": "Panjabi Shop BD Tracking Template",
       "publicId": "GTM-XXXXXXX",
       "usageContext": [
         "WEB"

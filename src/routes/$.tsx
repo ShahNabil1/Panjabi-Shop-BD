@@ -5,7 +5,7 @@ import { NotFoundView } from "@/components/site/not-found-view";
 export const Route = createFileRoute("/$")({
   head: () => ({
     meta: [
-      { title: "পেইজটি পাওয়া যায়নি | Not found — উপহারকাব্য" },
+      { title: "পেইজটি পাওয়া যায়নি | Not found — Panjabi Shop BD" },
       { name: "robots", content: "noindex, follow" },
     ],
   }),

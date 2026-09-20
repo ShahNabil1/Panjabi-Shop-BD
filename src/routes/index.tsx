@@ -18,13 +18,13 @@ export const Route = createFileRoute("/")({
   loader: async (): Promise<HomeData> => getHomeData(),
   head: () => ({
     meta: [
-      { title: "উপহারকাব্য — গিফট কম্বো ও উপহার সামগ্রীর অনলাইন শপ" },
+      { title: "Panjabi Shop BD — গিফট কম্বো ও উপহার সামগ্রীর অনলাইন শপ" },
       {
         name: "description",
         content:
           "জন্মদিন, বিবাহবার্ষিকী কিংবা কর্পোরেট — প্রতিটি উপলক্ষের জন্য সাজানো গিফট কম্বো ও উপহার বক্স। সারা দেশে ক্যাশ অন ডেলিভারি।",
       },
-      { property: "og:title", content: "উপহারকাব্য — গিফট কম্বো ও উপহার সামগ্রীর অনলাইন শপ" },
+      { property: "og:title", content: "Panjabi Shop BD — গিফট কম্বো ও উপহার সামগ্রীর অনলাইন শপ" },
       {
         property: "og:description",
         content: "জন্মদিন, বিবাহবার্ষিকী কিংবা কর্পোরেট — প্রতিটি উপলক্ষের জন্য সাজানো গিফট কম্বো ও উপহার বক্স। সারা দেশে ক্যাশ অন ডেলিভারি।",
@@ -50,8 +50,8 @@ function HomePage() {
       <PromoPopup config={popup} />
       <h1 className="sr-only">
         {lang === "bn"
-          ? "উপহারকাব্য — গিফট কম্বো ও উপহার সামগ্রীর অনলাইন শপ"
-          : "Upoharkabbo — Gift combos and premium gift items online shop"}
+          ? "Panjabi Shop BD — গিফট কম্বো ও উপহার সামগ্রীর অনলাইন শপ"
+          : "Panjabi Shop BD — Gift combos and premium gift items online shop"}
       </h1>
       {slides.length > 0 ? (
         <HeroSlider slides={slides} />
@@ -179,7 +179,7 @@ function HomePage() {
               Frequently asked questions
             </h2>
             <p className="mx-auto mt-2 max-w-xl text-balance px-2 text-sm font-semibold leading-6 text-muted-foreground lg:max-w-none lg:whitespace-nowrap">
-              Everything you need to know about shopping, delivery and payments on Upoharkabbo.
+              Everything you need to know about shopping, delivery and payments on Panjabi Shop BD.
             </p>
           </div>
           <FaqList items={data.faqs} />

@@ -19,7 +19,7 @@ import type { CartItem } from "@/lib/cart-context";
 import { ecommerce, useScrollDepth, useTrackOnce } from "@/lib/tracking";
 import { cartTrackingItems } from "@/lib/tracking-items";
 import { cn } from "@/lib/utils";
-import logoMark from "@/assets/upoharkabbo-logo.png";
+import logoMark from "@/assets/panjabishopbd-logo.png";
 import { ImageLightbox, useLightbox } from "@/components/site/image-lightbox";
 import { pageTitle, SITE_URL } from "@/lib/site";
 

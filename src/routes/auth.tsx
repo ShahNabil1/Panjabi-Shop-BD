@@ -7,22 +7,22 @@ import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import logoMark from "@/assets/upoharkabbo-logo.png";
+import logoMark from "@/assets/panjabishopbd-logo.png";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "স্টাফ লগইন — উপহারকাব্য (upoharkabbo.com)" },
+      { title: "স্টাফ লগইন — Panjabi Shop BD (upoharkabbo.com)" },
       {
         name: "description",
         content:
-          "upoharkabbo.com-এর নিজস্ব স্টাফ/অ্যাডমিন লগইন পেইজ। শুধুমাত্র উপহারকাব্য টিমের অনুমোদিত সদস্যদের জন্য।",
+          "upoharkabbo.com-এর নিজস্ব স্টাফ/অ্যাডমিন লগইন পেইজ। শুধুমাত্র Panjabi Shop BD টিমের অনুমোদিত সদস্যদের জন্য।",
       },
       { name: "robots", content: "noindex, follow" },
-      { property: "og:title", content: "স্টাফ লগইন — উপহারকাব্য" },
+      { property: "og:title", content: "স্টাফ লগইন — Panjabi Shop BD" },
       {
         property: "og:description",
-        content: "উপহারকাব্য স্টোর ম্যানেজমেন্ট প্যানেলের অফিসিয়াল লগইন পেইজ।",
+        content: "Panjabi Shop BD স্টোর ম্যানেজমেন্ট প্যানেলের অফিসিয়াল লগইন পেইজ।",
       },
     ],
   }),
@@ -85,9 +85,9 @@ function AuthPage() {
           is the pattern Google Safe Browsing reports as "possible phishing". */}
       <header className="border-b border-border">
         <div className="mx-auto flex w-full max-w-5xl items-center justify-between gap-3 px-4 py-3">
-          <Link to="/" className="flex items-center gap-2" aria-label="উপহারকাব্য হোমপেইজ">
-            <img src={logoMark} alt="উপহারকাব্য" className="h-9 w-9 rounded-sm object-contain" />
-            <span className="text-sm font-bold tracking-tight">উপহারকাব্য</span>
+          <Link to="/" className="flex items-center gap-2" aria-label="Panjabi Shop BD হোমপেইজ">
+            <img src={logoMark} alt="Panjabi Shop BD" className="h-9 w-9 rounded-sm object-contain" />
+            <span className="text-sm font-bold tracking-tight">Panjabi Shop BD</span>
           </Link>
           <Link to="/" className="text-sm text-muted-foreground hover:text-primary">
             ← হোমপেইজে ফিরুন
@@ -98,11 +98,11 @@ function AuthPage() {
       <main className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center px-4 py-12">
         <div className="rounded-lg border border-border bg-card p-6 shadow-sm sm:p-8">
           <h1 className="text-xl font-bold tracking-tight">
-            {mode === "signin" ? "উপহারকাব্য স্টাফ লগইন" : "নতুন স্টাফ অ্যাকাউন্ট"}
+            {mode === "signin" ? "Panjabi Shop BD স্টাফ লগইন" : "নতুন স্টাফ অ্যাকাউন্ট"}
           </h1>
           <p className="mt-1.5 text-sm text-muted-foreground">
             এটি <span className="font-en font-semibold">upoharkabbo.com</span>-এর নিজস্ব স্টোর
-            ম্যানেজমেন্ট প্যানেল। শুধুমাত্র উপহারকাব্য টিমের অনুমোদিত সদস্যরা এখানে সাইন ইন করবেন।
+            ম্যানেজমেন্ট প্যানেল। শুধুমাত্র Panjabi Shop BD টিমের অনুমোদিত সদস্যরা এখানে সাইন ইন করবেন।
             কেনাকাটার জন্য লগইনের প্রয়োজন নেই।
           </p>
 
@@ -157,7 +157,7 @@ function AuthPage() {
             </button>
           ) : (
             <p className="mt-4 text-center text-xs text-muted-foreground">
-              অ্যাকাউন্ট শুধুমাত্র উপহারকাব্য অ্যাডমিন তৈরি করে দেন। সমস্যা হলে{" "}
+              অ্যাকাউন্ট শুধুমাত্র Panjabi Shop BD অ্যাডমিন তৈরি করে দেন। সমস্যা হলে{" "}
               <Link to="/contact" className="underline underline-offset-4 hover:text-primary">
                 যোগাযোগ করুন
               </Link>
@@ -167,7 +167,7 @@ function AuthPage() {
         </div>
 
         <p className="mt-6 text-center text-xs text-muted-foreground">
-          © উপহারকাব্য · <span className="font-en">upoharkabbo.com</span> ·{" "}
+          © Panjabi Shop BD · <span className="font-en">upoharkabbo.com</span> ·{" "}
           <Link to="/about" className="underline underline-offset-4 hover:text-primary">
             আমাদের সম্পর্কে
           </Link>{" "}

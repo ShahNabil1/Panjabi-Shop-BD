@@ -492,12 +492,12 @@ export const smsTemplates = [
   {
     id: "order_confirm",
     label: "Order confirmation",
-    body: "প্রিয় {{name}}, আপনার অর্ডার {{order_no}} কনফার্ম হয়েছে। মোট: {{amount}} টাকা। ধন্যবাদ — উপহারকাব্য",
+    body: "প্রিয় {{name}}, আপনার অর্ডার {{order_no}} কনফার্ম হয়েছে। মোট: {{amount}} টাকা। ধন্যবাদ — Panjabi Shop BD",
   },
   {
     id: "no_response",
     label: "No response follow-up",
-    body: "প্রিয় {{name}}, আপনার অর্ডার {{order_no}} নিশ্চিত করতে আমরা কল করেছি কিন্তু পাইনি। কল ব্যাক করুন — উপহারকাব্য",
+    body: "প্রিয় {{name}}, আপনার অর্ডার {{order_no}} নিশ্চিত করতে আমরা কল করেছি কিন্তু পাইনি। কল ব্যাক করুন — Panjabi Shop BD",
   },
   {
     id: "shipped",

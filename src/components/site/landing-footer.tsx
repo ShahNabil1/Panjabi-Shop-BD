@@ -1,5 +1,5 @@
 import { useLang } from "@/lib/language-context";
-import logoMark from "@/assets/upoharkabbo-logo.png";
+import logoMark from "@/assets/panjabishopbd-logo.png";
 import { cn } from "@/lib/utils";
 import { SOCIAL_LINKS } from "./social-links";
 

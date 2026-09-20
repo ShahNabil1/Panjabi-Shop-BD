@@ -18,7 +18,7 @@ export const Route = createFileRoute("/admin/settings/retention")({
   component: RetentionSettings,
   head: () => ({
     meta: [
-      { title: "Data Cleanup · Upoharkabbo Admin" },
+      { title: "Data Cleanup · Panjabi Shop BD Admin" },
       { name: "description", content: "Auto-delete old order activity logs and webhook payloads to keep the database small." },
     ],
   }),

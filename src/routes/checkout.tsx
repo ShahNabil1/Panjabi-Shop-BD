@@ -25,13 +25,13 @@ export const Route = createFileRoute("/checkout")({
   component: CheckoutPage,
   head: () => ({
     meta: [
-      { title: "চেকআউট | উপহারকাব্য" },
+      { title: "চেকআউট | Panjabi Shop BD" },
       {
         name: "description",
         content: "ক্যাশ অন ডেলিভারিতে অর্ডার সম্পন্ন করুন — কোনো অগ্রিম পেমেন্ট লাগবে না।",
       },
       { name: "robots", content: "noindex" },
-      { property: "og:title", content: "চেকআউট | উপহারকাব্য" },
+      { property: "og:title", content: "চেকআউট | Panjabi Shop BD" },
       { property: "og:description", content: "ক্যাশ অন ডেলিভারিতে অর্ডার সম্পন্ন করুন।" },
       { property: "og:url", content: `${SITE_URL}/checkout` },
     ],

@@ -94,7 +94,7 @@ export function AddToCartBar({
   const productUrl = `${typeof window !== "undefined" ? window.location.origin : ""}/p/${item.slug}`;
   const productName = pick(lang, item.nameBn, item.nameEn);
   const whatsappText = encodeURIComponent(
-    `Hello Upoharkabbo, I want to order this product:\n\n${productName}\n${productUrl}\n\nQuantity: ${qty}`,
+    `Hello Panjabi Shop BD, I want to order this product:\n\n${productName}\n${productUrl}\n\nQuantity: ${qty}`,
   );
   const whatsappHref = `https://wa.me/8801338125069?text=${whatsappText}`;
 

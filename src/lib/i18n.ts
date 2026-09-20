@@ -84,8 +84,8 @@ export const t = {
   emptyCart: { bn: "আপনার কার্ট খালি।", en: "Your cart is empty." },
   emptyCartTitle: { bn: "আপনার শপিং কার্ট এখনো খালি", en: "Your cart is still empty" },
   emptyCartBody: {
-    bn: "উপহারকাব্য থেকে প্রিয়জনের জন্য সেরা গিফট কম্বোটি বেছে নিন।",
-    en: "Pick the perfect gift combo for your loved ones from Upoharkabbo.",
+    bn: "Panjabi Shop BD থেকে প্রিয়জনের জন্য সেরা গিফট কম্বোটি বেছে নিন।",
+    en: "Pick the perfect gift combo for your loved ones from Panjabi Shop BD.",
   },
   browseGifts: { bn: "গিফট ব্রাউজ করুন", en: "Browse gifts" },
   continueShopping: { bn: "কেনাকাটা চালিয়ে যান", en: "Continue shopping" },

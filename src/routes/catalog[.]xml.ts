@@ -93,7 +93,7 @@ export const Route = createFileRoute("/catalog.xml")({
           '<?xml version="1.0" encoding="UTF-8"?>',
           '<rss version="2.0" xmlns:g="http://base.google.com/ns/1.0">',
           "  <channel>",
-          "    <title>Upoharkabbo Product Catalogue</title>",
+          "    <title>Panjabi Shop BD Product Catalogue</title>",
           `    <link>${SITE_URL}/</link>`,
           "    <description>Curated gift combos and gift boxes for every occasion.</description>",
           ...entries,

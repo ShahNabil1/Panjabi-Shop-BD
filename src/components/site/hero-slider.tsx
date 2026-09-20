@@ -93,7 +93,7 @@ export function HeroSlider({ slides }: { slides: HeroSlide[] }) {
               const img = (
                 <SmartImage
                   src={slide.url}
-                  alt={slide.alt ?? "উপহারকাব্য ব্যানার"}
+                  alt={slide.alt ?? "Panjabi Shop BD ব্যানার"}
                   baseWidth={1200}
                   priority={i === 0}
                   className="aspect-4/3 w-full object-cover sm:aspect-[21/9]"

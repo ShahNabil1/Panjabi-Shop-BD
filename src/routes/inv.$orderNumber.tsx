@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useEffect, useRef } from "react";
 import { useServerFn } from "@tanstack/react-start";
 
-import logoMark from "@/assets/upoharkabbo-logo.png";
+import logoMark from "@/assets/panjabishopbd-logo.png";
 import { getOrderSummaryShort } from "@/lib/order.functions";
 import { courierLabel, courierTrackingUrl, orderStatusLabel } from "@/lib/order-receipt";
 import { formatPrice } from "@/lib/i18n";
@@ -24,11 +24,11 @@ export const Route = createFileRoute("/inv/$orderNumber")({
   validateSearch: searchSchema,
   head: ({ params }) => ({
     meta: [
-      { title: pageTitle(`Invoice ${params.orderNumber}`, "Upoharkabbo") },
-      { name: "description", content: "Your Upoharkabbo order invoice — print or save as PDF." },
+      { title: pageTitle(`Invoice ${params.orderNumber}`, "Panjabi Shop BD") },
+      { name: "description", content: "Your Panjabi Shop BD order invoice — print or save as PDF." },
       { name: "robots", content: "noindex, nofollow" },
-      { property: "og:title", content: "Invoice — Upoharkabbo" },
-      { property: "og:description", content: "Your Upoharkabbo order invoice." },
+      { property: "og:title", content: "Invoice — Panjabi Shop BD" },
+      { property: "og:description", content: "Your Panjabi Shop BD order invoice." },
     ],
   }),
   component: InvoicePage,

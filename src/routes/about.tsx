@@ -9,13 +9,13 @@ import { SITE_URL } from "@/lib/site";
 export const Route = createFileRoute("/about")({
   head: () => ({
     meta: [
-      { title: "আমাদের কথা | About — উপহারকাব্য" },
+      { title: "আমাদের কথা | About — Panjabi Shop BD" },
       {
         name: "description",
         content:
-          "উপহারকাব্য প্রতিটি উপলক্ষের জন্য যত্নে সাজানো গিফট কম্বো তৈরি করে। আমাদের গল্প, কাজের ধরন ও প্রতিশ্রুতি।",
+          "Panjabi Shop BD প্রতিটি উপলক্ষের জন্য যত্নে সাজানো গিফট কম্বো তৈরি করে। আমাদের গল্প, কাজের ধরন ও প্রতিশ্রুতি।",
       },
-      { property: "og:title", content: "আমাদের কথা | About — উপহারকাব্য" },
+      { property: "og:title", content: "আমাদের কথা | About — Panjabi Shop BD" },
       { property: "og:description", content: "উপহার সাজানোর কাজটা আমরা কবিতার মতো করে করি।" },
       { property: "og:url", content: `${SITE_URL}/about` },
     ],
@@ -25,12 +25,12 @@ export const Route = createFileRoute("/about")({
 });
 
 const BODY = {
-  bn: `উপহারকাব্য শুরু হয়েছিল একটা সহজ ভাবনা থেকে — উপহার শুধু একটা জিনিস নয়, এটা একটা কথা বলার উপায়।
+  bn: `Panjabi Shop BD শুরু হয়েছিল একটা সহজ ভাবনা থেকে — উপহার শুধু একটা জিনিস নয়, এটা একটা কথা বলার উপায়।
 
 আমরা প্রতিটি গিফট কম্বো নিজেরা সাজাই। কোন উপলক্ষ, কার জন্য, বাজেট কত — এসব মাথায় রেখে পণ্য বাছাই করা হয়, তারপর হাতে মোড়ানো হয় সুন্দর বক্সে, সঙ্গে থাকে আপনার লেখা কার্ড।
 
 পাঠানোর আগে প্রতিটি বক্স হাতে ধরে যাচাই করা হয় — পণ্যের মান, প্যাকেজিং আর মোড়কের নিখুঁততা। পছন্দ না হলে ডেলিভারির ৭ দিনের ভেতর ফেরত দেওয়া যাবে।`,
-  en: `Upoharkabbo began with a simple thought — a gift is not just an object, it is a way of saying something.
+  en: `Panjabi Shop BD began with a simple thought — a gift is not just an object, it is a way of saying something.
 
 We build every combo ourselves. The occasion, the person and the budget decide what goes in the box; then it is wrapped by hand and paired with a card in your own words.
 

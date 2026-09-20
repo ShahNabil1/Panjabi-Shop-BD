@@ -46,7 +46,7 @@ export function BrandLoader({
         <div className="absolute -inset-2 animate-pulse rounded-full bg-primary/5" />
         <img
           src="/favicon.png"
-          alt="Upoharkabbo"
+          alt="Panjabi Shop BD"
           className={cn(
             "relative z-10 rounded-full bg-white object-contain p-1.5 shadow-lg ring-1 ring-border",
             sizeMap[size],
@@ -91,7 +91,7 @@ export function BrandSkeleton({ className, rows = 4 }: { className?: string; row
         <div className="relative">
           <img
             src="/favicon.png"
-            alt="Upoharkabbo"
+            alt="Panjabi Shop BD"
             className="size-10 rounded-full bg-white object-contain p-1 ring-1 ring-border"
           />
         </div>

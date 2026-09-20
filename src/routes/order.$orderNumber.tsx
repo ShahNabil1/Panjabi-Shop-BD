@@ -19,7 +19,7 @@ export const Route = createFileRoute("/order/$orderNumber")({
       { title: pageTitle(`অর্ডার ${params.orderNumber}`) },
       { name: "description", content: "আপনার অর্ডারের বিস্তারিত ও স্ট্যাটাস দেখুন।" },
       { name: "robots", content: "noindex, nofollow" },
-      { property: "og:title", content: "অর্ডার কনফার্মেশন | উপহারকাব্য" },
+      { property: "og:title", content: "অর্ডার কনফার্মেশন | Panjabi Shop BD" },
       { property: "og:description", content: "আপনার অর্ডারের বিস্তারিত ও স্ট্যাটাস।" },
     ],
   }),

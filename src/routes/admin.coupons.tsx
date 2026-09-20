@@ -45,7 +45,7 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/admin/coupons")({
   head: () => ({
     meta: [
-      { title: "Coupons — Upoharkabbo Admin" },
+      { title: "Coupons — Panjabi Shop BD Admin" },
       { name: "robots", content: "noindex, nofollow" },
     ],
   }),
