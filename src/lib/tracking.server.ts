@@ -87,7 +87,7 @@ export async function probeMetaCapi(cfg: TrackingConfig): Promise<Probe> {
         action_source: "website",
         event_source_url: "https://upoharkabbo.com/",
         user_data: {
-          client_user_agent: "UpoharkabboConnectionTest/1.0",
+          client_user_agent: "PanjabiShopBdConnectionTest/1.0",
           client_ip_address: "203.0.113.1",
           fbp: `fb.1.${Date.now()}.1234567890`,
           external_id: externalId,
@@ -142,7 +142,7 @@ export async function probeTikTok(cfg: TrackingConfig): Promise<Probe> {
         event: "ViewContent",
         event_time: Math.floor(Date.now() / 1000),
         event_id: `conn-test.${Date.now()}`,
-        user: { user_agent: "UpoharkabboConnectionTest/1.0", ip: "203.0.113.1" },
+        user: { user_agent: "PanjabiShopBdConnectionTest/1.0", ip: "203.0.113.1" },
         page: { url: "https://upoharkabbo.com/" },
       },
     ],
