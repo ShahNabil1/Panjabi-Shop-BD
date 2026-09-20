@@ -68,14 +68,15 @@ export function AddToCartBar({
   const [qty, setQty] = useState(1);
   const soldOut = stock <= 0;
 
-  const addItem = (openDrawer = true) => {
+  const addItem = async (openDrawer = true) => {
     const line = { ...item, quantity: qty };
-    add(line);
+    if (!(await add(line))) return false;
     pushEvent("add_to_cart", ecommerce(cartTrackingItems([{ ...line, key: "" } as CartItem])));
     toast.success(tr(lang, "added"), {
       description: pick(lang, item.nameBn, item.nameEn),
     });
     if (openDrawer) openCart("cart");
+    return true;
   };
 
   if (soldOut) {
@@ -104,7 +105,7 @@ export function AddToCartBar({
         <QuantityStepper value={qty} onChange={setQty} max={stock} />
         <button
           type="button"
-          onClick={() => addItem()}
+          onClick={() => void addItem()}
           className="font-en min-w-36 flex-1 rounded-sm border border-primary px-5 py-3 text-sm font-semibold text-primary transition-colors hover:bg-primary/5"
         >
           {tr(lang, "addToCart")}
@@ -112,8 +113,9 @@ export function AddToCartBar({
         <button
           type="button"
           onClick={() => {
-            addItem(false);
-            void navigate({ to: "/checkout" });
+            void addItem(false).then((added) => {
+              if (added) void navigate({ to: "/checkout" });
+            });
           }}
           className="font-en min-w-36 flex-1 rounded-sm bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
         >

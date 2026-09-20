@@ -341,7 +341,7 @@ export function ItemsCard({
         {items.map((item, index) => (
           <li
             key={`${item.productId ?? "custom"}-${index}`}
-            className="flex flex-wrap items-center gap-3 rounded-xl border border-border/70 bg-background/60 p-2.5"
+            className="grid min-w-0 grid-cols-[auto_minmax(0,1fr)] items-start gap-3 rounded-xl border border-border/70 bg-background/60 p-2.5 sm:flex sm:flex-wrap sm:items-center"
           >
             {item.image ? (
               <button
@@ -356,8 +356,8 @@ export function ItemsCard({
               <span className="size-11 rounded-md bg-muted" />
             )}
             <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-semibold">{item.productName}</p>
-              <p className="font-mono text-xs text-muted-foreground">
+              <p className="break-words text-sm font-semibold sm:truncate">{item.productName}</p>
+              <p className="break-all font-mono text-xs text-muted-foreground">
                 {item.sku ?? "no-sku"} · {item.variantLabel ?? "physical"}
               </p>
               {item.comboSelections.length > 0 ? (
@@ -406,12 +406,14 @@ export function ItemsCard({
               ) : null}
 
             </div>
+            <div className="col-span-2 grid w-full grid-cols-[minmax(0,0.8fr)_minmax(0,1fr)] items-center gap-2 sm:ml-auto sm:flex sm:w-auto">
             <Input
               type="number"
               min={1}
               readOnly={locked}
               disabled={locked}
-              className="h-9 w-20 rounded-lg text-center"
+              aria-label="Quantity"
+              className="h-9 w-full rounded-lg text-center sm:w-20"
               value={item.quantity}
               onChange={(e) => patch(index, { quantity: Math.max(1, Number(e.target.value)) })}
             />
@@ -420,11 +422,12 @@ export function ItemsCard({
               min={0}
               readOnly={locked}
               disabled={locked}
-              className="h-9 w-28 rounded-lg text-center"
+              aria-label="Unit price"
+              className="h-9 w-full rounded-lg text-center sm:w-28"
               value={item.unitPrice}
               onChange={(e) => patch(index, { unitPrice: Math.max(0, Number(e.target.value)) })}
             />
-            <span className="w-24 text-right text-sm font-bold tabular-nums">
+            <span className="text-right text-sm font-bold tabular-nums sm:w-24">
               {money(item.unitPrice * item.quantity)}
             </span>
             {locked ? null : (
@@ -437,6 +440,7 @@ export function ItemsCard({
                 <Trash2 className="size-4" />
               </button>
             )}
+            </div>
           </li>
         ))}
       </ul>

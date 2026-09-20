@@ -17,12 +17,12 @@ const CHANNEL_STYLE: Record<string, string> = {
 
 function Row({ label, value, mono }: { label: string; value: string; mono?: boolean | undefined }) {
   return (
-    <div className="flex items-start justify-between gap-3 py-1">
+    <div className="flex min-w-0 items-start justify-between gap-3 py-1">
       <dt className="shrink-0 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
         {label}
       </dt>
-      <dd className="flex min-w-0 items-center gap-1.5">
-        <span className={cn("truncate text-right text-xs font-semibold", mono && "font-mono text-[11px]")}>
+      <dd className="flex min-w-0 flex-1 items-center justify-end gap-1.5">
+        <span className={cn("min-w-0 flex-1 truncate text-right text-xs font-semibold", mono && "font-mono text-[11px]")}> 
           {value}
         </span>
         <button

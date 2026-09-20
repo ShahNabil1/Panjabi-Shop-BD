@@ -36,6 +36,7 @@ export const placeOrderSchema = z.object({
   couponCode: z.string().trim().max(40).optional().or(z.literal("")),
   source: z.enum(["website", "landing"]).default("website"),
   attribution: attributionSchema,
+  deviceFingerprint: z.string().trim().length(64).nullable().optional(),
   items: z.array(orderLineSchema).min(1).max(30),
 });
 
@@ -61,6 +62,7 @@ export const incompleteOrderSchema = z.object({
   note: z.string().trim().max(500).optional().default(""),
   source: z.enum(["website", "landing"]).default("website"),
   attribution: attributionSchema,
+  deviceFingerprint: z.string().trim().length(64).nullable().optional(),
   items: z.array(orderLineSchema).min(1).max(30),
 });
 

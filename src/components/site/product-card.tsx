@@ -86,7 +86,7 @@ export function ProductCard({ product }: { product: ProductCardData }) {
     } catch {
       comboSelections = [];
     }
-    add({
+    const added = await add({
       productId: product.id,
       slug: product.slug,
       nameBn: product.nameBn,
@@ -101,6 +101,7 @@ export function ProductCard({ product }: { product: ProductCardData }) {
       variantLabelEn: null,
       comboSelections,
     });
+    if (!added) return false;
     pushEvent(
       "add_to_cart",
       ecommerce([
@@ -113,20 +114,25 @@ export function ProductCard({ product }: { product: ProductCardData }) {
         },
       ]),
     );
+    return true;
   };
 
   const onAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     if (soldOut) return;
-    void addItem().then(() => openCart("cart"));
+    void addItem().then((added) => {
+      if (added) openCart("cart");
+    });
   };
 
   const onBuyNow = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     if (soldOut) return;
-    void addItem().then(() => navigate({ to: "/checkout" }));
+    void addItem().then((added) => {
+      if (added) void navigate({ to: "/checkout" });
+    });
   };
 
   return (

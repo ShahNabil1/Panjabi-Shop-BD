@@ -346,8 +346,8 @@ export function FulfillmentCard({
 
 
   return (
-    <div className="grid gap-4 lg:grid-cols-2">
-      <Panel className="space-y-3">
+    <div className="grid min-w-0 gap-4 lg:grid-cols-2">
+      <Panel className="min-w-0 space-y-3 overflow-hidden">
         <div className="flex items-start justify-between gap-2">
           <h2 className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
             Fulfillment
@@ -540,7 +540,7 @@ export function FulfillmentCard({
                             : "Open tracking"
                       }
                       className={cn(
-                        "truncate font-mono text-lg font-extrabold tracking-tight text-black underline-offset-4 transition hover:underline",
+                        "min-w-0 flex-1 truncate font-mono text-lg font-extrabold tracking-tight text-black underline-offset-4 transition hover:underline",
                         isPathao
                           ? "hover:text-[#E32227]"
                           : isSteadfast
@@ -551,7 +551,7 @@ export function FulfillmentCard({
                       {consignmentId}
                     </a>
                   ) : (
-                    <span className="truncate font-mono text-lg font-extrabold tracking-tight text-foreground">
+                    <span className="min-w-0 flex-1 truncate font-mono text-lg font-extrabold tracking-tight text-foreground">
                       {consignmentId}
                     </span>
                   )}
@@ -607,12 +607,12 @@ export function FulfillmentCard({
                         target="_blank"
                         rel="noreferrer"
                         title="Open return in Pathao merchant panel"
-                        className="truncate font-mono text-lg font-extrabold tracking-tight text-black underline-offset-4 transition hover:text-[#E32227] hover:underline"
+                        className="min-w-0 flex-1 truncate font-mono text-lg font-extrabold tracking-tight text-black underline-offset-4 transition hover:text-[#E32227] hover:underline"
                       >
                         {returnConsignmentId}
                       </a>
                     ) : (
-                      <span className="truncate font-mono text-lg font-extrabold tracking-tight text-foreground">
+                      <span className="min-w-0 flex-1 truncate font-mono text-lg font-extrabold tracking-tight text-foreground">
                         {returnConsignmentId}
                       </span>
                     )}
@@ -832,10 +832,12 @@ export function SecurityCard({
   orderId,
   identifiers,
   blocked,
+  ipLocation,
 }: {
   orderId: string;
   identifiers: Array<{ kind: BlockKind; value: string | null }>;
   blocked: Array<{ kind: string; value: string }>;
+  ipLocation?: Record<string, unknown> | null;
 }) {
   const qc = useQueryClient();
   const present = identifiers.filter(
@@ -941,6 +943,24 @@ export function SecurityCard({
           })
         )}
       </div>
+
+      {ipLocation && Object.keys(ipLocation).length > 0 ? (
+        <div className="rounded-xl border border-border/70 bg-background/60 p-3">
+          <div className="flex items-center gap-1.5 text-[11px] font-semibold uppercase text-muted-foreground">
+            <MapPin className="size-3.5" /> IP-based location
+          </div>
+          <p className="mt-1 break-words text-sm font-semibold">
+            {[ipLocation["city"], ipLocation["region"], ipLocation["country"]]
+              .filter((value): value is string => typeof value === "string" && value.length > 0)
+              .join(", ") || "Location unavailable"}
+          </p>
+          <p className="mt-1 break-words text-xs text-muted-foreground">
+            {[ipLocation["postalCode"], ipLocation["timezone"]]
+              .filter((value): value is string => typeof value === "string" && value.length > 0)
+              .join(" · ")}
+          </p>
+        </div>
+      ) : null}
 
       <p className="text-xs text-muted-foreground">
         Select any combination and use Block or Unblock. Blocked identifiers cannot place new

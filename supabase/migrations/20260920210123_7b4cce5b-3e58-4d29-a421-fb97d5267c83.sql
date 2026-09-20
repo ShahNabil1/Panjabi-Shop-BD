@@ -1,0 +1,2 @@
+REVOKE ALL ON FUNCTION public.storefront_security_check(text, text, text) FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.storefront_security_check(text, text, text) TO service_role;
