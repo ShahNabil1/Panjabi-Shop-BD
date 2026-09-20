@@ -93,6 +93,14 @@ function actorOf(meta: unknown): string | null {
   return null;
 }
 
+/** "X took over this order from Y" — names come from meta when present. */
+function takeoverText(a: ActivityEntry): string {
+  const m = (a.meta ?? {}) as { actor?: string; from?: string };
+  if (m.actor && m.from) return `${m.actor} took over this order from ${m.from}`;
+  return a.message ?? "Order taken over";
+}
+
+
 export function ActivityLog({ entries }: { entries: ActivityEntry[] }) {
   const [limit, setLimit] = useState(5);
   const sorted = [...entries].sort((a, b) => (a.created_at < b.created_at ? 1 : -1));
@@ -122,8 +130,15 @@ export function ActivityLog({ entries }: { entries: ActivityEntry[] }) {
               const actor = actorOf(a.meta);
               const last = idx === visible.length - 1;
               return (
-                <li key={a.id} className="relative flex gap-3 pb-4 last:pb-0">
-                  {!last ? (
+                <li
+                  key={a.id}
+                  className={cn(
+                    "relative flex gap-3 pb-4 last:pb-0",
+                    a.kind === "takeover" &&
+                      "rounded-lg border border-rose-300 bg-rose-50 p-3 pb-3 last:pb-3",
+                  )}
+                >
+                  {!last && a.kind !== "takeover" ? (
                     <span className="absolute left-[13px] top-7 h-[calc(100%-1.25rem)] w-px bg-border" />
                   ) : null}
                   <span
@@ -134,6 +149,7 @@ export function ActivityLog({ entries }: { entries: ActivityEntry[] }) {
                   >
                     <Icon className="size-3.5" />
                   </span>
+
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
                       <span
@@ -151,9 +167,16 @@ export function ActivityLog({ entries }: { entries: ActivityEntry[] }) {
                         {fullTime(a.created_at)} · {relative(a.created_at)}
                       </span>
                     </div>
-                    <p className="mt-1 break-words text-sm leading-relaxed text-foreground">
-                      {a.message ?? a.kind}
-                    </p>
+                    {a.kind === "takeover" ? (
+                      <p className="mt-1 break-words text-sm font-bold leading-relaxed text-rose-700">
+                        {takeoverText(a)}
+                      </p>
+                    ) : (
+                      <p className="mt-1 break-words text-sm leading-relaxed text-foreground">
+                        {a.message ?? a.kind}
+                      </p>
+                    )}
+
                   </div>
                 </li>
               );
