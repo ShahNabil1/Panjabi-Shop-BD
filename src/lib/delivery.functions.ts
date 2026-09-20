@@ -348,7 +348,7 @@ export const adminTestCourierWebhook = createServerFn({ method: "POST" })
             notification_type: "webhook_test",
             consignment_id: `TEST-${Date.now()}`,
             merchant_order_id: "WEBHOOK-TEST",
-            source: "upoharkabbo-admin",
+            source: "panjabishopbd-admin",
           };
 
     try {
