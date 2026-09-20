@@ -1,11 +1,11 @@
 {
-  "version": 1,
   "asset_id": "3a531157-0a23-4ac9-a45a-f15866db31ed",
-  "project_id": "92cdac08-5a8f-43a4-af29-da13a2aba9b7",
-  "url": "/__l5e/assets-v1/3a531157-0a23-4ac9-a45a-f15866db31ed/steadfast-logo.svg",
-  "r2_key": "a/v1/92cdac08-5a8f-43a4-af29-da13a2aba9b7/3a531157-0a23-4ac9-a45a-f15866db31ed/steadfast-logo.svg",
-  "original_filename": "steadfast-logo.svg",
-  "size": 36281,
   "content_type": "image/svg+xml",
-  "created_at": "2026-08-08T09:05:07Z"
+  "created_at": "2026-08-08T09:05:07Z",
+  "original_filename": "steadfast-logo.svg",
+  "project_id": "a62639b1-d330-4159-b56e-25451a9889c4",
+  "r2_key": "a/v1/a62639b1-d330-4159-b56e-25451a9889c4/3a531157-0a23-4ac9-a45a-f15866db31ed/steadfast-logo.svg",
+  "size": 36281,
+  "url": "/__l5e/assets-v1/3a531157-0a23-4ac9-a45a-f15866db31ed/steadfast-logo.svg",
+  "version": 1
 }
