@@ -311,14 +311,13 @@ export function RichTextEditor({
     },
   });
 
-  // Load server content once the draft arrives (edit page fetches async).
+  // Keep the editor aligned when an existing row is selected or the form resets.
   useEffect(() => {
     if (!editor) return;
     const incoming = toRichHtml(value);
     const current = editor.getHTML();
-    if (incoming && current === "<p></p>" && incoming !== current) {
-      editor.commands.setContent(incoming, { emitUpdate: false });
-    }
+    const normalizedIncoming = incoming || "<p></p>";
+    if (normalizedIncoming !== current) editor.commands.setContent(normalizedIncoming, { emitUpdate: false });
   }, [editor, value]);
 
   return (

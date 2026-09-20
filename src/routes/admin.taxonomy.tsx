@@ -193,7 +193,7 @@ function TaxonomyPage() {
         </Panel>
 
         <Panel className="min-w-0 overflow-hidden p-0">
-          <div className="border-b border-border p-4"><h2 className="text-sm font-bold">Categories</h2><p className="mt-1 text-xs text-muted-foreground">Drag rows on desktop, or use arrows on mobile.</p></div>
+          <div className="border-b border-border p-4"><h2 className="text-sm font-bold">Categories</h2></div>
           {isLoading ? <BrandLoader size="md" className="py-6" /> : orderedCategories.length === 0 ? <div className="p-4"><EmptyState title="No categories yet" /></div> : (
             <ul className="divide-y divide-border">
               {orderedCategories.map((row) => (
@@ -225,7 +225,7 @@ function TaxonomyPage() {
         </Panel>
 
         <Panel className="min-w-0 overflow-hidden p-0">
-          <div className="border-b border-border p-4"><h2 className="text-sm font-bold">Subcategories</h2><p className="mt-1 text-xs text-muted-foreground">Drag rows on desktop, or use arrows on mobile.</p></div>
+          <div className="border-b border-border p-4"><h2 className="text-sm font-bold">Subcategories</h2></div>
           {orderedSubcategories.length === 0 ? <div className="p-4"><EmptyState title="No subcategories yet" /></div> : (
             <ul className="divide-y divide-border">
               {orderedSubcategories.map((row) => {
