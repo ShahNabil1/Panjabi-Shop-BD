@@ -1,7 +1,9 @@
 import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
+import { MessageCircle, PackageX } from "lucide-react";
 
+import { Button } from "@/components/ui/button";
 import { useCart, type CartItem, type NewCartItem } from "@/lib/cart-context";
 import { useLang } from "@/lib/language-context";
 import { formatNumber, pick, tr } from "@/lib/i18n";
@@ -67,6 +69,14 @@ export function AddToCartBar({
   const navigate = useNavigate();
   const [qty, setQty] = useState(1);
   const soldOut = stock <= 0;
+  const productUrl = `https://panjabishopbd.com/p/${item.slug}`;
+  const productName = pick(lang, item.nameBn, item.nameEn);
+  const whatsappText = encodeURIComponent(
+    soldOut
+      ? `Hello Panjabi Shop BD, this product is out of stock. Please let me know when it is available or suggest an alternative:\n\n${productName}\n${productUrl}`
+      : `Hello Panjabi Shop BD, I want to order this product:\n\n${productName}\n${productUrl}\n\nQuantity: ${qty}`,
+  );
+  const whatsappHref = `https://wa.me/8801772588538?text=${whatsappText}`;
 
   const addItem = async (openDrawer = true) => {
     const line = { ...item, quantity: qty };
@@ -83,21 +93,32 @@ export function AddToCartBar({
     return (
       <div
         className={cn(
-          "rounded-sm border border-border bg-secondary px-4 py-3 text-center text-sm font-semibold text-muted-foreground",
+          "overflow-hidden rounded-sm border border-destructive/35 bg-destructive/5",
           className,
         )}
       >
-        {tr(lang, "outOfStock")}
+        <div className="flex items-center gap-3 px-4 py-3.5 text-left">
+          <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-destructive/10 text-destructive">
+            <PackageX className="size-5" aria-hidden />
+          </span>
+          <div className="min-w-0">
+            <p className="text-sm font-bold text-destructive">{tr(lang, "outOfStock")}</p>
+            <p className="mt-0.5 text-xs leading-5 text-muted-foreground">
+              {lang === "bn"
+                ? "WhatsApp-এ যোগাযোগ করে স্টক আপডেট বা বিকল্প সাইজ জেনে নিন।"
+                : "Ask on WhatsApp for a restock update or an alternative size."}
+            </p>
+          </div>
+        </div>
+        <Button asChild className="h-11 w-full rounded-none text-sm font-bold">
+          <a href={whatsappHref} target="_blank" rel="noopener noreferrer">
+            <MessageCircle className="size-4" aria-hidden />
+            {lang === "bn" ? "WhatsApp-এ কথা বলুন" : "Chat on WhatsApp"}
+          </a>
+        </Button>
       </div>
     );
   }
-
-  const productUrl = `${typeof window !== "undefined" ? window.location.origin : ""}/p/${item.slug}`;
-  const productName = pick(lang, item.nameBn, item.nameEn);
-  const whatsappText = encodeURIComponent(
-    `Hello Panjabi Shop BD, I want to order this product:\n\n${productName}\n${productUrl}\n\nQuantity: ${qty}`,
-  );
-  const whatsappHref = `https://wa.me/8801772588538?text=${whatsappText}`;
 
   return (
     <div className={cn("flex flex-col gap-3", className)}>
