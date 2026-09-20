@@ -163,7 +163,12 @@ function ReceiveInventory() {
     onSuccess: async (res) => {
       toast.success(`${res.received} item(s) received into stock`);
       await qc.invalidateQueries({ queryKey: ["admin", "inventory"] });
-      void navigate({ to: "/admin/inventory/live" });
+      // Stay on this page so the next receipt can be entered right away.
+      setLines([newLine()]);
+      setSelected([]);
+      setInvoiceNo("");
+      setExtraCost(0);
+      setNote("");
     },
     onError: (e: Error) => toast.error(e.message),
   });
