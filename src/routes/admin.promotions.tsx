@@ -200,7 +200,6 @@ function PromotionsPage() {
               onChange={(v) => setDraft({ ...draft, sort_order: v })}
             />
             <TextField
-            <TextField
               label="Meta title"
               value={draft.meta_title ?? ""}
               onChange={(v) => setDraft({ ...draft, meta_title: v || null })}
@@ -216,6 +215,9 @@ function PromotionsPage() {
             maxLength={160}
             hint="সর্বোচ্চ ১৬০ ক্যারেক্টার"
           />
+          <div className="grid gap-3 sm:grid-cols-2">
+            <ToggleField
+              label="Show on Homepage"
               checked={draft.show_on_home}
               onChange={(v) => setDraft({ ...draft, show_on_home: v })}
             />

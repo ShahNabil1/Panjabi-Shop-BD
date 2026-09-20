@@ -326,7 +326,7 @@ export function RichTextEditor({
       <Label className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground transition-colors group-focus-within/field:text-primary">
         {label}
       </Label>
-      <div className="overflow-hidden rounded-xl border border-border/80 bg-background/70 transition-all focus-within:border-primary/60 focus-within:ring-2 focus-within:ring-primary/20">
+      <div className="min-w-0 overflow-hidden rounded-xl border border-border/80 bg-background/70 transition-all focus-within:border-primary/60 focus-within:ring-2 focus-within:ring-primary/20">
         {editor ? <Toolbar editor={editor} /> : null}
         <EditorContent editor={editor} className="px-3 py-2.5 text-sm" />
       </div>

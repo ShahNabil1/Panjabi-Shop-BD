@@ -76,6 +76,22 @@ const optText = z
   .nullable()
   .transform((v) => (v ? v : null));
 
+const metaTitle = z
+  .string()
+  .trim()
+  .max(60)
+  .optional()
+  .nullable()
+  .transform((v) => (v ? v : null));
+
+const metaDescription = z
+  .string()
+  .trim()
+  .max(160)
+  .optional()
+  .nullable()
+  .transform((v) => (v ? v : null));
+
 export const idSchema = z.object({ id: uuid });
 
 export const orderStatusSchema = z.object({
@@ -188,8 +204,8 @@ export const categorySchema = z.object({
   description_bn: optText,
   description_en: optText,
   image_url: optText,
-  meta_title: optText,
-  meta_description: optText,
+  meta_title: metaTitle,
+  meta_description: metaDescription,
   sort_order: z.number().int().min(0).default(0),
   is_active: z.boolean().default(true),
   is_featured: z.boolean().default(false),
@@ -271,8 +287,8 @@ export const productSchema = z.object({
   brand: optText,
   badge_bn: optText,
   badge_en: optText,
-  meta_title: optText,
-  meta_description: optText,
+  meta_title: metaTitle,
+  meta_description: metaDescription,
   og_image_url: optText,
   is_active: z.boolean().default(true),
   is_featured: z.boolean().default(false),
@@ -291,8 +307,8 @@ export const promotionSchema = z.object({
   subtitle_en: optText,
   type: z.enum(promotionTypes).default("offer"),
   banner_url: optText,
-  meta_title: optText,
-  meta_description: optText,
+  meta_title: metaTitle,
+  meta_description: metaDescription,
   starts_at: optText,
   ends_at: optText,
   sort_order: z.number().int().min(0).default(0),
@@ -309,8 +325,8 @@ export const landingPageSchema = z.object({
   headline_en: optText,
   subheadline_bn: optText,
   subheadline_en: optText,
-  meta_title: optText,
-  meta_description: optText,
+  meta_title: metaTitle,
+  meta_description: metaDescription,
   og_image_url: optText,
   is_active: z.boolean().default(true),
   seo: z

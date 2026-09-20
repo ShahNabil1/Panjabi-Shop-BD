@@ -73,7 +73,6 @@ function FaqSeoPanel() {
         </p>
       </div>
       <TextField
-      <TextField
         label="Meta title"
         value={seo.meta_title}
         onChange={(v) => setSeo({ ...seo, meta_title: v })}
@@ -88,6 +87,9 @@ function FaqSeoPanel() {
         maxLength={160}
         hint="সর্বোচ্চ ১৬০ ক্যারেক্টার"
       />
+      <div className="space-y-2">
+        <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+          OG image
         </p>
         <div className="flex items-center gap-3">
           {seo.og_image ? (

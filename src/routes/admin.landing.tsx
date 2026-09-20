@@ -173,7 +173,6 @@ function LandingPagesAdmin() {
               }
             />
             <TextField
-            <TextField
               label="Meta title"
               value={draft.meta_title ?? ""}
               onChange={(v) => setDraft({ ...draft, meta_title: v || null })}
@@ -189,6 +188,8 @@ function LandingPagesAdmin() {
             maxLength={160}
             hint="সর্বোচ্চ ১৬০ ক্যারেক্টার"
           />
+          <div className="space-y-3 rounded-2xl border border-border/70 bg-background/50 p-4">
+            <div>
               <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                 SEO & Social
               </p>
