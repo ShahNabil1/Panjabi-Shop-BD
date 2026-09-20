@@ -13,7 +13,7 @@ export function SiteFooter({ minimalOnMobile }: { minimalOnMobile?: boolean }) {
   const { brand, contact } = useSiteData();
 
   return (
-    <footer className="mt-16 border-t border-border bg-footer">
+    <footer className="mt-16 border-t border-secondary-foreground/10 bg-footer text-secondary-foreground">
       <div className={cn("mx-auto grid w-full max-w-6xl justify-items-center gap-8 px-4 py-10 text-center sm:grid-cols-2 sm:justify-items-stretch sm:text-left lg:grid-cols-4", minimalOnMobile && "hidden sm:grid")}>
         <div className="w-full min-w-0">
           <div className="flex items-center justify-center sm:justify-start">
@@ -62,17 +62,17 @@ export function SiteFooter({ minimalOnMobile }: { minimalOnMobile?: boolean }) {
           <h2 className="text-base font-bold text-primary">Important Links</h2>
           <ul className="mt-3 space-y-2">
             <li>
-              <Link to="/about" className="text-sm text-foreground/80 hover:text-primary">
+              <Link to="/about" className="text-sm text-secondary-foreground/80 hover:text-primary">
                 {tr(lang, "about")}
               </Link>
             </li>
             <li>
-              <Link to="/faq" className="text-sm text-foreground/80 hover:text-primary">
+              <Link to="/faq" className="text-sm text-secondary-foreground/80 hover:text-primary">
                 {tr(lang, "faq")}
               </Link>
             </li>
             <li>
-              <Link to="/offers" className="text-sm text-foreground/80 hover:text-primary">
+              <Link to="/offers" className="text-sm text-secondary-foreground/80 hover:text-primary">
                 {tr(lang, "offers")}
               </Link>
             </li>
@@ -83,17 +83,17 @@ export function SiteFooter({ minimalOnMobile }: { minimalOnMobile?: boolean }) {
           <h2 className="text-base font-bold text-primary">Legal</h2>
           <ul className="mt-3 space-y-2">
             <li>
-              <span className="cursor-default text-sm text-foreground/80 hover:text-primary">
+              <span className="cursor-default text-sm text-secondary-foreground/80 hover:text-primary">
                 Privacy Policy
               </span>
             </li>
             <li>
-              <span className="cursor-default text-sm text-foreground/80 hover:text-primary">
+              <span className="cursor-default text-sm text-secondary-foreground/80 hover:text-primary">
                 Terms & Conditions
               </span>
             </li>
             <li>
-              <span className="cursor-default text-sm text-foreground/80 hover:text-primary">
+              <span className="cursor-default text-sm text-secondary-foreground/80 hover:text-primary">
                 Return Policy
               </span>
             </li>
@@ -102,7 +102,7 @@ export function SiteFooter({ minimalOnMobile }: { minimalOnMobile?: boolean }) {
 
         <div className="w-full min-w-0">
           <h2 className="text-base font-bold text-primary">{tr(lang, "contact")}</h2>
-          <ul className="mt-3 space-y-2 text-sm text-foreground/80">
+          <ul className="mt-3 space-y-2 text-sm text-secondary-foreground/80">
             {contact.phone ? (
               <li className="flex min-w-0 items-center justify-center gap-2 sm:justify-start">
                 <Phone className="h-4 w-4 shrink-0 text-primary" />
@@ -132,7 +132,7 @@ export function SiteFooter({ minimalOnMobile }: { minimalOnMobile?: boolean }) {
               </span>
             </li>
             <li className="pt-1">
-              <span className="flex w-full flex-row items-center justify-center gap-2 rounded-lg border-2 border-primary bg-primary/5 px-3 py-2 text-center text-xs font-bold leading-tight text-primary sm:items-center sm:justify-center sm:text-center sm:text-sm">
+              <span className="flex w-full flex-row items-center justify-center gap-2 rounded-lg border-2 border-primary bg-primary/10 px-3 py-2 text-center text-xs font-bold leading-tight text-primary sm:items-center sm:justify-center sm:text-center sm:text-sm">
                 <span className="shrink-0 animate-pulse text-base leading-none sm:text-sm">🚚</span>
                 <span>সারা বাংলাদেশে ফ্রী ডেলিভারি</span>
               </span>
