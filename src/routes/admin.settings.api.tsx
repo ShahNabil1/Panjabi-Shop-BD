@@ -327,8 +327,14 @@ function GroupCard({
             variant="ghost"
             className="text-destructive hover:bg-destructive/10"
             disabled={busy}
-            onClick={() => {
-              if (!window.confirm(`Remove all ${meta.title} credentials?`)) return;
+            onClick={async () => {
+              const ok = await confirm({
+                title: `Remove all ${meta.title} credentials?`,
+                description: "This disconnects the integration immediately. You can reconnect it later by saving the keys again.",
+                confirmLabel: "Remove",
+                tone: "danger",
+              });
+              if (!ok) return;
               remove.mutate();
             }}
           >
