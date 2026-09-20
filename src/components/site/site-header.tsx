@@ -1,12 +1,15 @@
 import { Link, useLoaderData, useNavigate, useRouterState } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { useLang } from "@/lib/language-context";
 import type { CategoryWithSubs } from "@/lib/types";
 import type { Lang } from "@/lib/i18n";
-import { formatNumber, pick, tr } from "@/lib/i18n";
+import { formatNumber, formatPrice, pick, tr } from "@/lib/i18n";
 import { useCart } from "@/lib/cart-context";
 import { cn } from "@/lib/utils";
+import { searchProducts } from "@/lib/catalog.functions";
+import type { ProductCard } from "@/lib/supabase-public";
+import { SmartImage } from "@/components/site/smart-image";
 import logoMark from "@/assets/panjabishopbd-logo.png";
 
 
@@ -27,44 +30,172 @@ function SearchBox({ onDone }: { onDone?: () => void }) {
   const { lang } = useLang();
   const navigate = useNavigate();
   const [q, setQ] = useState("");
+  const [results, setResults] = useState<ProductCard[]>([]);
+  const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const term = q.trim();
+    if (term.length < 2) {
+      setResults([]);
+      setOpen(false);
+      setLoading(false);
+      return;
+    }
+    setLoading(true);
+    let alive = true;
+    const id = window.setTimeout(async () => {
+      try {
+        const data = await searchProducts({ data: { q: term } });
+        if (!alive) return;
+        setResults(data.products.slice(0, 8));
+        setOpen(true);
+      } catch {
+        if (alive) setResults([]);
+      } finally {
+        if (alive) setLoading(false);
+      }
+    }, 250);
+    return () => {
+      alive = false;
+      window.clearTimeout(id);
+    };
+  }, [q]);
+
+  useEffect(() => {
+    const onPointerDown = (e: PointerEvent) => {
+      if (rootRef.current && !rootRef.current.contains(e.target as Node)) setOpen(false);
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    document.addEventListener("pointerdown", onPointerDown);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("pointerdown", onPointerDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, []);
+
+  const close = () => {
+    setOpen(false);
+    setQ("");
+  };
 
   return (
-    <form
-      role="search"
-      onSubmit={(e) => {
-        e.preventDefault();
-        const term = q.trim();
-        if (!term) return;
-        onDone?.();
-        navigate({ to: "/search", search: { q: term } });
-      }}
-      className="flex w-full items-center gap-2 rounded-sm border border-border bg-card px-3 py-2"
-    >
-      <svg
-        aria-hidden
-        viewBox="0 0 24 24"
-        className="h-4 w-4 shrink-0 text-muted-foreground"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.8"
+    <div ref={rootRef} className="relative w-full">
+      <form
+        role="search"
+        onSubmit={(e) => {
+          e.preventDefault();
+          const term = q.trim();
+          if (!term) return;
+          close();
+          onDone?.();
+          navigate({ to: "/search", search: { q: term } });
+        }}
+        className="flex w-full items-center gap-2 rounded-sm border border-border bg-card px-3 py-2"
       >
-        <circle cx="11" cy="11" r="7" />
-        <path d="m20 20-3.2-3.2" strokeLinecap="round" />
-      </svg>
-      <input
-        value={q}
-        onChange={(e) => setQ(e.target.value)}
-        placeholder={tr(lang, "searchPlaceholder")}
-        aria-label={tr(lang, "search")}
-        className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
-      />
-      <button
-        type="submit"
-        className="shrink-0 rounded-sm bg-primary px-3 py-1 text-xs font-semibold text-primary-foreground transition-all duration-200 hover:scale-105 hover:shadow-md active:scale-95"
-      >
-        {tr(lang, "search")}
-      </button>
-    </form>
+        <svg
+          aria-hidden
+          viewBox="0 0 24 24"
+          className="h-4 w-4 shrink-0 text-muted-foreground"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+        >
+          <circle cx="11" cy="11" r="7" />
+          <path d="m20 20-3.2-3.2" strokeLinecap="round" />
+        </svg>
+        <input
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          onFocus={() => {
+            if (results.length > 0) setOpen(true);
+          }}
+          placeholder={tr(lang, "searchPlaceholder")}
+          aria-label={tr(lang, "search")}
+          autoComplete="off"
+          className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+        />
+        <button
+          type="submit"
+          className="shrink-0 rounded-sm bg-primary px-3 py-1 text-xs font-semibold text-primary-foreground transition-all duration-200 hover:scale-105 hover:shadow-md active:scale-95"
+        >
+          {tr(lang, "search")}
+        </button>
+      </form>
+
+      {open && q.trim().length >= 2 ? (
+        <div className="absolute inset-x-0 top-full z-50 mt-2 overflow-hidden rounded-lg border border-border bg-card shadow-lg">
+          {loading ? (
+            <p className="px-4 py-3 text-sm text-muted-foreground">খোঁজা হচ্ছে…</p>
+          ) : results.length === 0 ? (
+            <p className="px-4 py-3 text-sm text-muted-foreground">
+              {lang === "bn" ? "কোনো পণ্য পাওয়া যায়নি" : "No products found"}
+            </p>
+          ) : (
+            <ul role="listbox" aria-label={tr(lang, "search")}>
+              {results.map((p) => (
+                <li key={p.id}>
+                  <Link
+                    to="/p/$product"
+                    params={{ product: p.slug }}
+                    onClick={() => {
+                      close();
+                      onDone?.();
+                    }}
+                    className="flex items-center gap-3 px-3 py-2 transition-colors hover:bg-muted/60"
+                  >
+                    {p.image ? (
+                      <SmartImage
+                        src={p.image}
+                        alt={pick(lang, p.imageAltBn, p.imageAltEn) || pick(lang, p.nameBn, p.nameEn)}
+                        baseWidth={96}
+                        className="h-11 w-11 shrink-0 rounded-md border border-border object-cover"
+                      />
+                    ) : (
+                      <div className="h-11 w-11 shrink-0 rounded-md border border-border bg-muted" />
+                    )}
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate text-sm font-medium text-foreground">
+                        {pick(lang, p.nameBn, p.nameEn)}
+                      </span>
+                      <span className="mt-0.5 flex items-baseline gap-2 text-xs">
+                        <span className="font-semibold text-primary">
+                          {formatPrice(lang, p.price)}
+                        </span>
+                        {p.compareAtPrice && p.compareAtPrice > p.price ? (
+                          <span className="text-muted-foreground line-through">
+                            {formatPrice(lang, p.compareAtPrice)}
+                          </span>
+                        ) : null}
+                      </span>
+                    </span>
+                  </Link>
+                </li>
+              ))}
+              <li className="border-t border-border">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const term = q.trim();
+                    if (!term) return;
+                    close();
+                    onDone?.();
+                    navigate({ to: "/search", search: { q: term } });
+                  }}
+                  className="block w-full px-4 py-2.5 text-center text-xs font-semibold text-primary transition-colors hover:bg-muted/60"
+                >
+                  {lang === "bn" ? `“${q.trim()}” এর সব ফলাফল দেখুন` : `See all results for “${q.trim()}”`}
+                </button>
+              </li>
+            </ul>
+          )}
+        </div>
+      ) : null}
+    </div>
   );
 }
 
