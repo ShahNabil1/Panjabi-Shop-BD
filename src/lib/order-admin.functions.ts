@@ -39,26 +39,43 @@ export const adminOrderWorkspace = createServerFn({ method: "POST" })
 
     const o = order as unknown as Record<string, unknown>;
 
-    // Record who opened the order: throttled to one entry per viewer per 30 min,
-    // but always record when someone else viewed after this viewer's last view.
+    // Record who opened the order: at most one entry per viewer per 30 min.
+    // A view is also recorded right after a takeover, so the new handler's
+    // entry always follows the takeover line. NOTE: it must never depend on
+    // *other* people's views — that made two open tabs log each other in a
+    // realtime refetch loop (endless "viewed this order" spam).
     const who = await actorName(db, context.userId);
-    const { data: recentViews } = await db
-      .from("order_activity")
-      .select("id, meta, created_at")
-      .eq("order_id", orderId)
-      .eq("kind", "view")
-      .order("created_at", { ascending: false })
-      .limit(1);
-    const last = (recentViews ?? [])[0] as
-      | { meta?: { actor?: string }; created_at: string }
-      | undefined;
-    const lastActor = last?.meta?.actor ?? "";
-    const lastAt = last ? new Date(last.created_at).getTime() : 0;
+    const [{ data: ownViews }, { data: takeovers }] = await Promise.all([
+      db
+        .from("order_activity")
+        .select("created_at")
+        .eq("order_id", orderId)
+        .eq("kind", "view")
+        .eq("meta->>actor", who)
+        .order("created_at", { ascending: false })
+        .limit(1),
+      db
+        .from("order_activity")
+        .select("created_at")
+        .eq("order_id", orderId)
+        .eq("kind", "takeover")
+        .order("created_at", { ascending: false })
+        .limit(1),
+    ]);
+    const lastOwnAt = (ownViews ?? [])[0]
+      ? new Date((ownViews as { created_at: string }[])[0]!.created_at).getTime()
+      : 0;
+    const lastTakeoverAt = (takeovers ?? [])[0]
+      ? new Date((takeovers as { created_at: string }[])[0]!.created_at).getTime()
+      : 0;
     const shouldLog =
-      !last || lastActor !== who || Date.now() - lastAt >= 30 * 60 * 1000;
+      lastOwnAt === 0 ||
+      Date.now() - lastOwnAt >= 30 * 60 * 1000 ||
+      lastTakeoverAt > lastOwnAt;
     if (shouldLog) {
       await logActivity(db, orderId, "view", `${who} viewed this order`, { actor: who });
     }
+
 
 
     const [notes, sms, blocked, activity, redemption] = await Promise.all([
