@@ -10,7 +10,7 @@ import type { CategoryWithSubs } from "@/lib/types";
 
 const TITLE = pageTitle("সব ক্যাটাগরি");
 const DESCRIPTION =
-  "Panjabi Shop BD-এর সব ক্যাটাগরি ও সাব-ক্যাটাগরি এক জায়গায় — পাঞ্জাবি, শাড়ি, অ্যাকসেসরিজ ও গিফট কম্বো। সারা দেশে ক্যাশ অন ডেলিভারি।";
+  "Panjabi Shop BD-এর সব পাঞ্জাবি ক্যাটাগরি ও সাব-ক্যাটাগরি এক জায়গায় দেখুন। সারা বাংলাদেশে ক্যাশ অন ডেলিভারি।";
 
 export const Route = createFileRoute("/categories")({
   loader: async () => {
@@ -76,8 +76,8 @@ function AllCategoriesPage() {
       </h1>
       <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
         {lang === "bn"
-          ? "Panjabi Shop BD-এর সব ক্যাটাগরি ঘুরে দেখুন এবং পছন্দের উপহার বেছে নিন।"
-          : "Browse every Panjabi Shop BD category and pick the perfect gift."}
+          ? "Panjabi Shop BD-এর সব ক্যাটাগরি ঘুরে দেখুন এবং পছন্দের পাঞ্জাবি বেছে নিন।"
+          : "Browse every Panjabi Shop BD category and pick your perfect Panjabi."}
       </p>
 
       <div className="mt-8 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">

@@ -18,16 +18,16 @@ export const Route = createFileRoute("/")({
   loader: async (): Promise<HomeData> => getHomeData(),
   head: () => ({
     meta: [
-      { title: "Panjabi Shop BD — গিফট কম্বো ও উপহার সামগ্রীর অনলাইন শপ" },
+      { title: "Panjabi Shop BD — প্রিমিয়াম পাঞ্জাবির অনলাইন শপ" },
       {
         name: "description",
         content:
-          "জন্মদিন, বিবাহবার্ষিকী কিংবা কর্পোরেট — প্রতিটি উপলক্ষের জন্য সাজানো গিফট কম্বো ও উপহার বক্স। সারা দেশে ক্যাশ অন ডেলিভারি।",
+          "আধুনিক ডিজাইন, আরামদায়ক কাপড় ও নিখুঁত ফিটের প্রিমিয়াম পাঞ্জাবি কিনুন। সারা বাংলাদেশে ক্যাশ অন ডেলিভারি।",
       },
-      { property: "og:title", content: "Panjabi Shop BD — গিফট কম্বো ও উপহার সামগ্রীর অনলাইন শপ" },
+      { property: "og:title", content: "Panjabi Shop BD — প্রিমিয়াম পাঞ্জাবির অনলাইন শপ" },
       {
         property: "og:description",
-        content: "জন্মদিন, বিবাহবার্ষিকী কিংবা কর্পোরেট — প্রতিটি উপলক্ষের জন্য সাজানো গিফট কম্বো ও উপহার বক্স। সারা দেশে ক্যাশ অন ডেলিভারি।",
+        content: "আধুনিক ডিজাইন, আরামদায়ক কাপড় ও নিখুঁত ফিটের প্রিমিয়াম পাঞ্জাবি কিনুন। সারা বাংলাদেশে ক্যাশ অন ডেলিভারি।",
       },
       { property: "og:url", content: `${SITE_URL}/` },
       { property: "og:image", content: `${SITE_URL}/og-image.jpg` },
@@ -50,8 +50,8 @@ function HomePage() {
       <PromoPopup config={popup} />
       <h1 className="sr-only">
         {lang === "bn"
-          ? "Panjabi Shop BD — গিফট কম্বো ও উপহার সামগ্রীর অনলাইন শপ"
-          : "Panjabi Shop BD — Gift combos and premium gift items online shop"}
+          ? "Panjabi Shop BD — প্রিমিয়াম পাঞ্জাবির অনলাইন শপ"
+          : "Panjabi Shop BD — Premium Panjabi Online Store"}
       </h1>
       {slides.length > 0 ? (
         <HeroSlider slides={slides} />
@@ -61,11 +61,11 @@ function HomePage() {
             <h2 className="text-2xl font-bold tracking-tight sm:text-4xl">
               {lang === "bn" ? (
                 <>
-                  উপহার হোক <span className="text-primary">একটা কবিতার মতো</span>
+                  আপনার স্টাইলের <span className="text-primary">প্রিমিয়াম পাঞ্জাবি</span>
                 </>
               ) : (
                 <>
-                  Let every gift read <span className="text-primary">like a poem</span>
+                  Find your <span className="text-primary">premium Panjabi</span>
                 </>
               )}
             </h2>
@@ -121,8 +121,8 @@ function HomePage() {
             </p>
             <p className="mt-1 max-w-md text-sm text-muted-foreground">
               {lang === "bn"
-                ? "সব ক্যাটাগরি ঘুরে দেখুন এবং পছন্দের উপহার বক্স বেছে নিন।"
-                : "Browse all categories and pick your favorite gift box."}
+                ? "সব ক্যাটাগরি ঘুরে দেখুন এবং পছন্দের পাঞ্জাবি বেছে নিন।"
+                : "Browse all categories and pick your favorite Panjabi."}
             </p>
             <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
               <Link

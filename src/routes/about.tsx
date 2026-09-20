@@ -13,10 +13,10 @@ export const Route = createFileRoute("/about")({
       {
         name: "description",
         content:
-          "Panjabi Shop BD প্রতিটি উপলক্ষের জন্য যত্নে সাজানো গিফট কম্বো তৈরি করে। আমাদের গল্প, কাজের ধরন ও প্রতিশ্রুতি।",
+          "Panjabi Shop BD আধুনিক ডিজাইন, আরামদায়ক কাপড় ও নির্ভরযোগ্য মানের পাঞ্জাবি সরবরাহ করে। আমাদের গল্প ও প্রতিশ্রুতি জানুন।",
       },
       { property: "og:title", content: "আমাদের কথা | About — Panjabi Shop BD" },
-      { property: "og:description", content: "উপহার সাজানোর কাজটা আমরা কবিতার মতো করে করি।" },
+      { property: "og:description", content: "মানসম্মত পাঞ্জাবি সহজে পৌঁছে দেওয়াই আমাদের লক্ষ্য।" },
       { property: "og:url", content: `${SITE_URL}/about` },
     ],
     links: [{ rel: "canonical", href: `${SITE_URL}/about` }],
@@ -25,16 +25,16 @@ export const Route = createFileRoute("/about")({
 });
 
 const BODY = {
-  bn: `Panjabi Shop BD শুরু হয়েছিল একটা সহজ ভাবনা থেকে — উপহার শুধু একটা জিনিস নয়, এটা একটা কথা বলার উপায়।
+  bn: `Panjabi Shop BD শুরু হয়েছিল একটি সহজ লক্ষ্য নিয়ে — মানসম্মত, আরামদায়ক ও রুচিশীল পাঞ্জাবি অনলাইনে সহজে সবার কাছে পৌঁছে দেওয়া।
 
-আমরা প্রতিটি গিফট কম্বো নিজেরা সাজাই। কোন উপলক্ষ, কার জন্য, বাজেট কত — এসব মাথায় রেখে পণ্য বাছাই করা হয়, তারপর হাতে মোড়ানো হয় সুন্দর বক্সে, সঙ্গে থাকে আপনার লেখা কার্ড।
+আমরা কাপড়ের মান, সেলাই, ফিট ও ডিজাইনের দিকে বিশেষ গুরুত্ব দিয়ে প্রতিটি পাঞ্জাবি নির্বাচন করি। উৎসব, অনুষ্ঠান বা দৈনন্দিন পরিধানের জন্য আমাদের কালেকশনে রয়েছে বিভিন্ন রঙ, নকশা ও সাইজ।
 
-পাঠানোর আগে প্রতিটি বক্স হাতে ধরে যাচাই করা হয় — পণ্যের মান, প্যাকেজিং আর মোড়কের নিখুঁততা। পছন্দ না হলে ডেলিভারির ৭ দিনের ভেতর ফেরত দেওয়া যাবে।`,
-  en: `Panjabi Shop BD began with a simple thought — a gift is not just an object, it is a way of saying something.
+পাঠানোর আগে প্রতিটি পণ্যের মান ও প্যাকেজিং যাচাই করা হয়। সারা বাংলাদেশে ক্যাশ অন ডেলিভারি এবং নীতিমালা অনুযায়ী সহজ এক্সচেঞ্জ ও রিটার্ন সুবিধা রয়েছে।`,
+  en: `Panjabi Shop BD began with one clear goal: making well-made, comfortable and stylish Panjabis easy to shop online.
 
-We build every combo ourselves. The occasion, the person and the budget decide what goes in the box; then it is wrapped by hand and paired with a card in your own words.
+We select every Panjabi with close attention to fabric, stitching, fit and design. Our collection covers different colors, patterns and sizes for festivals, occasions and everyday wear.
 
-Each box is checked by hand before it ships — product quality, packaging and finish. If it is not right, return it within 7 days of delivery.`,
+Every item and its packaging are checked before dispatch. We offer cash on delivery across Bangladesh and straightforward exchanges and returns under our policy.`,
 };
 
 
@@ -52,8 +52,8 @@ export function AboutPage() {
 
       <div className="mt-8 grid gap-3 sm:grid-cols-3">
         {[
-          { bn: "যত্নে সাজানো গিফট কম্বো", en: "Curated gift combos" },
-          { bn: "হাতে যাচাই করা মান", en: "Hand-checked quality" },
+          { bn: "আধুনিক পাঞ্জাবি কালেকশন", en: "Modern Panjabi collection" },
+          { bn: "যাচাইকৃত কাপড় ও সেলাই", en: "Checked fabric and stitching" },
           { bn: "৭ দিনের রিটার্ন", en: "7-day returns" },
         ].map((item) => (
           <div key={item.en} className="rounded-lg border border-border bg-card p-4">

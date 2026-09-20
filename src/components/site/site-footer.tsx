@@ -83,19 +83,19 @@ export function SiteFooter({ minimalOnMobile }: { minimalOnMobile?: boolean }) {
           <h2 className="text-base font-bold text-primary">Legal</h2>
           <ul className="mt-3 space-y-2">
             <li>
-              <span className="cursor-default text-sm text-secondary-foreground/80 hover:text-primary">
+              <Link to="/privacy-policy" className="text-sm text-secondary-foreground/80 hover:text-primary">
                 Privacy Policy
-              </span>
+              </Link>
             </li>
             <li>
-              <span className="cursor-default text-sm text-secondary-foreground/80 hover:text-primary">
+              <Link to="/terms-and-conditions" className="text-sm text-secondary-foreground/80 hover:text-primary">
                 Terms & Conditions
-              </span>
+              </Link>
             </li>
             <li>
-              <span className="cursor-default text-sm text-secondary-foreground/80 hover:text-primary">
+              <Link to="/return-policy" className="text-sm text-secondary-foreground/80 hover:text-primary">
                 Return Policy
-              </span>
+              </Link>
             </li>
           </ul>
         </div>
