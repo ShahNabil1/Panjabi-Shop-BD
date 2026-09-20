@@ -48,10 +48,12 @@ import {
 
   X,
   KeyRound,
+  ShieldCheck,
 } from "lucide-react";
 
 import { useAuth } from "@/lib/auth-context";
-import { checkIsAdmin } from "@/lib/admin.functions";
+import { getAdminAccess, logAdminActivity } from "@/lib/staff.functions";
+import { canAccessPath, canManageStaff } from "@/lib/rbac-shared";
 import { BrandLoader } from "@/components/admin/brand-loader";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -78,7 +80,13 @@ export const Route = createFileRoute("/admin")({
   component: AdminLayout,
 });
 
-type NavItem = { to: string; label: string; icon: typeof LayoutDashboard; exact?: boolean };
+type NavItem = {
+  to: string;
+  label: string;
+  icon: typeof LayoutDashboard;
+  exact?: boolean;
+  adminOnly?: boolean;
+};
 
 const sections: Array<{ title: string; items: NavItem[] }> = [
   {
@@ -160,6 +168,7 @@ const sections: Array<{ title: string; items: NavItem[] }> = [
       { to: "/admin/settings/sms-templates", label: "SMS Templates", icon: MessageSquareText },
       { to: "/admin/settings/api", label: "API & Integrations", icon: KeyRound },
       { to: "/admin/settings/retention", label: "Data Cleanup", icon: Database },
+      { to: "/admin/staff", label: "Staff & Access", icon: ShieldCheck, adminOnly: true },
 
     ],
   },
