@@ -69,7 +69,7 @@ export function AddToCartBar({
   const navigate = useNavigate();
   const [qty, setQty] = useState(1);
   const soldOut = stock <= 0;
-  const productUrl = `${typeof window !== "undefined" ? window.location.origin : ""}/p/${item.slug}`;
+  const productUrl = `https://panjabishopbd.com/p/${item.slug}`;
   const productName = pick(lang, item.nameBn, item.nameEn);
   const whatsappText = encodeURIComponent(
     soldOut
