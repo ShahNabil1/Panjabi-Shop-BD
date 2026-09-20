@@ -1240,6 +1240,7 @@ export type Database = {
           created_at: string
           customer_email: string | null
           customer_ip: string | null
+          customer_ip_location: Json
           customer_name: string
           customer_phone: string
           customer_user_agent: string | null
@@ -1282,6 +1283,7 @@ export type Database = {
           created_at?: string
           customer_email?: string | null
           customer_ip?: string | null
+          customer_ip_location?: Json
           customer_name: string
           customer_phone: string
           customer_user_agent?: string | null
@@ -1324,6 +1326,7 @@ export type Database = {
           created_at?: string
           customer_email?: string | null
           customer_ip?: string | null
+          customer_ip_location?: Json
           customer_name?: string
           customer_phone?: string
           customer_user_agent?: string | null
@@ -2624,6 +2627,10 @@ export type Database = {
       r2_rewrite_media_urls: {
         Args: { new_base: string; old_base: string }
         Returns: number
+      }
+      storefront_security_check: {
+        Args: { _fingerprint?: string; _ip?: string; _phone?: string }
+        Returns: boolean
       }
       validate_coupon: {
         Args: {
