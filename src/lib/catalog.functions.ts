@@ -51,7 +51,7 @@ export const getLayoutData = createServerFn({ method: "GET" }).handler(async () 
 );
 
 export const getLegalPage = createServerFn({ method: "GET" })
-  .inputValidator((data: { key: "legal_privacy" | "legal_terms" | "legal_returns" }) => ({
+  .inputValidator((data: { key: "about" | "legal_privacy" | "legal_terms" | "legal_returns" }) => ({
     key: data.key,
   }))
   .handler(async ({ data }) => fetchLegalPage(data.key));

@@ -77,11 +77,12 @@ function SettingsAdmin() {
 
       <Panel className="space-y-3">
         <div>
-          <h2 className="ig-text text-sm font-bold">Legal pages</h2>
-          <p className="mt-1 text-xs text-muted-foreground">Edit the policies linked in the storefront footer.</p>
+          <h2 className="ig-text text-sm font-bold">About & legal pages</h2>
+          <p className="mt-1 text-xs text-muted-foreground">Edit the information and policies linked in the storefront footer.</p>
         </div>
         <div className="divide-y divide-border overflow-hidden rounded-xl border border-border/70">
           {[
+            { title: "About Us", to: "/admin/settings/about" as const },
             { title: "Privacy Policy", to: "/admin/settings/privacy-policy" as const },
             { title: "Terms & Conditions", to: "/admin/settings/terms-and-conditions" as const },
             { title: "Return Policy", to: "/admin/settings/return-policy" as const },

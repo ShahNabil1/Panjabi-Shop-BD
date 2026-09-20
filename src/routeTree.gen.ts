@@ -72,6 +72,7 @@ import { Route as AdminOrdersSearchRouteImport } from './routes/admin.orders.sea
 import { Route as AdminProductsIndexRouteImport } from './routes/admin.products.index'
 import { Route as AdminProductsIdRouteImport } from './routes/admin.products.$id'
 import { Route as AdminSettingsIndexRouteImport } from './routes/admin.settings.index'
+import { Route as AdminSettingsAboutRouteImport } from './routes/admin.settings.about'
 import { Route as AdminSettingsApiRouteImport } from './routes/admin.settings.api'
 import { Route as AdminSettingsDeliveryRouteImport } from './routes/admin.settings.delivery'
 import { Route as AdminSettingsPrivacyPolicyRouteImport } from './routes/admin.settings.privacy-policy'
@@ -406,6 +407,11 @@ const AdminSettingsIndexRoute = AdminSettingsIndexRouteImport.update({
   path: '/settings/',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminSettingsAboutRoute = AdminSettingsAboutRouteImport.update({
+  id: '/settings/about',
+  path: '/settings/about',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminSettingsApiRoute = AdminSettingsApiRouteImport.update({
   id: '/settings/api',
   path: '/settings/api',
@@ -548,6 +554,7 @@ export interface FileRoutesByFullPath {
   '/admin/orders/list': typeof AdminOrdersListRoute
   '/admin/orders/search': typeof AdminOrdersSearchRoute
   '/admin/products/$id': typeof AdminProductsIdRoute
+  '/admin/settings/about': typeof AdminSettingsAboutRoute
   '/admin/settings/api': typeof AdminSettingsApiRoute
   '/admin/settings/delivery': typeof AdminSettingsDeliveryRoute
   '/admin/settings/privacy-policy': typeof AdminSettingsPrivacyPolicyRoute
@@ -627,6 +634,7 @@ export interface FileRoutesByTo {
   '/admin/orders/list': typeof AdminOrdersListRoute
   '/admin/orders/search': typeof AdminOrdersSearchRoute
   '/admin/products/$id': typeof AdminProductsIdRoute
+  '/admin/settings/about': typeof AdminSettingsAboutRoute
   '/admin/settings/api': typeof AdminSettingsApiRoute
   '/admin/settings/delivery': typeof AdminSettingsDeliveryRoute
   '/admin/settings/privacy-policy': typeof AdminSettingsPrivacyPolicyRoute
@@ -708,6 +716,7 @@ export interface FileRoutesById {
   '/admin/orders/list': typeof AdminOrdersListRoute
   '/admin/orders/search': typeof AdminOrdersSearchRoute
   '/admin/products/$id': typeof AdminProductsIdRoute
+  '/admin/settings/about': typeof AdminSettingsAboutRoute
   '/admin/settings/api': typeof AdminSettingsApiRoute
   '/admin/settings/delivery': typeof AdminSettingsDeliveryRoute
   '/admin/settings/privacy-policy': typeof AdminSettingsPrivacyPolicyRoute
@@ -790,6 +799,7 @@ export interface FileRouteTypes {
     | '/admin/orders/list'
     | '/admin/orders/search'
     | '/admin/products/$id'
+    | '/admin/settings/about'
     | '/admin/settings/api'
     | '/admin/settings/delivery'
     | '/admin/settings/privacy-policy'
@@ -869,6 +879,7 @@ export interface FileRouteTypes {
     | '/admin/orders/list'
     | '/admin/orders/search'
     | '/admin/products/$id'
+    | '/admin/settings/about'
     | '/admin/settings/api'
     | '/admin/settings/delivery'
     | '/admin/settings/privacy-policy'
@@ -949,6 +960,7 @@ export interface FileRouteTypes {
     | '/admin/orders/list'
     | '/admin/orders/search'
     | '/admin/products/$id'
+    | '/admin/settings/about'
     | '/admin/settings/api'
     | '/admin/settings/delivery'
     | '/admin/settings/privacy-policy'
@@ -1448,6 +1460,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminSettingsIndexRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/settings/about': {
+      id: '/admin/settings/about'
+      path: '/settings/about'
+      fullPath: '/admin/settings/about'
+      preLoaderRoute: typeof AdminSettingsAboutRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/settings/api': {
       id: '/admin/settings/api'
       path: '/settings/api'
@@ -1590,6 +1609,7 @@ interface AdminRouteChildren {
   AdminOrdersListRoute: typeof AdminOrdersListRoute
   AdminOrdersSearchRoute: typeof AdminOrdersSearchRoute
   AdminProductsIdRoute: typeof AdminProductsIdRoute
+  AdminSettingsAboutRoute: typeof AdminSettingsAboutRoute
   AdminSettingsApiRoute: typeof AdminSettingsApiRoute
   AdminSettingsDeliveryRoute: typeof AdminSettingsDeliveryRoute
   AdminSettingsPrivacyPolicyRoute: typeof AdminSettingsPrivacyPolicyRoute
@@ -1641,6 +1661,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminOrdersListRoute: AdminOrdersListRoute,
   AdminOrdersSearchRoute: AdminOrdersSearchRoute,
   AdminProductsIdRoute: AdminProductsIdRoute,
+  AdminSettingsAboutRoute: AdminSettingsAboutRoute,
   AdminSettingsApiRoute: AdminSettingsApiRoute,
   AdminSettingsDeliveryRoute: AdminSettingsDeliveryRoute,
   AdminSettingsPrivacyPolicyRoute: AdminSettingsPrivacyPolicyRoute,

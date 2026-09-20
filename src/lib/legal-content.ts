@@ -1,4 +1,4 @@
-export type LegalPageKey = "legal_privacy" | "legal_terms" | "legal_returns";
+export type LegalPageKey = "about" | "legal_privacy" | "legal_terms" | "legal_returns";
 
 export type LegalPageContent = {
   title: string;
@@ -8,6 +8,13 @@ export type LegalPageContent = {
 };
 
 export const LEGAL_PAGES: Record<LegalPageKey, LegalPageContent & { path: string }> = {
+  about: {
+    path: "/about",
+    title: "আমাদের কথা",
+    metaTitle: "আমাদের কথা — Panjabi Shop BD",
+    metaDescription: "Panjabi Shop BD-এর মানসম্মত কাপড়, নিখুঁত সেলাই ও আধুনিক ডিজাইনের পাঞ্জাবি নিয়ে আমাদের গল্প ও প্রতিশ্রুতি জানুন।",
+    content: "<h2>পাঞ্জাবিতে স্বাচ্ছন্দ্য আর রুচির গল্প</h2><p>Panjabi Shop BD শুরু হয়েছিল একটি সহজ লক্ষ্য নিয়ে—মানসম্মত, আরামদায়ক ও রুচিশীল পাঞ্জাবি অনলাইনে সবার কাছে সহজে পৌঁছে দেওয়া।</p><p>আমরা কাপড়ের মান, সেলাই, ফিট ও ডিজাইনের দিকে বিশেষ গুরুত্ব দিয়ে প্রতিটি পাঞ্জাবি নির্বাচন করি। উৎসব, অনুষ্ঠান কিংবা প্রতিদিনের পরিধান—প্রতিটি উপলক্ষের জন্য আমাদের কালেকশনে রয়েছে বৈচিত্র্যময় রঙ, নকশা ও সাইজ।</p><h3>মানের প্রতি আমাদের প্রতিশ্রুতি</h3><p>পাঠানোর আগে প্রতিটি পণ্যের মান ও প্যাকেজিং যাচাই করা হয়। সারা বাংলাদেশে ক্যাশ অন ডেলিভারি এবং নীতিমালা অনুযায়ী সহজ এক্সচেঞ্জ ও রিটার্ন সুবিধা দিয়ে কেনাকাটাকে নিশ্চিন্ত রাখাই আমাদের চেষ্টা।</p>",
+  },
   legal_privacy: {
     path: "/privacy-policy",
     title: "Privacy Policy",
