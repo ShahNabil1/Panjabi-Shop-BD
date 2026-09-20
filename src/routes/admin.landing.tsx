@@ -173,20 +173,22 @@ function LandingPagesAdmin() {
               }
             />
             <TextField
-              label="Meta Title"
+            <TextField
+              label="Meta title"
               value={draft.meta_title ?? ""}
               onChange={(v) => setDraft({ ...draft, meta_title: v || null })}
+              maxLength={60}
+              hint="সর্বোচ্চ ৬০ ক্যারেক্টার"
             />
           </div>
           <AreaField
-            label="Meta Description"
+            label="Meta description"
             rows={3}
             value={draft.meta_description ?? ""}
             onChange={(v) => setDraft({ ...draft, meta_description: v || null })}
+            maxLength={160}
+            hint="সর্বোচ্চ ১৬০ ক্যারেক্টার"
           />
-
-          <div className="space-y-3 rounded-2xl border border-border/70 bg-background/50 p-4">
-            <div>
               <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                 SEO & Social
               </p>
