@@ -147,6 +147,8 @@ export const adminCreateStaff = createServerFn({ method: "POST" })
     return { userId };
   });
 
+export type StaffUpdateInput = z.infer<typeof updateSchema>;
+
 export const adminUpdateStaff = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => updateSchema.parse(input))
@@ -154,14 +156,21 @@ export const adminUpdateStaff = createServerFn({ method: "POST" })
     await requireSuperAdmin(context.supabase, context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-    const patch: Record<string, unknown> = {};
-    if (data.fullName !== undefined) patch["full_name"] = data.fullName;
-    if (data.phone !== undefined) patch["phone"] = data.phone || null;
-    if (data.note !== undefined) patch["note"] = data.note || null;
-    if (data.isActive !== undefined) patch["is_active"] = data.isActive;
-    if (data.fullAccess !== undefined) patch["full_access"] = data.fullAccess;
+    const patch: {
+      full_name?: string;
+      phone?: string | null;
+      note?: string | null;
+      is_active?: boolean;
+      full_access?: boolean;
+      permissions?: string[];
+    } = {};
+    if (data.fullName !== undefined) patch.full_name = data.fullName;
+    if (data.phone !== undefined) patch.phone = data.phone || null;
+    if (data.note !== undefined) patch.note = data.note || null;
+    if (data.isActive !== undefined) patch.is_active = data.isActive;
+    if (data.fullAccess !== undefined) patch.full_access = data.fullAccess;
     if (data.permissions !== undefined || data.fullAccess !== undefined) {
-      patch["permissions"] = data.fullAccess
+      patch.permissions = data.fullAccess
         ? STAFF_MODULE_KEYS
         : clean(data.permissions ?? []);
     }

@@ -11,6 +11,7 @@ import {
   adminListStaff,
   adminUpdateStaff,
   type StaffRow,
+  type StaffUpdateInput,
 } from "@/lib/staff.functions";
 import { STAFF_MODULES, STAFF_MODULE_KEYS, STAFF_SECTIONS } from "@/lib/rbac-shared";
 import { AdminHeading, Panel, StatCard, TextField } from "@/components/admin/kit";
@@ -227,8 +228,7 @@ function StaffPage() {
   });
 
   const update = useMutation({
-    mutationFn: (input: Parameters<typeof adminUpdateStaff>[0]["data"]) =>
-      adminUpdateStaff({ data: input }),
+    mutationFn: (input: StaffUpdateInput) => adminUpdateStaff({ data: input }),
     onSuccess: async () => {
       toast.success("Saved");
       setEditing(null);
