@@ -40,4 +40,4 @@ Disallow: /order/
 Disallow: /invoice/
 Disallow: /search
 
-Sitemap: https://upoharkabbo.com/sitemap.xml
+Sitemap: https://panjabishopbd.com/sitemap.xml

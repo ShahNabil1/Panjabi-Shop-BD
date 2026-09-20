@@ -12,11 +12,11 @@ import logoMark from "@/assets/panjabishopbd-logo.png";
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "স্টাফ লগইন — Panjabi Shop BD (upoharkabbo.com)" },
+      { title: "স্টাফ লগইন — Panjabi Shop BD (panjabishopbd.com)" },
       {
         name: "description",
         content:
-          "upoharkabbo.com-এর নিজস্ব স্টাফ/অ্যাডমিন লগইন পেইজ। শুধুমাত্র Panjabi Shop BD টিমের অনুমোদিত সদস্যদের জন্য।",
+          "panjabishopbd.com-এর নিজস্ব স্টাফ/অ্যাডমিন লগইন পেইজ। শুধুমাত্র Panjabi Shop BD টিমের অনুমোদিত সদস্যদের জন্য।",
       },
       { name: "robots", content: "noindex, follow" },
       { property: "og:title", content: "স্টাফ লগইন — Panjabi Shop BD" },
@@ -101,7 +101,7 @@ function AuthPage() {
             {mode === "signin" ? "Panjabi Shop BD স্টাফ লগইন" : "নতুন স্টাফ অ্যাকাউন্ট"}
           </h1>
           <p className="mt-1.5 text-sm text-muted-foreground">
-            এটি <span className="font-en font-semibold">upoharkabbo.com</span>-এর নিজস্ব স্টোর
+            এটি <span className="font-en font-semibold">panjabishopbd.com</span>-এর নিজস্ব স্টোর
             ম্যানেজমেন্ট প্যানেল। শুধুমাত্র Panjabi Shop BD টিমের অনুমোদিত সদস্যরা এখানে সাইন ইন করবেন।
             কেনাকাটার জন্য লগইনের প্রয়োজন নেই।
           </p>
@@ -167,7 +167,7 @@ function AuthPage() {
         </div>
 
         <p className="mt-6 text-center text-xs text-muted-foreground">
-          © Panjabi Shop BD · <span className="font-en">upoharkabbo.com</span> ·{" "}
+          © Panjabi Shop BD · <span className="font-en">panjabishopbd.com</span> ·{" "}
           <Link to="/about" className="underline underline-offset-4 hover:text-primary">
             আমাদের সম্পর্কে
           </Link>{" "}

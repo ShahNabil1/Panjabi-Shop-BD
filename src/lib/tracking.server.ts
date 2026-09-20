@@ -85,7 +85,7 @@ export async function probeMetaCapi(cfg: TrackingConfig): Promise<Probe> {
         event_time: now,
         event_id: `conn-test.${Date.now()}`,
         action_source: "website",
-        event_source_url: "https://upoharkabbo.com/",
+        event_source_url: "https://panjabishopbd.com/",
         user_data: {
           client_user_agent: "PanjabiShopBdConnectionTest/1.0",
           client_ip_address: "203.0.113.1",
@@ -143,7 +143,7 @@ export async function probeTikTok(cfg: TrackingConfig): Promise<Probe> {
         event_time: Math.floor(Date.now() / 1000),
         event_id: `conn-test.${Date.now()}`,
         user: { user_agent: "PanjabiShopBdConnectionTest/1.0", ip: "203.0.113.1" },
-        page: { url: "https://upoharkabbo.com/" },
+        page: { url: "https://panjabishopbd.com/" },
       },
     ],
   };
@@ -185,7 +185,7 @@ export async function probeGa4(cfg: TrackingConfig): Promise<Probe> {
       method: "POST",
       body: JSON.stringify({
         client_id: "0000000000.1111111111",
-        events: [{ name: "page_view", params: { page_location: "https://upoharkabbo.com/" } }],
+        events: [{ name: "page_view", params: { page_location: "https://panjabishopbd.com/" } }],
       }),
     },
   );

@@ -66,7 +66,7 @@ export const Route = createFileRoute("/admin/settings/delivery")({
   }),
 });
 
-const BRAND_WEBHOOK_ORIGIN = "https://upoharkabbo.com";
+const BRAND_WEBHOOK_ORIGIN = "https://panjabishopbd.com";
 
 function webhookUrl(provider: DeliveryProvider) {
   return `${BRAND_WEBHOOK_ORIGIN}/api/public/courier/${provider}`;
