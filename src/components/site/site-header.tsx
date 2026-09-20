@@ -133,15 +133,15 @@ function SearchBox({ onDone }: { onDone?: () => void }) {
             <p className="px-4 py-3 text-sm text-muted-foreground">খোঁজা হচ্ছে…</p>
           ) : results.length === 0 ? (
             <p className="px-4 py-3 text-sm text-muted-foreground">
-              {tr(lang, "noResults") !== "noResults" ? tr(lang, "noResults") : "কোনো পণ্য পাওয়া যায়নি"}
+              {lang === "bn" ? "কোনো পণ্য পাওয়া যায়নি" : "No products found"}
             </p>
           ) : (
             <ul role="listbox" aria-label={tr(lang, "search")}>
               {results.map((p) => (
                 <li key={p.id}>
                   <Link
-                    to="/p/$slug"
-                    params={{ slug: p.slug }}
+                    to="/p/$product"
+                    params={{ product: p.slug }}
                     onClick={() => {
                       close();
                       onDone?.();
