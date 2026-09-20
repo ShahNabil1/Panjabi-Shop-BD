@@ -30,6 +30,7 @@ import {
   TextField,
   ToggleField,
 } from "@/components/admin/kit";
+import { RichTextEditor } from "@/components/admin/rich-text-editor";
 import {
   CropExistingButton,
   ImageUploadButton,
