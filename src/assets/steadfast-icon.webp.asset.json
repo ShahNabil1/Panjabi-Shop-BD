@@ -1,11 +1,11 @@
 {
+  "version": 1,
   "asset_id": "05c48262-ae9e-46b4-9ae9-224d716ed6da",
-  "content_type": "image/webp",
-  "created_at": "2026-08-08T09:05:09Z",
-  "original_filename": "steadfast-icon.webp",
-  "project_id": "a62639b1-d330-4159-b56e-25451a9889c4",
-  "r2_key": "a/v1/a62639b1-d330-4159-b56e-25451a9889c4/05c48262-ae9e-46b4-9ae9-224d716ed6da/steadfast-icon.webp",
-  "size": 3030,
+  "project_id": "92cdac08-5a8f-43a4-af29-da13a2aba9b7",
   "url": "/__l5e/assets-v1/05c48262-ae9e-46b4-9ae9-224d716ed6da/steadfast-icon.webp",
-  "version": 1
+  "r2_key": "a/v1/92cdac08-5a8f-43a4-af29-da13a2aba9b7/05c48262-ae9e-46b4-9ae9-224d716ed6da/steadfast-icon.webp",
+  "original_filename": "steadfast-icon.webp",
+  "size": 3030,
+  "content_type": "image/webp",
+  "created_at": "2026-08-08T09:05:09Z"
 }

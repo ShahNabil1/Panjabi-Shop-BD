@@ -1,11 +1,11 @@
 {
+  "version": 1,
   "asset_id": "fb9cf83b-2c8b-4273-b769-3933f677a3a5",
-  "content_type": "image/jpeg",
-  "created_at": "2026-08-10T20:07:13Z",
-  "original_filename": "tiktok-ads.jpg",
-  "project_id": "a62639b1-d330-4159-b56e-25451a9889c4",
-  "r2_key": "a/v1/a62639b1-d330-4159-b56e-25451a9889c4/fb9cf83b-2c8b-4273-b769-3933f677a3a5/tiktok-ads.jpg",
-  "size": 7245,
+  "project_id": "92cdac08-5a8f-43a4-af29-da13a2aba9b7",
   "url": "/__l5e/assets-v1/fb9cf83b-2c8b-4273-b769-3933f677a3a5/tiktok-ads.jpg",
-  "version": 1
+  "r2_key": "a/v1/92cdac08-5a8f-43a4-af29-da13a2aba9b7/fb9cf83b-2c8b-4273-b769-3933f677a3a5/tiktok-ads.jpg",
+  "original_filename": "tiktok-ads.jpg",
+  "size": 7245,
+  "content_type": "image/jpeg",
+  "created_at": "2026-08-10T20:07:13Z"
 }
