@@ -430,7 +430,7 @@ export function CheckoutForm({
             {allowAddMore ? (
               <Link
                 to="/"
-                className="font-en group inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-primary to-pink-500 px-4 py-2 text-xs font-extrabold text-primary-foreground shadow-md transition-all duration-300 hover:scale-[1.03] hover:shadow-lg active:scale-95 sm:text-sm"
+                className="font-en group inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-primary to-foreground px-4 py-2 text-xs font-extrabold text-primary-foreground shadow-md transition-all duration-300 hover:scale-[1.03] hover:shadow-lg active:scale-95 sm:text-sm"
               >
                 <Plus className="h-3.5 w-3.5 transition-transform duration-300 group-hover:rotate-90" />
                 Add Product
@@ -454,7 +454,7 @@ export function CheckoutForm({
                 </p>
                 <Link
                   to="/"
-                  className="font-en group inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-primary to-pink-500 px-5 py-2.5 text-sm font-extrabold text-primary-foreground shadow-md transition-all duration-300 hover:scale-[1.03] hover:shadow-lg active:scale-95"
+                  className="font-en group inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-primary to-foreground px-5 py-2.5 text-sm font-extrabold text-primary-foreground shadow-md transition-all duration-300 hover:scale-[1.03] hover:shadow-lg active:scale-95"
                 >
                   <Plus className="h-4 w-4 transition-transform duration-300 group-hover:rotate-90" />
                   Add Product
