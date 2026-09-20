@@ -234,10 +234,9 @@ function PartnerCard({
       const res = await adminTestDeliveryPartner({ data: { provider, credentials: values } });
       setResult({ ok: res.ok, message: res.message });
       setStores(res.stores ?? []);
-      if (res.ok) {
-        onDone();
-        toast.success(`${providerLabels[provider]}: ${res.message}`);
-      }
+      // Never call onDone() here: for a not-yet-saved partner it clears the draft
+      // selection and unmounts this card, losing the typed credentials.
+      if (res.ok) toast.success(`${providerLabels[provider]}: ${res.message}`);
       else toast.error(res.message);
     } catch (error) {
       const message = (error as Error).message;
