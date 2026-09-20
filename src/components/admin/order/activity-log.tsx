@@ -93,6 +93,14 @@ function actorOf(meta: unknown): string | null {
   return null;
 }
 
+/** "X took over this order from Y" — names come from meta when present. */
+function takeoverText(a: ActivityEntry): string {
+  const m = (a.meta ?? {}) as { actor?: string; from?: string };
+  if (m.actor && m.from) return `${m.actor} took over this order from ${m.from}`;
+  return a.message ?? "Order taken over";
+}
+
+
 export function ActivityLog({ entries }: { entries: ActivityEntry[] }) {
   const [limit, setLimit] = useState(5);
   const sorted = [...entries].sort((a, b) => (a.created_at < b.created_at ? 1 : -1));
