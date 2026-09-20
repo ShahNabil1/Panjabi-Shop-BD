@@ -1,0 +1,324 @@
+import { useQuery } from "@tanstack/react-query";
+import { useEffect, useMemo, useState } from "react";
+import { Search, Trash2 } from "lucide-react";
+
+import { NumberField, Panel } from "@/components/admin/kit";
+import { Button } from "@/components/ui/button";
+import { useConfirm } from "@/components/ui/confirm-dialog";
+import { adminSearchProducts } from "@/lib/admin.functions";
+import {
+  normalizeDeliveryConfig,
+  serializeDeliveryConfig,
+  type DeliveryConfig,
+  type ProductDeliveryMode,
+  type ProductDeliveryRule,
+} from "@/lib/delivery-rates";
+
+function Toggle({
+  checked,
+  onChange,
+  title,
+  description,
+}: {
+  checked: boolean;
+  onChange: (next: boolean) => void;
+  title: string;
+  description: string;
+}) {
+  return (
+    <label className="flex cursor-pointer items-center justify-between gap-4 rounded-xl border border-border/70 bg-background/40 px-3 py-2.5 transition-colors hover:border-primary/30">
+      <span className="min-w-0">
+        <span className="ig-text block text-sm font-bold">{title}</span>
+        <span className="block text-xs text-muted-foreground">{description}</span>
+      </span>
+      <input
+        type="checkbox"
+        role="switch"
+        checked={checked}
+        onChange={(e) => onChange(e.target.checked)}
+        className="peer sr-only"
+      />
+      <span className="relative inline-flex h-6 w-11 shrink-0 touch-manipulation items-center rounded-full bg-muted shadow-sm transition-[background-color,box-shadow,transform] duration-300 ease-out peer-active:scale-95 peer-checked:bg-primary peer-focus-visible:ring-2 peer-focus-visible:ring-ring/40 motion-reduce:transition-none">
+        <span
+          className={`absolute left-0.5 size-5 rounded-full bg-background shadow-md transition-transform duration-300 ease-out motion-reduce:transition-none ${
+            checked ? "translate-x-5" : "translate-x-0"
+          }`}
+        />
+      </span>
+    </label>
+  );
+}
+
+function ModeTabs({
+  value,
+  onChange,
+  options,
+}: {
+  value: string;
+  onChange: (next: string) => void;
+  options: Array<{ value: string; label: string }>;
+}) {
+  return (
+    <div className="inline-flex flex-wrap gap-1 rounded-xl border border-border bg-background/50 p-1">
+      {options.map((opt) => (
+        <button
+          key={opt.value}
+          type="button"
+          onClick={() => onChange(opt.value)}
+          className={`rounded-lg px-3 py-1.5 text-xs font-bold transition-all duration-200 active:scale-95 ${
+            value === opt.value
+              ? "bg-primary text-primary-foreground shadow-sm"
+              : "text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          {opt.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+export function DeliverySettingsPanel({
+  value,
+  saving,
+  onSave,
+}: {
+  value: unknown;
+  saving: boolean;
+  onSave: (value: Record<string, unknown>) => void;
+}) {
+  const confirm = useConfirm();
+  const [config, setConfig] = useState<DeliveryConfig>(() => normalizeDeliveryConfig(value));
+  const [query, setQuery] = useState("");
+  const [pickerOpen, setPickerOpen] = useState(false);
+
+  useEffect(() => {
+    setConfig(normalizeDeliveryConfig(value));
+  }, [value]);
+
+  const patch = (next: Partial<DeliveryConfig>) => setConfig((prev) => ({ ...prev, ...next }));
+  const patchRule = (productId: string, next: Partial<ProductDeliveryRule>) =>
+    setConfig((prev) => ({
+      ...prev,
+      rules: prev.rules.map((r) => (r.productId === productId ? { ...r, ...next } : r)),
+    }));
+
+  const search = useQuery({
+    queryKey: ["admin", "delivery-product-search", query],
+    queryFn: () => adminSearchProducts({ data: { query } }),
+    enabled: pickerOpen,
+  });
+
+  const existing = useMemo(() => new Set(config.rules.map((r) => r.productId)), [config.rules]);
+
+  const addRule = (productId: string, label: string) => {
+    if (existing.has(productId)) return;
+    setConfig((prev) => ({
+      ...prev,
+      rules: [
+        ...prev.rules,
+        {
+          productId,
+          label,
+          mode: "free" as ProductDeliveryMode,
+          uniform: prev.uniform,
+          inside_dhaka: prev.inside_dhaka,
+          outside_dhaka: prev.outside_dhaka,
+        },
+      ],
+    }));
+    setPickerOpen(false);
+    setQuery("");
+  };
+
+  const removeRule = async (rule: ProductDeliveryRule) => {
+    const ok = await confirm({
+      title: "Remove delivery rule?",
+      description: `“${rule.label || "This product"}” will use the site-wide delivery charge again.`,
+      confirmLabel: "Remove",
+      destructive: true,
+    });
+    if (!ok) return;
+    setConfig((prev) => ({ ...prev, rules: prev.rules.filter((r) => r.productId !== rule.productId) }));
+  };
+
+  const disabled = config.freeAll;
+
+  return (
+    <Panel className="space-y-4">
+      <h2 className="ig-text text-sm font-bold">Delivery charges</h2>
+
+      <Toggle
+        checked={config.freeAll}
+        onChange={(next) => patch({ freeAll: next })}
+        title="Free delivery for all orders"
+        description="When on, every order ships free and checkout shows the charge as FREE."
+      />
+
+      <div className={`space-y-4 transition-opacity duration-200 ${disabled ? "pointer-events-none opacity-50" : ""}`}>
+        <div className="space-y-2">
+          <span className="block text-xs font-bold uppercase tracking-wide text-muted-foreground">
+            Site-wide rate
+          </span>
+          <ModeTabs
+            value={config.mode}
+            onChange={(next) => patch({ mode: next === "uniform" ? "uniform" : "zone" })}
+            options={[
+              { value: "zone", label: "Inside / Outside Dhaka" },
+              { value: "uniform", label: "Universal (one rate)" },
+            ]}
+          />
+        </div>
+
+        <div className="grid gap-3 sm:grid-cols-3">
+          {config.mode === "uniform" ? (
+            <NumberField
+              label="Universal rate (৳)"
+              hint="Same charge anywhere in Bangladesh"
+              value={config.uniform}
+              onChange={(v) => patch({ uniform: v })}
+            />
+          ) : (
+            <>
+              <NumberField
+                label="Inside Dhaka (৳)"
+                value={config.inside_dhaka}
+                onChange={(v) => patch({ inside_dhaka: v })}
+              />
+              <NumberField
+                label="Outside Dhaka (৳)"
+                value={config.outside_dhaka}
+                onChange={(v) => patch({ outside_dhaka: v })}
+              />
+            </>
+          )}
+          <NumberField
+            label="Free delivery above (৳)"
+            hint="0 = off"
+            value={config.freeAbove}
+            onChange={(v) => patch({ freeAbove: v })}
+          />
+        </div>
+
+        <div className="space-y-3 rounded-xl border border-border/70 bg-background/40 p-3">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <span className="min-w-0">
+              <span className="ig-text block text-sm font-bold">Product / combo specific charges</span>
+              <span className="block text-xs text-muted-foreground">
+                Pick a product or combo and give it its own charge — free, one universal rate, or
+                separate Dhaka rates. Mixed carts use the highest applicable charge.
+              </span>
+            </span>
+            <Button variant="outline" onClick={() => setPickerOpen((o) => !o)}>
+              {pickerOpen ? "Close" : "Add product"}
+            </Button>
+          </div>
+
+          {pickerOpen ? (
+            <div className="space-y-2 rounded-lg border border-border bg-card p-3">
+              <div className="flex items-center gap-2 rounded-lg border border-border px-2.5 py-2">
+                <Search className="size-4 shrink-0 text-muted-foreground" />
+                <input
+                  autoFocus
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Search product or combo by name / SKU"
+                  className="w-full bg-transparent text-sm outline-none"
+                />
+              </div>
+              <div className="max-h-64 space-y-1 overflow-y-auto">
+                {search.isLoading ? (
+                  <p className="p-2 text-xs text-muted-foreground">Loading…</p>
+                ) : (search.data ?? []).length === 0 ? (
+                  <p className="p-2 text-xs text-muted-foreground">No products found.</p>
+                ) : (
+                  (search.data ?? []).map((p) => {
+                    const label = p.name_bn || p.name_en;
+                    const added = existing.has(p.id);
+                    return (
+                      <button
+                        key={p.id}
+                        type="button"
+                        disabled={added}
+                        onClick={() => addRule(p.id, label)}
+                        className="flex w-full items-center justify-between gap-2 rounded-lg px-2.5 py-2 text-left text-sm transition-colors hover:bg-muted disabled:opacity-50"
+                      >
+                        <span className="min-w-0 truncate font-semibold">{label}</span>
+                        <span className="shrink-0 text-[11px] font-bold uppercase text-muted-foreground">
+                          {added ? "Added" : p.kind === "combo" ? "Combo" : "Product"}
+                        </span>
+                      </button>
+                    );
+                  })
+                )}
+              </div>
+            </div>
+          ) : null}
+
+          {config.rules.length === 0 ? (
+            <p className="text-xs text-muted-foreground">No product-specific rules yet.</p>
+          ) : (
+            <div className="space-y-2">
+              {config.rules.map((rule) => (
+                <div key={rule.productId} className="space-y-3 rounded-lg border border-border bg-card p-3">
+                  <div className="flex items-start justify-between gap-2">
+                    <span className="min-w-0 break-words text-sm font-bold">
+                      {rule.label || rule.productId}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => void removeRule(rule)}
+                      className="shrink-0 rounded-lg p-1.5 text-destructive transition-colors hover:bg-destructive/10"
+                      aria-label="Remove rule"
+                    >
+                      <Trash2 className="size-4" />
+                    </button>
+                  </div>
+                  <ModeTabs
+                    value={rule.mode}
+                    onChange={(next) => patchRule(rule.productId, { mode: next as ProductDeliveryMode })}
+                    options={[
+                      { value: "free", label: "Free delivery" },
+                      { value: "uniform", label: "Universal rate" },
+                      { value: "zone", label: "Inside / Outside Dhaka" },
+                    ]}
+                  />
+                  {rule.mode === "uniform" ? (
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      <NumberField
+                        label="Universal rate (৳)"
+                        value={rule.uniform}
+                        onChange={(v) => patchRule(rule.productId, { uniform: v })}
+                      />
+                    </div>
+                  ) : rule.mode === "zone" ? (
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      <NumberField
+                        label="Inside Dhaka (৳)"
+                        value={rule.inside_dhaka}
+                        onChange={(v) => patchRule(rule.productId, { inside_dhaka: v })}
+                      />
+                      <NumberField
+                        label="Outside Dhaka (৳)"
+                        value={rule.outside_dhaka}
+                        onChange={(v) => patchRule(rule.productId, { outside_dhaka: v })}
+                      />
+                    </div>
+                  ) : null}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      <Button
+        loading={saving}
+        onClick={() => onSave(serializeDeliveryConfig(config))}
+        className="transition-transform duration-200 hover:-translate-y-0.5"
+      >
+        Save
+      </Button>
+    </Panel>
+  );
+}
