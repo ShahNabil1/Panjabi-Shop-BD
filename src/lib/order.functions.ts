@@ -143,10 +143,12 @@ export const placeOrder = createServerFn({ method: "POST" })
     const deliveryArea: DeliveryArea =
       data.district === "ঢাকা" || data.district === "Dhaka" ? "inside_dhaka" : "outside_dhaka";
 
-    const deliveryCharge =
-      rates.freeAll || (rates.freeAbove > 0 && subtotal >= rates.freeAbove)
-        ? 0
-        : rates[deliveryArea];
+    const deliveryCharge = deliveryChargeFor(
+      rates,
+      deliveryArea,
+      subtotal,
+      lines.map((l) => l.product.id),
+    );
 
     // Coupons are re-validated server-side; the client's number is never trusted.
     let discount = 0;
