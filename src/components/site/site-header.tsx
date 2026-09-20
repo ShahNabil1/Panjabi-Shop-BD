@@ -1,12 +1,15 @@
 import { Link, useLoaderData, useNavigate, useRouterState } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { useLang } from "@/lib/language-context";
 import type { CategoryWithSubs } from "@/lib/types";
 import type { Lang } from "@/lib/i18n";
-import { formatNumber, pick, tr } from "@/lib/i18n";
+import { formatNumber, formatPrice, pick, tr } from "@/lib/i18n";
 import { useCart } from "@/lib/cart-context";
 import { cn } from "@/lib/utils";
+import { searchProducts } from "@/lib/catalog.functions";
+import type { ProductCard } from "@/lib/supabase-public";
+import { SmartImage } from "@/components/site/smart-image";
 import logoMark from "@/assets/panjabishopbd-logo.png";
 
 
