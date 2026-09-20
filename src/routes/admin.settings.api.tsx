@@ -50,6 +50,7 @@ import {
 
   type IntegrationGroup,
 } from "@/lib/integrations-shared";
+import { useConfirm } from "@/components/ui/confirm-dialog";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/admin/settings/api")({
@@ -127,6 +128,7 @@ function GroupCard({
   onSaved: () => Promise<void>;
 }) {
   const meta = integrationMeta[group];
+  const confirm = useConfirm();
   const [values, setValues] = useState<Record<string, string>>({});
   const [savedSnapshot, setSavedSnapshot] = useState<string>("{}");
   const [result, setResult] = useState<IntegrationTestResult | null>(null);
