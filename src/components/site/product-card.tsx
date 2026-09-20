@@ -210,7 +210,7 @@ export function ProductCard({ product }: { product: ProductCardData }) {
             disabled={soldOut}
             className={cn(
               "inline-flex w-full items-center justify-center gap-1.5 rounded-xl bg-primary px-3 py-2 text-[13px] font-bold text-primary-foreground shadow-sm",
-              "transition-all duration-200 ease-out hover:brightness-110 hover:shadow-[0_10px_24px_-10px_rgba(255,51,102,0.9)] active:scale-[0.97]",
+              "transition-all duration-200 ease-out hover:bg-footer hover:text-white hover:shadow-[0_10px_24px_-10px_oklch(0.222_0.04_193/0.45)] active:scale-[0.97]",
               "disabled:pointer-events-none disabled:opacity-50",
             )}
           >
