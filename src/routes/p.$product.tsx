@@ -17,6 +17,8 @@ import { cn } from "@/lib/utils";
 import { ecommerce, useTrackOnce } from "@/lib/tracking";
 import { catalogId } from "@/lib/tracking-items";
 import { ImageLightbox, useLightbox } from "@/components/site/image-lightbox";
+import { RichText } from "@/components/site/rich-text";
+import { richTextToPlain } from "@/lib/rich-text";
 
 export const Route = createFileRoute("/p/$product")({
   loader: async ({ params }): Promise<ProductPageData> => {
