@@ -1,8 +1,8 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { PackagePlus, Plus, Trash2 } from "lucide-react";
+import { ImageOff, PackagePlus, Plus, Trash2 } from "lucide-react";
 
 import { inventorySuppliers, receiveStock } from "@/lib/inventory.functions";
 import { money } from "@/lib/inventory.shared";
@@ -14,8 +14,12 @@ import {
 import { InfoTip, Panel, StatCard, TipTitle } from "@/components/admin/kit";
 import { ModuleHero } from "@/components/admin/module-hero";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useConfirm } from "@/components/ui/confirm-dialog";
+import { SmartImage } from "@/components/site/smart-image";
 
 export const Route = createFileRoute("/admin/inventory/receive")({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -48,12 +52,52 @@ const fieldClass =
 
 function ReceiveInventory() {
   const qc = useQueryClient();
-  const navigate = useNavigate();
+  const confirm = useConfirm();
   const [lines, setLines] = useState<Line[]>([newLine()]);
   const [supplierId, setSupplierId] = useState<string>("");
   const [invoiceNo, setInvoiceNo] = useState("");
   const [extraCost, setExtraCost] = useState(0);
   const [note, setNote] = useState("");
+  const [selected, setSelected] = useState<string[]>([]);
+  const [preview, setPreview] = useState<PickableItem | null>(null);
+
+  const hasData = (l: Line) => Boolean(l.item) || l.quantity > 1 || l.unitCost > 0;
+
+  const removeLines = (uids: string[]) =>
+    setLines((prev) => {
+      const next = prev.filter((l) => !uids.includes(l.uid));
+      return next.length ? next : [newLine()];
+    });
+
+  const removeLine = async (line: Line) => {
+    if (
+      hasData(line) &&
+      !(await confirm({
+        title: "Remove this item line?",
+        description: "The entered item, quantity and buying price will be cleared.",
+        tone: "danger",
+        confirmLabel: "Remove",
+      }))
+    )
+      return;
+    removeLines([line.uid]);
+    setSelected((prev) => prev.filter((id) => id !== line.uid));
+  };
+
+  const removeSelected = async () => {
+    if (!selected.length) return;
+    if (
+      !(await confirm({
+        title: `Remove ${selected.length} selected line(s)?`,
+        description: "Everything entered on those lines will be cleared.",
+        tone: "danger",
+        confirmLabel: "Remove",
+      }))
+    )
+      return;
+    removeLines(selected);
+    setSelected([]);
+  };
 
   const { data: suppliers = [] } = useQuery({
     queryKey: ["admin", "inventory", "suppliers"],
@@ -119,7 +163,12 @@ function ReceiveInventory() {
     onSuccess: async (res) => {
       toast.success(`${res.received} item(s) received into stock`);
       await qc.invalidateQueries({ queryKey: ["admin", "inventory"] });
-      void navigate({ to: "/admin/inventory/live" });
+      // Stay on this page so the next receipt can be entered right away.
+      setLines([newLine()]);
+      setSelected([]);
+      setInvoiceNo("");
+      setExtraCost(0);
+      setNote("");
     },
     onError: (e: Error) => toast.error(e.message),
   });
@@ -144,6 +193,28 @@ function ReceiveInventory() {
             tip="Scan a barcode to add an item — the product/variant SKU is the barcode. Each line can have a different cost; the system computes the weighted average cost automatically."
           />
 
+          <div className="flex flex-wrap items-center gap-3 rounded-xl border border-border/70 bg-muted/20 px-3 py-2">
+            <Checkbox
+              checked={selected.length > 0 && selected.length === lines.length}
+              onCheckedChange={(v) => setSelected(v === true ? lines.map((l) => l.uid) : [])}
+              aria-label="Select all lines"
+            />
+            <span className="text-xs text-muted-foreground">
+              {selected.length ? `${selected.length} selected` : "Select all"}
+            </span>
+            {selected.length ? (
+              <Button
+                variant="destructive"
+                size="sm"
+                className="ml-auto rounded-lg"
+                onClick={() => void removeSelected()}
+              >
+                <Trash2 className="size-4" />
+                Remove selected
+              </Button>
+            ) : null}
+          </div>
+
           <div className="space-y-3">
             {lines.map((line, idx) => (
               <div
@@ -151,9 +222,40 @@ function ReceiveInventory() {
                 className="admin-rise space-y-3 rounded-xl border border-border/80 bg-background/50 p-3 transition-colors duration-200 hover:border-primary/25"
               >
                 <div className="flex items-center gap-2">
+                  <Checkbox
+                    checked={selected.includes(line.uid)}
+                    onCheckedChange={(v) =>
+                      setSelected((prev) =>
+                        v === true ? [...new Set([...prev, line.uid])] : prev.filter((id) => id !== line.uid),
+                      )
+                    }
+                    aria-label={`Select line ${idx + 1}`}
+                    className="shrink-0"
+                  />
                   <span className="font-en grid size-6 shrink-0 place-items-center rounded-full bg-muted text-[11px] font-bold">
                     {idx + 1}
                   </span>
+                  {line.item ? (
+                    <button
+                      type="button"
+                      onClick={() => setPreview(line.item)}
+                      className="grid size-10 shrink-0 place-items-center overflow-hidden rounded-md border border-border/70 bg-muted/40 transition-transform hover:scale-105"
+                      aria-label="Preview product image"
+                    >
+                      {line.item.imageUrl ? (
+                        <SmartImage
+                          src={line.item.imageUrl}
+                          alt={line.item.label}
+                          baseWidth={80}
+                          height={80}
+                          fit="contain"
+                          className="size-full object-contain"
+                        />
+                      ) : (
+                        <ImageOff className="size-4 text-muted-foreground/70" />
+                      )}
+                    </button>
+                  ) : null}
                   <div className="min-w-0 flex-1">
                     <ItemPicker
                       value={line.item}
@@ -167,11 +269,7 @@ function ReceiveInventory() {
                     variant="ghost"
                     size="icon"
                     className="shrink-0 rounded-lg text-muted-foreground transition-colors hover:text-destructive"
-                    onClick={() =>
-                      setLines((prev) =>
-                        prev.length === 1 ? [newLine()] : prev.filter((l) => l.uid !== line.uid),
-                      )
-                    }
+                    onClick={() => void removeLine(line)}
                   >
                     <Trash2 className="size-4" />
                   </Button>
@@ -198,8 +296,9 @@ function ReceiveInventory() {
                     <Input
                       type="number"
                       min={0}
-                      value={line.unitCost}
-                      onChange={(e) => patch(line.uid, { unitCost: Number(e.target.value) })}
+                      placeholder="0"
+                      value={line.unitCost === 0 ? "" : line.unitCost}
+                      onChange={(e) => patch(line.uid, { unitCost: Number(e.target.value || 0) })}
                       className={fieldClass}
                     />
                   </div>
@@ -332,6 +431,26 @@ function ReceiveInventory() {
           </p>
         </div>
       </div>
+
+      <Dialog open={Boolean(preview)} onOpenChange={(o) => !o && setPreview(null)}>
+        <DialogContent className="max-w-lg">
+          <DialogTitle className="text-sm">{preview?.label}</DialogTitle>
+          <div className="grid place-items-center overflow-hidden rounded-xl border border-border/70 bg-muted/20 p-3">
+            {preview?.imageUrl ? (
+              <SmartImage
+                src={preview.imageUrl}
+                alt={preview.label}
+                baseWidth={720}
+                height={720}
+                fit="contain"
+                className="max-h-[60vh] w-full object-contain"
+              />
+            ) : (
+              <p className="py-10 text-xs text-muted-foreground">No image for this item.</p>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
