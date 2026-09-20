@@ -11,6 +11,14 @@ export type Db = SupabaseClient<Database>;
  * Never call this before `requireSupabaseAuth` has run.
  */
 export async function requireAdmin(supabase: Db, userId: string): Promise<Db> {
+  const { data, error } = await supabase.rpc("is_admin_user", { _user_id: userId });
+  if (error) throw new Error("Role check failed");
+  if (!data) throw new Error("Forbidden");
+  return supabase;
+}
+
+/** Stricter gate: only real admins (never staff accounts). */
+export async function requireSuperAdmin(supabase: Db, userId: string): Promise<Db> {
   const { data, error } = await supabase.rpc("has_role", {
     _user_id: userId,
     _role: "admin",
