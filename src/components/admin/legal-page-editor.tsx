@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 import { AdminHeading, AreaField, Panel, TextField } from "@/components/admin/kit";
+import { SaveButton, isDirty } from "@/components/admin/save-button";
 import { RichTextEditor } from "@/components/admin/rich-text-editor";
 import { Button } from "@/components/ui/button";
 import { adminListSettings, adminSaveSetting } from "@/lib/admin.functions";
@@ -18,6 +19,11 @@ export function LegalPageEditor({ settingKey }: { settingKey: LegalPageKey }) {
     const raw = (data.find((row) => row.key === settingKey)?.value ?? {}) as Record<string, unknown>;
     setDraft(readLegalPage(settingKey, raw));
   }, [data, settingKey]);
+
+  const saved = readLegalPage(
+    settingKey,
+    (data?.find((row) => row.key === settingKey)?.value ?? {}) as Record<string, unknown>,
+  );
 
   const save = useMutation({
     mutationFn: () =>
@@ -47,7 +53,7 @@ export function LegalPageEditor({ settingKey }: { settingKey: LegalPageKey }) {
         <TextField label="Meta title" value={draft.metaTitle} onChange={(metaTitle) => setDraft({ ...draft, metaTitle })} maxLength={60} />
         <AreaField label="Meta description" value={draft.metaDescription} onChange={(metaDescription) => setDraft({ ...draft, metaDescription })} maxLength={160} rows={3} />
         <RichTextEditor label="Page content" value={draft.content} onChange={(content) => setDraft({ ...draft, content })} minHeight={420} hint="Formatting, spacing, links and text colors appear on the live page." />
-        <Button loading={save.isPending} onClick={() => save.mutate()}>Save changes</Button>
+        <SaveButton dirty={isDirty(draft, saved)} loading={save.isPending} onClick={() => save.mutate()} />
       </Panel>
     </div>
   );

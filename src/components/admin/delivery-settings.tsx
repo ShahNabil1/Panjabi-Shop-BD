@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Search, Trash2 } from "lucide-react";
 
 import { NumberField, Panel } from "@/components/admin/kit";
+import { SaveButton, isDirty } from "@/components/admin/save-button";
 import { Button } from "@/components/ui/button";
 import { useConfirm } from "@/components/ui/confirm-dialog";
 import { adminSearchProducts } from "@/lib/admin.functions";
@@ -312,13 +313,11 @@ export function DeliverySettingsPanel({
         </div>
       </div>
 
-      <Button
+      <SaveButton
+        dirty={isDirty(serializeDeliveryConfig(config), serializeDeliveryConfig(normalizeDeliveryConfig(value)))}
         loading={saving}
         onClick={() => onSave(serializeDeliveryConfig(config))}
-        className="transition-transform duration-200 hover:-translate-y-0.5"
-      >
-        Save
-      </Button>
+      />
     </Panel>
   );
 }

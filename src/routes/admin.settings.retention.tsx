@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-import { Database, Play, Save, Trash2 } from "lucide-react";
+import { Database, Play, Trash2 } from "lucide-react";
 
 import {
   adminGetCleanupStats,
@@ -11,6 +11,7 @@ import {
   adminSaveSetting,
 } from "@/lib/admin.functions";
 import { AdminHeading, NumberField, Panel } from "@/components/admin/kit";
+import { SaveButton } from "@/components/admin/save-button";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 
@@ -137,9 +138,11 @@ function RetentionSettings() {
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          <Button
+          <SaveButton
+            saveLabel="Save schedule"
+            savedLabel="Schedule updated"
             loading={save.isPending}
-            disabled={!changed}
+            dirty={changed}
             onClick={() =>
               save.mutate({
                 days,
@@ -148,11 +151,7 @@ function RetentionSettings() {
                 last_result: (settings?.find((s: { key: string }) => s.key === "retention")?.value as Obj)?.["last_result"] ?? null,
               })
             }
-            className="transition-transform duration-200 hover:-translate-y-0.5"
-          >
-            <Save className="size-4" />
-            Save schedule
-          </Button>
+          />
           <Button
             variant="outline"
             loading={run.isPending}
