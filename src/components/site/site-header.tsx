@@ -7,7 +7,7 @@ import type { Lang } from "@/lib/i18n";
 import { formatNumber, pick, tr } from "@/lib/i18n";
 import { useCart } from "@/lib/cart-context";
 import { cn } from "@/lib/utils";
-import logoMark from "@/assets/upoharkabbo-logo.png";
+import logoMark from "@/assets/panjabishopbd-logo.png";
 
 
 export type SiteData = {

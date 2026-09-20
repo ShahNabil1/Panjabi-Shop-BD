@@ -157,7 +157,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
                 "@type": "WebSite",
                 "@id": `${SITE_URL}/#website`,
                 name: brand,
-                alternateName: ["Upoharkabbo", "upoharkabbo.com"],
+                alternateName: ["Panjabi Shop BD", "upoharkabbo.com"],
                 url: SITE_URL,
 
                 inLanguage: ["bn", "en"],

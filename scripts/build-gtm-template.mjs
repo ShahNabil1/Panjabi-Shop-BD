@@ -323,13 +323,13 @@ const container = {
     accountId: ACC,
     containerId: CNT,
     containerVersionId: "0",
-    name: "Upoharkabbo Tracking Template",
+    name: "Panjabi Shop BD Tracking Template",
     description:
       "GA4 + Meta Pixel + TikTok Pixel + Microsoft Clarity, wired to the dataLayer events pushed by src/lib/tracking.ts. Edit only the four CFG - * constant variables after import.",
     container: {
       accountId: ACC,
       containerId: CNT,
-      name: "Upoharkabbo Tracking Template",
+      name: "Panjabi Shop BD Tracking Template",
       publicId: "GTM-XXXXXXX",
       usageContext: ["WEB"],
       fingerprint: "0",

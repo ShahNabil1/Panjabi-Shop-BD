@@ -4,7 +4,7 @@ import { Phone, Mail, MapPin } from "lucide-react";
 import { useLang } from "@/lib/language-context";
 import { tr } from "@/lib/i18n";
 import { useSiteData } from "./site-header";
-import logoMark from "@/assets/upoharkabbo-logo.png";
+import logoMark from "@/assets/panjabishopbd-logo.png";
 import { SOCIAL_LINKS } from "./social-links";
 import { cn } from "@/lib/utils";
 
@@ -143,7 +143,7 @@ export function SiteFooter({ minimalOnMobile }: { minimalOnMobile?: boolean }) {
 
       <div className="bg-primary py-3">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-1 px-4 text-sm font-semibold text-primary-foreground sm:flex-row">
-          <p>© 2026 Upoharkabbo. All Rights Reserved.</p>
+          <p>© 2026 Panjabi Shop BD. All Rights Reserved.</p>
           <p>
             Design & Developed By{" "}
             <a

@@ -16,13 +16,13 @@ export const Route = createFileRoute("/admin/inventory/closing")({
   component: MonthlyClosing,
   head: () => ({
     meta: [
-      { title: "Monthly Closing · Upoharkabbo Admin" },
+      { title: "Monthly Closing · Panjabi Shop BD Admin" },
       {
         name: "description",
         content: "Lock monthly inventory valuation, opening/closing stock value and supplier dues.",
       },
-      { property: "og:title", content: "Monthly Closing · Upoharkabbo Admin" },
-      { property: "og:description", content: "Inventory and finance month-end closing for Upoharkabbo." },
+      { property: "og:title", content: "Monthly Closing · Panjabi Shop BD Admin" },
+      { property: "og:description", content: "Inventory and finance month-end closing for Panjabi Shop BD." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],

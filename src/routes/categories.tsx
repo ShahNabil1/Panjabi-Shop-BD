@@ -77,7 +77,7 @@ function AllCategoriesPage() {
       <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
         {lang === "bn"
           ? "উপহারকাব্যের সব ক্যাটাগরি ঘুরে দেখুন এবং পছন্দের উপহার বেছে নিন।"
-          : "Browse every Upoharkabbo category and pick the perfect gift."}
+          : "Browse every Panjabi Shop BD category and pick the perfect gift."}
       </p>
 
       <div className="mt-8 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">

@@ -19,10 +19,10 @@ export const Route = createFileRoute("/admin/inventory/alerts")({
   component: StockAlertsPage,
   head: () => ({
     meta: [
-      { title: "Stock Alerts · Upoharkabbo Admin" },
+      { title: "Stock Alerts · Panjabi Shop BD Admin" },
       { name: "description", content: "Inventory alerts: stock-outs, reorder points, dead stock and late purchase orders." },
-      { property: "og:title", content: "Stock Alerts · Upoharkabbo Admin" },
-      { property: "og:description", content: "Prioritised inventory action list for the Upoharkabbo warehouse team." },
+      { property: "og:title", content: "Stock Alerts · Panjabi Shop BD Admin" },
+      { property: "og:description", content: "Prioritised inventory action list for the Panjabi Shop BD warehouse team." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],

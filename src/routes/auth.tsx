@@ -7,7 +7,7 @@ import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import logoMark from "@/assets/upoharkabbo-logo.png";
+import logoMark from "@/assets/panjabishopbd-logo.png";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({

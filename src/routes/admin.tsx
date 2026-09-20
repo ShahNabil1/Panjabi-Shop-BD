@@ -55,23 +55,23 @@ import { checkIsAdmin } from "@/lib/admin.functions";
 import { BrandLoader } from "@/components/admin/brand-loader";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import logoMark from "@/assets/upoharkabbo-logo.png";
+import logoMark from "@/assets/panjabishopbd-logo.png";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
     meta: [
-      { title: "Admin Dashboard — Upoharkabbo" },
+      { title: "Admin Dashboard — Panjabi Shop BD" },
       {
         name: "description",
         content:
-          "Access the Upoharkabbo admin dashboard to manage products, categories, customer orders, and site content efficiently.",
+          "Access the Panjabi Shop BD admin dashboard to manage products, categories, customer orders, and site content efficiently.",
       },
       { name: "robots", content: "noindex, nofollow" },
-      { property: "og:title", content: "Admin Dashboard — Upoharkabbo" },
+      { property: "og:title", content: "Admin Dashboard — Panjabi Shop BD" },
       {
         property: "og:description",
         content:
-          "Access the Upoharkabbo admin dashboard to manage products, categories, customer orders, and site content efficiently.",
+          "Access the Panjabi Shop BD admin dashboard to manage products, categories, customer orders, and site content efficiently.",
       },
     ],
   }),
@@ -312,23 +312,23 @@ function AdminLayout() {
       <div className="relative flex min-h-[7rem] items-center justify-center border-b border-white/10 px-4 py-6">
         <Link
           to="/admin"
-          title="Upoharkabbo"
+          title="Panjabi Shop BD"
           className={cn("shrink-0 transition-all duration-300", collapsed ? "block" : "hidden")}
         >
           <img
             src="/favicon.png"
-            alt="Upoharkabbo"
+            alt="Panjabi Shop BD"
             className="size-12 rounded-xl bg-white object-contain p-1.5 ring-1 ring-white/15"
           />
         </Link>
         <Link
           to="/admin"
-          title="Upoharkabbo"
+          title="Panjabi Shop BD"
           className={cn("shrink-0 transition-all duration-300", collapsed ? "hidden" : "block")}
         >
           <img
             src={logoMark}
-            alt="Upoharkabbo"
+            alt="Panjabi Shop BD"
             className="h-16 w-auto rounded-xl bg-white object-contain px-4 py-2.5 ring-1 ring-white/15"
           />
         </Link>
@@ -486,7 +486,7 @@ function AdminLayout() {
       <header className="sticky top-0 z-20 flex items-center justify-between border-b border-border bg-card/80 px-4 py-3 backdrop-blur lg:hidden">
         <div className="flex items-center gap-2">
           <img src="/favicon.png" alt="" className="size-8 rounded-lg object-contain" />
-          <span className="text-base font-bold tracking-tight">Upoharkabbo</span>
+          <span className="text-base font-bold tracking-tight">Panjabi Shop BD</span>
         </div>
         <button
           onClick={() => setMobileOpen(true)}

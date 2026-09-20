@@ -270,7 +270,7 @@ export async function fetchCatalogFeed(): Promise<FeedItem[]> {
     const offerDisclaimerUrl = promo ? `${SITE_URL}/offers/${promotionSlugs[0]}` : null;
 
     const listPrice = num(p.compare_at_price);
-    const brand = p.brand || "Upoharkabbo";
+    const brand = p.brand || "Panjabi Shop BD";
     const groupId = p.sku || fallbackId(p.slug);
     const ratingCount = p.review_count ?? 0;
     const ratingAverage = ratingCount > 0 && num(p.rating) > 0 ? Number(num(p.rating).toFixed(1)) : null;

@@ -30,7 +30,7 @@ const BODY = {
 আমরা প্রতিটি গিফট কম্বো নিজেরা সাজাই। কোন উপলক্ষ, কার জন্য, বাজেট কত — এসব মাথায় রেখে পণ্য বাছাই করা হয়, তারপর হাতে মোড়ানো হয় সুন্দর বক্সে, সঙ্গে থাকে আপনার লেখা কার্ড।
 
 পাঠানোর আগে প্রতিটি বক্স হাতে ধরে যাচাই করা হয় — পণ্যের মান, প্যাকেজিং আর মোড়কের নিখুঁততা। পছন্দ না হলে ডেলিভারির ৭ দিনের ভেতর ফেরত দেওয়া যাবে।`,
-  en: `Upoharkabbo began with a simple thought — a gift is not just an object, it is a way of saying something.
+  en: `Panjabi Shop BD began with a simple thought — a gift is not just an object, it is a way of saying something.
 
 We build every combo ourselves. The occasion, the person and the budget decide what goes in the box; then it is wrapped by hand and paired with a card in your own words.
 

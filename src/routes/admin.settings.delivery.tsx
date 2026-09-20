@@ -60,7 +60,7 @@ export const Route = createFileRoute("/admin/settings/delivery")({
   component: DeliverySettings,
   head: () => ({
     meta: [
-      { title: "Delivery Settings · Upoharkabbo Admin" },
+      { title: "Delivery Settings · Panjabi Shop BD Admin" },
       { name: "description", content: "Connect Steadfast, Pathao and Carrybee courier accounts." },
     ],
   }),

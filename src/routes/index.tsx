@@ -51,7 +51,7 @@ function HomePage() {
       <h1 className="sr-only">
         {lang === "bn"
           ? "উপহারকাব্য — গিফট কম্বো ও উপহার সামগ্রীর অনলাইন শপ"
-          : "Upoharkabbo — Gift combos and premium gift items online shop"}
+          : "Panjabi Shop BD — Gift combos and premium gift items online shop"}
       </h1>
       {slides.length > 0 ? (
         <HeroSlider slides={slides} />
@@ -179,7 +179,7 @@ function HomePage() {
               Frequently asked questions
             </h2>
             <p className="mx-auto mt-2 max-w-xl text-balance px-2 text-sm font-semibold leading-6 text-muted-foreground lg:max-w-none lg:whitespace-nowrap">
-              Everything you need to know about shopping, delivery and payments on Upoharkabbo.
+              Everything you need to know about shopping, delivery and payments on Panjabi Shop BD.
             </p>
           </div>
           <FaqList items={data.faqs} />
