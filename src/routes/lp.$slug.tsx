@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import { getLandingPage } from "@/lib/catalog.functions";
 import { getDeliveryRates } from "@/lib/order.functions";
+import type { DeliveryConfig } from "@/lib/delivery-rates";
 import type { LandingPageData } from "@/lib/types";
 import { useLang } from "@/lib/language-context";
 import { richTextToPlain } from "@/lib/rich-text";
@@ -115,7 +116,7 @@ export const Route = createFileRoute("/lp/$slug")({
 function LandingPage() {
   const { lang } = useLang();
   const { landing, product, images, variants, comboItems, rates } = Route.useLoaderData() as LandingPageData & {
-    rates: { inside_dhaka: number; outside_dhaka: number; freeAbove: number; freeAll?: boolean };
+    rates: DeliveryConfig;
   };
 
   // Catalogue ads deep-link with ?sku=… — preselect the advertised variant and,

@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { useCart } from "@/lib/cart-context";
 import { getDeliveryRates } from "@/lib/order.functions";
+import { normalizeDeliveryConfig } from "@/lib/delivery-rates";
 import { CheckoutForm } from "@/components/site/checkout-form";
 import { Section } from "@/components/site/ui";
 import { SITE_URL } from "@/lib/site";
@@ -12,14 +13,7 @@ export const Route = createFileRoute("/checkout")({
       return { rates: await getDeliveryRates() };
     } catch {
       // Transient network/RPC failure shouldn't blank the checkout page.
-      return {
-        rates: {
-          inside_dhaka: 60,
-          outside_dhaka: 120,
-          freeAbove: 0,
-          freeAll: false,
-        },
-      };
+      return { rates: normalizeDeliveryConfig(null) };
     }
   },
   component: CheckoutPage,
