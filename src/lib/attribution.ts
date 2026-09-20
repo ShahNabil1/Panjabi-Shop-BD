@@ -51,7 +51,7 @@ export type AttributionPayload = {
   last?: Attribution;
 };
 
-const STORE_KEY = "upoharkabbo-attribution";
+const STORE_KEY = "panjabishopbd-attribution";
 const MAX_LEN = 300;
 
 const PARAM_MAP: Record<string, keyof Attribution> = {
@@ -99,7 +99,7 @@ function randomFbp(): string {
   return `fb.1.${Date.now()}.${rand}`;
 }
 
-const VISITOR_KEY = "upoharkabbo-visitor-id";
+const VISITOR_KEY = "panjabishopbd-visitor-id";
 
 /**
  * Stable first-party visitor id, reused as `external_id` for Meta/TikTok.
