@@ -274,8 +274,9 @@ function ReceiveInventory() {
                     <Input
                       type="number"
                       min={0}
-                      value={line.unitCost}
-                      onChange={(e) => patch(line.uid, { unitCost: Number(e.target.value) })}
+                      placeholder="0"
+                      value={line.unitCost === 0 ? "" : line.unitCost}
+                      onChange={(e) => patch(line.uid, { unitCost: Number(e.target.value || 0) })}
                       className={fieldClass}
                     />
                   </div>
