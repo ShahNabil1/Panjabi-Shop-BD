@@ -1,11 +1,12 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { ArrowDown, ArrowUp, FilePenLine, ImagePlus, Trash2 } from "lucide-react";
 
 import { adminListSettings, adminSaveSetting } from "@/lib/admin.functions";
 import { AdminHeading, NumberField, Panel, TextField } from "@/components/admin/kit";
+import { SaveButton, isDirty } from "@/components/admin/save-button";
 import { ImageField } from "@/components/admin/image-upload";
 import { DeliverySettingsPanel } from "@/components/admin/delivery-settings";
 import { MAX_HERO_SLIDES, readHeroSlides, type HeroSlide } from "@/components/site/hero-slider";
@@ -38,16 +39,19 @@ function SettingsAdmin() {
   const [slides, setSlides] = useState<HeroSlide[]>([]);
   const [popup, setPopup] = useState<PromoPopup>(() => readPromoPopup(undefined));
 
+  const find = useCallback(
+    (key: string) => ((data?.find((r) => r.key === key)?.value ?? {}) as Obj) satisfies Obj,
+    [data],
+  );
+
   useEffect(() => {
     if (!data) return;
-    const find = (key: string) =>
-      ((data.find((r) => r.key === key)?.value ?? {}) as Obj) satisfies Obj;
     setGeneral(find("general"));
     setContact(find("contact"));
     setDelivery(find("delivery"));
     setSlides(readHeroSlides(find("hero") as never));
     setPopup(readPromoPopup(find("popup") as never));
-  }, [data]);
+  }, [data, find]);
 
 
 
@@ -59,6 +63,10 @@ function SettingsAdmin() {
     },
     onError: (e: Error) => toast.error(e.message),
   });
+
+  const pendingKey = save.isPending ? save.variables?.key : null;
+  const savedHero = readHeroSlides(find("hero") as never);
+  const savedPopup = readPromoPopup(find("popup") as never);
 
   return (
     <div className="space-y-6 pb-16">
@@ -184,8 +192,9 @@ function SettingsAdmin() {
             <ImagePlus className="size-4" />
             Add banner
           </Button>
-          <Button
-            loading={save.isPending}
+          <SaveButton
+            dirty={isDirty(slides, savedHero)}
+            loading={pendingKey === "hero"}
             onClick={() => {
               const clean = slides.filter((s) => s.url.trim());
               if (clean.length === 0) {
@@ -195,10 +204,7 @@ function SettingsAdmin() {
               setSlides(clean);
               save.mutate({ key: "hero", value: { slides: clean.slice(0, MAX_HERO_SLIDES) } });
             }}
-            className="transition-transform duration-200 hover:-translate-y-0.5"
-          >
-            Save
-          </Button>
+          />
         </div>
       </Panel>
 
@@ -281,8 +287,9 @@ function SettingsAdmin() {
           />
         </div>
 
-        <Button
-          loading={save.isPending}
+        <SaveButton
+          dirty={isDirty(popup, savedPopup)}
+          loading={pendingKey === "popup"}
           onClick={() => {
             if (popup.enabled && !popup.url.trim()) {
               toast.error("Upload a popup image first.");
@@ -301,10 +308,7 @@ function SettingsAdmin() {
               },
             });
           }}
-          className="transition-transform duration-200 hover:-translate-y-0.5"
-        >
-          Save
-        </Button>
+        />
       </Panel>
 
 
@@ -322,13 +326,11 @@ function SettingsAdmin() {
             onChange={(v) => setGeneral({ ...general, tagline: v })}
           />
         </div>
-        <Button
-          loading={save.isPending}
+        <SaveButton
+          dirty={isDirty(general, find("general"))}
+          loading={pendingKey === "general"}
           onClick={() => save.mutate({ key: "general", value: general })}
-          className="transition-transform duration-200 hover:-translate-y-0.5"
-        >
-          Save
-        </Button>
+        />
       </Panel>
 
       <Panel className="space-y-4">
@@ -350,18 +352,16 @@ function SettingsAdmin() {
             onChange={(v) => setContact({ ...contact, address: v })}
           />
         </div>
-        <Button
-          loading={save.isPending}
+        <SaveButton
+          dirty={isDirty(contact, find("contact"))}
+          loading={pendingKey === "contact"}
           onClick={() => save.mutate({ key: "contact", value: contact })}
-          className="transition-transform duration-200 hover:-translate-y-0.5"
-        >
-          Save
-        </Button>
+        />
       </Panel>
 
       <DeliverySettingsPanel
         value={delivery}
-        saving={save.isPending}
+        saving={pendingKey === "delivery"}
         onSave={(value) => save.mutate({ key: "delivery", value })}
       />
     </div>
