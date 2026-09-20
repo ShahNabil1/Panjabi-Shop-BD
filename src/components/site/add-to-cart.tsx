@@ -96,7 +96,7 @@ export function AddToCartBar({
   const whatsappText = encodeURIComponent(
     `Hello Panjabi Shop BD, I want to order this product:\n\n${productName}\n${productUrl}\n\nQuantity: ${qty}`,
   );
-  const whatsappHref = `https://wa.me/8801338125069?text=${whatsappText}`;
+  const whatsappHref = `https://wa.me/8801772588538?text=${whatsappText}`;
 
   return (
     <div className={cn("flex flex-col gap-3", className)}>
