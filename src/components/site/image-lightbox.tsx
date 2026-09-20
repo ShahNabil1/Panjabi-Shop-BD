@@ -44,6 +44,9 @@ export function ImageLightbox({
   const [index, setIndex] = useState(startIndex);
   const [scale, setScale] = useState(1);
   const [isZoomed, setIsZoomed] = useState(false);
+  const [offset, setOffset] = useState({ x: 0, y: 0 });
+  const pinchRef = useRef<{ dist: number; scale: number } | null>(null);
+  const dragRef = useRef<{ x: number; y: number } | null>(null);
   const touchStartX = useRef<number | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
