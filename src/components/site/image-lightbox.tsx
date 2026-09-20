@@ -256,18 +256,63 @@ export function ImageLightbox({
         onClick={(e) => e.stopPropagation()}
       >
         {current ? (
-          <div className="relative overflow-hidden rounded-xl bg-card shadow-2xl ring-1 ring-border/40">
+          <div
+            className="relative overflow-hidden rounded-xl bg-card shadow-2xl ring-1 ring-border/40"
+            style={{ touchAction: "none" }}
+            onWheel={onWheel}
+            onTouchStart={onImgTouchStart}
+            onTouchMove={onImgTouchMove}
+            onTouchEnd={onImgTouchEnd}
+            onMouseDown={onMouseDown}
+            onMouseMove={onMouseMove}
+            onMouseUp={endDrag}
+            onMouseLeave={endDrag}
+          >
             <img
               key={current.src}
               src={cdnImage(current.src, { width: 1600, fit: "contain", quality: 88 })}
               alt={current.alt || ""}
-              onClick={toggleZoom}
+              draggable={false}
+              onDoubleClick={toggleZoom}
               className={cn(
-                "block max-h-[80vh] w-auto max-w-[92vw] cursor-pointer object-contain transition-transform duration-300",
-                isZoomed ? "cursor-zoom-out" : "cursor-zoom-in",
+                "block max-h-[80vh] w-auto max-w-[92vw] select-none object-contain",
+                dragRef.current ? "" : "transition-transform duration-200",
+                isZoomed ? "cursor-grab" : "cursor-zoom-in",
               )}
-              style={{ transform: `scale(${scale})` }}
+              style={{
+                transform: `translate(${offset.x}px, ${offset.y}px) scale(${scale})`,
+              }}
             />
+
+            <div className="absolute bottom-3 left-1/2 z-10 flex -translate-x-1/2 items-center gap-1 rounded-full bg-card/95 px-2 py-1 shadow-lg backdrop-blur">
+              <button
+                type="button"
+                aria-label="Zoom out"
+                onClick={() => applyScale(scale / 1.4)}
+                className="grid size-8 cursor-pointer place-items-center rounded-full text-foreground transition-colors hover:bg-muted"
+              >
+                <ZoomOut className="size-4" />
+              </button>
+              <span className="min-w-10 text-center font-en text-xs font-semibold text-muted-foreground">
+                {Math.round(scale * 100)}%
+              </span>
+              <button
+                type="button"
+                aria-label="Zoom in"
+                onClick={() => applyScale(scale * 1.4)}
+                className="grid size-8 cursor-pointer place-items-center rounded-full text-foreground transition-colors hover:bg-muted"
+              >
+                <ZoomIn className="size-4" />
+              </button>
+              <button
+                type="button"
+                aria-label="Reset zoom"
+                onClick={() => applyScale(1)}
+                className="grid size-8 cursor-pointer place-items-center rounded-full text-foreground transition-colors hover:bg-muted"
+              >
+                <RotateCcw className="size-4" />
+              </button>
+            </div>
 
             <button
               type="button"
