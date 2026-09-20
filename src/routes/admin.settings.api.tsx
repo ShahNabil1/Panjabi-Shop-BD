@@ -50,6 +50,7 @@ import {
 
   type IntegrationGroup,
 } from "@/lib/integrations-shared";
+import { useConfirm } from "@/components/ui/confirm-dialog";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/admin/settings/api")({
@@ -127,6 +128,7 @@ function GroupCard({
   onSaved: () => Promise<void>;
 }) {
   const meta = integrationMeta[group];
+  const confirm = useConfirm();
   const [values, setValues] = useState<Record<string, string>>({});
   const [savedSnapshot, setSavedSnapshot] = useState<string>("{}");
   const [result, setResult] = useState<IntegrationTestResult | null>(null);
@@ -325,8 +327,14 @@ function GroupCard({
             variant="ghost"
             className="text-destructive hover:bg-destructive/10"
             disabled={busy}
-            onClick={() => {
-              if (!window.confirm(`Remove all ${meta.title} credentials?`)) return;
+            onClick={async () => {
+              const ok = await confirm({
+                title: `Remove all ${meta.title} credentials?`,
+                description: "This disconnects the integration immediately. You can reconnect it later by saving the keys again.",
+                confirmLabel: "Remove",
+                tone: "danger",
+              });
+              if (!ok) return;
               remove.mutate();
             }}
           >
