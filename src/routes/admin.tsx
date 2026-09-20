@@ -204,6 +204,7 @@ function AdminLayout() {
         .filter((section) => section.items.length > 0),
     [access, manageStaff],
   );
+  const firstAllowedPath = sections[0]?.items[0]?.to ?? null;
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [openSections, setOpenSections] = useState<string[]>(() =>
@@ -258,6 +259,21 @@ function AdminLayout() {
   useEffect(() => {
     if (!loading && !session) void navigate({ to: "/auth" });
   }, [loading, session, navigate]);
+
+  // `/admin` is a convenient entry point, not necessarily a staff member's
+  // home page. Send them to the first page the owner actually granted.
+  useEffect(() => {
+    if (
+      pathname !== "/admin" ||
+      accessQuery.isLoading ||
+      !access?.isActive ||
+      canAccessPath(access, "/admin") ||
+      !firstAllowedPath
+    ) {
+      return;
+    }
+    void navigate({ to: firstAllowedPath as "/admin", replace: true });
+  }, [access, accessQuery.isLoading, firstAllowedPath, navigate, pathname]);
 
   // Warm every admin route after the shell becomes idle. Navigation then only
   // swaps the already-loaded route component instead of waiting for its chunk.
@@ -319,6 +335,14 @@ function AdminLayout() {
             <Link to="/">Back to site</Link>
           </Button>
         </div>
+      </div>
+    );
+  }
+
+  if (pathname === "/admin" && !canAccessPath(access, pathname) && firstAllowedPath) {
+    return (
+      <div className="admin-scope fixed inset-0 z-50 flex h-screen w-screen flex-col items-center justify-center bg-background">
+        <BrandLoader size="lg" />
       </div>
     );
   }
@@ -605,11 +629,22 @@ function AdminLayout() {
                 Your account does not have permission for this page. Ask the owner to grant it in
                 Staff &amp; Access.
               </p>
-              <div className="mt-6 flex justify-center">
-                <Button asChild variant="outline">
-                  <Link to="/admin">Back to dashboard</Link>
-                </Button>
-              </div>
+              {firstAllowedPath ? (
+                <div className="mt-6 flex justify-center">
+                  <Button asChild variant="outline">
+                    <Link to={firstAllowedPath as "/admin"}>Go to an available page</Link>
+                  </Button>
+                </div>
+              ) : (
+                <div className="mt-6 flex justify-center gap-2">
+                  <Button variant="outline" onClick={() => void signOut()}>
+                    Sign out
+                  </Button>
+                  <Button asChild>
+                    <Link to="/">Back to site</Link>
+                  </Button>
+                </div>
+              )}
             </div>
           )}
         </main>
