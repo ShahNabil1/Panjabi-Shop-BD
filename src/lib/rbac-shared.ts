@@ -55,6 +55,26 @@ export const STAFF_MODULES: StaffModule[] = [
 
 export const STAFF_MODULE_KEYS = STAFF_MODULES.map((m) => m.key);
 
+/** Sensitive capabilities granted on top of page access. */
+export type StaffFlag = { key: string; label: string; hint: string };
+
+export const STAFF_FLAGS: StaffFlag[] = [
+  {
+    key: "flag:inventory.cost",
+    label: "See buying price & cost value",
+    hint: "Average cost, cost value and the value-at-cost totals on inventory screens.",
+  },
+  {
+    key: "flag:inventory.reorder",
+    label: "Set reorder rules",
+    hint: "View and edit the reorder point / reorder quantity on Live inventory.",
+  },
+];
+
+export const STAFF_FLAG_KEYS = STAFF_FLAGS.map((f) => f.key);
+
+export const STAFF_PERMISSION_KEYS = [...STAFF_MODULE_KEYS, ...STAFF_FLAG_KEYS];
+
 export const STAFF_SECTIONS = [...new Set(STAFF_MODULES.map((m) => m.section))];
 
 export type AdminAccess = {
