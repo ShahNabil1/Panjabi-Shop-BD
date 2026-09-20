@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { requireAdmin, unwrap } from "./admin.server";
+import { actorName, logActivity, requireAdmin, unwrap } from "./admin.server";
 import {
   adminCreateOrderSchema,
   categorySchema,
