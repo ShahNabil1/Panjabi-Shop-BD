@@ -88,7 +88,7 @@ type NavItem = {
   adminOnly?: boolean;
 };
 
-const sections: Array<{ title: string; items: NavItem[] }> = [
+const allSections: Array<{ title: string; items: NavItem[] }> = [
   {
     title: "Overview",
     items: [{ to: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true }],
@@ -179,23 +179,48 @@ function AdminLayout() {
   const navigate = useNavigate();
   const router = useRouter();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+
+  const accessQuery = useQuery({
+    queryKey: ["admin-access", session?.user.id ?? null],
+    queryFn: () => getAdminAccess(),
+    enabled: Boolean(session),
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
+    retry: 1,
+  });
+  const access = accessQuery.data ?? null;
+  const manageStaff = canManageStaff(access);
+
+  const sections = useMemo(
+    () =>
+      allSections
+        .map((section) => ({
+          title: section.title,
+          items: section.items.filter(
+            (item) =>
+              (!item.adminOnly || manageStaff) && canAccessPath(access, item.to),
+          ),
+        }))
+        .filter((section) => section.items.length > 0),
+    [access, manageStaff],
+  );
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [openSections, setOpenSections] = useState<string[]>(() =>
-    sections.map((s) => s.title),
+    allSections.map((s) => s.title),
   );
 
   const matches = (item: NavItem) =>
     item.exact ? pathname === item.to : pathname.startsWith(item.to);
 
   const activeSection = useMemo(
-    () => sections.find((s) => s.items.some(matches))?.title ?? sections[0]!.title,
-    [pathname],
+    () => sections.find((s) => s.items.some(matches))?.title ?? sections[0]?.title ?? "Overview",
+    [pathname, sections],
   );
 
   const topItems = useMemo(
     () => sections.find((s) => s.title === activeSection)?.items ?? [],
-    [activeSection],
+    [activeSection, sections],
   );
 
   useEffect(() => {
@@ -254,18 +279,20 @@ function AdminLayout() {
 
     const timeoutId = globalThis.setTimeout(preloadRoutes, 250);
     return () => globalThis.clearTimeout(timeoutId);
-  }, [router, session]);
+  }, [router, session, sections]);
 
-  const isAdmin = useQuery({
-    queryKey: ["is-admin", session?.user.id ?? null],
-    queryFn: () => checkIsAdmin(),
-    enabled: Boolean(session),
-    staleTime: 5 * 60 * 1000,
-    gcTime: 30 * 60 * 1000,
-    retry: 1,
-  });
+  // Activity trail: one entry per admin page the signed-in user opens.
+  useEffect(() => {
+    if (!session || !access?.isActive) return;
+    const id = globalThis.setTimeout(() => {
+      void logAdminActivity({
+        data: { action: "page.view", area: pathname, detail: `Opened ${pathname}` },
+      }).catch(() => undefined);
+    }, 800);
+    return () => globalThis.clearTimeout(id);
+  }, [pathname, session, access?.isActive]);
 
-  if (loading || !session || isAdmin.isLoading) {
+  if (loading || !session || accessQuery.isLoading) {
     return (
       <div className="admin-scope fixed inset-0 z-50 flex h-screen w-screen flex-col items-center justify-center bg-background">
         <BrandLoader size="lg" />
@@ -273,13 +300,16 @@ function AdminLayout() {
     );
   }
 
-  if (isAdmin.data === false) {
+  const signedInAllowed = Boolean(access && (access.isAdmin || (access.isStaff && access.isActive)));
+
+  if (!signedInAllowed) {
     return (
       <div className="admin-scope mx-auto max-w-md px-4 py-24 text-center">
         <h1 className="ig-text text-2xl font-bold">No access</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          This account does not have the admin role. Add an admin role in the{" "}
-          <code>user_roles</code> table and try again.
+          {access?.isStaff
+            ? "This employee account has been deactivated. Ask the owner to switch it back on."
+            : "This account is not allowed in the admin panel."}
         </p>
         <div className="mt-6 flex justify-center gap-2">
           <Button variant="outline" onClick={() => void signOut()}>
