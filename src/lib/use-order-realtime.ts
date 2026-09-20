@@ -44,8 +44,14 @@ export function useOrderRealtime(orderId?: string) {
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "order_activity", ...(filter ? { filter } : {}) },
-        invalidate,
+        (payload) => {
+          // A "view" row is written by the workspace fetch itself — refetching
+          // on it would loop forever between open tabs.
+          if ((payload.new as { kind?: string } | null)?.kind === "view") return;
+          invalidate();
+        },
       )
+
       // Webhook events are not linked to an order id, so always listen broadly.
       .on(
         "postgres_changes",
