@@ -5,6 +5,7 @@ import { getLandingPage } from "@/lib/catalog.functions";
 import { getDeliveryRates } from "@/lib/order.functions";
 import type { LandingPageData } from "@/lib/types";
 import { useLang } from "@/lib/language-context";
+import { richTextToPlain } from "@/lib/rich-text";
 import { discountPercent, formatNumber, formatPrice, pick, toBnDigits, tr } from "@/lib/i18n";
 import { ProductThumb } from "@/components/site/product-card";
 import { NotFoundView } from "@/components/site/not-found-view";
@@ -57,7 +58,7 @@ export const Route = createFileRoute("/lp/$slug")({
     const title = landing.metaTitle || pageTitle(landing.headlineBn || product.nameBn);
     const description =
       landing.metaDescription ||
-      product.shortBn ||
+      richTextToPlain(product.shortBn).slice(0, 300) ||
       `${product.nameBn} — ${formatPrice("bn", product.price)}. ক্যাশ অন ডেলিভারিতে অর্ডার করুন।`;
     const ogTitle = seo.ogTitle || title;
     const ogDescription = seo.ogDescription || description;
@@ -213,7 +214,7 @@ function LandingPage() {
   }));
 
   const headline = pick(lang, landing.headlineBn, landing.headlineEn) || pick(lang, product.nameBn, product.nameEn);
-  const subheadline = pick(lang, landing.subheadlineBn, landing.subheadlineEn) || pick(lang, product.shortBn, product.shortEn);
+  const subheadline = pick(lang, landing.subheadlineBn, landing.subheadlineEn) || richTextToPlain(pick(lang, product.shortBn, product.shortEn));
   const description = pick(lang, product.descriptionBn, product.descriptionEn);
 
   return (

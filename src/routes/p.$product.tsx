@@ -35,7 +35,7 @@ export const Route = createFileRoute("/p/$product")({
     const title = p.metaTitle || pageTitle(p.nameBn);
     const description =
       p.metaDescription ||
-      p.shortBn ||
+      richTextToPlain(p.shortBn).slice(0, 300) ||
       `${p.nameBn} — ${formatPrice("bn", p.price)}. সারা দেশে ক্যাশ অন ডেলিভারি।`;
     const url = `/p/${params.product}`;
 
@@ -316,7 +316,7 @@ function ProductPage() {
               ) : null}
             </div>
 
-            {short ? <p className="mt-4 text-[15px] leading-7 text-foreground/90">{short}</p> : null}
+            <RichText html={short} className="mt-4" />
 
             {product.specs.length > 0 ? (
               <dl className="mt-4 divide-y divide-border overflow-hidden rounded-lg border border-border bg-card">
