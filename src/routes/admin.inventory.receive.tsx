@@ -193,6 +193,28 @@ function ReceiveInventory() {
             tip="Scan a barcode to add an item — the product/variant SKU is the barcode. Each line can have a different cost; the system computes the weighted average cost automatically."
           />
 
+          <div className="flex flex-wrap items-center gap-3 rounded-xl border border-border/70 bg-muted/20 px-3 py-2">
+            <Checkbox
+              checked={selected.length > 0 && selected.length === lines.length}
+              onCheckedChange={(v) => setSelected(v === true ? lines.map((l) => l.uid) : [])}
+              aria-label="Select all lines"
+            />
+            <span className="text-xs text-muted-foreground">
+              {selected.length ? `${selected.length} selected` : "Select all"}
+            </span>
+            {selected.length ? (
+              <Button
+                variant="destructive"
+                size="sm"
+                className="ml-auto rounded-lg"
+                onClick={() => void removeSelected()}
+              >
+                <Trash2 className="size-4" />
+                Remove selected
+              </Button>
+            ) : null}
+          </div>
+
           <div className="space-y-3">
             {lines.map((line, idx) => (
               <div
