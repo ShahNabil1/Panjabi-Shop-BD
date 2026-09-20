@@ -107,6 +107,12 @@ export async function fetchLayoutData() {
   return { settings, categories };
 }
 
+export async function fetchLegalPage(key: "legal_privacy" | "legal_terms" | "legal_returns") {
+  const db = createPublicServerClient();
+  const { data } = await db.from("site_settings").select("value").eq("key", key).maybeSingle();
+  return (data?.value ?? {}) as Record<string, unknown>;
+}
+
 export async function fetchCategoryPage(slug: string) {
   const db = createPublicServerClient();
   const { data: category } = await db

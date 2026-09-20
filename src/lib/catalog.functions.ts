@@ -7,6 +7,7 @@ import {
   fetchHome,
   fetchLandingPage,
   fetchLayoutData,
+  fetchLegalPage,
   fetchProduct,
   fetchPromotion,
   fetchPromotionList,
@@ -48,6 +49,12 @@ export const searchProducts = createServerFn({ method: "GET" })
 export const getLayoutData = createServerFn({ method: "GET" }).handler(async () =>
   fetchLayoutData(),
 );
+
+export const getLegalPage = createServerFn({ method: "GET" })
+  .inputValidator((data: { key: "legal_privacy" | "legal_terms" | "legal_returns" }) => ({
+    key: data.key,
+  }))
+  .handler(async ({ data }) => fetchLegalPage(data.key));
 
 export const getLandingPage = createServerFn({ method: "GET" })
   .inputValidator((data: { slug: string }) => ({ slug: String(data.slug) }))
