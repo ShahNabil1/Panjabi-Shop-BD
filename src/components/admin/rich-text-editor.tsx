@@ -38,7 +38,6 @@ const SWATCHES = [
   "#db2777",
   "#64748b",
 ];
-const EMOJIS = ["🔥", "✅", "🎁", "⭐", "💯", "🚚", "❤️", "👑", "😍", "✨", "📦", "💥"];
 
 function Btn({
   active,

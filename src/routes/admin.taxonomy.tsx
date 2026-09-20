@@ -183,6 +183,8 @@ function TaxonomyPage() {
               label="Meta title"
               value={cat.meta_title ?? ""}
               onChange={(v) => setCat({ ...cat, meta_title: v || null })}
+              maxLength={60}
+              hint="সর্বোচ্চ ৬০ ক্যারেক্টার"
             />
             <ImageField
               cropPreset="card"
@@ -207,16 +209,14 @@ function TaxonomyPage() {
               }
             />
           </Field>
-          <Field label="Meta description">
-            <textarea
-              className="min-h-[64px] w-full rounded-xl border border-border/80 bg-background/70 p-3 text-sm transition-all duration-200 focus-visible:border-primary/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/25"
-              rows={2}
-              maxLength={160}
-              placeholder="50–160 characters, shown in Google & social previews"
-              value={cat.meta_description ?? ""}
-              onChange={(e) => setCat({ ...cat, meta_description: e.target.value || null })}
-            />
-          </Field>
+          <AreaField
+            label="Meta description"
+            rows={3}
+            value={cat.meta_description ?? ""}
+            onChange={(v) => setCat({ ...cat, meta_description: v || null })}
+            maxLength={160}
+            hint="সর্বোচ্চ ১৬০ ক্যারেক্টার"
+          />
           <div className="grid gap-2 sm:grid-cols-3">
             <ToggleField
               label="Active"
@@ -388,6 +388,8 @@ function TaxonomyPage() {
               label="Meta title"
               value={sub.meta_title ?? ""}
               onChange={(v) => setSub({ ...sub, meta_title: v || null })}
+              maxLength={60}
+              hint="সর্বোচ্চ ৬০ ক্যারেক্টার"
             />
             <ImageField
               cropPreset="card"
@@ -397,16 +399,14 @@ function TaxonomyPage() {
               onChange={(v) => setSub({ ...sub, image_url: v })}
             />
           </div>
-          <Field label="Meta description">
-            <textarea
-              className="min-h-[64px] w-full rounded-xl border border-border/80 bg-background/70 p-3 text-sm transition-all duration-200 focus-visible:border-primary/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/25"
-              rows={2}
-              maxLength={160}
-              placeholder="50–160 characters, shown in Google & social previews"
-              value={sub.meta_description ?? ""}
-              onChange={(e) => setSub({ ...sub, meta_description: e.target.value || null })}
-            />
-          </Field>
+          <AreaField
+            label="Meta description"
+            rows={3}
+            value={sub.meta_description ?? ""}
+            onChange={(v) => setSub({ ...sub, meta_description: v || null })}
+            maxLength={160}
+            hint="সর্বোচ্চ ১৬০ ক্যারেক্টার"
+          />
           <Field label="Description">
             <textarea
               className="min-h-[84px] w-full rounded-xl border border-border/80 bg-background/70 p-3 text-sm transition-all duration-200 focus-visible:border-primary/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/25"
