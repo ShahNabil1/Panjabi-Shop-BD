@@ -10,6 +10,17 @@ export type R2Config = {
   publicBaseUrl: string;
 };
 
+/**
+ * Admins usually paste the CDN host without a scheme ("cdn.example.com"),
+ * which would produce relative, unloadable image URLs. Always store and return
+ * an absolute https:// base.
+ */
+export function normalizePublicBaseUrl(value: string): string {
+  const trimmed = value.trim().replace(/\/+$/, "");
+  if (!trimmed) return trimmed;
+  return /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed.replace(/^\/+/, "")}`;
+}
+
 /** Reads R2 settings from the admin panel, falling back to environment vars. */
 export async function readR2Config(): Promise<R2Config | null> {
   const v = await getIntegrationValues();
@@ -24,7 +35,7 @@ export async function readR2Config(): Promise<R2Config | null> {
     accessKeyId,
     secretAccessKey,
     bucket,
-    publicBaseUrl: publicBaseUrl.replace(/\/+$/, ""),
+    publicBaseUrl: normalizePublicBaseUrl(publicBaseUrl),
   };
 }
 
