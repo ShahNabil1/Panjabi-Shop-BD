@@ -77,28 +77,8 @@ export const placeOrder = createServerFn({ method: "POST" })
     const { createPublicServerClient } = await import("./supabase-public");
     const db = createPublicServerClient();
 
-    const { getRequestIP, getRequestHeader } = await import("@tanstack/react-start/server");
-    let clientIp: string | null = null;
-    try {
-      const forwarded = getRequestHeader("x-forwarded-for") ?? "";
-      clientIp =
-        (getRequestHeader("cf-connecting-ip") ||
-          forwarded.split(",")[0]?.trim() ||
-          getRequestIP({ xForwardedFor: true }) ||
-          null) ?? null;
-    } catch {
-      clientIp = null;
-    }
-
-    // The customer's own user-agent is snapshotted here because server-side
-    // conversion events (Meta CAPI / TikTok) fire later from the admin panel,
-    // where the request headers would belong to staff instead of the buyer.
-    let userAgent: string | null = null;
-    try {
-      userAgent = (getRequestHeader("user-agent") ?? "").slice(0, 500) || null;
-    } catch {
-      userAgent = null;
-    }
+    const { getRequestSecurityContext } = await import("./storefront-security.functions");
+    const security = await getRequestSecurityContext();
 
 
 
@@ -218,9 +198,10 @@ export const placeOrder = createServerFn({ method: "POST" })
         discount,
         total,
         source: data.source,
-        customer_ip: clientIp,
-        customer_user_agent: userAgent,
-
+        customer_ip: security.ip,
+        customer_user_agent: security.userAgent,
+        device_fingerprint: data.deviceFingerprint,
+        customer_ip_location: security.location,
         attribution: data.attribution ?? {},
       },
       _items: lines.map((l) => ({
@@ -239,6 +220,7 @@ export const placeOrder = createServerFn({ method: "POST" })
     });
 
     const order = placed as { id?: string; order_number?: string } | null;
+    if (orderError?.message.includes("ORDER_BLOCKED")) throw new Error("ORDER_BLOCKED");
     if (orderError || !order?.order_number) throw new Error("ORDER_FAILED");
 
     // No conversion event here: a website order lands as `processing`, which is
@@ -356,6 +338,8 @@ export const captureIncompleteOrder = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const { createPublicServerClient } = await import("./supabase-public");
     const db = createPublicServerClient();
+    const { getRequestSecurityContext } = await import("./storefront-security.functions");
+    const security = await getRequestSecurityContext();
 
     const productIds = [...new Set(data.items.map((i) => i.productId))];
     const variantIds = [...new Set([
@@ -443,6 +427,10 @@ export const captureIncompleteOrder = createServerFn({ method: "POST" })
       note: data.note || null,
       subtotal,
       source: data.source,
+      customer_ip: security.ip,
+      customer_user_agent: security.userAgent,
+      device_fingerprint: data.deviceFingerprint,
+      customer_ip_location: security.location,
       attribution: data.attribution ?? {},
     };
 

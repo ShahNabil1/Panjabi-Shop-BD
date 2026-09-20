@@ -30,6 +30,7 @@ import { SITE_URL } from "../lib/site";
 import { useDigitNormalizer } from "../lib/use-digit-normalizer";
 import { RoutePending } from "../components/site/route-pending";
 import { captureAttribution } from "../lib/attribution";
+import { BlockedSupportProvider } from "@/components/site/blocked-support-dialog";
 
 
 function str(value: unknown, fallback: string) {
@@ -251,8 +252,9 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <LanguageProvider initialLang={lang}>
         <AuthProvider>
-          <CartProvider>
-            <ConfirmProvider>
+          <BlockedSupportProvider>
+            <CartProvider>
+              <ConfirmProvider>
             <RoutePending />
             <Chrome brand={brand}>
               {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
@@ -260,8 +262,9 @@ function RootComponent() {
             </Chrome>
             <CartDrawer />
             <Toaster position="top-center" richColors closeButton />
-            </ConfirmProvider>
-          </CartProvider>
+              </ConfirmProvider>
+            </CartProvider>
+          </BlockedSupportProvider>
 
         </AuthProvider>
       </LanguageProvider>

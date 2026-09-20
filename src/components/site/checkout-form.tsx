@@ -24,6 +24,8 @@ import { ProductThumb } from "@/components/site/product-card";
 import { QuantityStepper } from "@/components/site/add-to-cart";
 import { cn } from "@/lib/utils";
 import { normalizePhoneInput } from "@/lib/phone";
+import { getBrowserFingerprint } from "@/lib/browser-fingerprint";
+import { useBlockedSupport } from "@/components/site/blocked-support-dialog";
 import { ecommerce, pushEvent, useTrackOnce } from "@/lib/tracking";
 import { cartTrackingItems } from "@/lib/tracking-items";
 
@@ -95,6 +97,7 @@ export function CheckoutForm({
 }) {
   const { lang } = useLang();
   const confirmDialog = useConfirm();
+  const { showBlockedDialog } = useBlockedSupport();
 
   const navigate = useNavigate();
   const submit = useServerFn(placeOrder);
@@ -170,6 +173,7 @@ export function CheckoutForm({
         note: s.note.trim(),
         source: s.source,
         attribution: getAttribution(),
+        deviceFingerprint: null,
         items: s.items.map((i) => ({
           productId: i.productId,
           variantId: i.variantId,
@@ -345,6 +349,7 @@ export function CheckoutForm({
 
     setPending(true);
     try {
+      const deviceFingerprint = await getBrowserFingerprint();
       const result = await submit({
         data: {
           customerName: name.trim(),
@@ -357,6 +362,7 @@ export function CheckoutForm({
           couponCode: appliedCode ?? "",
           source,
           attribution: getAttribution(),
+          deviceFingerprint,
 
           items: items.map((i) => ({
             productId: i.productId,
@@ -385,8 +391,12 @@ export function CheckoutForm({
         params: { orderNumber: result.orderNumber },
         search: { phone: phone.trim() },
       });
-    } catch {
-      setFailed(true);
+    } catch (error) {
+      if (error instanceof Error && error.message.includes("ORDER_BLOCKED")) {
+        showBlockedDialog();
+      } else {
+        setFailed(true);
+      }
     } finally {
       setPending(false);
     }

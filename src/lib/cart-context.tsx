@@ -1,5 +1,10 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
+import { useServerFn } from "@tanstack/react-start";
+
+import { useBlockedSupport } from "@/components/site/blocked-support-dialog";
+import { getBrowserFingerprint } from "@/lib/browser-fingerprint";
+import { checkStorefrontAccess } from "@/lib/storefront-security.functions";
 
 const CART_KEY = "panjabishopbd_cart_v1";
 
@@ -48,7 +53,7 @@ type CartContextValue = {
   openCart: (step?: CartStep) => void;
   closeCart: () => void;
   setStep: (step: CartStep) => void;
-  add: (item: NewCartItem) => void;
+  add: (item: NewCartItem) => Promise<boolean>;
   setQuantity: (key: string, quantity: number) => void;
   remove: (key: string) => void;
   clear: () => void;
@@ -95,6 +100,8 @@ function readStorage(): CartItem[] {
 }
 
 export function CartProvider({ children }: { children: ReactNode }) {
+  const checkAccess = useServerFn(checkStorefrontAccess);
+  const { showBlockedDialog } = useBlockedSupport();
   const [items, setItems] = useState<CartItem[]>([]);
   const [ready, setReady] = useState(false);
   const [open, setOpen] = useState(false);
@@ -114,7 +121,17 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
   }, [items, ready]);
 
-  const add = useCallback((incoming: NewCartItem) => {
+  const add = useCallback(async (incoming: NewCartItem) => {
+    try {
+      const fingerprint = await getBrowserFingerprint();
+      const result = await checkAccess({ data: { fingerprint } });
+      if (result.blocked) {
+        showBlockedDialog();
+        return false;
+      }
+    } catch {
+      // A transient security-check failure must not make the storefront unusable.
+    }
     const key = itemKey(incoming.productId, incoming.variantId, incoming.comboSelections);
     setItems((prev) => {
       const existing = prev.find((i) => i.key === key);
@@ -128,7 +145,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
       }
       return [...prev, { ...incoming, key }];
     });
-  }, []);
+    return true;
+  }, [checkAccess, showBlockedDialog]);
 
   const setQuantity = useCallback((key: string, quantity: number) => {
     setItems((prev) =>
