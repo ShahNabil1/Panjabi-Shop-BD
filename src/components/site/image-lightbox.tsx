@@ -1,5 +1,5 @@
 import { cdnImage } from "@/lib/cdn-image";
-import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, RotateCcw, X, ZoomIn, ZoomOut } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
@@ -52,6 +52,9 @@ export function ImageLightbox({
 
   useEffect(() => {
     if (isOpen) setIndex(startIndex);
+    setScale(1);
+    setIsZoomed(false);
+    setOffset({ x: 0, y: 0 });
   }, [isOpen, startIndex]);
 
   const onCloseRef = useRef(onClose);
@@ -63,6 +66,7 @@ export function ImageLightbox({
     if (!isOpen) {
       setScale(1);
       setIsZoomed(false);
+      setOffset({ x: 0, y: 0 });
       return;
     }
     const onKey = (e: KeyboardEvent) => {
@@ -284,7 +288,7 @@ export function ImageLightbox({
               }}
             />
 
-            <div className="absolute bottom-3 left-1/2 z-10 flex -translate-x-1/2 items-center gap-1 rounded-full bg-card/95 px-2 py-1 shadow-lg backdrop-blur">
+            <div className="absolute left-2 top-2 z-10 flex items-center gap-1 rounded-full bg-card/95 px-2 py-1 shadow-lg backdrop-blur">
               <button
                 type="button"
                 aria-label="Zoom out"
