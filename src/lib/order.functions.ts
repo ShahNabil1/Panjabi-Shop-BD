@@ -134,7 +134,7 @@ export const placeOrder = createServerFn({ method: "POST" })
     });
 
     const subtotal = lines.reduce((sum, l) => sum + l.lineTotal, 0);
-    const rates = deliveryRates(settingsRes.data?.value);
+    const rates = normalizeDeliveryConfig(settingsRes.data?.value);
 
     const { findUpazila } = await import("./bd-geo");
     if (!findUpazila(data.division, data.district, data.upazila)) {
