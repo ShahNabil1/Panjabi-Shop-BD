@@ -417,6 +417,15 @@ export function OrdersBoard({
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="text-[15px] font-bold text-foreground">{o.customer_name}</span>
                     <StatusPill status={o.status} />
+                    {(o as { created_by?: string | null; created_by_name?: string | null }).created_by ? (
+                      <span
+                        title="Created from the admin panel"
+                        className="inline-flex items-center gap-1 rounded-full bg-sky-50 px-2 py-0.5 text-xs font-semibold text-sky-800 ring-1 ring-sky-200"
+                      >
+                        <UserRound className="size-3" />
+                        Manual · Created by {(o as { created_by_name?: string | null }).created_by_name || "Staff"}
+                      </span>
+                    ) : null}
                     <CopyBadge value={o.order_number} />
                     <PhoneActions phone={o.customer_phone} size="sm" />
 
