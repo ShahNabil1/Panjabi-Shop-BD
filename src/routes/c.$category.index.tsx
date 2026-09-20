@@ -6,7 +6,9 @@ import { useLang } from "@/lib/language-context";
 import { pick, tr } from "@/lib/i18n";
 import { ProductGrid } from "@/components/site/product-card";
 import { NotFoundView } from "@/components/site/not-found-view";
-import { Breadcrumbs, Prose, Section } from "@/components/site/ui";
+import { Breadcrumbs, Section } from "@/components/site/ui";
+import { RichText } from "@/components/site/rich-text";
+import { richTextToPlain } from "@/lib/rich-text";
 import { absoluteUrl, pageTitle } from "@/lib/site";
 import { useViewItemList } from "@/lib/tracking-items";
 
@@ -24,7 +26,7 @@ export const Route = createFileRoute("/c/$category/")({
     const title = c.meta_title || pageTitle(c.name_bn);
     const description =
       c.meta_description ||
-      c.description_bn ||
+      richTextToPlain(c.description_bn) ||
       `${c.name_bn} — সেরা দামে অনলাইনে অর্ডার করুন, সারা দেশে ক্যাশ অন ডেলিভারি।`;
     const url = `/c/${params.category}`;
     return {
@@ -88,7 +90,7 @@ function CategoryPage() {
     <Section>
       <Breadcrumbs items={[{ label: tr(lang, "home"), to: "/" }, { label: name }]} />
       <h1 className="mt-3 text-2xl font-bold tracking-tight sm:text-3xl">{name}</h1>
-      {description ? <Prose text={description} className="mt-3 max-w-3xl" /> : null}
+      {description ? <RichText html={description} className="mt-3 max-w-3xl" /> : null}
 
       {subcategories.length > 0 ? (
         <div className="mt-6 flex flex-wrap gap-2">
