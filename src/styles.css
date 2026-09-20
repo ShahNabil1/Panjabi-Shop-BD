@@ -782,3 +782,16 @@
   height: 0;
   pointer-events: none;
 }
+
+/* Global modal scroll lock: no background scrolling while any popup is open */
+body[data-scroll-locked],
+body.lv-scroll-locked {
+  overflow: hidden !important;
+  overscroll-behavior: contain;
+}
+
+html:has(body[data-scroll-locked]),
+html:has(body.lv-scroll-locked) {
+  overflow: hidden !important;
+  overscroll-behavior: none;
+}

@@ -15,7 +15,7 @@ import { InfoTip, Panel, StatCard, TipTitle } from "@/components/admin/kit";
 import { ModuleHero } from "@/components/admin/module-hero";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { ImageLightbox } from "@/components/site/image-lightbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useConfirm } from "@/components/ui/confirm-dialog";
@@ -432,25 +432,11 @@ function ReceiveInventory() {
         </div>
       </div>
 
-      <Dialog open={Boolean(preview)} onOpenChange={(o) => !o && setPreview(null)}>
-        <DialogContent className="max-w-lg">
-          <DialogTitle className="text-sm">{preview?.label}</DialogTitle>
-          <div className="grid place-items-center overflow-hidden rounded-xl border border-border/70 bg-muted/20 p-3">
-            {preview?.imageUrl ? (
-              <SmartImage
-                src={preview.imageUrl}
-                alt={preview.label}
-                baseWidth={720}
-                height={720}
-                fit="contain"
-                className="max-h-[60vh] w-full object-contain"
-              />
-            ) : (
-              <p className="py-10 text-xs text-muted-foreground">No image for this item.</p>
-            )}
-          </div>
-        </DialogContent>
-      </Dialog>
+      <ImageLightbox
+        isOpen={Boolean(preview?.imageUrl)}
+        images={preview?.imageUrl ? [{ src: preview.imageUrl, alt: preview.label }] : []}
+        onClose={() => setPreview(null)}
+      />
     </div>
   );
 }

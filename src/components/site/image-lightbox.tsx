@@ -1,5 +1,5 @@
 import { cdnImage } from "@/lib/cdn-image";
-import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, RotateCcw, X, ZoomIn, ZoomOut } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
@@ -44,11 +44,17 @@ export function ImageLightbox({
   const [index, setIndex] = useState(startIndex);
   const [scale, setScale] = useState(1);
   const [isZoomed, setIsZoomed] = useState(false);
+  const [offset, setOffset] = useState({ x: 0, y: 0 });
+  const pinchRef = useRef<{ dist: number; scale: number } | null>(null);
+  const dragRef = useRef<{ x: number; y: number } | null>(null);
   const touchStartX = useRef<number | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (isOpen) setIndex(startIndex);
+    setScale(1);
+    setIsZoomed(false);
+    setOffset({ x: 0, y: 0 });
   }, [isOpen, startIndex]);
 
   const onCloseRef = useRef(onClose);
@@ -60,6 +66,7 @@ export function ImageLightbox({
     if (!isOpen) {
       setScale(1);
       setIsZoomed(false);
+      setOffset({ x: 0, y: 0 });
       return;
     }
     const onKey = (e: KeyboardEvent) => {
@@ -134,13 +141,71 @@ export function ImageLightbox({
     }
   };
 
-  const toggleZoom = () => {
-    setIsZoomed((z) => {
-      const next = !z;
-      setScale(next ? 2 : 1);
-      return next;
-    });
+  const applyScale = (next: number) => {
+    const clamped = Math.min(5, Math.max(1, Number(next.toFixed(3))));
+    setScale(clamped);
+    setIsZoomed(clamped > 1);
+    if (clamped === 1) setOffset({ x: 0, y: 0 });
   };
+
+  const toggleZoom = () => applyScale(scale > 1 ? 1 : 2);
+
+  const onWheel = (e: React.WheelEvent) => {
+    e.preventDefault();
+    applyScale(scale * (e.deltaY < 0 ? 1.15 : 1 / 1.15));
+  };
+
+  const onImgTouchStart = (e: React.TouchEvent) => {
+    if (e.touches.length === 2) {
+      const [a, b] = [e.touches[0]!, e.touches[1]!];
+      pinchRef.current = {
+        dist: Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY),
+        scale,
+      };
+    } else if (e.touches.length === 1 && scale > 1) {
+      dragRef.current = {
+        x: e.touches[0]!.clientX - offset.x,
+        y: e.touches[0]!.clientY - offset.y,
+      };
+    }
+  };
+
+  const onImgTouchMove = (e: React.TouchEvent) => {
+    if (e.touches.length === 2 && pinchRef.current) {
+      e.preventDefault();
+      e.stopPropagation();
+      const [a, b] = [e.touches[0]!, e.touches[1]!];
+      const dist = Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY);
+      applyScale(pinchRef.current.scale * (dist / pinchRef.current.dist));
+    } else if (e.touches.length === 1 && scale > 1 && dragRef.current) {
+      e.stopPropagation();
+      setOffset({
+        x: e.touches[0]!.clientX - dragRef.current.x,
+        y: e.touches[0]!.clientY - dragRef.current.y,
+      });
+    }
+  };
+
+  const onImgTouchEnd = () => {
+    pinchRef.current = null;
+    dragRef.current = null;
+  };
+
+  const onMouseDown = (e: React.MouseEvent) => {
+    if (scale <= 1) return;
+    e.preventDefault();
+    dragRef.current = { x: e.clientX - offset.x, y: e.clientY - offset.y };
+  };
+
+  const onMouseMove = (e: React.MouseEvent) => {
+    if (!dragRef.current || scale <= 1) return;
+    setOffset({ x: e.clientX - dragRef.current.x, y: e.clientY - dragRef.current.y });
+  };
+
+  const endDrag = () => {
+    dragRef.current = null;
+  };
+
 
   const canPrev = index > 0;
   const canNext = index < images.length - 1;
@@ -195,18 +260,63 @@ export function ImageLightbox({
         onClick={(e) => e.stopPropagation()}
       >
         {current ? (
-          <div className="relative overflow-hidden rounded-xl bg-card shadow-2xl ring-1 ring-border/40">
+          <div
+            className="relative overflow-hidden rounded-xl bg-card shadow-2xl ring-1 ring-border/40"
+            style={{ touchAction: "none" }}
+            onWheel={onWheel}
+            onTouchStart={onImgTouchStart}
+            onTouchMove={onImgTouchMove}
+            onTouchEnd={onImgTouchEnd}
+            onMouseDown={onMouseDown}
+            onMouseMove={onMouseMove}
+            onMouseUp={endDrag}
+            onMouseLeave={endDrag}
+          >
             <img
               key={current.src}
               src={cdnImage(current.src, { width: 1600, fit: "contain", quality: 88 })}
               alt={current.alt || ""}
-              onClick={toggleZoom}
+              draggable={false}
+              onDoubleClick={toggleZoom}
               className={cn(
-                "block max-h-[80vh] w-auto max-w-[92vw] cursor-pointer object-contain transition-transform duration-300",
-                isZoomed ? "cursor-zoom-out" : "cursor-zoom-in",
+                "block max-h-[80vh] w-auto max-w-[92vw] select-none object-contain",
+                dragRef.current ? "" : "transition-transform duration-200",
+                isZoomed ? "cursor-grab" : "cursor-zoom-in",
               )}
-              style={{ transform: `scale(${scale})` }}
+              style={{
+                transform: `translate(${offset.x}px, ${offset.y}px) scale(${scale})`,
+              }}
             />
+
+            <div className="absolute left-2 top-2 z-10 flex items-center gap-1 rounded-full bg-card/95 px-2 py-1 shadow-lg backdrop-blur">
+              <button
+                type="button"
+                aria-label="Zoom out"
+                onClick={() => applyScale(scale / 1.4)}
+                className="grid size-8 cursor-pointer place-items-center rounded-full text-foreground transition-colors hover:bg-muted"
+              >
+                <ZoomOut className="size-4" />
+              </button>
+              <span className="min-w-10 text-center font-en text-xs font-semibold text-muted-foreground">
+                {Math.round(scale * 100)}%
+              </span>
+              <button
+                type="button"
+                aria-label="Zoom in"
+                onClick={() => applyScale(scale * 1.4)}
+                className="grid size-8 cursor-pointer place-items-center rounded-full text-foreground transition-colors hover:bg-muted"
+              >
+                <ZoomIn className="size-4" />
+              </button>
+              <button
+                type="button"
+                aria-label="Reset zoom"
+                onClick={() => applyScale(1)}
+                className="grid size-8 cursor-pointer place-items-center rounded-full text-foreground transition-colors hover:bg-muted"
+              >
+                <RotateCcw className="size-4" />
+              </button>
+            </div>
 
             <button
               type="button"
