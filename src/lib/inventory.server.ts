@@ -46,11 +46,17 @@ export function mapLevel(row: LevelRow): InventoryRow {
     reorderPoint: Number(row["reorder_point"] ?? 0),
     reorderQty: Number(row["reorder_qty"] ?? 0),
     lastMovementAt: row["last_movement_at"] ?? null,
+    imageUrl:
+      (Array.isArray(p?.product_images) && p.product_images.length
+        ? [...p.product_images].sort(
+            (a: any, b: any) => Number(a?.sort_order ?? 0) - Number(b?.sort_order ?? 0),
+          )[0]?.url
+        : null) ?? null,
   };
 }
 
 export const LEVEL_SELECT =
-  "*, products(id,name_en,name_bn,sku,price,kind), product_variants(id,sku,group_name_en,value_en,price_delta), packaging_materials(id,name,sku,unit)";
+  "*, products(id,name_en,name_bn,sku,price,kind,product_images(url,sort_order)), product_variants(id,sku,group_name_en,value_en,price_delta), packaging_materials(id,name,sku,unit)";
 
 export const LEDGER_SELECT =
   "*, products(name_en,name_bn), product_variants(group_name_en,value_en), packaging_materials(name)";

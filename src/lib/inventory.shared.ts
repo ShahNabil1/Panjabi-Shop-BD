@@ -132,6 +132,7 @@ export type InventoryRow = {
   reorderPoint: number;
   reorderQty: number;
   lastMovementAt: string | null;
+  imageUrl?: string | null;
 };
 
 export type LedgerRow = {

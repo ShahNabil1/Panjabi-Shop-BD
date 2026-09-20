@@ -3,7 +3,7 @@ import { z } from "zod";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { requireSuperAdmin } from "./admin.server";
-import { STAFF_MODULE_KEYS, type AdminAccess } from "./rbac-shared";
+import { STAFF_PERMISSION_KEYS, type AdminAccess } from "./rbac-shared";
 
 const permissionsSchema = z.array(z.string()).default([]);
 
@@ -41,7 +41,7 @@ export type StaffRow = {
   created_at: string;
 };
 
-const clean = (keys: string[]) => [...new Set(keys.filter((k) => STAFF_MODULE_KEYS.includes(k)))];
+const clean = (keys: string[]) => [...new Set(keys.filter((k) => STAFF_PERMISSION_KEYS.includes(k)))];
 
 /** Who am I in the admin panel, and which pages may I open? */
 export const getAdminAccess = createServerFn({ method: "GET" })
@@ -123,7 +123,7 @@ export const adminCreateStaff = createServerFn({ method: "POST" })
       full_name: data.fullName,
       phone: data.phone ?? null,
       full_access: data.fullAccess,
-      permissions: data.fullAccess ? STAFF_MODULE_KEYS : clean(data.permissions),
+      permissions: data.fullAccess ? STAFF_PERMISSION_KEYS : clean(data.permissions),
       note: data.note ?? null,
       created_by: context.userId,
     });
@@ -171,7 +171,7 @@ export const adminUpdateStaff = createServerFn({ method: "POST" })
     if (data.fullAccess !== undefined) patch.full_access = data.fullAccess;
     if (data.permissions !== undefined || data.fullAccess !== undefined) {
       patch.permissions = data.fullAccess
-        ? STAFF_MODULE_KEYS
+        ? STAFF_PERMISSION_KEYS
         : clean(data.permissions ?? []);
     }
 

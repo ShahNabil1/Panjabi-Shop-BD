@@ -13,7 +13,7 @@ import {
   type StaffRow,
   type StaffUpdateInput,
 } from "@/lib/staff.functions";
-import { STAFF_MODULES, STAFF_MODULE_KEYS, STAFF_SECTIONS } from "@/lib/rbac-shared";
+import { STAFF_FLAGS, STAFF_MODULES, STAFF_PERMISSION_KEYS, STAFF_SECTIONS } from "@/lib/rbac-shared";
 import { AdminHeading, Panel, StatCard, TextField } from "@/components/admin/kit";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
@@ -156,6 +156,29 @@ function PermissionPicker({
           </div>
         );
       })}
+
+      <div className="rounded-xl border border-amber-300/70 bg-amber-50/60 p-3">
+        <p className="mb-2 text-xs font-bold uppercase tracking-wide text-amber-800">
+          Sensitive controls
+        </p>
+        <div className="space-y-2">
+          {STAFF_FLAGS.map((flag) => (
+            <div
+              key={flag.key}
+              className="flex items-center justify-between gap-3 rounded-lg border border-amber-200 bg-white px-3 py-2"
+            >
+              <div className="min-w-0">
+                <p className="text-sm font-semibold">{flag.label}</p>
+                <p className="text-[11px] text-muted-foreground">{flag.hint}</p>
+              </div>
+              <Switch
+                checked={value.includes(flag.key)}
+                onCheckedChange={() => toggle(flag.key)}
+              />
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
@@ -329,7 +352,7 @@ function StaffPage() {
                 setDraft((d) => ({
                   ...d,
                   fullAccess: v,
-                  permissions: v ? [...STAFF_MODULE_KEYS] : [],
+                  permissions: v ? [...STAFF_PERMISSION_KEYS] : [],
                 }))
               }
             />
@@ -469,7 +492,7 @@ function StaffPage() {
                       onCheckedChange={(v) =>
                         setEditDraft((d) =>
                           d
-                            ? { ...d, fullAccess: v, permissions: v ? [...STAFF_MODULE_KEYS] : d.permissions }
+                            ? { ...d, fullAccess: v, permissions: v ? [...STAFF_PERMISSION_KEYS] : d.permissions }
                             : d,
                         )
                       }

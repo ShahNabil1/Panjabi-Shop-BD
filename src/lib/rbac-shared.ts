@@ -98,6 +98,13 @@ export function canAccessPath(access: AdminAccess | null | undefined, pathname: 
   return access.permissions.some((key) => key !== "/admin" && (path === key || path.startsWith(`${key}/`)));
 }
 
+/** Sensitive capability check (full access / admin implies granted). */
+export function hasFlag(access: AdminAccess | null | undefined, flag: string): boolean {
+  if (!access || !access.isActive) return false;
+  if (access.isAdmin || access.fullAccess) return true;
+  return access.permissions.includes(flag);
+}
+
 /** Staff-management pages are reserved for real admins. */
 export function canManageStaff(access: AdminAccess | null | undefined): boolean {
   return Boolean(access?.isAdmin);
