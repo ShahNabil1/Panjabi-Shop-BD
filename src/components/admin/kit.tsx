@@ -202,12 +202,14 @@ export function AreaField({
   onChange,
   rows = 4,
   hint,
+  maxLength,
 }: {
   label: string;
   value: string;
   onChange: (value: string) => void;
   rows?: number;
   hint?: string;
+  maxLength?: number;
 }) {
   return (
     <Field label={label} {...(hint ? { hint } : {})}>
@@ -215,8 +217,10 @@ export function AreaField({
         className={inputClass}
         rows={rows}
         value={value}
-        onChange={(e) => onChange(e.target.value)}
+        {...(maxLength ? { maxLength } : {})}
+        onChange={(e) => onChange(clamp(e.target.value, maxLength))}
       />
+      {maxLength ? <CharCount value={value} max={maxLength} /> : null}
     </Field>
   );
 }
