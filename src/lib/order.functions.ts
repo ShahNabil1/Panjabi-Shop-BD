@@ -77,7 +77,7 @@ export const placeOrder = createServerFn({ method: "POST" })
     const { createPublicServerClient } = await import("./supabase-public");
     const db = createPublicServerClient();
 
-    const { getRequestSecurityContext } = await import("./storefront-security.functions");
+    const { getRequestSecurityContext } = await import("./request-security.server");
     const security = await getRequestSecurityContext();
 
 
@@ -338,7 +338,7 @@ export const captureIncompleteOrder = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const { createPublicServerClient } = await import("./supabase-public");
     const db = createPublicServerClient();
-    const { getRequestSecurityContext } = await import("./storefront-security.functions");
+    const { getRequestSecurityContext } = await import("./request-security.server");
     const security = await getRequestSecurityContext();
 
     const productIds = [...new Set(data.items.map((i) => i.productId))];
