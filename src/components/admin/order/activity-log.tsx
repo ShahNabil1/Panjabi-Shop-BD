@@ -159,9 +159,16 @@ export function ActivityLog({ entries }: { entries: ActivityEntry[] }) {
                         {fullTime(a.created_at)} · {relative(a.created_at)}
                       </span>
                     </div>
-                    <p className="mt-1 break-words text-sm leading-relaxed text-foreground">
-                      {a.message ?? a.kind}
-                    </p>
+                    {a.kind === "takeover" ? (
+                      <p className="mt-1 break-words text-sm font-bold leading-relaxed text-rose-700">
+                        {takeoverText(a)}
+                      </p>
+                    ) : (
+                      <p className="mt-1 break-words text-sm leading-relaxed text-foreground">
+                        {a.message ?? a.kind}
+                      </p>
+                    )}
+
                   </div>
                 </li>
               );
