@@ -52,12 +52,52 @@ const fieldClass =
 
 function ReceiveInventory() {
   const qc = useQueryClient();
-  const navigate = useNavigate();
+  const confirm = useConfirm();
   const [lines, setLines] = useState<Line[]>([newLine()]);
   const [supplierId, setSupplierId] = useState<string>("");
   const [invoiceNo, setInvoiceNo] = useState("");
   const [extraCost, setExtraCost] = useState(0);
   const [note, setNote] = useState("");
+  const [selected, setSelected] = useState<string[]>([]);
+  const [preview, setPreview] = useState<PickableItem | null>(null);
+
+  const hasData = (l: Line) => Boolean(l.item) || l.quantity > 1 || l.unitCost > 0;
+
+  const removeLines = (uids: string[]) =>
+    setLines((prev) => {
+      const next = prev.filter((l) => !uids.includes(l.uid));
+      return next.length ? next : [newLine()];
+    });
+
+  const removeLine = async (line: Line) => {
+    if (
+      hasData(line) &&
+      !(await confirm({
+        title: "Remove this item line?",
+        description: "The entered item, quantity and buying price will be cleared.",
+        tone: "danger",
+        confirmLabel: "Remove",
+      }))
+    )
+      return;
+    removeLines([line.uid]);
+    setSelected((prev) => prev.filter((id) => id !== line.uid));
+  };
+
+  const removeSelected = async () => {
+    if (!selected.length) return;
+    if (
+      !(await confirm({
+        title: `Remove ${selected.length} selected line(s)?`,
+        description: "Everything entered on those lines will be cleared.",
+        tone: "danger",
+        confirmLabel: "Remove",
+      }))
+    )
+      return;
+    removeLines(selected);
+    setSelected([]);
+  };
 
   const { data: suppliers = [] } = useQuery({
     queryKey: ["admin", "inventory", "suppliers"],
