@@ -21,8 +21,8 @@ export const Route = createFileRoute("/search")({
     const term = loaderData?.query ?? "";
     const title = term ? pageTitle(`“${term}” — খোঁজার ফলাফল`) : pageTitle("পণ্য খুঁজুন");
     const description = term
-      ? `Panjabi Shop BD-এর গিফট কম্বো ক্যাটালগে “${term}” খোঁজার ফলাফল দেখুন।`
-      : "Panjabi Shop BD-এর গিফট কম্বো ক্যাটালগে আপনার পছন্দের উপহার খুঁজুন।";
+      ? `Panjabi Shop BD-এর পাঞ্জাবি কালেকশনে “${term}” খোঁজার ফলাফল দেখুন।`
+      : "Panjabi Shop BD-এর কালেকশনে আপনার পছন্দের পাঞ্জাবি খুঁজুন।";
     return {
       meta: [
         { title },

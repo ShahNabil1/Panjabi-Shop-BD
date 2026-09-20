@@ -7,7 +7,7 @@ export const Route = createFileRoute("/admin/combos/")({
     <ProductList
       kind="combo"
       title="Build Combo Box"
-      description="কম্বো গিফট বক্স তৈরি করুন — ভিতরের আইটেম সাব-প্রোডাক্ট থেকে বেছে নিন।"
+      description="কম্বো প্যাকেজ তৈরি করুন — ভিতরের আইটেম সাব-প্রোডাক্ট থেকে বেছে নিন।"
       newLabel="New combo box"
     />
   ),

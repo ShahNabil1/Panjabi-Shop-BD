@@ -106,8 +106,8 @@ const num = (v: number | string | null | undefined) => Number(v ?? 0) || 0;
  */
 const TAXONOMY: Record<string, { google: string; fb: string }> = {
   "gift-combo": {
-    google: "Arts & Entertainment > Party & Celebration > Gift Giving > Gift Baskets",
-    fb: "arts & entertainment > party & celebration > gift giving",
+    google: "Apparel & Accessories > Clothing > Shirts & Tops",
+    fb: "apparel & accessories > clothing > shirts & tops",
   },
   saree: { google: "Apparel & Accessories > Clothing > Dresses", fb: "apparel & accessories > clothing > dresses" },
   panjabi: { google: "Apparel & Accessories > Clothing > Shirts & Tops", fb: "apparel & accessories > clothing > shirts & tops" },
@@ -119,8 +119,8 @@ const TAXONOMY: Record<string, { google: string; fb: string }> = {
 };
 
 const DEFAULT_TAXONOMY = {
-  google: "Arts & Entertainment > Party & Celebration > Gift Giving > Gift Baskets",
-  fb: "arts & entertainment > party & celebration > gift giving",
+  google: "Apparel & Accessories > Clothing > Shirts & Tops",
+  fb: "apparel & accessories > clothing > shirts & tops",
 };
 
 const taxonomyFor = (categorySlug: string | null, subcategorySlug: string | null) =>
@@ -250,7 +250,7 @@ export async function fetchCatalogFeed(): Promise<FeedItem[]> {
 
     const categorySlug = p.categories?.slug ?? null;
     const subcategorySlug = p.subcategories?.slug ?? null;
-    const categoryName = p.categories?.name_bn || p.categories?.name_en || "গিফট";
+    const categoryName = p.categories?.name_bn || p.categories?.name_en || "পাঞ্জাবি";
     const subcategoryName = p.subcategories?.name_bn || p.subcategories?.name_en || null;
     const productType = [categoryName, subcategoryName].filter(Boolean).join(" > ");
     const categoryLink = categorySlug
@@ -304,7 +304,7 @@ export async function fetchCatalogFeed(): Promise<FeedItem[]> {
         salePrice: onSale ? row.price : null,
         brand,
         condition: "new",
-        productType: productType || "গিফট",
+        productType: productType || "পাঞ্জাবি",
         googleProductCategory: taxonomy.google,
         fbProductCategory: taxonomy.fb,
         sku: row.sku,

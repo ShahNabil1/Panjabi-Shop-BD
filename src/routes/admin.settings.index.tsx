@@ -1,8 +1,8 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { Link, createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { ArrowDown, ArrowUp, ImagePlus, Trash2 } from "lucide-react";
+import { ArrowDown, ArrowUp, FilePenLine, ImagePlus, Trash2 } from "lucide-react";
 
 import { adminListSettings, adminSaveSetting } from "@/lib/admin.functions";
 import { AdminHeading, NumberField, Panel, TextField } from "@/components/admin/kit";
@@ -68,12 +68,33 @@ function SettingsAdmin() {
         description="Hero banner, brand, contact and delivery charges."
       />
 
+      <Panel className="space-y-3">
+        <div>
+          <h2 className="ig-text text-sm font-bold">Legal pages</h2>
+          <p className="mt-1 text-xs text-muted-foreground">Edit the policies linked in the storefront footer.</p>
+        </div>
+        <div className="divide-y divide-border overflow-hidden rounded-xl border border-border/70">
+          {[
+            { title: "Privacy Policy", to: "/admin/settings/privacy-policy" as const },
+            { title: "Terms & Conditions", to: "/admin/settings/terms-and-conditions" as const },
+            { title: "Return Policy", to: "/admin/settings/return-policy" as const },
+          ].map((item) => (
+            <div key={item.to} className="flex items-center justify-between gap-3 bg-background/40 px-3 py-3">
+              <span className="min-w-0 text-sm font-semibold">{item.title}</span>
+              <Button asChild size="sm" variant="outline">
+                <Link to={item.to}><FilePenLine className="size-4" />Edit</Link>
+              </Button>
+            </div>
+          ))}
+        </div>
+      </Panel>
+
       <Panel className="space-y-4">
         <div>
           <h2 className="ig-text text-sm font-bold">Hero banner slider</h2>
           <p className="mt-1 text-xs text-muted-foreground">
             At least 1, up to {MAX_HERO_SLIDES} banners. Adding a link makes
-            the banner clickable (e.g. <code className="rounded bg-muted px-1">/c/gift-combo</code>).
+            the banner clickable (e.g. <code className="rounded bg-muted px-1">/c/panjabi</code>).
           </p>
         </div>
 
@@ -204,9 +225,9 @@ function SettingsAdmin() {
             onChange={(e) => setPopup({ ...popup, enabled: e.target.checked })}
             className="peer sr-only"
           />
-          <span className="relative inline-flex h-6 w-11 shrink-0 items-center rounded-full bg-muted transition-colors duration-200 peer-checked:bg-emerald-500 peer-focus-visible:ring-2 peer-focus-visible:ring-emerald-500/40">
+          <span className="relative inline-flex h-6 w-11 shrink-0 touch-manipulation items-center rounded-full bg-muted shadow-sm transition-[background-color,box-shadow,transform] duration-300 ease-out peer-active:scale-95 peer-checked:bg-primary peer-focus-visible:ring-2 peer-focus-visible:ring-ring/40 motion-reduce:transition-none">
             <span
-              className={`absolute left-0.5 size-5 rounded-full bg-white shadow transition-transform duration-200 ${
+              className={`absolute left-0.5 size-5 rounded-full bg-background shadow-md transition-transform duration-300 ease-out motion-reduce:transition-none ${
                 popup.enabled ? "translate-x-5" : "translate-x-0"
               }`}
             />
@@ -356,9 +377,9 @@ function SettingsAdmin() {
             onChange={(e) => setDelivery({ ...delivery, free_all: e.target.checked })}
             className="peer sr-only"
           />
-          <span className="relative inline-flex h-6 w-11 shrink-0 items-center rounded-full bg-muted transition-colors duration-200 peer-checked:bg-emerald-500 peer-focus-visible:ring-2 peer-focus-visible:ring-emerald-500/40">
+          <span className="relative inline-flex h-6 w-11 shrink-0 touch-manipulation items-center rounded-full bg-muted shadow-sm transition-[background-color,box-shadow,transform] duration-300 ease-out peer-active:scale-95 peer-checked:bg-primary peer-focus-visible:ring-2 peer-focus-visible:ring-ring/40 motion-reduce:transition-none">
             <span
-              className={`absolute left-0.5 size-5 rounded-full bg-white shadow transition-transform duration-200 ${
+              className={`absolute left-0.5 size-5 rounded-full bg-background shadow-md transition-transform duration-300 ease-out motion-reduce:transition-none ${
                 freeAll ? "translate-x-5" : "translate-x-0"
               }`}
             />

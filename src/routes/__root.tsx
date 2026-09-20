@@ -56,7 +56,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       categories: layout.categories,
       gtmId: gtm.gtmId,
       brand: str(general["brand_name"], "Panjabi Shop BD"),
-      tagline: str(general["tagline"], "গিফট কম্বো ও উপহার সামগ্রী · সারা দেশে ক্যাশ অন ডেলিভারি"),
+      tagline: str(general["tagline"], "প্রিমিয়াম পাঞ্জাবির বিশ্বস্ত অনলাইন শপ · সারা দেশে ক্যাশ অন ডেলিভারি"),
       contact: {
         phone: str(contactSetting["phone"], ""),
         email: str(contactSetting["email"], ""),
@@ -75,11 +75,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           content:
             "width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content",
         },
-        { title: `${brand} — গিফট কম্বো ও উপহার সামগ্রী` },
+        { title: `${brand} — প্রিমিয়াম পাঞ্জাবির অনলাইন শপ` },
         {
           name: "description",
           content:
-            "Panjabi Shop BD থেকে গিফট কম্বো, উপহার সামগ্রী ও বিশেষ অনুষ্ঠানের কালেকশন কিনুন। সারা দেশে ক্যাশ অন ডেলিভারি উপভোগ করুন।",
+            "Panjabi Shop BD থেকে মানসম্মত ও আধুনিক ডিজাইনের পাঞ্জাবি কিনুন। সারা বাংলাদেশে ক্যাশ অন ডেলিভারি সুবিধা।",
         },
         {
           name: "google-site-verification",

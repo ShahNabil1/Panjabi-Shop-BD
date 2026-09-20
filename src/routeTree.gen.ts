@@ -21,8 +21,11 @@ import { Route as CategoriesRouteImport } from './routes/categories'
 import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as FaqRouteImport } from './routes/faq'
+import { Route as PrivacyPolicyRouteImport } from './routes/privacy-policy'
+import { Route as ReturnPolicyRouteImport } from './routes/return-policy'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as TermsAndConditionsRouteImport } from './routes/terms-and-conditions'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminCouponsRouteImport } from './routes/admin.coupons'
 import { Route as AdminFaqsRouteImport } from './routes/admin.faqs'
@@ -71,8 +74,11 @@ import { Route as AdminProductsIdRouteImport } from './routes/admin.products.$id
 import { Route as AdminSettingsIndexRouteImport } from './routes/admin.settings.index'
 import { Route as AdminSettingsApiRouteImport } from './routes/admin.settings.api'
 import { Route as AdminSettingsDeliveryRouteImport } from './routes/admin.settings.delivery'
+import { Route as AdminSettingsPrivacyPolicyRouteImport } from './routes/admin.settings.privacy-policy'
 import { Route as AdminSettingsRetentionRouteImport } from './routes/admin.settings.retention'
+import { Route as AdminSettingsReturnPolicyRouteImport } from './routes/admin.settings.return-policy'
 import { Route as AdminSettingsSmsTemplatesRouteImport } from './routes/admin.settings.sms-templates'
+import { Route as AdminSettingsTermsAndConditionsRouteImport } from './routes/admin.settings.terms-and-conditions'
 import { Route as AdminSubProductsIndexRouteImport } from './routes/admin.sub-products.index'
 import { Route as AdminSubProductsIdRouteImport } from './routes/admin.sub-products.$id'
 import { Route as CCategoryIndexRouteImport } from './routes/c.$category.index'
@@ -142,6 +148,16 @@ const FaqRoute = FaqRouteImport.update({
   path: '/faq',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PrivacyPolicyRoute = PrivacyPolicyRouteImport.update({
+  id: '/privacy-policy',
+  path: '/privacy-policy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReturnPolicyRoute = ReturnPolicyRouteImport.update({
+  id: '/return-policy',
+  path: '/return-policy',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SearchRoute = SearchRouteImport.update({
   id: '/search',
   path: '/search',
@@ -150,6 +166,11 @@ const SearchRoute = SearchRouteImport.update({
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsAndConditionsRoute = TermsAndConditionsRouteImport.update({
+  id: '/terms-and-conditions',
+  path: '/terms-and-conditions',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
@@ -395,15 +416,33 @@ const AdminSettingsDeliveryRoute = AdminSettingsDeliveryRouteImport.update({
   path: '/settings/delivery',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminSettingsPrivacyPolicyRoute =
+  AdminSettingsPrivacyPolicyRouteImport.update({
+    id: '/settings/privacy-policy',
+    path: '/settings/privacy-policy',
+    getParentRoute: () => AdminRoute,
+  } as any)
 const AdminSettingsRetentionRoute = AdminSettingsRetentionRouteImport.update({
   id: '/settings/retention',
   path: '/settings/retention',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminSettingsReturnPolicyRoute =
+  AdminSettingsReturnPolicyRouteImport.update({
+    id: '/settings/return-policy',
+    path: '/settings/return-policy',
+    getParentRoute: () => AdminRoute,
+  } as any)
 const AdminSettingsSmsTemplatesRoute =
   AdminSettingsSmsTemplatesRouteImport.update({
     id: '/settings/sms-templates',
     path: '/settings/sms-templates',
+    getParentRoute: () => AdminRoute,
+  } as any)
+const AdminSettingsTermsAndConditionsRoute =
+  AdminSettingsTermsAndConditionsRouteImport.update({
+    id: '/settings/terms-and-conditions',
+    path: '/settings/terms-and-conditions',
     getParentRoute: () => AdminRoute,
   } as any)
 const AdminSubProductsIndexRoute = AdminSubProductsIndexRouteImport.update({
@@ -464,8 +503,11 @@ export interface FileRoutesByFullPath {
   '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
   '/faq': typeof FaqRoute
+  '/privacy-policy': typeof PrivacyPolicyRoute
+  '/return-policy': typeof ReturnPolicyRoute
   '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/terms-and-conditions': typeof TermsAndConditionsRoute
   '/admin/coupons': typeof AdminCouponsRoute
   '/admin/faqs': typeof AdminFaqsRoute
   '/admin/landing': typeof AdminLandingRoute
@@ -508,8 +550,11 @@ export interface FileRoutesByFullPath {
   '/admin/products/$id': typeof AdminProductsIdRoute
   '/admin/settings/api': typeof AdminSettingsApiRoute
   '/admin/settings/delivery': typeof AdminSettingsDeliveryRoute
+  '/admin/settings/privacy-policy': typeof AdminSettingsPrivacyPolicyRoute
   '/admin/settings/retention': typeof AdminSettingsRetentionRoute
+  '/admin/settings/return-policy': typeof AdminSettingsReturnPolicyRoute
   '/admin/settings/sms-templates': typeof AdminSettingsSmsTemplatesRoute
+  '/admin/settings/terms-and-conditions': typeof AdminSettingsTermsAndConditionsRoute
   '/admin/sub-products/$id': typeof AdminSubProductsIdRoute
   '/c/$category/$subcategory': typeof CCategorySubcategoryRoute
   '/admin/combos/': typeof AdminCombosIndexRoute
@@ -537,8 +582,11 @@ export interface FileRoutesByTo {
   '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
   '/faq': typeof FaqRoute
+  '/privacy-policy': typeof PrivacyPolicyRoute
+  '/return-policy': typeof ReturnPolicyRoute
   '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/terms-and-conditions': typeof TermsAndConditionsRoute
   '/admin/coupons': typeof AdminCouponsRoute
   '/admin/faqs': typeof AdminFaqsRoute
   '/admin/landing': typeof AdminLandingRoute
@@ -581,8 +629,11 @@ export interface FileRoutesByTo {
   '/admin/products/$id': typeof AdminProductsIdRoute
   '/admin/settings/api': typeof AdminSettingsApiRoute
   '/admin/settings/delivery': typeof AdminSettingsDeliveryRoute
+  '/admin/settings/privacy-policy': typeof AdminSettingsPrivacyPolicyRoute
   '/admin/settings/retention': typeof AdminSettingsRetentionRoute
+  '/admin/settings/return-policy': typeof AdminSettingsReturnPolicyRoute
   '/admin/settings/sms-templates': typeof AdminSettingsSmsTemplatesRoute
+  '/admin/settings/terms-and-conditions': typeof AdminSettingsTermsAndConditionsRoute
   '/admin/sub-products/$id': typeof AdminSubProductsIdRoute
   '/c/$category/$subcategory': typeof CCategorySubcategoryRoute
   '/admin/combos': typeof AdminCombosIndexRoute
@@ -612,8 +663,11 @@ export interface FileRoutesById {
   '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
   '/faq': typeof FaqRoute
+  '/privacy-policy': typeof PrivacyPolicyRoute
+  '/return-policy': typeof ReturnPolicyRoute
   '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/terms-and-conditions': typeof TermsAndConditionsRoute
   '/admin/coupons': typeof AdminCouponsRoute
   '/admin/faqs': typeof AdminFaqsRoute
   '/admin/landing': typeof AdminLandingRoute
@@ -656,8 +710,11 @@ export interface FileRoutesById {
   '/admin/products/$id': typeof AdminProductsIdRoute
   '/admin/settings/api': typeof AdminSettingsApiRoute
   '/admin/settings/delivery': typeof AdminSettingsDeliveryRoute
+  '/admin/settings/privacy-policy': typeof AdminSettingsPrivacyPolicyRoute
   '/admin/settings/retention': typeof AdminSettingsRetentionRoute
+  '/admin/settings/return-policy': typeof AdminSettingsReturnPolicyRoute
   '/admin/settings/sms-templates': typeof AdminSettingsSmsTemplatesRoute
+  '/admin/settings/terms-and-conditions': typeof AdminSettingsTermsAndConditionsRoute
   '/admin/sub-products/$id': typeof AdminSubProductsIdRoute
   '/c/$category/$subcategory': typeof CCategorySubcategoryRoute
   '/admin/combos/': typeof AdminCombosIndexRoute
@@ -688,8 +745,11 @@ export interface FileRouteTypes {
     | '/checkout'
     | '/contact'
     | '/faq'
+    | '/privacy-policy'
+    | '/return-policy'
     | '/search'
     | '/sitemap.xml'
+    | '/terms-and-conditions'
     | '/admin/coupons'
     | '/admin/faqs'
     | '/admin/landing'
@@ -732,8 +792,11 @@ export interface FileRouteTypes {
     | '/admin/products/$id'
     | '/admin/settings/api'
     | '/admin/settings/delivery'
+    | '/admin/settings/privacy-policy'
     | '/admin/settings/retention'
+    | '/admin/settings/return-policy'
     | '/admin/settings/sms-templates'
+    | '/admin/settings/terms-and-conditions'
     | '/admin/sub-products/$id'
     | '/c/$category/$subcategory'
     | '/admin/combos/'
@@ -761,8 +824,11 @@ export interface FileRouteTypes {
     | '/checkout'
     | '/contact'
     | '/faq'
+    | '/privacy-policy'
+    | '/return-policy'
     | '/search'
     | '/sitemap.xml'
+    | '/terms-and-conditions'
     | '/admin/coupons'
     | '/admin/faqs'
     | '/admin/landing'
@@ -805,8 +871,11 @@ export interface FileRouteTypes {
     | '/admin/products/$id'
     | '/admin/settings/api'
     | '/admin/settings/delivery'
+    | '/admin/settings/privacy-policy'
     | '/admin/settings/retention'
+    | '/admin/settings/return-policy'
     | '/admin/settings/sms-templates'
+    | '/admin/settings/terms-and-conditions'
     | '/admin/sub-products/$id'
     | '/c/$category/$subcategory'
     | '/admin/combos'
@@ -835,8 +904,11 @@ export interface FileRouteTypes {
     | '/checkout'
     | '/contact'
     | '/faq'
+    | '/privacy-policy'
+    | '/return-policy'
     | '/search'
     | '/sitemap.xml'
+    | '/terms-and-conditions'
     | '/admin/coupons'
     | '/admin/faqs'
     | '/admin/landing'
@@ -879,8 +951,11 @@ export interface FileRouteTypes {
     | '/admin/products/$id'
     | '/admin/settings/api'
     | '/admin/settings/delivery'
+    | '/admin/settings/privacy-policy'
     | '/admin/settings/retention'
+    | '/admin/settings/return-policy'
     | '/admin/settings/sms-templates'
+    | '/admin/settings/terms-and-conditions'
     | '/admin/sub-products/$id'
     | '/c/$category/$subcategory'
     | '/admin/combos/'
@@ -910,8 +985,11 @@ export interface RootRouteChildren {
   CheckoutRoute: typeof CheckoutRoute
   ContactRoute: typeof ContactRoute
   FaqRoute: typeof FaqRoute
+  PrivacyPolicyRoute: typeof PrivacyPolicyRoute
+  ReturnPolicyRoute: typeof ReturnPolicyRoute
   SearchRoute: typeof SearchRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  TermsAndConditionsRoute: typeof TermsAndConditionsRoute
   InvOrderNumberRoute: typeof InvOrderNumberRoute
   InvoiceOrderNumberRoute: typeof InvoiceOrderNumberRoute
   LpSlugRoute: typeof LpSlugRoute
@@ -1013,6 +1091,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FaqRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/privacy-policy': {
+      id: '/privacy-policy'
+      path: '/privacy-policy'
+      fullPath: '/privacy-policy'
+      preLoaderRoute: typeof PrivacyPolicyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/return-policy': {
+      id: '/return-policy'
+      path: '/return-policy'
+      fullPath: '/return-policy'
+      preLoaderRoute: typeof ReturnPolicyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/search': {
       id: '/search'
       path: '/search'
@@ -1025,6 +1117,13 @@ declare module '@tanstack/react-router' {
       path: '/sitemap.xml'
       fullPath: '/sitemap.xml'
       preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms-and-conditions': {
+      id: '/terms-and-conditions'
+      path: '/terms-and-conditions'
+      fullPath: '/terms-and-conditions'
+      preLoaderRoute: typeof TermsAndConditionsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/': {
@@ -1363,6 +1462,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminSettingsDeliveryRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/settings/privacy-policy': {
+      id: '/admin/settings/privacy-policy'
+      path: '/settings/privacy-policy'
+      fullPath: '/admin/settings/privacy-policy'
+      preLoaderRoute: typeof AdminSettingsPrivacyPolicyRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/settings/retention': {
       id: '/admin/settings/retention'
       path: '/settings/retention'
@@ -1370,11 +1476,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminSettingsRetentionRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/settings/return-policy': {
+      id: '/admin/settings/return-policy'
+      path: '/settings/return-policy'
+      fullPath: '/admin/settings/return-policy'
+      preLoaderRoute: typeof AdminSettingsReturnPolicyRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/settings/sms-templates': {
       id: '/admin/settings/sms-templates'
       path: '/settings/sms-templates'
       fullPath: '/admin/settings/sms-templates'
       preLoaderRoute: typeof AdminSettingsSmsTemplatesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/settings/terms-and-conditions': {
+      id: '/admin/settings/terms-and-conditions'
+      path: '/settings/terms-and-conditions'
+      fullPath: '/admin/settings/terms-and-conditions'
+      preLoaderRoute: typeof AdminSettingsTermsAndConditionsRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/sub-products/': {
@@ -1472,8 +1592,11 @@ interface AdminRouteChildren {
   AdminProductsIdRoute: typeof AdminProductsIdRoute
   AdminSettingsApiRoute: typeof AdminSettingsApiRoute
   AdminSettingsDeliveryRoute: typeof AdminSettingsDeliveryRoute
+  AdminSettingsPrivacyPolicyRoute: typeof AdminSettingsPrivacyPolicyRoute
   AdminSettingsRetentionRoute: typeof AdminSettingsRetentionRoute
+  AdminSettingsReturnPolicyRoute: typeof AdminSettingsReturnPolicyRoute
   AdminSettingsSmsTemplatesRoute: typeof AdminSettingsSmsTemplatesRoute
+  AdminSettingsTermsAndConditionsRoute: typeof AdminSettingsTermsAndConditionsRoute
   AdminSubProductsIdRoute: typeof AdminSubProductsIdRoute
   AdminCombosIndexRoute: typeof AdminCombosIndexRoute
   AdminInventoryIndexRoute: typeof AdminInventoryIndexRoute
@@ -1520,8 +1643,11 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminProductsIdRoute: AdminProductsIdRoute,
   AdminSettingsApiRoute: AdminSettingsApiRoute,
   AdminSettingsDeliveryRoute: AdminSettingsDeliveryRoute,
+  AdminSettingsPrivacyPolicyRoute: AdminSettingsPrivacyPolicyRoute,
   AdminSettingsRetentionRoute: AdminSettingsRetentionRoute,
+  AdminSettingsReturnPolicyRoute: AdminSettingsReturnPolicyRoute,
   AdminSettingsSmsTemplatesRoute: AdminSettingsSmsTemplatesRoute,
+  AdminSettingsTermsAndConditionsRoute: AdminSettingsTermsAndConditionsRoute,
   AdminSubProductsIdRoute: AdminSubProductsIdRoute,
   AdminCombosIndexRoute: AdminCombosIndexRoute,
   AdminInventoryIndexRoute: AdminInventoryIndexRoute,
@@ -1547,8 +1673,11 @@ const rootRouteChildren: RootRouteChildren = {
   CheckoutRoute: CheckoutRoute,
   ContactRoute: ContactRoute,
   FaqRoute: FaqRoute,
+  PrivacyPolicyRoute: PrivacyPolicyRoute,
+  ReturnPolicyRoute: ReturnPolicyRoute,
   SearchRoute: SearchRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  TermsAndConditionsRoute: TermsAndConditionsRoute,
   InvOrderNumberRoute: InvOrderNumberRoute,
   InvoiceOrderNumberRoute: InvoiceOrderNumberRoute,
   LpSlugRoute: LpSlugRoute,

@@ -296,7 +296,7 @@ export function ProductEditor({ id, kind }: { id: string; kind: ProductKind }) {
           isComponent
             ? "কম্বো বক্সের একটি সিংগেল আইটেম — নাম, SKU, দাম, ছবি আর ভেরিয়েন্ট।"
             : isCombo
-              ? "কম্বো গিফট বক্স — ভিতরের আইটেমগুলো ড্রপডাউন থেকে যোগ করুন।"
+              ? "কম্বো প্যাকেজ — ভিতরের আইটেমগুলো ড্রপডাউন থেকে যোগ করুন।"
               : "Name, pricing, images, variants and SEO details."
         }
       />

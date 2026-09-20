@@ -192,7 +192,7 @@ function ProductPage() {
   const selectedIds = Object.values(selected);
   const activeVariant =
     variants.find((v) => selectedIds.includes(v.id)) ??
-    (groups.size === 1 ? (variants[0] ?? null) : null);
+    (groups.size === 1 ? (variants.find((variant) => variant.stock > 0) ?? variants[0] ?? null) : null);
   const unitPrice = product.price + Number(activeVariant?.price_delta ?? 0);
   // Catalogue id: variant SKU when a variant is picked, else the product SKU.
   const activeSku = activeVariant?.sku ?? product.sku;
@@ -375,21 +375,29 @@ function ProductPage() {
                       {options.map((opt) => {
                         const label = pick(lang, opt.value_bn, opt.value_en);
                         const isOn = selected[group] === opt.id;
+                        const isOutOfStock = opt.stock <= 0;
                         return (
                           <button
                             key={opt.id}
                             type="button"
-                            onClick={() =>
-                              setSelected((prev) => ({ ...prev, [group]: opt.id }))
-                            }
+                            disabled={isOutOfStock}
+                            aria-pressed={isOn}
+                            aria-label={`${label}${isOutOfStock ? " — Out of stock" : ""}`}
+                            onClick={() => {
+                              if (isOutOfStock) return;
+                              setSelected((prev) => ({ ...prev, [group]: opt.id }));
+                            }}
                             className={cn(
-                              "rounded-sm border px-3.5 py-2 text-sm transition-colors",
+                              "relative isolate overflow-hidden rounded-sm border px-3.5 py-2 text-sm transition-[color,background-color,border-color,box-shadow,transform] duration-200 ease-out motion-reduce:transition-none",
+                              !isOutOfStock && "cursor-pointer hover:-translate-y-0.5 hover:shadow-sm active:translate-y-0 active:scale-[0.97]",
                               isOn
-                                ? "border-primary bg-primary/10 text-primary"
-                                : "border-border bg-card hover:border-primary",
+                                ? "border-primary bg-primary text-primary-foreground shadow-sm"
+                                : "border-border bg-card hover:border-primary hover:bg-primary/5",
+                              isOutOfStock &&
+                                "cursor-not-allowed border-border bg-muted text-muted-foreground opacity-65 after:absolute after:left-[-12%] after:top-1/2 after:h-px after:w-[124%] after:-rotate-[22deg] after:bg-destructive after:content-['']",
                             )}
                           >
-                            {label}
+                            <span className="relative z-10">{label}</span>
                             {Number(opt.price_delta) !== 0 ? (
                               <span className="ml-1 text-xs text-muted-foreground">
                                 {Number(opt.price_delta) > 0 ? "+" : ""}
@@ -479,7 +487,7 @@ function ProductPage() {
             className="group flex items-center justify-between gap-4 rounded-2xl bg-primary px-5 py-4 text-primary-foreground shadow-lg shadow-primary/25 transition-transform hover:scale-[1.02] active:scale-[0.98] sm:px-6"
           >
             <span className="font-solaiman text-lg font-bold leading-snug sm:text-xl">
-              আরও গিফট কম্বো দেখতে
+              আরও পাঞ্জাবি দেখতে
             </span>
             <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary-foreground/20 backdrop-blur-sm transition-transform group-hover:translate-x-1 sm:h-11 sm:w-11">
               <ArrowRight className="h-5 w-5 text-primary-foreground sm:h-6 sm:w-6" />

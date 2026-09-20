@@ -84,10 +84,10 @@ export const t = {
   emptyCart: { bn: "আপনার কার্ট খালি।", en: "Your cart is empty." },
   emptyCartTitle: { bn: "আপনার শপিং কার্ট এখনো খালি", en: "Your cart is still empty" },
   emptyCartBody: {
-    bn: "Panjabi Shop BD থেকে প্রিয়জনের জন্য সেরা গিফট কম্বোটি বেছে নিন।",
-    en: "Pick the perfect gift combo for your loved ones from Panjabi Shop BD.",
+    bn: "Panjabi Shop BD থেকে আপনার পছন্দের পাঞ্জাবিটি বেছে নিন।",
+    en: "Pick your favorite Panjabi from Panjabi Shop BD.",
   },
-  browseGifts: { bn: "গিফট ব্রাউজ করুন", en: "Browse gifts" },
+  browseGifts: { bn: "পাঞ্জাবি দেখুন", en: "Browse Panjabis" },
   continueShopping: { bn: "কেনাকাটা চালিয়ে যান", en: "Continue shopping" },
   downloadInvoice: { bn: "ইনভয়েস ডাউনলোড", en: "Download invoice" },
 

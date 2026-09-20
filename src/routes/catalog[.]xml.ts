@@ -95,7 +95,7 @@ export const Route = createFileRoute("/catalog.xml")({
           "  <channel>",
           "    <title>Panjabi Shop BD Product Catalogue</title>",
           `    <link>${SITE_URL}/</link>`,
-          "    <description>Curated gift combos and gift boxes for every occasion.</description>",
+          "    <description>Premium Panjabis with nationwide cash on delivery in Bangladesh.</description>",
           ...entries,
           "  </channel>",
           "</rss>",
