@@ -893,14 +893,16 @@ export function ProductEditor({ id, kind }: { id: string; kind: ProductKind }) {
                 label="Meta title"
                 value={draft.meta_title ?? ""}
                 onChange={(v) => set("meta_title", v || null)}
-                hint="Keep within 60 characters"
+                maxLength={60}
+                hint="সর্বোচ্চ ৬০ ক্যারেক্টার"
               />
               <AreaField
                 label="Meta description"
                 rows={3}
                 value={draft.meta_description ?? ""}
                 onChange={(v) => set("meta_description", v || null)}
-                hint="Keep within 160 characters"
+                maxLength={160}
+                hint="সর্বোচ্চ ১৬০ ক্যারেক্টার"
               />
             </div>
           </Panel>
