@@ -399,12 +399,19 @@ export function OrdersBoard({
           </div>
         ) : (
           <ul className="divide-y divide-border">
-            {rows.map((o) => (
+            {rows.map((o, rowIndex) => (
 
               <li
                 key={o.id}
                 className="flex flex-wrap items-center justify-between gap-3 px-4 py-3.5 transition-colors duration-200 hover:bg-muted/40"
               >
+                <span
+                  className="flex size-8 shrink-0 items-center justify-center rounded-full border border-border bg-muted text-xs font-bold tabular-nums text-foreground"
+                  aria-label={`Serial number ${(current - 1) * pageSize + rowIndex + 1}`}
+                  title="Serial number"
+                >
+                  {(current - 1) * pageSize + rowIndex + 1}
+                </span>
                 {bulkEnabled ? (
                   <Checkbox
                     checked={selected.includes(o.id)}
