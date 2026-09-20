@@ -122,8 +122,15 @@ export function ActivityLog({ entries }: { entries: ActivityEntry[] }) {
               const actor = actorOf(a.meta);
               const last = idx === visible.length - 1;
               return (
-                <li key={a.id} className="relative flex gap-3 pb-4 last:pb-0">
-                  {!last ? (
+                <li
+                  key={a.id}
+                  className={cn(
+                    "relative flex gap-3 pb-4 last:pb-0",
+                    a.kind === "takeover" &&
+                      "rounded-lg border border-rose-300 bg-rose-50 p-3 pb-3 last:pb-3",
+                  )}
+                >
+                  {!last && a.kind !== "takeover" ? (
                     <span className="absolute left-[13px] top-7 h-[calc(100%-1.25rem)] w-px bg-border" />
                   ) : null}
                   <span
@@ -134,6 +141,7 @@ export function ActivityLog({ entries }: { entries: ActivityEntry[] }) {
                   >
                     <Icon className="size-3.5" />
                   </span>
+
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
                       <span
