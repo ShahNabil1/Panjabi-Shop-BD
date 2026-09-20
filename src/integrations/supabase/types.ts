@@ -2479,7 +2479,6 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      __apply_sql: { Args: { sql: string }; Returns: undefined }
       checkout_incomplete_state: { Args: { _phone: string }; Returns: Json }
       checkout_place_order: {
         Args: {
