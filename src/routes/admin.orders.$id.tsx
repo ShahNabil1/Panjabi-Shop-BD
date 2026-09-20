@@ -293,6 +293,7 @@ function AdminOrderDetail() {
     address_line: string;
     customer_ip: string | null;
     device_fingerprint: string | null;
+    customer_ip_location?: Record<string, unknown> | null;
     delivery_note: string | null;
     note: string | null;
     delivery_partner: string | null;
@@ -776,6 +777,7 @@ function AdminOrderDetail() {
       <SecurityCard
         orderId={order.id}
         blocked={data.blocked}
+        ipLocation={order.customer_ip_location ?? null}
         identifiers={[
           { kind: "ip", value: order.customer_ip },
           { kind: "fingerprint", value: order.device_fingerprint },

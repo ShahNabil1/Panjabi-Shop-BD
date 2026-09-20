@@ -162,7 +162,7 @@ export function CheckoutForm({
     const key = `${s.phone.trim()}|${s.items.map((i) => `${i.productId}:${i.variantId ?? ""}:${i.comboSelections.map((selection) => selection.variantId).join("+")}:${i.quantity}`).join(",")}|${s.name}|${s.address}`;
     if (capturedRef.current === key) return;
     capturedRef.current = key;
-    void captureIncompleteOrder({
+    void getBrowserFingerprint().then((deviceFingerprint) => captureIncompleteOrder({
       data: {
         customerPhone: s.phone.trim(),
         customerName: s.name.trim(),
@@ -173,7 +173,7 @@ export function CheckoutForm({
         note: s.note.trim(),
         source: s.source,
         attribution: getAttribution(),
-        deviceFingerprint: null,
+        deviceFingerprint,
         items: s.items.map((i) => ({
           productId: i.productId,
           variantId: i.variantId,
@@ -190,7 +190,7 @@ export function CheckoutForm({
           ),
         })),
       },
-    }).catch(() => undefined);
+    })).catch(() => undefined);
   };
 
   // Requests fired during `pagehide` are usually killed with the document, so
