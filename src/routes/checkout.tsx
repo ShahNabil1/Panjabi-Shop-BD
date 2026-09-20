@@ -51,7 +51,7 @@ function CheckoutPage() {
 
         <div className="mx-auto max-w-2xl">
           <div className="mb-5 text-center">
-            <h1 className="bg-gradient-to-r from-primary via-primary to-pink-500 bg-clip-text text-transparent text-xl font-bold tracking-tight drop-shadow-sm sm:text-2xl">
+            <h1 className="bg-gradient-to-r from-primary via-primary to-foreground bg-clip-text text-transparent text-xl font-bold tracking-tight drop-shadow-sm sm:text-2xl">
               Checkout
             </h1>
           </div>
@@ -60,7 +60,7 @@ function CheckoutPage() {
               <span className="inline-block h-2 w-2 rounded-full bg-primary shadow-[0_0_8px_var(--color-primary)]" />
               Delivery Information
             </h2>
-            <div className="mx-auto mt-2 h-0.5 w-12 rounded-full bg-gradient-to-r from-primary to-pink-400" />
+            <div className="mx-auto mt-2 h-0.5 w-12 rounded-full bg-gradient-to-r from-primary to-foreground" />
           </div>
           <CheckoutForm
             items={items}

@@ -348,7 +348,7 @@ function ProductPage() {
                   <span className="text-lg text-muted-foreground line-through">
                     {formatPrice(lang, product.compareAtPrice)}
                   </span>
-                  <span className="rounded-full bg-primary px-3 py-1 text-sm font-bold text-white shadow-sm">
+                  <span className="rounded-full bg-primary px-3 py-1 text-sm font-bold text-primary-foreground shadow-sm">
                     {formatNumber(lang, off)}% {tr(lang, "off")}
                   </span>
                 </>
