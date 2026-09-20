@@ -230,7 +230,7 @@ export const getDeliveryRates = createServerFn({ method: "GET" }).handler(async 
   const { createPublicServerClient } = await import("./supabase-public");
   const db = createPublicServerClient();
   const { data } = await db.from("site_settings").select("value").eq("key", "delivery").maybeSingle();
-  return deliveryRates(data?.value);
+  return normalizeDeliveryConfig(data?.value);
 });
 
 export const getOrderSummary = createServerFn({ method: "GET" })
