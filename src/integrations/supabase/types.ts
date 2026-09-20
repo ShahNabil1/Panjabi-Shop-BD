@@ -14,6 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_activity_log: {
+        Row: {
+          action: string
+          actor_email: string | null
+          actor_name: string | null
+          area: string | null
+          created_at: string
+          detail: string | null
+          id: string
+          meta: Json
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          actor_email?: string | null
+          actor_name?: string | null
+          area?: string | null
+          created_at?: string
+          detail?: string | null
+          id?: string
+          meta?: Json
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          actor_email?: string | null
+          actor_name?: string | null
+          area?: string | null
+          created_at?: string
+          detail?: string | null
+          id?: string
+          meta?: Json
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       blocked_identifiers: {
         Row: {
           blocked_by: string | null
@@ -2024,6 +2060,51 @@ export type Database = {
         }
         Relationships: []
       }
+      staff_accounts: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          email: string
+          full_access: boolean
+          full_name: string
+          is_active: boolean
+          last_login_at: string | null
+          note: string | null
+          permissions: string[]
+          phone: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          email: string
+          full_access?: boolean
+          full_name: string
+          is_active?: boolean
+          last_login_at?: string | null
+          note?: string | null
+          permissions?: string[]
+          phone?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          email?: string
+          full_access?: boolean
+          full_name?: string
+          is_active?: boolean
+          last_login_at?: string | null
+          note?: string | null
+          permissions?: string[]
+          phone?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       stock_count_lines: {
         Row: {
           count_id: string
@@ -2529,6 +2610,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_admin_user: { Args: { _user_id: string }; Returns: boolean }
       next_order_number: { Args: never; Returns: string }
       order_receipt: {
         Args: { _order_number: string; _phone: string }
