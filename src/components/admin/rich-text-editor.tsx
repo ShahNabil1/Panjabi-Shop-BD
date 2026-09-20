@@ -261,22 +261,7 @@ function Toolbar({ editor }: { editor: Editor }) {
         <RemoveFormatting className="size-4" />
       </Btn>
 
-      <span className="mx-1 h-5 w-px bg-border" />
 
-      <div className="flex flex-wrap items-center gap-0.5">
-        {EMOJIS.map((e) => (
-          <button
-            key={e}
-            type="button"
-            title={`Insert ${e}`}
-            onMouseDown={(ev) => ev.preventDefault()}
-            onClick={() => editor.chain().focus().insertContent(e).run()}
-            className="inline-flex size-7 items-center justify-center rounded-lg text-base transition-transform hover:scale-125"
-          >
-            {e}
-          </button>
-        ))}
-      </div>
 
       <span className="ml-auto flex items-center gap-1">
         <Btn title="Undo" disabled={!editor.can().undo()} onClick={() => editor.chain().focus().undo().run()}>
