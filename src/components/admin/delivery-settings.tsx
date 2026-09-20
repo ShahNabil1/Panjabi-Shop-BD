@@ -136,7 +136,7 @@ export function DeliverySettingsPanel({
       title: "Remove delivery rule?",
       description: `“${rule.label || "This product"}” will use the site-wide delivery charge again.`,
       confirmLabel: "Remove",
-      destructive: true,
+      tone: "danger",
     });
     if (!ok) return;
     setConfig((prev) => ({ ...prev, rules: prev.rules.filter((r) => r.productId !== rule.productId) }));
