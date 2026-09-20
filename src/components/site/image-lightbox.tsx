@@ -134,13 +134,71 @@ export function ImageLightbox({
     }
   };
 
-  const toggleZoom = () => {
-    setIsZoomed((z) => {
-      const next = !z;
-      setScale(next ? 2 : 1);
-      return next;
-    });
+  const applyScale = (next: number) => {
+    const clamped = Math.min(5, Math.max(1, Number(next.toFixed(3))));
+    setScale(clamped);
+    setIsZoomed(clamped > 1);
+    if (clamped === 1) setOffset({ x: 0, y: 0 });
   };
+
+  const toggleZoom = () => applyScale(scale > 1 ? 1 : 2);
+
+  const onWheel = (e: React.WheelEvent) => {
+    e.preventDefault();
+    applyScale(scale * (e.deltaY < 0 ? 1.15 : 1 / 1.15));
+  };
+
+  const onImgTouchStart = (e: React.TouchEvent) => {
+    if (e.touches.length === 2) {
+      const [a, b] = [e.touches[0]!, e.touches[1]!];
+      pinchRef.current = {
+        dist: Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY),
+        scale,
+      };
+    } else if (e.touches.length === 1 && scale > 1) {
+      dragRef.current = {
+        x: e.touches[0]!.clientX - offset.x,
+        y: e.touches[0]!.clientY - offset.y,
+      };
+    }
+  };
+
+  const onImgTouchMove = (e: React.TouchEvent) => {
+    if (e.touches.length === 2 && pinchRef.current) {
+      e.preventDefault();
+      e.stopPropagation();
+      const [a, b] = [e.touches[0]!, e.touches[1]!];
+      const dist = Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY);
+      applyScale(pinchRef.current.scale * (dist / pinchRef.current.dist));
+    } else if (e.touches.length === 1 && scale > 1 && dragRef.current) {
+      e.stopPropagation();
+      setOffset({
+        x: e.touches[0]!.clientX - dragRef.current.x,
+        y: e.touches[0]!.clientY - dragRef.current.y,
+      });
+    }
+  };
+
+  const onImgTouchEnd = () => {
+    pinchRef.current = null;
+    dragRef.current = null;
+  };
+
+  const onMouseDown = (e: React.MouseEvent) => {
+    if (scale <= 1) return;
+    e.preventDefault();
+    dragRef.current = { x: e.clientX - offset.x, y: e.clientY - offset.y };
+  };
+
+  const onMouseMove = (e: React.MouseEvent) => {
+    if (!dragRef.current || scale <= 1) return;
+    setOffset({ x: e.clientX - dragRef.current.x, y: e.clientY - dragRef.current.y });
+  };
+
+  const endDrag = () => {
+    dragRef.current = null;
+  };
+
 
   const canPrev = index > 0;
   const canNext = index < images.length - 1;
