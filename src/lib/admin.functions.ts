@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { requireAdmin, unwrap } from "./admin.server";
+import { actorName, logActivity, requireAdmin, unwrap } from "./admin.server";
 import {
   adminCreateOrderSchema,
   categorySchema,
@@ -90,7 +90,7 @@ export const adminListOrders = createServerFn({ method: "POST" })
     let q = db
       .from("orders")
       .select(
-        "id, order_number, customer_name, customer_phone, city, total, status, source, customer_ip, created_at, delivery_partner, courier_status, courier_consignment_id, order_consignments(provider, delivery_fee, cod_amount, total_cost, collected_amount, status, payment_invoice_id, paid_at)",
+        "id, order_number, customer_name, customer_phone, city, total, status, source, customer_ip, created_at, created_by, created_by_name, delivery_partner, courier_status, courier_consignment_id, order_consignments(provider, delivery_fee, cod_amount, total_cost, collected_amount, status, payment_invoice_id, paid_at)",
       )
       .order("created_at", { ascending: false })
       .limit(200);
@@ -968,6 +968,7 @@ export const adminCreateOrder = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => adminCreateOrderSchema.parse(input))
   .handler(async ({ data, context }) => {
     const db = await requireAdmin(context.supabase, context.userId);
+    const creator = await actorName(db, context.userId);
 
     const productIds = [...new Set(data.items.map((i) => i.productId))];
     const variantIds = [
@@ -1055,6 +1056,8 @@ export const adminCreateOrder = createServerFn({ method: "POST" })
             ? data.scheduledFor
             : null,
         source: data.source,
+        created_by: context.userId,
+        created_by_name: creator,
       })
       .select("id, order_number")
       .single();
@@ -1075,6 +1078,11 @@ export const adminCreateOrder = createServerFn({ method: "POST" })
       })),
     );
     if (itemsError) throw new Error(itemsError.message);
+
+    await logActivity(db, order.id, "create", `${creator} created this order manually`, {
+      actor: creator,
+      meta: { mode: data.mode },
+    });
 
     return { id: order.id as string, orderNumber: order.order_number as string };
   });
