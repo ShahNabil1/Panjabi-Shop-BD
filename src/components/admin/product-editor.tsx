@@ -430,11 +430,6 @@ export function ProductEditor({ id, kind }: { id: string; kind: ProductKind }) {
             value={draft.compare_at_price ?? 0}
             onChange={(v) => set("compare_at_price", v > 0 ? v : null)}
           />
-          <NumberField
-            label="Sort order"
-            value={draft.sort_order}
-            onChange={(v) => set("sort_order", v)}
-          />
         </div>
       </Panel>
 
