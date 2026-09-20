@@ -82,7 +82,7 @@ export const Route = createFileRoute("/p/$product")({
                 .toISOString()
                 .slice(0, 10),
               itemCondition: "https://schema.org/NewCondition",
-              seller: { "@type": "Organization", name: "উপহারকাব্য" },
+              seller: { "@type": "Organization", name: "Panjabi Shop BD" },
               shippingDetails: {
                 "@type": "OfferShippingDetails",
                 shippingDestination: {

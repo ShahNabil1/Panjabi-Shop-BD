@@ -54,7 +54,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       lang,
       categories: layout.categories,
       gtmId: gtm.gtmId,
-      brand: str(general["brand_name"], "উপহারকাব্য"),
+      brand: str(general["brand_name"], "Panjabi Shop BD"),
       tagline: str(general["tagline"], "গিফট কম্বো ও উপহার সামগ্রী · সারা দেশে ক্যাশ অন ডেলিভারি"),
       contact: {
         phone: str(contactSetting["phone"], ""),
@@ -65,7 +65,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   },
 
   head: ({ loaderData }) => {
-    const brand = loaderData?.brand ?? "উপহারকাব্য";
+    const brand = loaderData?.brand ?? "Panjabi Shop BD";
     return {
       meta: [
         { charSet: "utf-8" },
@@ -78,7 +78,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         {
           name: "description",
           content:
-            "উপহারকাব্য থেকে গিফট কম্বো, উপহার সামগ্রী ও বিশেষ অনুষ্ঠানের কালেকশন কিনুন। সারা দেশে ক্যাশ অন ডেলিভারি উপভোগ করুন।",
+            "Panjabi Shop BD থেকে গিফট কম্বো, উপহার সামগ্রী ও বিশেষ অনুষ্ঠানের কালেকশন কিনুন। সারা দেশে ক্যাশ অন ডেলিভারি উপভোগ করুন।",
         },
         {
           name: "google-site-verification",

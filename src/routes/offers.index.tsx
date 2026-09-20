@@ -16,13 +16,13 @@ export const Route = createFileRoute("/offers/")({
     const url = absoluteUrl("/offers");
     return {
       meta: [
-        { title: "অফার ও ক্যাম্পেইন | Offers — উপহারকাব্য" },
+        { title: "অফার ও ক্যাম্পেইন | Offers — Panjabi Shop BD" },
         {
           name: "description",
           content:
             "চলমান সব অফার, ফ্ল্যাশ সেল আর নতুন কালেকশন এক জায়গায়। ক্যাশ অন ডেলিভারি সারা দেশে।",
         },
-        { property: "og:title", content: "অফার ও ক্যাম্পেইন | Offers — উপহারকাব্য" },
+        { property: "og:title", content: "অফার ও ক্যাম্পেইন | Offers — Panjabi Shop BD" },
         { property: "og:description", content: "চলমান সব অফার আর নতুন কালেকশন এক জায়গায়।" },
         { property: "og:url", content: url },
         { property: "og:type", content: "website" },
