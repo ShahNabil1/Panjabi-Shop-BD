@@ -38,7 +38,6 @@ const SWATCHES = [
   "#db2777",
   "#64748b",
 ];
-const EMOJIS = ["🔥", "✅", "🎁", "⭐", "💯", "🚚", "❤️", "👑", "😍", "✨", "📦", "💥"];
 
 function Btn({
   active,
@@ -262,22 +261,7 @@ function Toolbar({ editor }: { editor: Editor }) {
         <RemoveFormatting className="size-4" />
       </Btn>
 
-      <span className="mx-1 h-5 w-px bg-border" />
 
-      <div className="flex flex-wrap items-center gap-0.5">
-        {EMOJIS.map((e) => (
-          <button
-            key={e}
-            type="button"
-            title={`Insert ${e}`}
-            onMouseDown={(ev) => ev.preventDefault()}
-            onClick={() => editor.chain().focus().insertContent(e).run()}
-            className="inline-flex size-7 items-center justify-center rounded-lg text-base transition-transform hover:scale-125"
-          >
-            {e}
-          </button>
-        ))}
-      </div>
 
       <span className="ml-auto flex items-center gap-1">
         <Btn title="Undo" disabled={!editor.can().undo()} onClick={() => editor.chain().focus().undo().run()}>
@@ -327,14 +311,13 @@ export function RichTextEditor({
     },
   });
 
-  // Load server content once the draft arrives (edit page fetches async).
+  // Keep the editor aligned when an existing row is selected or the form resets.
   useEffect(() => {
     if (!editor) return;
     const incoming = toRichHtml(value);
     const current = editor.getHTML();
-    if (incoming && current === "<p></p>" && incoming !== current) {
-      editor.commands.setContent(incoming, { emitUpdate: false });
-    }
+    const normalizedIncoming = incoming || "<p></p>";
+    if (normalizedIncoming !== current) editor.commands.setContent(normalizedIncoming, { emitUpdate: false });
   }, [editor, value]);
 
   return (
@@ -342,7 +325,7 @@ export function RichTextEditor({
       <Label className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground transition-colors group-focus-within/field:text-primary">
         {label}
       </Label>
-      <div className="overflow-hidden rounded-xl border border-border/80 bg-background/70 transition-all focus-within:border-primary/60 focus-within:ring-2 focus-within:ring-primary/20">
+      <div className="min-w-0 overflow-hidden rounded-xl border border-border/80 bg-background/70 transition-all focus-within:border-primary/60 focus-within:ring-2 focus-within:ring-primary/20">
         {editor ? <Toolbar editor={editor} /> : null}
         <EditorContent editor={editor} className="px-3 py-2.5 text-sm" />
       </div>

@@ -351,9 +351,19 @@ export const adminSaveCategory = createServerFn({ method: "POST" })
       const others = (existing.data ?? []).filter((c) => c.id !== id);
       if (others.length >= 4) throw new Error("Maximum 4 featured categories allowed");
     }
+    let payload = rest;
+    if (!id) {
+      const { data: last } = await db
+        .from("categories")
+        .select("sort_order")
+        .order("sort_order", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      payload = { ...rest, sort_order: Number(last?.sort_order ?? -1) + 1 };
+    }
     const res = id
-      ? await db.from("categories").update(rest).eq("id", id).select("id").single()
-      : await db.from("categories").insert(rest).select("id").single();
+      ? await db.from("categories").update(payload).eq("id", id).select("id").single()
+      : await db.from("categories").insert(payload).select("id").single();
     if (res.error) throw new Error(res.error.message);
     return res.data;
   });
@@ -383,15 +393,42 @@ export const adminToggleCategoryActive = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+export const adminReorderCategories = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z.object({ ids: z.array(z.string().uuid()).max(200) }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const db = await requireAdmin(context.supabase, context.userId);
+    for (let i = 0; i < data.ids.length; i += 1) {
+      const { error } = await db
+        .from("categories")
+        .update({ sort_order: i })
+        .eq("id", data.ids[i] as string);
+      if (error) throw new Error(error.message);
+    }
+    return { ok: true, count: data.ids.length };
+  });
+
 export const adminSaveSubcategory = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => subcategorySchema.parse(mirrorLang(input)))
   .handler(async ({ data, context }) => {
     const db = await requireAdmin(context.supabase, context.userId);
     const { id, ...rest } = data;
+    let payload = rest;
+    if (!id) {
+      const { data: last } = await db
+        .from("subcategories")
+        .select("sort_order")
+        .order("sort_order", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      payload = { ...rest, sort_order: Number(last?.sort_order ?? -1) + 1 };
+    }
     const res = id
-      ? await db.from("subcategories").update(rest).eq("id", id).select("id").single()
-      : await db.from("subcategories").insert(rest).select("id").single();
+      ? await db.from("subcategories").update(payload).eq("id", id).select("id").single()
+      : await db.from("subcategories").insert(payload).select("id").single();
     if (res.error) throw new Error(res.error.message);
     return res.data;
   });
@@ -404,6 +441,23 @@ export const adminDeleteSubcategory = createServerFn({ method: "POST" })
     const { error } = await db.from("subcategories").delete().eq("id", data.id);
     if (error) throw new Error(error.message);
     return { ok: true };
+  });
+
+export const adminReorderSubcategories = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z.object({ ids: z.array(z.string().uuid()).max(500) }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const db = await requireAdmin(context.supabase, context.userId);
+    for (let i = 0; i < data.ids.length; i += 1) {
+      const { error } = await db
+        .from("subcategories")
+        .update({ sort_order: i })
+        .eq("id", data.ids[i] as string);
+      if (error) throw new Error(error.message);
+    }
+    return { ok: true, count: data.ids.length };
   });
 
 /** Hidden internal category that holds every combo sub-item. */

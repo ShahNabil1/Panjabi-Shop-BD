@@ -76,12 +76,16 @@ function FaqSeoPanel() {
         label="Meta title"
         value={seo.meta_title}
         onChange={(v) => setSeo({ ...seo, meta_title: v })}
+        maxLength={60}
+        hint="সর্বোচ্চ ৬০ ক্যারেক্টার"
       />
       <AreaField
         label="Meta description"
         rows={3}
         value={seo.meta_description}
         onChange={(v) => setSeo({ ...seo, meta_description: v })}
+        maxLength={160}
+        hint="সর্বোচ্চ ১৬০ ক্যারেক্টার"
       />
       <div className="space-y-2">
         <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">

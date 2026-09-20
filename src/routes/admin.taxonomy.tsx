@@ -1,71 +1,67 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useConfirm } from "@/components/ui/confirm-dialog";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { Eye, EyeOff, FolderTree, Layers, Pencil, Trash2, X } from "lucide-react";
+import {
+  ArrowDown,
+  ArrowUp,
+  Eye,
+  EyeOff,
+  FolderTree,
+  GripVertical,
+  Layers,
+  Pencil,
+  Trash2,
+  X,
+} from "lucide-react";
 
 import {
   adminDeleteCategory,
   adminDeleteSubcategory,
+  adminReorderCategories,
+  adminReorderSubcategories,
   adminSaveCategory,
   adminSaveSubcategory,
   adminTaxonomy,
   adminToggleCategoryActive,
 } from "@/lib/admin.functions";
 import type { CategoryInput, SubcategoryInput } from "@/lib/admin-schema";
-import {
-  AdminHeading,
-  EmptyState,
-  Field,
-  NumberField,
-  Panel,
-  TextField,
-  ToggleField,
-} from "@/components/admin/kit";
+import { AdminHeading, AreaField, EmptyState, Field, Panel, TextField, ToggleField } from "@/components/admin/kit";
+import { RichTextEditor } from "@/components/admin/rich-text-editor";
 import { BrandLoader } from "@/components/admin/brand-loader";
 import { ImageField } from "@/components/admin/image-upload";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-export const Route = createFileRoute("/admin/taxonomy")({
-  component: TaxonomyPage,
-});
+export const Route = createFileRoute("/admin/taxonomy")({ component: TaxonomyPage });
+
+type TaxonomyRow = {
+  id: string;
+  slug: string;
+  name_bn: string;
+  name_en: string;
+  category_id?: string;
+  is_active: boolean;
+  is_featured?: boolean;
+  show_in_header?: boolean;
+};
 
 function slugify(input: string) {
-  return input
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9\u0980-\u09FF]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .slice(0, 80);
+  return input.toLowerCase().trim().replace(/[^a-z0-9\u0980-\u09FF]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 80);
 }
 
 function emptyCategory(): CategoryInput {
   return {
-    slug: "",
-    name_bn: "",
-    name_en: "",
-    description_bn: null,
-    description_en: null,
-    image_url: null,
-    meta_title: null,
-    meta_description: null,
-    sort_order: 0,
-    is_active: true,
-    is_featured: false,
-    show_in_header: true,
+    slug: "", name_bn: "", name_en: "", description_bn: null, description_en: null,
+    image_url: null, meta_title: null, meta_description: null, sort_order: 0,
+    is_active: true, is_featured: false, show_in_header: true,
   };
 }
 
-function toCategoryDraft(c: any): CategoryInput {
+function toCategoryDraft(row: unknown): CategoryInput {
+  const c = row as CategoryInput;
   return {
     ...c,
     name_bn: c.name_bn || c.name_en || "",
@@ -75,261 +71,136 @@ function toCategoryDraft(c: any): CategoryInput {
   };
 }
 
-function toSubcategoryDraft(s: any): SubcategoryInput {
+function toSubcategoryDraft(row: unknown): SubcategoryInput {
+  const s = row as SubcategoryInput;
   return {
     ...s,
     name_bn: s.name_bn || s.name_en || "",
     name_en: s.name_bn || s.name_en || "",
+    description_bn: s.description_bn ?? s.description_en ?? null,
+    description_en: s.description_bn ?? s.description_en ?? null,
   };
+}
+
+function moveId(ids: string[], id: string, targetId: string) {
+  const from = ids.indexOf(id);
+  const to = ids.indexOf(targetId);
+  if (from < 0 || to < 0 || from === to) return ids;
+  const next = ids.slice();
+  next.splice(from, 1);
+  next.splice(to, 0, id);
+  return next;
+}
+
+function moveBy(ids: string[], id: string, amount: number) {
+  const from = ids.indexOf(id);
+  const to = from + amount;
+  if (from < 0 || to < 0 || to >= ids.length) return ids;
+  return moveId(ids, id, ids[to] as string);
+}
+
+function SortControls({ id, ids, onMove }: { id: string; ids: string[]; onMove: (next: string[]) => void }) {
+  const index = ids.indexOf(id);
+  return (
+    <div className="flex shrink-0 items-center gap-1 sm:hidden">
+      <Button size="icon" variant="ghost" title="Move up" disabled={index <= 0} onClick={() => onMove(moveBy(ids, id, -1))}>
+        <ArrowUp className="size-4" />
+      </Button>
+      <Button size="icon" variant="ghost" title="Move down" disabled={index < 0 || index >= ids.length - 1} onClick={() => onMove(moveBy(ids, id, 1))}>
+        <ArrowDown className="size-4" />
+      </Button>
+    </div>
+  );
 }
 
 function TaxonomyPage() {
   const qc = useQueryClient();
   const confirmDialog = useConfirm();
-  const { data, isLoading } = useQuery({
-    queryKey: ["admin", "taxonomy"],
-    queryFn: () => adminTaxonomy(),
-  });
+  const { data, isLoading } = useQuery({ queryKey: ["admin", "taxonomy"], queryFn: () => adminTaxonomy() });
   const [cat, setCat] = useState<CategoryInput>(emptyCategory());
   const [sub, setSub] = useState<SubcategoryInput>({ ...emptyCategory(), category_id: "" });
+  const [categoryOrder, setCategoryOrder] = useState<string[]>([]);
+  const [subcategoryOrder, setSubcategoryOrder] = useState<string[]>([]);
+  const dragId = useRef<string | null>(null);
+  const [overId, setOverId] = useState<string | null>(null);
 
-  const allCats = (data?.categories ?? []) as any[];
-  const featuredCount = allCats.filter((c) => c.is_featured).length;
-  const isCurrentFeatured = Boolean(cat.id && allCats.find((c) => c.id === cat.id)?.is_featured);
+  const categories = (data?.categories ?? []) as TaxonomyRow[];
+  const subcategories = (data?.subcategories ?? []) as TaxonomyRow[];
+  useEffect(() => setCategoryOrder(categories.map((row) => row.id)), [data?.categories]);
+  useEffect(() => setSubcategoryOrder(subcategories.map((row) => row.id)), [data?.subcategories]);
 
+  const orderedCategories = categoryOrder.map((id) => categories.find((row) => row.id === id)).filter((row): row is TaxonomyRow => Boolean(row));
+  const orderedSubcategories = subcategoryOrder.map((id) => subcategories.find((row) => row.id === id)).filter((row): row is TaxonomyRow => Boolean(row));
+  const featuredCount = categories.filter((row) => row.is_featured).length;
+  const isCurrentFeatured = Boolean(cat.id && categories.find((row) => row.id === cat.id)?.is_featured);
   const refresh = () => qc.invalidateQueries({ queryKey: ["admin"] });
 
   const saveCat = useMutation({
     mutationFn: (input: CategoryInput) => adminSaveCategory({ data: input }),
-    onSuccess: async () => {
-      toast.success("Category saved");
-      setCat(emptyCategory());
-      await refresh();
-    },
-    onError: (e: Error) => toast.error(e.message),
-  });
-  const delCat = useMutation({
-    mutationFn: (id: string) => adminDeleteCategory({ data: { id } }),
-    onSuccess: async () => {
-      toast.success("Deleted");
-      await refresh();
-    },
-    onError: (e: Error) => toast.error(e.message),
-  });
-  const toggleCat = useMutation({
-    mutationFn: ({ id, is_active }: { id: string; is_active: boolean }) =>
-      adminToggleCategoryActive({ data: { id, is_active } }),
-    onSuccess: async (_, vars) => {
-      toast.success(vars.is_active ? "Category page visible" : "Category page hidden");
-      await refresh();
-    },
+    onSuccess: async () => { toast.success("Category saved"); setCat(emptyCategory()); await refresh(); },
     onError: (e: Error) => toast.error(e.message),
   });
   const saveSub = useMutation({
     mutationFn: (input: SubcategoryInput) => adminSaveSubcategory({ data: input }),
-    onSuccess: async () => {
-      toast.success("Subcategory saved");
-      setSub({ ...emptyCategory(), category_id: sub.category_id });
-      await refresh();
-    },
+    onSuccess: async () => { toast.success("Subcategory saved"); setSub({ ...emptyCategory(), category_id: sub.category_id }); await refresh(); },
     onError: (e: Error) => toast.error(e.message),
   });
-  const delSub = useMutation({
-    mutationFn: (id: string) => adminDeleteSubcategory({ data: { id } }),
-    onSuccess: async () => {
-      toast.success("Deleted");
-      await refresh();
-    },
+  const delCat = useMutation({ mutationFn: (id: string) => adminDeleteCategory({ data: { id } }), onSuccess: async () => { toast.success("Deleted"); await refresh(); }, onError: (e: Error) => toast.error(e.message) });
+  const delSub = useMutation({ mutationFn: (id: string) => adminDeleteSubcategory({ data: { id } }), onSuccess: async () => { toast.success("Deleted"); await refresh(); }, onError: (e: Error) => toast.error(e.message) });
+  const toggleCat = useMutation({
+    mutationFn: ({ id, is_active }: { id: string; is_active: boolean }) => adminToggleCategoryActive({ data: { id, is_active } }),
+    onSuccess: async (_, variables) => { toast.success(variables.is_active ? "Category page visible" : "Category page hidden"); await refresh(); },
     onError: (e: Error) => toast.error(e.message),
   });
+  const reorderCats = useMutation({
+    mutationFn: (ids: string[]) => adminReorderCategories({ data: { ids } }),
+    onSuccess: async () => { toast.success("Category order saved"); await refresh(); },
+    onError: async (e: Error) => { toast.error(e.message); await refresh(); },
+  });
+  const reorderSubs = useMutation({
+    mutationFn: (ids: string[]) => adminReorderSubcategories({ data: { ids } }),
+    onSuccess: async () => { toast.success("Subcategory order saved"); await refresh(); },
+    onError: async (e: Error) => { toast.error(e.message); await refresh(); },
+  });
+
+  function commitCategoryOrder(next: string[]) { setCategoryOrder(next); reorderCats.mutate(next); }
+  function commitSubcategoryOrder(next: string[]) { setSubcategoryOrder(next); reorderSubs.mutate(next); }
 
   return (
-    <div className="space-y-6 pb-16">
-      <AdminHeading
-        title="Categories & Subcategories"
-        description="Manage the store's navigation structure."
-      />
+    <div className="min-w-0 space-y-6 pb-16">
+      <AdminHeading title="Categories & Subcategories" description="Manage the store's navigation structure." />
 
-      <div className="grid gap-5 lg:grid-cols-2">
-        <Panel className="space-y-4">
-          <h2 className="flex items-center gap-2 text-sm font-bold">
-            <FolderTree className="size-4 text-primary" />
-            {cat.id ? "Edit category" : "New category"}
-          </h2>
-          <div className="grid gap-3 sm:grid-cols-2">
-            <TextField
-              label="Name"
-              value={cat.name_bn}
-              onChange={(v) =>
-                setCat({
-                  ...cat,
-                  name_bn: v,
-                  name_en: v,
-                  slug: cat.slug || slugify(v),
-                })
-              }
-            />
-            <TextField
-              label="Slug"
-              value={cat.slug}
-              onChange={(v) => setCat({ ...cat, slug: slugify(v) })}
-            />
-            <NumberField
-              label="Sort order"
-              value={cat.sort_order}
-              onChange={(v) => setCat({ ...cat, sort_order: v })}
-            />
-            <TextField
-              label="Meta title"
-              value={cat.meta_title ?? ""}
-              onChange={(v) => setCat({ ...cat, meta_title: v || null })}
-            />
-            <ImageField
-              cropPreset="card"
-              label="Category image"
-              folder="categories"
-              value={cat.image_url}
-              onChange={(v) => setCat({ ...cat, image_url: v })}
-              hint="আপলোড বা Crop চাপলে অ্যাডভান্স ক্রপ টুল খুলবে — কার্ড (4:5), স্কয়ার, 3:4 বা ওয়াইড রেশিও, জুম/ড্র্যাগ ও ডেস্কটপ-মোবাইল লাইভ প্রিভিউসহ।"
-            />
+      <div className="grid min-w-0 gap-5 xl:grid-cols-2">
+        <Panel className="min-w-0 space-y-4 overflow-hidden">
+          <h2 className="flex items-center gap-2 text-sm font-bold"><FolderTree className="size-4 text-primary" />{cat.id ? "Edit category" : "New category"}</h2>
+          <div className="grid min-w-0 gap-3 sm:grid-cols-2">
+            <TextField label="Name" value={cat.name_bn} onChange={(value) => setCat({ ...cat, name_bn: value, name_en: value, slug: cat.slug || slugify(value) })} />
+            <TextField label="Slug" value={cat.slug} onChange={(value) => setCat({ ...cat, slug: slugify(value) })} />
+            <TextField label="Meta title" value={cat.meta_title ?? ""} onChange={(value) => setCat({ ...cat, meta_title: value || null })} maxLength={60} hint="সর্বোচ্চ ৬০ ক্যারেক্টার" />
+            <ImageField cropPreset="card" label="Category image" folder="categories" value={cat.image_url} onChange={(value) => setCat({ ...cat, image_url: value })} hint="আপলোড বা Crop চাপলে অ্যাডভান্স ক্রপ টুল খুলবে।" />
           </div>
-          <Field label="Description">
-            <textarea
-              className="min-h-[84px] w-full rounded-xl border border-border/80 bg-background/70 p-3 text-sm transition-all duration-200 focus-visible:border-primary/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/25"
-              rows={3}
-              value={cat.description_bn ?? ""}
-              onChange={(e) =>
-                setCat({
-                  ...cat,
-                  description_bn: e.target.value || null,
-                  description_en: e.target.value || null,
-                })
-              }
-            />
-          </Field>
-          <Field label="Meta description">
-            <textarea
-              className="min-h-[64px] w-full rounded-xl border border-border/80 bg-background/70 p-3 text-sm transition-all duration-200 focus-visible:border-primary/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/25"
-              rows={2}
-              maxLength={160}
-              placeholder="50–160 characters, shown in Google & social previews"
-              value={cat.meta_description ?? ""}
-              onChange={(e) => setCat({ ...cat, meta_description: e.target.value || null })}
-            />
-          </Field>
+          <RichTextEditor label="Description" value={cat.description_bn ?? ""} minHeight={150} onChange={(value) => setCat({ ...cat, description_bn: value || null, description_en: value || null })} />
+          <AreaField label="Meta description" rows={3} value={cat.meta_description ?? ""} onChange={(value) => setCat({ ...cat, meta_description: value || null })} maxLength={160} hint="সর্বোচ্চ ১৬০ ক্যারেক্টার" />
           <div className="grid gap-2 sm:grid-cols-3">
-            <ToggleField
-              label="Active"
-              checked={cat.is_active}
-              onChange={(v) => setCat({ ...cat, is_active: v })}
-            />
-            <ToggleField
-              label={`Featured (${featuredCount}/4)`}
-              checked={cat.is_featured}
-              onChange={(v) => {
-                if (v && featuredCount >= 4 && !isCurrentFeatured) {
-                  toast.error("Maximum 4 featured categories allowed");
-                  return;
-                }
-                setCat({ ...cat, is_featured: v });
-              }}
-            />
-            <ToggleField
-              label="Show on hero section"
-              checked={cat.show_in_header}
-              onChange={(v) => setCat({ ...cat, show_in_header: v })}
-            />
+            <ToggleField label="Active" checked={cat.is_active} onChange={(value) => setCat({ ...cat, is_active: value })} />
+            <ToggleField label={`Featured (${featuredCount}/4)`} checked={cat.is_featured} onChange={(value) => { if (value && featuredCount >= 4 && !isCurrentFeatured) { toast.error("Maximum 4 featured categories allowed"); return; } setCat({ ...cat, is_featured: value }); }} />
+            <ToggleField label="Show on hero section" checked={cat.show_in_header} onChange={(value) => setCat({ ...cat, show_in_header: value })} />
           </div>
-          <div className="flex gap-2 pt-1">
-            <Button
-              loading={saveCat.isPending}
-              onClick={() => saveCat.mutate(cat)}
-              className="ig-gradient transition-transform duration-300 hover:scale-[1.02]"
-            >
-              Save
-            </Button>
-            {cat.id ? (
-              <Button variant="outline" onClick={() => setCat(emptyCategory())}>
-                <X className="mr-1 size-4" />
-                Cancel
-              </Button>
-            ) : null}
+          <div className="grid grid-cols-2 gap-2 pt-1 sm:flex">
+            <Button loading={saveCat.isPending} onClick={() => saveCat.mutate(cat)} className="ig-gradient">Save</Button>
+            {cat.id ? <Button variant="outline" onClick={() => setCat(emptyCategory())}><X className="mr-1 size-4" />Cancel</Button> : null}
           </div>
         </Panel>
 
-        <Panel className="p-0">
-          <h2 className="border-b border-border p-4 text-sm font-bold">Categories</h2>
-          {isLoading ? (
-            <BrandLoader size="md" className="py-6" />
-          ) : (data?.categories ?? []).length === 0 ? (
-            <div className="p-4">
-              <EmptyState title="No categories yet" hint="Create your first category on the left." />
-            </div>
-          ) : (
+        <Panel className="min-w-0 overflow-hidden p-0">
+          <div className="border-b border-border p-4"><h2 className="text-sm font-bold">Categories</h2></div>
+          {isLoading ? <BrandLoader size="md" className="py-6" /> : orderedCategories.length === 0 ? <div className="p-4"><EmptyState title="No categories yet" /></div> : (
             <ul className="divide-y divide-border">
-              {(data?.categories ?? []).map((c, i) => (
-                <li
-                  key={c.id}
-                  className={cn(
-                    "admin-rise group flex items-center gap-2 px-4 py-3 text-sm transition-colors duration-300 hover:bg-primary/5",
-                    !c.is_active && "bg-muted/40 text-muted-foreground",
-                  )}
-                  style={{ animationDelay: `${i * 30}ms` }}
-                >
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate font-semibold">{c.name_bn || c.name_en}</p>
-                    <p className="truncate text-xs text-muted-foreground">/c/{c.slug}</p>
-                  </div>
-                  <div className="flex items-center gap-1 opacity-70 transition-opacity duration-200 group-hover:opacity-100">
-                    <span
-                      className={cn(
-                        "rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide",
-                        c.is_active
-                          ? "bg-emerald-100 text-emerald-700"
-                          : "bg-amber-100 text-amber-700",
-                      )}
-                    >
-                      {c.is_active ? "Visible" : "Hidden"}
-                    </span>
-                    {(c as any).is_featured ? (
-                      <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-primary">
-                        Featured
-                      </span>
-                    ) : null}
-                    {(c as any).show_in_header ? (
-                      <span className="rounded-full bg-sky-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-sky-700">
-                        Hero
-                      </span>
-                    ) : null}
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      title={c.is_active ? "Hide page" : "Show page"}
-                      loading={toggleCat.isPending && toggleCat.variables?.id === c.id}
-                      onClick={() => toggleCat.mutate({ id: c.id, is_active: !c.is_active })}
-                    >
-                      {c.is_active ? <EyeOff className="size-3.5" /> : <Eye className="size-3.5" />}
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => setCat(toCategoryDraft(c))}
-                    >
-                      <Pencil className="size-3.5" />
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => {
-                        void confirmDialog({
-                          title: "Delete this category?",
-                          description: "Products under it will lose this category.",
-                        }).then((ok) => ok && delCat.mutate(c.id));
-                      }}
-                    >
-                      <Trash2 className="size-3.5" />
-                    </Button>
-                  </div>
+              {orderedCategories.map((row) => (
+                <li key={row.id} draggable onDragStart={() => { dragId.current = row.id; setOverId(row.id); }} onDragOver={(event) => { event.preventDefault(); setOverId(row.id); }} onDragEnd={() => { dragId.current = null; setOverId(null); }} onDrop={(event) => { event.preventDefault(); const from = dragId.current; if (from) commitCategoryOrder(moveId(categoryOrder, from, row.id)); dragId.current = null; setOverId(null); }} className={cn("grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 px-3 py-3 text-sm transition-colors hover:bg-primary/5 sm:px-4", overId === row.id && dragId.current !== row.id && "bg-primary/10", !row.is_active && "bg-muted/40 text-muted-foreground")}>
+                  <GripVertical className="hidden size-4 cursor-grab text-muted-foreground sm:block" />
+                  <div className="min-w-0"><p className="truncate font-semibold">{row.name_bn || row.name_en}</p><p className="truncate text-xs text-muted-foreground">/c/{row.slug}</p><div className="mt-1 flex flex-wrap gap-1"><span className={cn("rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase", row.is_active ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700")}>{row.is_active ? "Visible" : "Hidden"}</span>{row.is_featured ? <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold uppercase text-primary">Featured</span> : null}{row.show_in_header ? <span className="rounded-full bg-sky-100 px-2 py-0.5 text-[10px] font-semibold uppercase text-sky-700">Hero</span> : null}</div></div>
+                  <div className="flex shrink-0 flex-col items-end gap-1 sm:flex-row sm:items-center"><SortControls id={row.id} ids={categoryOrder} onMove={commitCategoryOrder} /><div className="flex gap-1"><Button size="icon" variant="outline" title={row.is_active ? "Hide page" : "Show page"} loading={toggleCat.isPending && toggleCat.variables?.id === row.id} onClick={() => toggleCat.mutate({ id: row.id, is_active: !row.is_active })}>{row.is_active ? <EyeOff className="size-3.5" /> : <Eye className="size-3.5" />}</Button><Button size="icon" variant="outline" title="Edit" onClick={() => setCat(toCategoryDraft(row))}><Pencil className="size-3.5" /></Button><Button size="icon" variant="ghost" title="Delete" onClick={() => { void confirmDialog({ title: "Delete this category?", description: "Products under it will lose this category." }).then((ok) => ok && delCat.mutate(row.id)); }}><Trash2 className="size-3.5" /></Button></div></div>
                 </li>
               ))}
             </ul>
@@ -337,160 +208,33 @@ function TaxonomyPage() {
         </Panel>
       </div>
 
-      <div className="grid gap-5 lg:grid-cols-2">
-        <Panel className="space-y-4">
-          <h2 className="flex items-center gap-2 text-sm font-bold">
-            <Layers className="size-4 text-primary" />
-            {sub.id ? "Edit subcategory" : "New subcategory"}
-          </h2>
-          <Field label="Parent category">
-            <Select
-              value={sub.category_id || "none"}
-              onValueChange={(v) => setSub({ ...sub, category_id: v === "none" ? "" : v })}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="none">Select</SelectItem>
-                {(data?.categories ?? []).map((c) => (
-                  <SelectItem key={c.id} value={c.id}>
-                    {c.name_bn || c.name_en}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </Field>
-          <div className="grid gap-3 sm:grid-cols-2">
-            <TextField
-              label="Name"
-              value={sub.name_bn}
-              onChange={(v) =>
-                setSub({
-                  ...sub,
-                  name_bn: v,
-                  name_en: v,
-                  slug: sub.slug || slugify(v),
-                })
-              }
-            />
-            <TextField
-              label="Slug"
-              value={sub.slug}
-              onChange={(v) => setSub({ ...sub, slug: slugify(v) })}
-            />
-            <NumberField
-              label="Sort order"
-              value={sub.sort_order}
-              onChange={(v) => setSub({ ...sub, sort_order: v })}
-            />
-            <TextField
-              label="Meta title"
-              value={sub.meta_title ?? ""}
-              onChange={(v) => setSub({ ...sub, meta_title: v || null })}
-            />
-            <ImageField
-              cropPreset="card"
-              label="Subcategory image (used as OG preview)"
-              folder="categories"
-              value={sub.image_url}
-              onChange={(v) => setSub({ ...sub, image_url: v })}
-            />
+      <div className="grid min-w-0 gap-5 xl:grid-cols-2">
+        <Panel className="min-w-0 space-y-4 overflow-hidden">
+          <h2 className="flex items-center gap-2 text-sm font-bold"><Layers className="size-4 text-primary" />{sub.id ? "Edit subcategory" : "New subcategory"}</h2>
+          <Field label="Parent category"><Select value={sub.category_id || "none"} onValueChange={(value) => setSub({ ...sub, category_id: value === "none" ? "" : value })}><SelectTrigger className="w-full"><SelectValue placeholder="Select" /></SelectTrigger><SelectContent><SelectItem value="none">Select</SelectItem>{categories.map((row) => <SelectItem key={row.id} value={row.id}>{row.name_bn || row.name_en}</SelectItem>)}</SelectContent></Select></Field>
+          <div className="grid min-w-0 gap-3 sm:grid-cols-2">
+            <TextField label="Name" value={sub.name_bn} onChange={(value) => setSub({ ...sub, name_bn: value, name_en: value, slug: sub.slug || slugify(value) })} />
+            <TextField label="Slug" value={sub.slug} onChange={(value) => setSub({ ...sub, slug: slugify(value) })} />
+            <TextField label="Meta title" value={sub.meta_title ?? ""} onChange={(value) => setSub({ ...sub, meta_title: value || null })} maxLength={60} hint="সর্বোচ্চ ৬০ ক্যারেক্টার" />
+            <ImageField cropPreset="card" label="Subcategory image (used as OG preview)" folder="categories" value={sub.image_url} onChange={(value) => setSub({ ...sub, image_url: value })} />
           </div>
-          <Field label="Meta description">
-            <textarea
-              className="min-h-[64px] w-full rounded-xl border border-border/80 bg-background/70 p-3 text-sm transition-all duration-200 focus-visible:border-primary/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/25"
-              rows={2}
-              maxLength={160}
-              placeholder="50–160 characters, shown in Google & social previews"
-              value={sub.meta_description ?? ""}
-              onChange={(e) => setSub({ ...sub, meta_description: e.target.value || null })}
-            />
-          </Field>
-          <Field label="Description">
-            <textarea
-              className="min-h-[84px] w-full rounded-xl border border-border/80 bg-background/70 p-3 text-sm transition-all duration-200 focus-visible:border-primary/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/25"
-              rows={3}
-              value={sub.description_bn ?? ""}
-              onChange={(e) =>
-                setSub({
-                  ...sub,
-                  description_bn: e.target.value || null,
-                  description_en: e.target.value || null,
-                })
-              }
-            />
-          </Field>
-          <ToggleField
-            label="Active"
-            checked={sub.is_active}
-            onChange={(v) => setSub({ ...sub, is_active: v })}
-          />
-          <div className="flex gap-2 pt-1">
-            <Button
-              loading={saveSub.isPending}
-              onClick={() => saveSub.mutate(sub)}
-              className="ig-gradient transition-transform duration-300 hover:scale-[1.02]"
-            >
-              Save
-            </Button>
-            {sub.id ? (
-              <Button
-                variant="outline"
-                onClick={() => setSub({ ...emptyCategory(), category_id: sub.category_id })}
-              >
-                <X className="mr-1 size-4" />
-                Cancel
-              </Button>
-            ) : null}
-          </div>
+          <RichTextEditor label="Description" value={sub.description_bn ?? ""} minHeight={150} onChange={(value) => setSub({ ...sub, description_bn: value || null, description_en: value || null })} />
+          <AreaField label="Meta description" rows={3} value={sub.meta_description ?? ""} onChange={(value) => setSub({ ...sub, meta_description: value || null })} maxLength={160} hint="সর্বোচ্চ ১৬০ ক্যারেক্টার" />
+          <ToggleField label="Active" checked={sub.is_active} onChange={(value) => setSub({ ...sub, is_active: value })} />
+          <div className="grid grid-cols-2 gap-2 pt-1 sm:flex"><Button loading={saveSub.isPending} onClick={() => saveSub.mutate(sub)} className="ig-gradient">Save</Button>{sub.id ? <Button variant="outline" onClick={() => setSub({ ...emptyCategory(), category_id: sub.category_id })}><X className="mr-1 size-4" />Cancel</Button> : null}</div>
         </Panel>
 
-        <Panel className="p-0">
-          <h2 className="border-b border-border p-4 text-sm font-bold">Subcategories</h2>
-          {(data?.subcategories ?? []).length === 0 ? (
-            <div className="p-4">
-              <EmptyState title="No subcategories yet" />
-            </div>
-          ) : (
+        <Panel className="min-w-0 overflow-hidden p-0">
+          <div className="border-b border-border p-4"><h2 className="text-sm font-bold">Subcategories</h2></div>
+          {orderedSubcategories.length === 0 ? <div className="p-4"><EmptyState title="No subcategories yet" /></div> : (
             <ul className="divide-y divide-border">
-              {(data?.subcategories ?? []).map((s, i) => {
-                const parent = (data?.categories ?? []).find((c) => c.id === s.category_id);
-                return (
-                  <li
-                    key={s.id}
-                    className="admin-rise group flex items-center gap-2 px-4 py-3 text-sm transition-colors duration-300 hover:bg-primary/5"
-                    style={{ animationDelay: `${i * 30}ms` }}
-                  >
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate font-semibold">{s.name_bn || s.name_en}</p>
-                      <p className="truncate text-xs text-muted-foreground">
-                        /c/{parent?.slug ?? "?"}/{s.slug}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-1 opacity-70 transition-opacity duration-200 group-hover:opacity-100">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => setSub(toSubcategoryDraft(s))}
-                      >
-                        <Pencil className="size-3.5" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => {
-                          void confirmDialog({
-                            title: "Delete this subcategory?",
-                            description: "Products under it will lose this subcategory.",
-                          }).then((ok) => ok && delSub.mutate(s.id));
-                        }}
-                      >
-                        <Trash2 className="size-3.5" />
-                      </Button>
-                    </div>
-                  </li>
-                );
+              {orderedSubcategories.map((row) => {
+                const parent = categories.find((category) => category.id === row.category_id);
+                return <li key={row.id} draggable onDragStart={() => { dragId.current = row.id; setOverId(row.id); }} onDragOver={(event) => { event.preventDefault(); setOverId(row.id); }} onDragEnd={() => { dragId.current = null; setOverId(null); }} onDrop={(event) => { event.preventDefault(); const from = dragId.current; if (from) commitSubcategoryOrder(moveId(subcategoryOrder, from, row.id)); dragId.current = null; setOverId(null); }} className={cn("grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 px-3 py-3 text-sm transition-colors hover:bg-primary/5 sm:px-4", overId === row.id && dragId.current !== row.id && "bg-primary/10")}>
+                  <GripVertical className="hidden size-4 cursor-grab text-muted-foreground sm:block" />
+                  <div className="min-w-0"><p className="truncate font-semibold">{row.name_bn || row.name_en}</p><p className="truncate text-xs text-muted-foreground">/c/{parent?.slug ?? "?"}/{row.slug}</p></div>
+                  <div className="flex shrink-0 flex-col items-end gap-1 sm:flex-row sm:items-center"><SortControls id={row.id} ids={subcategoryOrder} onMove={commitSubcategoryOrder} /><div className="flex gap-1"><Button size="icon" variant="outline" title="Edit" onClick={() => setSub(toSubcategoryDraft(row))}><Pencil className="size-3.5" /></Button><Button size="icon" variant="ghost" title="Delete" onClick={() => { void confirmDialog({ title: "Delete this subcategory?", description: "Products under it will lose this subcategory." }).then((ok) => ok && delSub.mutate(row.id)); }}><Trash2 className="size-3.5" /></Button></div></div>
+                </li>;
               })}
             </ul>
           )}

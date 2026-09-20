@@ -7,7 +7,9 @@ import { pick, tr } from "@/lib/i18n";
 import { ProductGrid } from "@/components/site/product-card";
 import { NotFoundView } from "@/components/site/not-found-view";
 import { absoluteUrl, pageTitle } from "@/lib/site";
-import { Breadcrumbs, Prose, Section } from "@/components/site/ui";
+import { Breadcrumbs, Section } from "@/components/site/ui";
+import { RichText } from "@/components/site/rich-text";
+import { richTextToPlain } from "@/lib/rich-text";
 import { useViewItemList } from "@/lib/tracking-items";
 
 export const Route = createFileRoute("/c/$category/$subcategory")({
@@ -27,7 +29,7 @@ export const Route = createFileRoute("/c/$category/$subcategory")({
     const title = s.meta_title || pageTitle(`${s.name_bn} — ${c.name_bn}`);
     const description =
       s.meta_description ||
-      s.description_bn ||
+      richTextToPlain(s.description_bn) ||
       `${s.name_bn} — ${c.name_bn} ক্যাটাগরির পণ্য, সারা দেশে ক্যাশ অন ডেলিভারি।`;
     const url = `/c/${params.category}/${params.subcategory}`;
     return {
@@ -106,7 +108,7 @@ function SubcategoryPage() {
         ]}
       />
       <h1 className="mt-3 text-2xl font-bold tracking-tight sm:text-3xl">{subName}</h1>
-      {description ? <Prose text={description} className="mt-3 max-w-3xl" /> : null}
+      {description ? <RichText html={description} className="mt-3 max-w-3xl" /> : null}
 
       {subcategories.length > 1 ? (
         <div className="mt-6 flex flex-wrap gap-2">
