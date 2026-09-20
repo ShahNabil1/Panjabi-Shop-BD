@@ -200,9 +200,40 @@ function ReceiveInventory() {
                 className="admin-rise space-y-3 rounded-xl border border-border/80 bg-background/50 p-3 transition-colors duration-200 hover:border-primary/25"
               >
                 <div className="flex items-center gap-2">
+                  <Checkbox
+                    checked={selected.includes(line.uid)}
+                    onCheckedChange={(v) =>
+                      setSelected((prev) =>
+                        v === true ? [...new Set([...prev, line.uid])] : prev.filter((id) => id !== line.uid),
+                      )
+                    }
+                    aria-label={`Select line ${idx + 1}`}
+                    className="shrink-0"
+                  />
                   <span className="font-en grid size-6 shrink-0 place-items-center rounded-full bg-muted text-[11px] font-bold">
                     {idx + 1}
                   </span>
+                  {line.item ? (
+                    <button
+                      type="button"
+                      onClick={() => setPreview(line.item)}
+                      className="grid size-10 shrink-0 place-items-center overflow-hidden rounded-md border border-border/70 bg-muted/40 transition-transform hover:scale-105"
+                      aria-label="Preview product image"
+                    >
+                      {line.item.imageUrl ? (
+                        <SmartImage
+                          src={line.item.imageUrl}
+                          alt={line.item.label}
+                          baseWidth={80}
+                          height={80}
+                          fit="contain"
+                          className="size-full object-contain"
+                        />
+                      ) : (
+                        <ImageOff className="size-4 text-muted-foreground/70" />
+                      )}
+                    </button>
+                  ) : null}
                   <div className="min-w-0 flex-1">
                     <ItemPicker
                       value={line.item}
@@ -216,11 +247,7 @@ function ReceiveInventory() {
                     variant="ghost"
                     size="icon"
                     className="shrink-0 rounded-lg text-muted-foreground transition-colors hover:text-destructive"
-                    onClick={() =>
-                      setLines((prev) =>
-                        prev.length === 1 ? [newLine()] : prev.filter((l) => l.uid !== line.uid),
-                      )
-                    }
+                    onClick={() => void removeLine(line)}
                   >
                     <Trash2 className="size-4" />
                   </Button>
