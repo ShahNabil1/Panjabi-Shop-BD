@@ -51,20 +51,8 @@ export type OrderSummary = {
   }>;
 };
 
-function deliveryRates(
-  raw: unknown,
-): Record<DeliveryArea, number> & { freeAbove: number; freeAll: boolean } {
-  const v = (raw ?? {}) as Record<string, unknown>;
-  const num = (value: unknown, fallback: number) =>
-    typeof value === "number" && Number.isFinite(value) && value >= 0 ? value : fallback;
-  return {
-    inside_dhaka: num(v["inside_dhaka"], 60),
-    outside_dhaka: num(v["outside_dhaka"], 120),
-    freeAbove: num(v["free_above"], 0),
-    // Global "free delivery" switch from Settings → Delivery charges.
-    freeAll: v["free_all"] === true,
-  };
-}
+// Delivery configuration (site-wide rate + per-product overrides) lives in
+// `site_settings.delivery`; parsing is shared with the storefront.
 
 /**
  * Places a cash-on-delivery order. Prices, stock and delivery charge are all
