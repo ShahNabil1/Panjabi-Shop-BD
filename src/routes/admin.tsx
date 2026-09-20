@@ -323,6 +323,9 @@ function AdminLayout() {
     );
   }
 
+  const isStaffPage = pathname.startsWith("/admin/staff");
+  const pageAllowed = isStaffPage ? manageStaff : canAccessPath(access, pathname);
+
   const isActive = matches;
   const toggleSection = (title: string, el?: HTMLElement | null) => {
     const opening = !openSections.includes(title);

@@ -275,12 +275,12 @@ function StaffPage() {
       />
 
       <div className="grid gap-3 sm:grid-cols-3">
-        <StatCard label="Employees" value={String(rows.length)} icon={Users2} />
-        <StatCard label="Active" value={String(activeCount)} icon={ShieldCheck} />
+        <StatCard label="Employees" value={String(rows.length)} icon={<Users2 className="size-4" />} />
+        <StatCard label="Active" value={String(activeCount)} icon={<ShieldCheck className="size-4" />} />
         <StatCard
           label="Actions in range"
           value={String(activity.data?.total ?? 0)}
-          icon={Activity}
+          icon={<Activity className="size-4" />}
         />
       </div>
 
