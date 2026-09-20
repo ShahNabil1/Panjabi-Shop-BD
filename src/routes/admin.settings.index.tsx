@@ -7,6 +7,7 @@ import { ArrowDown, ArrowUp, FilePenLine, ImagePlus, Trash2 } from "lucide-react
 import { adminListSettings, adminSaveSetting } from "@/lib/admin.functions";
 import { AdminHeading, NumberField, Panel, TextField } from "@/components/admin/kit";
 import { ImageField } from "@/components/admin/image-upload";
+import { DeliverySettingsPanel } from "@/components/admin/delivery-settings";
 import { MAX_HERO_SLIDES, readHeroSlides, type HeroSlide } from "@/components/site/hero-slider";
 import { readPromoPopup, type PromoPopup } from "@/components/site/promo-popup";
 import { Button } from "@/components/ui/button";
@@ -58,8 +59,6 @@ function SettingsAdmin() {
     },
     onError: (e: Error) => toast.error(e.message),
   });
-
-  const freeAll = delivery["free_all"] === true;
 
   return (
     <div className="space-y-6 pb-16">
@@ -360,61 +359,11 @@ function SettingsAdmin() {
         </Button>
       </Panel>
 
-      <Panel className="space-y-4">
-        <h2 className="ig-text text-sm font-bold">Delivery charges</h2>
-
-        <label className="flex cursor-pointer items-center justify-between gap-4 rounded-xl border border-border/70 bg-background/40 px-3 py-2.5 transition-colors hover:border-primary/30">
-          <span>
-            <span className="ig-text block text-sm font-bold">Free delivery for all orders</span>
-            <span className="block text-xs text-muted-foreground">
-              When on, every order ships free and checkout shows the charge as FREE.
-            </span>
-          </span>
-          <input
-            type="checkbox"
-            role="switch"
-            checked={freeAll}
-            onChange={(e) => setDelivery({ ...delivery, free_all: e.target.checked })}
-            className="peer sr-only"
-          />
-          <span className="relative inline-flex h-6 w-11 shrink-0 touch-manipulation items-center rounded-full bg-muted shadow-sm transition-[background-color,box-shadow,transform] duration-300 ease-out peer-active:scale-95 peer-checked:bg-primary peer-focus-visible:ring-2 peer-focus-visible:ring-ring/40 motion-reduce:transition-none">
-            <span
-              className={`absolute left-0.5 size-5 rounded-full bg-background shadow-md transition-transform duration-300 ease-out motion-reduce:transition-none ${
-                freeAll ? "translate-x-5" : "translate-x-0"
-              }`}
-            />
-          </span>
-        </label>
-
-        <div
-          className={`grid gap-3 transition-opacity duration-200 sm:grid-cols-3 ${
-            freeAll ? "pointer-events-none opacity-50" : ""
-          }`}
-        >
-          <NumberField
-            label="Inside Dhaka (৳)"
-            value={n(delivery, "inside_dhaka", 60)}
-            onChange={(v) => setDelivery({ ...delivery, inside_dhaka: v })}
-          />
-          <NumberField
-            label="Outside Dhaka (৳)"
-            value={n(delivery, "outside_dhaka", 120)}
-            onChange={(v) => setDelivery({ ...delivery, outside_dhaka: v })}
-          />
-          <NumberField
-            label="Free delivery above (৳)"
-            value={n(delivery, "free_above", 0)}
-            onChange={(v) => setDelivery({ ...delivery, free_above: v })}
-          />
-        </div>
-        <Button
-          loading={save.isPending}
-          onClick={() => save.mutate({ key: "delivery", value: delivery })}
-          className="transition-transform duration-200 hover:-translate-y-0.5"
-        >
-          Save
-        </Button>
-      </Panel>
+      <DeliverySettingsPanel
+        value={delivery}
+        saving={save.isPending}
+        onSave={(value) => save.mutate({ key: "delivery", value })}
+      />
     </div>
   );
 }

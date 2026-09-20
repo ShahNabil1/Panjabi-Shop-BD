@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 
 import { incompleteOrderSchema, orderLookupSchema, placeOrderSchema, shortLookupSchema } from "./order-schema";
 import type { DeliveryArea } from "./order-schema";
+import { deliveryChargeFor, normalizeDeliveryConfig } from "./delivery-rates";
 
 export type PlacedOrder = {
   orderNumber: string;
@@ -51,20 +52,8 @@ export type OrderSummary = {
   }>;
 };
 
-function deliveryRates(
-  raw: unknown,
-): Record<DeliveryArea, number> & { freeAbove: number; freeAll: boolean } {
-  const v = (raw ?? {}) as Record<string, unknown>;
-  const num = (value: unknown, fallback: number) =>
-    typeof value === "number" && Number.isFinite(value) && value >= 0 ? value : fallback;
-  return {
-    inside_dhaka: num(v["inside_dhaka"], 60),
-    outside_dhaka: num(v["outside_dhaka"], 120),
-    freeAbove: num(v["free_above"], 0),
-    // Global "free delivery" switch from Settings → Delivery charges.
-    freeAll: v["free_all"] === true,
-  };
-}
+// Delivery configuration (site-wide rate + per-product overrides) lives in
+// `site_settings.delivery`; parsing is shared with the storefront.
 
 /**
  * Places a cash-on-delivery order. Prices, stock and delivery charge are all
@@ -146,7 +135,7 @@ export const placeOrder = createServerFn({ method: "POST" })
     });
 
     const subtotal = lines.reduce((sum, l) => sum + l.lineTotal, 0);
-    const rates = deliveryRates(settingsRes.data?.value);
+    const rates = normalizeDeliveryConfig(settingsRes.data?.value);
 
     const { findUpazila } = await import("./bd-geo");
     if (!findUpazila(data.division, data.district, data.upazila)) {
@@ -155,10 +144,12 @@ export const placeOrder = createServerFn({ method: "POST" })
     const deliveryArea: DeliveryArea =
       data.district === "ঢাকা" || data.district === "Dhaka" ? "inside_dhaka" : "outside_dhaka";
 
-    const deliveryCharge =
-      rates.freeAll || (rates.freeAbove > 0 && subtotal >= rates.freeAbove)
-        ? 0
-        : rates[deliveryArea];
+    const deliveryCharge = deliveryChargeFor(
+      rates,
+      deliveryArea,
+      subtotal,
+      lines.map((l) => l.product.id),
+    );
 
     // Coupons are re-validated server-side; the client's number is never trusted.
     let discount = 0;
@@ -239,7 +230,7 @@ export const getDeliveryRates = createServerFn({ method: "GET" }).handler(async 
   const { createPublicServerClient } = await import("./supabase-public");
   const db = createPublicServerClient();
   const { data } = await db.from("site_settings").select("value").eq("key", "delivery").maybeSingle();
-  return deliveryRates(data?.value);
+  return normalizeDeliveryConfig(data?.value);
 });
 
 export const getOrderSummary = createServerFn({ method: "GET" })

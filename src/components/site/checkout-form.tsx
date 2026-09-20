@@ -24,17 +24,13 @@ import { ProductThumb } from "@/components/site/product-card";
 import { QuantityStepper } from "@/components/site/add-to-cart";
 import { cn } from "@/lib/utils";
 import { normalizePhoneInput } from "@/lib/phone";
+import { deliveryChargeFor, type DeliveryConfig } from "@/lib/delivery-rates";
 import { getBrowserFingerprint } from "@/lib/browser-fingerprint";
 import { useBlockedSupport } from "@/components/site/blocked-support-dialog";
 import { ecommerce, pushEvent, useTrackOnce } from "@/lib/tracking";
 import { cartTrackingItems } from "@/lib/tracking-items";
 
-export type DeliveryRates = {
-  inside_dhaka: number;
-  outside_dhaka: number;
-  freeAbove: number;
-  freeAll?: boolean;
-};
+export type DeliveryRates = DeliveryConfig;
 
 const inputClass =
   "w-full rounded-sm border border-border bg-background px-3 py-2.5 text-[15px] outline-none transition-colors focus:border-primary";
@@ -234,8 +230,10 @@ export function CheckoutForm({
     () => items.reduce((sum, i) => sum + i.price * i.quantity, 0),
     [items],
   );
-  const delivery =
-    rates.freeAll || (rates.freeAbove > 0 && subtotal >= rates.freeAbove) ? 0 : rates[area];
+  const delivery = useMemo(
+    () => deliveryChargeFor(rates, area, subtotal, items.map((i) => i.productId)),
+    [rates, area, subtotal, items],
+  );
 
   // Funnel: begin_checkout as soon as the form is on screen with items.
   const trackedItems = useMemo(() => cartTrackingItems(items), [items]);
