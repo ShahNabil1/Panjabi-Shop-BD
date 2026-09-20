@@ -1,75 +1,76 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { Link, createFileRoute } from "@tanstack/react-router";
+import { BadgeCheck, RefreshCcw, Shirt, Sparkles } from "lucide-react";
 
-import { useLang } from "@/lib/language-context";
-import { tr } from "@/lib/i18n";
+import { RichText } from "@/components/site/rich-text";
 import { useSiteData } from "@/components/site/site-header";
-import { Breadcrumbs, Prose, Section } from "@/components/site/ui";
-import { SITE_URL } from "@/lib/site";
+import { Button } from "@/components/ui/button";
+import { getLegalPage } from "@/lib/catalog.functions";
+import { readLegalPage } from "@/lib/legal-content";
+import { absoluteUrl } from "@/lib/site";
 
 export const Route = createFileRoute("/about")({
-  head: () => ({
-    meta: [
-      { title: "আমাদের কথা | About — Panjabi Shop BD" },
-      {
-        name: "description",
-        content:
-          "Panjabi Shop BD আধুনিক ডিজাইন, আরামদায়ক কাপড় ও নির্ভরযোগ্য মানের পাঞ্জাবি সরবরাহ করে। আমাদের গল্প ও প্রতিশ্রুতি জানুন।",
-      },
-      { property: "og:title", content: "আমাদের কথা | About — Panjabi Shop BD" },
-      { property: "og:description", content: "মানসম্মত পাঞ্জাবি সহজে পৌঁছে দেওয়াই আমাদের লক্ষ্য।" },
-      { property: "og:url", content: `${SITE_URL}/about` },
-    ],
-    links: [{ rel: "canonical", href: `${SITE_URL}/about` }],
-  }),
+  loader: () => getLegalPage({ data: { key: "about" } }),
+  head: ({ loaderData }) => {
+    const page = readLegalPage("about", loaderData);
+    return { meta: [{ title: page.metaTitle }, { name: "description", content: page.metaDescription }, { property: "og:title", content: page.metaTitle }, { property: "og:description", content: page.metaDescription }, { property: "og:type", content: "website" }, { property: "og:url", content: absoluteUrl("/about") }, { name: "twitter:card", content: "summary" }], links: [{ rel: "canonical", href: absoluteUrl("/about") }] };
+  },
   component: AboutPage,
 });
 
-const BODY = {
-  bn: `Panjabi Shop BD শুরু হয়েছিল একটি সহজ লক্ষ্য নিয়ে — মানসম্মত, আরামদায়ক ও রুচিশীল পাঞ্জাবি অনলাইনে সহজে সবার কাছে পৌঁছে দেওয়া।
-
-আমরা কাপড়ের মান, সেলাই, ফিট ও ডিজাইনের দিকে বিশেষ গুরুত্ব দিয়ে প্রতিটি পাঞ্জাবি নির্বাচন করি। উৎসব, অনুষ্ঠান বা দৈনন্দিন পরিধানের জন্য আমাদের কালেকশনে রয়েছে বিভিন্ন রঙ, নকশা ও সাইজ।
-
-পাঠানোর আগে প্রতিটি পণ্যের মান ও প্যাকেজিং যাচাই করা হয়। সারা বাংলাদেশে ক্যাশ অন ডেলিভারি এবং নীতিমালা অনুযায়ী সহজ এক্সচেঞ্জ ও রিটার্ন সুবিধা রয়েছে।`,
-  en: `Panjabi Shop BD began with one clear goal: making well-made, comfortable and stylish Panjabis easy to shop online.
-
-We select every Panjabi with close attention to fabric, stitching, fit and design. Our collection covers different colors, patterns and sizes for festivals, occasions and everyday wear.
-
-Every item and its packaging are checked before dispatch. We offer cash on delivery across Bangladesh and straightforward exchanges and returns under our policy.`,
-};
-
-
 export function AboutPage() {
-  const { lang } = useLang();
+  const page = readLegalPage("about", Route.useLoaderData());
   const { brand, contact } = useSiteData();
+  const highlights = [
+    { icon: Shirt, title: "নির্বাচিত কাপড়", text: "আরাম, ফিট ও দীর্ঘস্থায়িত্ব বিবেচনায় প্রতিটি পণ্য নির্বাচন" },
+    { icon: BadgeCheck, title: "মান যাচাই", text: "পাঠানোর আগে পণ্য ও প্যাকেজিংয়ের যত্নসহকারে পরীক্ষা" },
+    { icon: RefreshCcw, title: "সহজ এক্সচেঞ্জ", text: "নীতিমালা অনুযায়ী ৭ দিনের সহজ রিটার্ন ও এক্সচেঞ্জ সুবিধা" },
+  ];
 
   return (
-    <Section className="max-w-3xl">
-      <Breadcrumbs items={[{ label: tr(lang, "home"), to: "/" }, { label: tr(lang, "about") }]} />
-      <h1 className="mt-3 text-2xl font-bold tracking-tight sm:text-3xl">
-        {lang === "bn" ? `${brand} সম্পর্কে` : `About ${brand}`}
-      </h1>
-      <Prose text={BODY[lang]} className="mt-5" />
-
-      <div className="mt-8 grid gap-3 sm:grid-cols-3">
-        {[
-          { bn: "আধুনিক পাঞ্জাবি কালেকশন", en: "Modern Panjabi collection" },
-          { bn: "যাচাইকৃত কাপড় ও সেলাই", en: "Checked fabric and stitching" },
-          { bn: "৭ দিনের রিটার্ন", en: "7-day returns" },
-        ].map((item) => (
-          <div key={item.en} className="rounded-lg border border-border bg-card p-4">
-            <p className="text-sm font-semibold">{lang === "bn" ? item.bn : item.en}</p>
+    <main className="overflow-hidden bg-background">
+      <section className="bg-secondary text-secondary-foreground">
+        <div className="mx-auto grid w-full max-w-6xl gap-8 px-4 py-12 sm:py-16 lg:grid-cols-[minmax(0,1.2fr)_minmax(18rem,.8fr)] lg:items-center lg:py-20">
+          <div className="min-w-0">
+            <div className="flex items-center gap-2 text-sm font-semibold text-primary"><Sparkles className="size-4" /> আমাদের ঐতিহ্য, আপনার রুচি</div>
+            <h1 className="mt-4 max-w-3xl text-4xl font-bold leading-tight sm:text-5xl">{page.title}</h1>
+            <p className="mt-4 max-w-2xl text-base leading-8 text-secondary-foreground/75 sm:text-lg">মানসম্মত কাপড়, নিখুঁত সেলাই ও আধুনিক ডিজাইনে প্রতিটি উপলক্ষের জন্য আপনার নির্ভরযোগ্য পাঞ্জাবির ঠিকানা।</p>
+            <Button asChild className="mt-7"><Link to="/categories">কালেকশন দেখুন</Link></Button>
           </div>
-        ))}
-      </div>
+          <div className="border-l-4 border-primary bg-secondary-foreground/5 p-6 sm:p-8">
+            <p className="text-sm font-semibold text-primary">Panjabi Shop BD</p>
+            <p className="mt-3 text-2xl font-bold leading-snug sm:text-3xl">পোশাক নয়, প্রতিটি পাঞ্জাবিতে থাকুক আপনার নিজস্বতা।</p>
+          </div>
+        </div>
+      </section>
 
-      {contact.phone ? (
-        <p className="mt-8 text-sm text-muted-foreground">
-          {lang === "bn" ? "প্রশ্ন থাকলে কল করুন " : "Questions? Call us at "}
-          <a href={`tel:${contact.phone}`} className="font-semibold text-primary">
-            {contact.phone}
-          </a>
-        </p>
-      ) : null}
-    </Section>
+      <section className="mx-auto w-full max-w-6xl px-4 py-10 sm:py-14">
+        <div className="grid gap-8 lg:grid-cols-[minmax(0,.72fr)_minmax(0,1.28fr)] lg:gap-14">
+          <div>
+            <p className="text-sm font-bold text-primary">আমাদের গল্প</p>
+            <h2 className="mt-2 text-3xl font-bold leading-tight text-secondary">বিশ্বাসের সঙ্গে অনলাইনে পাঞ্জাবি কেনাকাটা</h2>
+            <div className="mt-5 h-1 w-16 bg-primary" />
+          </div>
+          <RichText html={page.content} className="text-base leading-8" />
+        </div>
+
+        <div className="mt-12 grid gap-px overflow-hidden border border-border bg-border sm:grid-cols-3">
+          {highlights.map(({ icon: Icon, title, text }) => (
+            <article key={title} className="bg-card p-6 sm:p-7">
+              <div className="flex size-11 items-center justify-center bg-accent text-primary"><Icon className="size-5" /></div>
+              <h3 className="mt-4 text-lg font-bold text-secondary">{title}</h3>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">{text}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="bg-accent">
+        <div className="mx-auto flex w-full max-w-6xl flex-col gap-5 px-4 py-9 sm:flex-row sm:items-center sm:justify-between">
+          <div><p className="text-sm font-semibold text-primary">আপনার পাশে আছি</p><h2 className="mt-1 text-2xl font-bold text-secondary">পাঞ্জাবি বাছাইয়ে সাহায্য প্রয়োজন?</h2></div>
+          {contact.phone ? <Button asChild variant="secondary"><a href={`tel:${contact.phone}`}>কল করুন {contact.phone}</a></Button> : <Button asChild variant="secondary"><Link to="/contact">যোগাযোগ করুন</Link></Button>}
+        </div>
+      </section>
+      <span className="sr-only">{brand}</span>
+    </main>
   );
 }

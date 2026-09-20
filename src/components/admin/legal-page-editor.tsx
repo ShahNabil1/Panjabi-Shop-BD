@@ -47,7 +47,7 @@ export function LegalPageEditor({ settingKey }: { settingKey: LegalPageKey }) {
 
   return (
     <div className="min-w-0 space-y-6 pb-16">
-      <AdminHeading title={draft.title} description="Update the live policy page shown in the storefront footer." backTo="/admin/settings" backLabel="Site Settings" />
+      <AdminHeading title={draft.title} description={settingKey === "about" ? "Update the live About page shown in the storefront footer." : "Update the live policy page shown in the storefront footer."} backTo="/admin/settings" backLabel="Site Settings" />
       <Panel className="min-w-0 space-y-4 overflow-hidden">
         <TextField label="Page title" value={draft.title} onChange={(title) => setDraft({ ...draft, title })} maxLength={80} />
         <TextField label="Meta title" value={draft.metaTitle} onChange={(metaTitle) => setDraft({ ...draft, metaTitle })} maxLength={60} />
