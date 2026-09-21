@@ -175,9 +175,28 @@ export function OrdersBoard({
     });
   };
 
+  /**
+   * The active tab is remembered per board so returning from an order detail
+   * page always lands on the same status list, even if the URL lost its
+   * `?tab=` (e.g. the browser back button or a link without search params).
+   */
+  const TAB_KEY = `admin.orders.tab.${bucket}`;
+  const storedTab =
+    typeof window !== "undefined" ? sessionStorage.getItem(TAB_KEY) : null;
   const status = isSearchBoard
     ? ""
-    : urlSearch.tab && tabs.includes(urlSearch.tab) ? urlSearch.tab : tabs[0]!;
+    : urlSearch.tab && tabs.includes(urlSearch.tab)
+      ? urlSearch.tab
+      : storedTab && tabs.includes(storedTab)
+        ? storedTab
+        : tabs[0]!;
+  useEffect(() => {
+    if (isSearchBoard || !status) return;
+    sessionStorage.setItem(TAB_KEY, status);
+    // Keep the URL in sync so refresh / share keeps the same tab.
+    if (urlSearch.tab !== status) setBoardSearch({ tab: status });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [status, urlSearch.tab]);
   const setStatus = (s: string) => setBoardSearch({ tab: s, page: 1 });
   const isPaymentView = (paymentFilters as readonly string[]).includes(status);
   const search = urlSearch.q ?? "";
