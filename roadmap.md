@@ -1,3 +1,3 @@
-- [ ] Add professional homepage SEO settings panel
-- [ ] Connect saved homepage SEO to live / metadata
-- [ ] Add 1200x630 OG image guidance and crop tool
+- [x] Add professional homepage SEO settings panel
+- [x] Connect saved homepage SEO to live / metadata
+- [x] Add 1200x630 OG image guidance and crop tool

@@ -16,25 +16,43 @@ import { Section } from "@/components/site/ui";
 
 export const Route = createFileRoute("/")({
   loader: async (): Promise<HomeData> => getHomeData(),
-  head: () => ({
-    meta: [
-      { title: "Panjabi Shop BD — প্রিমিয়াম পাঞ্জাবির অনলাইন শপ" },
-      {
-        name: "description",
-        content:
-          "আধুনিক ডিজাইন, আরামদায়ক কাপড় ও নিখুঁত ফিটের প্রিমিয়াম পাঞ্জাবি কিনুন। সারা বাংলাদেশে ক্যাশ অন ডেলিভারি।",
-      },
-      { property: "og:title", content: "Panjabi Shop BD — প্রিমিয়াম পাঞ্জাবির অনলাইন শপ" },
-      {
-        property: "og:description",
-        content: "আধুনিক ডিজাইন, আরামদায়ক কাপড় ও নিখুঁত ফিটের প্রিমিয়াম পাঞ্জাবি কিনুন। সারা বাংলাদেশে ক্যাশ অন ডেলিভারি।",
-      },
-      { property: "og:url", content: `${SITE_URL}/` },
-      { property: "og:image", content: `${SITE_URL}/og-image.jpg` },
-      { name: "twitter:image", content: `${SITE_URL}/og-image.jpg` },
-    ],
-    links: [{ rel: "canonical", href: `${SITE_URL}/` }],
-  }),
+  head: ({ loaderData }) => {
+    const seo = loaderData?.settings?.["home_seo"];
+    const titleValue = seo?.["meta_title"];
+    const descriptionValue = seo?.["meta_description"];
+    const imageValue = seo?.["og_image"];
+    const title =
+      typeof titleValue === "string" && titleValue.trim()
+        ? titleValue.trim()
+        : "Panjabi Shop BD — প্রিমিয়াম পাঞ্জাবির অনলাইন শপ";
+    const description =
+      typeof descriptionValue === "string" && descriptionValue.trim()
+        ? descriptionValue.trim()
+        : "আধুনিক ডিজাইন, আরামদায়ক কাপড় ও নিখুঁত ফিটের প্রিমিয়াম পাঞ্জাবি কিনুন। সারা বাংলাদেশে ক্যাশ অন ডেলিভারি।";
+    const image =
+      typeof imageValue === "string" && imageValue.trim().startsWith("https://")
+        ? imageValue.trim()
+        : null;
+
+    return {
+      meta: [
+        { title },
+        { name: "description", content: description },
+        { property: "og:title", content: title },
+        { property: "og:description", content: description },
+        { property: "og:type", content: "website" },
+        { property: "og:url", content: `${SITE_URL}/` },
+        { name: "twitter:card", content: "summary_large_image" },
+        ...(image
+          ? [
+              { property: "og:image", content: image },
+              { name: "twitter:image", content: image },
+            ]
+          : []),
+      ],
+      links: [{ rel: "canonical", href: `${SITE_URL}/` }],
+    };
+  },
   component: HomePage,
 });
 

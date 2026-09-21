@@ -2,10 +2,10 @@ import { Link, createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
-import { ArrowDown, ArrowUp, FilePenLine, ImagePlus, Trash2 } from "lucide-react";
+import { ArrowDown, ArrowUp, FilePenLine, ImagePlus, Search, Trash2 } from "lucide-react";
 
 import { adminListSettings, adminSaveSetting } from "@/lib/admin.functions";
-import { AdminHeading, NumberField, Panel, TextField } from "@/components/admin/kit";
+import { AdminHeading, AreaField, NumberField, Panel, TextField } from "@/components/admin/kit";
 import { SaveButton, isDirty } from "@/components/admin/save-button";
 import { ImageField } from "@/components/admin/image-upload";
 import { DeliverySettingsPanel } from "@/components/admin/delivery-settings";
@@ -34,6 +34,7 @@ function SettingsAdmin() {
   const { data } = useQuery({ queryKey: ["admin", "settings"], queryFn: () => adminListSettings() });
 
   const [general, setGeneral] = useState<Obj>({});
+  const [homeSeo, setHomeSeo] = useState<Obj>({});
   const [contact, setContact] = useState<Obj>({});
   const [delivery, setDelivery] = useState<Obj>({});
   const [slides, setSlides] = useState<HeroSlide[]>([]);
@@ -47,6 +48,7 @@ function SettingsAdmin() {
   useEffect(() => {
     if (!data) return;
     setGeneral(find("general"));
+    setHomeSeo(find("home_seo"));
     setContact(find("contact"));
     setDelivery(find("delivery"));
     setSlides(readHeroSlides(find("hero") as never));
@@ -74,6 +76,64 @@ function SettingsAdmin() {
         title="Settings"
         description="Hero banner, brand, contact and delivery charges."
       />
+
+      <Panel className="space-y-4">
+        <div className="flex items-start gap-3">
+          <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+            <Search className="size-4" />
+          </span>
+          <div>
+            <h2 className="ig-text text-sm font-bold">Homepage SEO & social sharing</h2>
+            <p className="mt-1 text-xs leading-5 text-muted-foreground">
+              Controls the title, description and preview image used by Google and when the main
+              website link is shared on Facebook, WhatsApp or other platforms.
+            </p>
+          </div>
+        </div>
+
+        <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(280px,0.8fr)]">
+          <div className="space-y-4">
+            <TextField
+              label="Meta title"
+              value={str(homeSeo, "meta_title")}
+              onChange={(value) => setHomeSeo({ ...homeSeo, meta_title: value })}
+              maxLength={60}
+              hint="সর্বোচ্চ ৬০ ক্যারেক্টার। মূল কীওয়ার্ড ও ব্র্যান্ডের নাম রাখুন।"
+            />
+            <AreaField
+              label="Meta description"
+              rows={4}
+              value={str(homeSeo, "meta_description")}
+              onChange={(value) => setHomeSeo({ ...homeSeo, meta_description: value })}
+              maxLength={160}
+              hint="সর্বোচ্চ ১৬০ ক্যারেক্টার। পণ্য, সুবিধা ও ডেলিভারির সংক্ষিপ্ত তথ্য দিন।"
+            />
+          </div>
+          <ImageField
+            label="OG image"
+            folder="site"
+            value={str(homeSeo, "og_image") || null}
+            onChange={(url) => setHomeSeo({ ...homeSeo, og_image: url ?? "" })}
+            cropPreset="og"
+            hint="বেস্ট সাইজ: ১২০০×৬৩০ px (১.৯১:১), JPG/WebP, ৩০০ KB-এর কম। আপলোডের পর Crop চাপলে ছবিটি সঠিক অনুপাতে অ্যাডজাস্ট হবে।"
+          />
+        </div>
+
+        <SaveButton
+          dirty={isDirty(homeSeo, find("home_seo"))}
+          loading={pendingKey === "home_seo"}
+          onClick={() =>
+            save.mutate({
+              key: "home_seo",
+              value: {
+                meta_title: str(homeSeo, "meta_title").trim(),
+                meta_description: str(homeSeo, "meta_description").trim(),
+                og_image: str(homeSeo, "og_image").trim(),
+              },
+            })
+          }
+        />
+      </Panel>
 
       <Panel className="space-y-3">
         <div>
