@@ -185,6 +185,22 @@ function AdminOrderDetail() {
   }, [id]);
 
 
+  // Idle guard: 5 minutes without any activity releases the order and sends
+  // the staff member back to the board, so nobody blocks an order by walking
+  // away from the desk.
+  useIdleTimeout(
+    5 * 60_000,
+    () => {
+      if (ownsRef.current) {
+        void adminReleaseOrder({ data: { id } }).catch(() => {});
+        ownsRef.current = false;
+      }
+      toast.info("৫ মিনিট নিষ্ক্রিয় থাকায় অর্ডার থেকে বের করে দেওয়া হয়েছে");
+      void navigate({ to: backTo, search: backSearch });
+    },
+    Boolean(id) && !evictedBy,
+  );
+
   // Someone else claimed the order while we were inside it.
   useEffect(() => {
     if (!user || !held || !ownsRef.current) return;
