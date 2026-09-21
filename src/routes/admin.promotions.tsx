@@ -3,15 +3,27 @@ import { useConfirm } from "@/components/ui/confirm-dialog";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
-import { CheckCircle2, ImageOff, Search, Trash2 } from "lucide-react";
+import { CheckCircle2, GripVertical, ImageOff, Search, Trash2 } from "lucide-react";
 
 import {
   adminDeletePromotion,
   adminListProducts,
   adminListPromotions,
+  adminReorderPromotions,
   adminSavePromotion,
 } from "@/lib/admin.functions";
 import { promotionTypes, type PromotionInput } from "@/lib/admin-schema";
+
+/** Preview of the discounted price shown in the admin editor. */
+function previewPrice(price: number, type: string, value: number) {
+  if (type === "none" || !(value > 0)) return null;
+  const next =
+    type === "percent" ? price * (1 - value / 100) : type === "flat" ? price - value : value;
+  const rounded = Math.round(next);
+  if (!Number.isFinite(rounded) || rounded < 0 || rounded >= price) return null;
+  return rounded;
+}
+
 import {
   AdminHeading,
   AreaField,
