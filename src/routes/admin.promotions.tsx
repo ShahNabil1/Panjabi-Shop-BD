@@ -194,12 +194,8 @@ function PromotionsPage() {
               value={(draft.ends_at ?? "").slice(0, 10)}
               onChange={(v) => setDraft({ ...draft, ends_at: v || null })}
             />
-            <NumberField
-              label="Sort Order"
-              value={draft.sort_order}
-              onChange={(v) => setDraft({ ...draft, sort_order: v })}
-            />
             <TextField
+
               label="Meta title"
               value={draft.meta_title ?? ""}
               onChange={(v) => setDraft({ ...draft, meta_title: v || null })}
