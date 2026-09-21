@@ -309,7 +309,7 @@ function StaffPage() {
     const ok = await confirm({
       title: "End all sessions?",
       description: `${name} will be signed out of the admin panel on every device within a minute.`,
-      confirmText: "Log out",
+      confirmLabel: "Log out",
     });
     if (ok) forceLogout.mutate(userId);
   };
