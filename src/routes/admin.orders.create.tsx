@@ -825,10 +825,16 @@ function CreateOrderPage() {
                 <input
                   type="number"
                   min={0}
-                  className={input}
+                  className={cn(input, !canDiscount && "cursor-not-allowed opacity-60")}
                   value={discount}
+                  disabled={!canDiscount}
                   onChange={(e) => setDiscount(Math.max(0, Number(e.target.value) || 0))}
                 />
+                {!canDiscount ? (
+                  <span className="mt-1 block text-[11px] text-muted-foreground">
+                    ডিসকাউন্ট দেওয়ার অনুমতি নেই।
+                  </span>
+                ) : null}
               </label>
               <label className="block">
                 <Label>Delivery charge</Label>
