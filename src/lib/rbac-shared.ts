@@ -93,6 +93,8 @@ export type AdminAccess = {
   isStaff: boolean;
   fullAccess: boolean;
   isActive: boolean;
+  /** Set when an admin ended this user's sessions after the token was issued. */
+  revoked?: boolean;
   permissions: string[];
   name: string;
   email: string;
