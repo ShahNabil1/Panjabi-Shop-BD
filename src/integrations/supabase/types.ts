@@ -23,7 +23,9 @@ export type Database = {
           created_at: string
           detail: string | null
           id: string
+          ip: string | null
           meta: Json
+          user_agent: string | null
           user_id: string | null
         }
         Insert: {
@@ -34,7 +36,9 @@ export type Database = {
           created_at?: string
           detail?: string | null
           id?: string
+          ip?: string | null
           meta?: Json
+          user_agent?: string | null
           user_id?: string | null
         }
         Update: {
@@ -45,8 +49,34 @@ export type Database = {
           created_at?: string
           detail?: string | null
           id?: string
+          ip?: string | null
           meta?: Json
+          user_agent?: string | null
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      admin_session_revocations: {
+        Row: {
+          created_at: string
+          revoked_at: string
+          revoked_by: string | null
+          revoked_by_name: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          revoked_at?: string
+          revoked_by?: string | null
+          revoked_by_name?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          revoked_at?: string
+          revoked_by?: string | null
+          revoked_by_name?: string | null
+          user_id?: string
         }
         Relationships: []
       }

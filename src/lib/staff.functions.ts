@@ -65,6 +65,17 @@ export const getAdminAccess = createServerFn({ method: "GET" })
       .eq("id", context.userId)
       .maybeSingle();
 
+    // An admin can end someone's sessions; any token issued before that moment
+    // is treated as signed out by the admin shell.
+    const { data: revocation } = await context.supabase
+      .from("admin_session_revocations")
+      .select("revoked_at")
+      .eq("user_id", context.userId)
+      .maybeSingle();
+    const issuedAt = Number((context.claims as { iat?: number } | undefined)?.iat ?? 0) * 1000;
+    const revokedAt = (revocation as { revoked_at?: string } | null)?.revoked_at;
+    const revoked = Boolean(revokedAt && issuedAt && new Date(revokedAt).getTime() > issuedAt);
+
     const row = staff as {
       full_name?: string;
       email?: string;
@@ -78,7 +89,8 @@ export const getAdminAccess = createServerFn({ method: "GET" })
       isAdmin,
       isStaff: Boolean(row),
       fullAccess: isAdmin || Boolean(row?.full_access),
-      isActive: isAdmin || Boolean(row?.is_active),
+      isActive: !revoked && (isAdmin || Boolean(row?.is_active)),
+      revoked,
       permissions: clean(row?.permissions ?? []),
       name:
         row?.full_name ??
@@ -249,6 +261,9 @@ export const logAdminActivity = createServerFn({ method: "POST" })
       .maybeSingle();
     const row = staff as { full_name?: string; email?: string } | null;
 
+    const { getRequestSecurityContext } = await import("./request-security.server");
+    const security = await getRequestSecurityContext().catch(() => null);
+
     await context.supabase.from("admin_activity_log").insert({
       user_id: context.userId,
       actor_name: row?.full_name ?? null,
@@ -256,6 +271,8 @@ export const logAdminActivity = createServerFn({ method: "POST" })
       action: data.action,
       area: data.area ?? null,
       detail: data.detail ?? null,
+      ip: security?.ip ?? null,
+      user_agent: security?.userAgent ?? null,
     });
 
     if (data.action === "login") {
@@ -267,83 +284,3 @@ export const logAdminActivity = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-export type ActivitySummary = {
-  from: string;
-  to: string;
-  total: number;
-  byUser: Array<{ userId: string; name: string; email: string; count: number; lastAt: string }>;
-  byAction: Array<{ action: string; count: number }>;
-  byDay: Array<{ day: string; count: number }>;
-  recent: Array<{
-    id: string;
-    created_at: string;
-    action: string;
-    area: string | null;
-    detail: string | null;
-    actor_name: string | null;
-    actor_email: string | null;
-    user_id: string | null;
-  }>;
-};
-
-export const adminActivitySummary = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) =>
-    z
-      .object({
-        from: z.string(),
-        to: z.string(),
-        userId: z.string().uuid().optional(),
-      })
-      .parse(input),
-  )
-  .handler(async ({ data, context }): Promise<ActivitySummary> => {
-    const db = await requireSuperAdmin(context.supabase, context.userId);
-
-    let q = db
-      .from("admin_activity_log")
-      .select("id, user_id, actor_name, actor_email, action, area, detail, created_at")
-      .gte("created_at", data.from)
-      .lte("created_at", data.to)
-      .order("created_at", { ascending: false })
-      .limit(1000);
-    if (data.userId) q = q.eq("user_id", data.userId);
-
-    const { data: rows, error } = await q;
-    if (error) throw new Error(error.message);
-
-    const list = (rows ?? []) as ActivitySummary["recent"];
-
-    const users = new Map<string, { userId: string; name: string; email: string; count: number; lastAt: string }>();
-    const actions = new Map<string, number>();
-    const days = new Map<string, number>();
-
-    for (const r of list) {
-      const key = r.user_id ?? "unknown";
-      const existing = users.get(key);
-      if (existing) existing.count += 1;
-      else
-        users.set(key, {
-          userId: key,
-          name: r.actor_name ?? "Admin",
-          email: r.actor_email ?? "",
-          count: 1,
-          lastAt: r.created_at,
-        });
-      actions.set(r.action, (actions.get(r.action) ?? 0) + 1);
-      const day = r.created_at.slice(0, 10);
-      days.set(day, (days.get(day) ?? 0) + 1);
-    }
-
-    return {
-      from: data.from,
-      to: data.to,
-      total: list.length,
-      byUser: [...users.values()].sort((a, b) => b.count - a.count),
-      byAction: [...actions.entries()]
-        .map(([action, count]) => ({ action, count }))
-        .sort((a, b) => b.count - a.count),
-      byDay: [...days.entries()].map(([day, count]) => ({ day, count })).sort((a, b) => a.day.localeCompare(b.day)),
-      recent: list.slice(0, 120),
-    };
-  });
