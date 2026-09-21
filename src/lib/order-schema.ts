@@ -37,6 +37,7 @@ export const placeOrderSchema = z.object({
   source: z.enum(["website", "landing"]).default("website"),
   attribution: attributionSchema,
   deviceFingerprint: z.string().trim().length(64).nullable().optional(),
+  captchaToken: z.string().trim().max(2048).optional().or(z.literal("")),
   items: z.array(orderLineSchema).min(1).max(30),
 });
 

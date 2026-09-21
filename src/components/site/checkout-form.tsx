@@ -10,6 +10,7 @@ import { useCart, type CartItem } from "@/lib/cart-context";
 import { useLang } from "@/lib/language-context";
 import { formatNumber, formatPrice, pick, tr } from "@/lib/i18n";
 import { captureIncompleteOrder, placeOrder } from "@/lib/order.functions";
+import { Turnstile, type TurnstileHandle } from "@/components/turnstile";
 import { getAttribution } from "@/lib/attribution";
 import { validateCoupon } from "@/lib/coupons.functions";
 import {
@@ -97,6 +98,8 @@ export function CheckoutForm({
 
   const navigate = useNavigate();
   const submit = useServerFn(placeOrder);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const captchaRef = useRef<TurnstileHandle | null>(null);
   const { clear } = useCart();
 
   const [name, setName] = useState("");
@@ -361,6 +364,7 @@ export function CheckoutForm({
           source,
           attribution: getAttribution(),
           deviceFingerprint,
+          captchaToken: captchaToken ?? "",
 
           items: items.map((i) => ({
             productId: i.productId,
@@ -395,6 +399,7 @@ export function CheckoutForm({
       } else {
         setFailed(true);
       }
+      captchaRef.current?.reset();
     } finally {
       setPending(false);
     }
@@ -883,6 +888,10 @@ export function CheckoutForm({
             {tr(lang, "orderFailed")}
           </p>
         ) : null}
+
+        <div className="flex justify-center">
+          <Turnstile onToken={setCaptchaToken} handleRef={captchaRef} />
+        </div>
 
         <button
           type="submit"
