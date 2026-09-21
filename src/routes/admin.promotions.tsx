@@ -247,7 +247,7 @@ function PromotionsPage() {
               ) : (
                 <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
                   {filteredProducts.map((p) => {
-                    const selected = draft.product_ids.includes(p.id);
+                    const selected = draft.products.some((x) => x.product_id === p.id);
                     const thumb = (p.product_images ?? [])
                       .slice()
                       .sort((a, b) => a.sort_order - b.sort_order)[0]?.url;
