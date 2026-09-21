@@ -2,10 +2,19 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
-import { Activity, KeyRound, Plus, ShieldCheck, Trash2, UserCog, Users2 } from "lucide-react";
+import {
+  Activity,
+  Clock,
+  KeyRound,
+  LogOut,
+  Plus,
+  ShieldCheck,
+  Trash2,
+  UserCog,
+  Users2,
+} from "lucide-react";
 
 import {
-  adminActivitySummary,
   adminCreateStaff,
   adminDeleteStaff,
   adminListStaff,
@@ -13,6 +22,7 @@ import {
   type StaffRow,
   type StaffUpdateInput,
 } from "@/lib/staff.functions";
+import { adminForceLogout, adminStaffReport } from "@/lib/staff-report.functions";
 import { STAFF_FLAGS, STAFF_MODULES, STAFF_PERMISSION_KEYS, STAFF_SECTIONS } from "@/lib/rbac-shared";
 import { AdminHeading, Panel, StatCard, TextField } from "@/components/admin/kit";
 import { Button } from "@/components/ui/button";
@@ -89,6 +99,14 @@ function formatWhen(iso: string) {
     return iso;
   }
 }
+
+function duration(minutes: number) {
+  const m = Math.max(0, Math.round(minutes));
+  const h = Math.floor(m / 60);
+  return h > 0 ? `${h}h ${m % 60}m` : `${m}m`;
+}
+
+const money = (n: number) => `৳${Math.round(n).toLocaleString("en-US")}`;
 
 function randomPassword() {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789@#$%";
@@ -221,7 +239,7 @@ function StaffPage() {
   const activity = useQuery({
     queryKey: ["admin", "staff-activity", bounds.from.toISOString(), bounds.to.toISOString(), activityUser],
     queryFn: () =>
-      adminActivitySummary({
+      adminStaffReport({
         data: {
           from: bounds.from.toISOString(),
           to: bounds.to.toISOString(),
@@ -278,6 +296,24 @@ function StaffPage() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const forceLogout = useMutation({
+    mutationFn: (userId: string) => adminForceLogout({ data: { userId } }),
+    onSuccess: async () => {
+      toast.success("Signed out of every device");
+      await refresh();
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const endSession = async (userId: string, name: string) => {
+    const ok = await confirm({
+      title: "End all sessions?",
+      description: `${name} will be signed out of the admin panel on every device within a minute.`,
+      confirmText: "Log out",
+    });
+    if (ok) forceLogout.mutate(userId);
+  };
+
   const rows = staff.data ?? [];
   const activeCount = rows.filter((r) => r.is_active).length;
 
@@ -310,9 +346,9 @@ function StaffPage() {
         <StatCard label="Employees" value={String(rows.length)} icon={<Users2 className="size-4" />} />
         <StatCard label="Active" value={String(activeCount)} icon={<ShieldCheck className="size-4" />} />
         <StatCard
-          label="Actions in range"
-          value={String(activity.data?.total ?? 0)}
-          icon={<Activity className="size-4" />}
+          label="Time on system (range)"
+          value={duration((activity.data?.people ?? []).reduce((a, p) => a + p.activeMinutes, 0))}
+          icon={<Clock className="size-4" />}
         />
       </div>
 
@@ -600,7 +636,7 @@ function StaffPage() {
 
       <Panel className="space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 className="ig-text text-sm font-bold">Activity summary</h2>
+          <h2 className="ig-text text-sm font-bold">Employee performance</h2>
           <div className="flex flex-wrap gap-1.5">
             {RANGES.map((r) => (
               <button
@@ -650,70 +686,129 @@ function StaffPage() {
           </div>
         </div>
 
+        {activity.isLoading ? (
+          <p className="py-8 text-center text-sm text-muted-foreground">Building report…</p>
+        ) : (activity.data?.people ?? []).length === 0 ? (
+          <p className="py-8 text-center text-sm text-muted-foreground">No activity in this range.</p>
+        ) : (
+          <div className="overflow-x-auto rounded-xl border border-border">
+            <table className="w-full min-w-[980px] text-sm">
+              <thead>
+                <tr className="border-b border-border bg-muted/40 text-[11px] uppercase tracking-wide text-muted-foreground">
+                  <th className="px-3 py-2 text-left font-bold">Employee</th>
+                  <th className="px-2 py-2 text-right font-bold">Time</th>
+                  <th className="px-2 py-2 text-right font-bold">Sessions</th>
+                  <th className="px-2 py-2 text-right font-bold">Created</th>
+                  <th className="px-2 py-2 text-right font-bold">Confirmed</th>
+                  <th className="px-2 py-2 text-right font-bold">Delivered</th>
+                  <th className="px-2 py-2 text-right font-bold">Cancelled</th>
+                  <th className="px-2 py-2 text-right font-bold">Returned</th>
+                  <th className="px-2 py-2 text-right font-bold">Incomplete → confirmed</th>
+                  <th className="px-2 py-2 text-right font-bold">Sales</th>
+                  <th className="px-2 py-2 text-right font-bold">Session</th>
+                </tr>
+              </thead>
+              <tbody>
+                {(activity.data?.people ?? []).map((p) => (
+                  <tr key={p.userId} className="border-b border-border/60 last:border-0 hover:bg-accent/40">
+                    <td className="px-3 py-2.5">
+                      <p className="font-semibold">{p.name}</p>
+                      <p className="text-[11px] text-muted-foreground">
+                        {p.email || "—"}
+                        {p.lastIp ? ` · IP ${p.lastIp}` : ""}
+                      </p>
+                    </td>
+                    <td className="px-2 py-2.5 text-right tabular-nums">{duration(p.activeMinutes)}</td>
+                    <td className="px-2 py-2.5 text-right tabular-nums">{p.sessions}</td>
+                    <td className="px-2 py-2.5 text-right tabular-nums">
+                      {p.ordersCreated}
+                      <span className="block text-[11px] text-muted-foreground">
+                        {money(p.ordersCreatedValue)}
+                      </span>
+                    </td>
+                    <td className="px-2 py-2.5 text-right font-semibold tabular-nums text-emerald-700">
+                      {p.confirmed}
+                    </td>
+                    <td className="px-2 py-2.5 text-right tabular-nums">
+                      {p.delivered}
+                      <span className="block text-[11px] text-muted-foreground">{money(p.deliveredValue)}</span>
+                    </td>
+                    <td className="px-2 py-2.5 text-right tabular-nums text-rose-600">{p.cancelled}</td>
+                    <td className="px-2 py-2.5 text-right tabular-nums text-amber-600">{p.returned}</td>
+                    <td className="px-2 py-2.5 text-right tabular-nums">{p.incompleteConverted}</td>
+                    <td className="px-2 py-2.5 text-right font-bold tabular-nums">{money(p.confirmedValue)}</td>
+                    <td className="px-2 py-2.5 text-right">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="h-8"
+                        disabled={forceLogout.isPending}
+                        onClick={() => void endSession(p.userId, p.name)}
+                      >
+                        <LogOut className="mr-1 size-3.5" />
+                        Log out
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+
         <div className="grid gap-4 lg:grid-cols-2">
-          <div className="rounded-xl border border-border p-3">
-            <p className="mb-2 text-xs font-bold uppercase tracking-wide text-muted-foreground">
-              Per employee
+          <div className="rounded-xl border border-border">
+            <p className="border-b border-border px-3 py-2 text-xs font-bold uppercase tracking-wide text-muted-foreground">
+              Login sessions · IP & device
             </p>
-            {(activity.data?.byUser ?? []).length === 0 ? (
-              <p className="py-4 text-center text-sm text-muted-foreground">No activity in this range.</p>
-            ) : (
-              <ul className="space-y-1.5">
-                {(activity.data?.byUser ?? []).map((u) => (
-                  <li key={u.userId} className="flex items-center justify-between text-sm">
-                    <span className="truncate">
-                      {u.name}
-                      {u.email ? <span className="text-muted-foreground"> · {u.email}</span> : null}
-                    </span>
-                    <span className="font-bold">{u.count}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
+            <div className="max-h-96 overflow-auto">
+              {(activity.data?.sessions ?? []).length === 0 ? (
+                <p className="py-6 text-center text-sm text-muted-foreground">No sessions in this range.</p>
+              ) : (
+                <ul className="divide-y divide-border">
+                  {(activity.data?.sessions ?? []).map((s) => (
+                    <li key={s.key} className="px-3 py-2 text-sm">
+                      <div className="flex flex-wrap items-center gap-x-2">
+                        <span className="font-semibold">{s.name}</span>
+                        <span className="text-xs text-muted-foreground">
+                          {formatWhen(s.startAt)} → {formatWhen(s.endAt)}
+                        </span>
+                        <span className="ml-auto text-xs font-bold tabular-nums">{duration(s.minutes)}</span>
+                      </div>
+                      <p className="truncate text-[11px] text-muted-foreground">
+                        IP {s.ip ?? "—"} · {s.events} actions · {s.userAgent ?? "unknown device"}
+                      </p>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
           </div>
 
-          <div className="rounded-xl border border-border p-3">
-            <p className="mb-2 text-xs font-bold uppercase tracking-wide text-muted-foreground">
-              By action
+          <div className="rounded-xl border border-border">
+            <p className="flex items-center gap-1.5 border-b border-border px-3 py-2 text-xs font-bold uppercase tracking-wide text-muted-foreground">
+              <Activity className="size-3.5" /> Recent activity
             </p>
-            {(activity.data?.byAction ?? []).length === 0 ? (
-              <p className="py-4 text-center text-sm text-muted-foreground">Nothing recorded yet.</p>
-            ) : (
-              <ul className="space-y-1.5">
-                {(activity.data?.byAction ?? []).map((a) => (
-                  <li key={a.action} className="flex items-center justify-between text-sm">
-                    <span className="truncate">{a.action}</span>
-                    <span className="font-bold">{a.count}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-        </div>
-
-        <div className="rounded-xl border border-border">
-          <p className="border-b border-border px-3 py-2 text-xs font-bold uppercase tracking-wide text-muted-foreground">
-            Recent activity
-          </p>
-          <div className="max-h-96 overflow-auto">
-            {(activity.data?.recent ?? []).length === 0 ? (
-              <p className="py-6 text-center text-sm text-muted-foreground">No entries.</p>
-            ) : (
-              <ul className="divide-y divide-border">
-                {(activity.data?.recent ?? []).map((r) => (
-                  <li key={r.id} className="flex flex-wrap items-center gap-x-3 px-3 py-2 text-sm">
-                    <span className="w-32 shrink-0 text-xs text-muted-foreground">
-                      {formatWhen(r.created_at)}
-                    </span>
-                    <span className="font-semibold">{r.actor_name ?? "Admin"}</span>
-                    <span className="text-muted-foreground">{r.detail ?? r.action}</span>
-                    {r.area ? (
-                      <span className="ml-auto truncate text-xs text-muted-foreground">{r.area}</span>
-                    ) : null}
-                  </li>
-                ))}
-              </ul>
-            )}
+            <div className="max-h-96 overflow-auto">
+              {(activity.data?.recent ?? []).length === 0 ? (
+                <p className="py-6 text-center text-sm text-muted-foreground">No entries.</p>
+              ) : (
+                <ul className="divide-y divide-border">
+                  {(activity.data?.recent ?? []).map((r) => (
+                    <li key={r.id} className="flex flex-wrap items-center gap-x-3 px-3 py-2 text-sm">
+                      <span className="w-28 shrink-0 text-xs text-muted-foreground">
+                        {formatWhen(r.created_at)}
+                      </span>
+                      <span className="font-semibold">{r.actor_name ?? "Admin"}</span>
+                      <span className="truncate text-muted-foreground">{r.detail ?? r.action}</span>
+                      {r.ip ? (
+                        <span className="ml-auto text-[11px] text-muted-foreground">{r.ip}</span>
+                      ) : null}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
           </div>
         </div>
       </Panel>
