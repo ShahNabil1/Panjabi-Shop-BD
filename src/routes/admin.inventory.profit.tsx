@@ -4,6 +4,8 @@ import { useQuery } from "@tanstack/react-query";
 import { Coins, Download, PiggyBank, Receipt, TrendingDown, TrendingUp } from "lucide-react";
 
 import { profitReport } from "@/lib/profit.functions";
+import { getAdminAccess } from "@/lib/staff.functions";
+import { hasFlag } from "@/lib/rbac-shared";
 import { money } from "@/lib/inventory.shared";
 import { EmptyState, Panel, StatCard, StatusPill } from "@/components/admin/kit";
 import { ModuleHero } from "@/components/admin/module-hero";
@@ -28,6 +30,9 @@ const pctText = (n: number) => `${n.toFixed(1)}%`;
 function ProfitAndLoss() {
   const [days, setDays] = useState<number>(30);
   const [tab, setTab] = useState<Tab>("orders");
+
+  const { data: access } = useQuery({ queryKey: ["admin-access"], queryFn: () => getAdminAccess() });
+  const canExport = hasFlag(access, "flag:data.export");
 
   const { data, isLoading } = useQuery({
     queryKey: ["admin", "profit", days],
@@ -84,9 +89,11 @@ function ProfitAndLoss() {
         title="Profit & Loss"
         description="True profit per order — sales minus product cost, packaging and courier charges."
         action={
-          <Button size="sm" variant="outline" className="rounded-xl" onClick={exportCsv}>
-            <Download className="mr-1.5 size-3.5" /> Export CSV
-          </Button>
+          canExport ? (
+            <Button size="sm" variant="outline" className="rounded-xl" onClick={exportCsv}>
+              <Download className="mr-1.5 size-3.5" /> Export CSV
+            </Button>
+          ) : null
         }
       />
 

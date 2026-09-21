@@ -69,6 +69,16 @@ export const STAFF_FLAGS: StaffFlag[] = [
     label: "Set reorder rules",
     hint: "View and edit the reorder point / reorder quantity on Live inventory.",
   },
+  {
+    key: "flag:order.discount",
+    label: "Give discount on manual orders",
+    hint: "Edit the Discount field while creating an order. Without it the discount stays 0.",
+  },
+  {
+    key: "flag:data.export",
+    label: "Download data exports (CSV)",
+    hint: "Export report data such as Profit & Loss to a CSV file.",
+  },
 ];
 
 export const STAFF_FLAG_KEYS = STAFF_FLAGS.map((f) => f.key);

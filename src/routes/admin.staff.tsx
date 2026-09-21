@@ -90,6 +90,13 @@ function formatWhen(iso: string) {
   }
 }
 
+function randomPassword() {
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789@#$%";
+  const buf = new Uint32Array(14);
+  crypto.getRandomValues(buf);
+  return Array.from(buf, (n) => chars[n % chars.length]).join("");
+}
+
 const emptyDraft = {
   fullName: "",
   email: "",
@@ -192,6 +199,7 @@ function StaffPage() {
   const [creating, setCreating] = useState(false);
   const [draft, setDraft] = useState(emptyDraft);
   const [editing, setEditing] = useState<string | null>(null);
+  const [resetFor, setResetFor] = useState<string | null>(null);
   const [editDraft, setEditDraft] = useState<{
     fullName: string;
     phone: string;
@@ -275,6 +283,7 @@ function StaffPage() {
 
   const startEdit = (row: StaffRow) => {
     setEditing(row.user_id);
+    setResetFor(null);
     setEditDraft({
       fullName: row.full_name,
       phone: row.phone ?? "",
@@ -474,12 +483,68 @@ function StaffPage() {
                       value={editDraft.phone}
                       onChange={(v) => setEditDraft((d) => (d ? { ...d, phone: v } : d))}
                     />
-                    <TextField
-                      label="New password"
-                      value={editDraft.password}
-                      onChange={(v) => setEditDraft((d) => (d ? { ...d, password: v } : d))}
-                      hint="Leave empty to keep the current password."
-                    />
+                    <div className="space-y-1.5">
+                      <Label className="text-xs font-semibold">Password</Label>
+                      {resetFor === row.user_id ? (
+                        <div className="space-y-2 rounded-xl border border-amber-200 bg-amber-50/60 p-2.5">
+                          <div className="flex gap-2">
+                            <Input
+                              value={editDraft.password}
+                              placeholder="New password (min 8 characters)"
+                              onChange={(e) =>
+                                setEditDraft((d) => (d ? { ...d, password: e.target.value } : d))
+                              }
+                            />
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() =>
+                                setEditDraft((d) => (d ? { ...d, password: randomPassword() } : d))
+                              }
+                            >
+                              Generate
+                            </Button>
+                          </div>
+                          <p className="text-[11px] text-amber-800">
+                            Save changes করলে নতুন পাসওয়ার্ড চালু হবে। কর্মীকে গোপনে জানিয়ে দিন।
+                          </p>
+                          <button
+                            type="button"
+                            className="text-[11px] font-semibold text-muted-foreground underline"
+                            onClick={() => {
+                              setResetFor(null);
+                              setEditDraft((d) => (d ? { ...d, password: "" } : d));
+                            }}
+                          >
+                            বাতিল করুন
+                          </button>
+                        </div>
+                      ) : (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          className="w-full justify-center"
+                          onClick={async () => {
+                            const ok = await confirm({
+                              title: `Reset password for ${row.full_name}?`,
+                              description:
+                                "পুরোনো পাসওয়ার্ড আর কাজ করবে না। কনফার্ম করলে নতুন পাসওয়ার্ড লেখা বা র‍্যান্ডমভাবে জেনারেট করা যাবে।",
+                              confirmLabel: "Reset password",
+                              tone: "danger",
+                            });
+                            if (ok) {
+                              setResetFor(row.user_id);
+                              setEditDraft((d) => (d ? { ...d, password: randomPassword() } : d));
+                            }
+                          }}
+                        >
+                          <KeyRound className="mr-1.5 size-4" />
+                          Reset password
+                        </Button>
+                      )}
+                    </div>
                   </div>
 
                   <div className="flex items-center justify-between rounded-xl border border-border p-3">

@@ -16,6 +16,8 @@ import {
   orderSources,
 } from "@/lib/admin-schema";
 import { adminActiveDeliveryPartners } from "@/lib/delivery.functions";
+import { getAdminAccess } from "@/lib/staff.functions";
+import { hasFlag } from "@/lib/rbac-shared";
 import { providerLabels } from "@/lib/delivery-shared";
 import { BD_DIVISIONS } from "@/lib/bd-geo";
 import { AdminHeading, Panel } from "@/components/admin/kit";
@@ -170,6 +172,11 @@ function CreateOrderPage() {
   const [comboDrafts, setComboDrafts] = useState<Record<string, Record<string, string>>>({});
 
   const [discount, setDiscount] = useState(0);
+  const { data: staffAccess } = useQuery({
+    queryKey: ["admin-access"],
+    queryFn: () => getAdminAccess(),
+  });
+  const canDiscount = hasFlag(staffAccess, "flag:order.discount");
   const [deliveryCharge, setDeliveryCharge] = useState(0);
   const [advanceAmount, setAdvanceAmount] = useState(0);
   const [advanceMethod, setAdvanceMethod] =
@@ -825,10 +832,16 @@ function CreateOrderPage() {
                 <input
                   type="number"
                   min={0}
-                  className={input}
+                  className={cn(input, !canDiscount && "cursor-not-allowed opacity-60")}
                   value={discount}
+                  disabled={!canDiscount}
                   onChange={(e) => setDiscount(Math.max(0, Number(e.target.value) || 0))}
                 />
+                {!canDiscount ? (
+                  <span className="mt-1 block text-[11px] text-muted-foreground">
+                    ডিসকাউন্ট দেওয়ার অনুমতি নেই।
+                  </span>
+                ) : null}
               </label>
               <label className="block">
                 <Label>Delivery charge</Label>
