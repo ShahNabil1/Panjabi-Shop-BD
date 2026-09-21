@@ -15,6 +15,7 @@ import {
   adminReleaseOrder,
 } from "@/lib/presence.functions";
 import { useOrderPresence } from "@/lib/use-order-presence";
+import { useIdleTimeout } from "@/lib/use-idle";
 import { useOrderRealtime } from "@/lib/use-order-realtime";
 import { useAuth } from "@/lib/auth-context";
 import { adminOrderWorkspace } from "@/lib/order-admin.functions";

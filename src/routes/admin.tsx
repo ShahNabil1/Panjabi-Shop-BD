@@ -180,6 +180,16 @@ function AdminLayout() {
   const router = useRouter();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
+  // Idle guard: one hour without activity ends the admin session.
+  useIdleTimeout(
+    60 * 60_000,
+    () => {
+      toast.info("১ ঘণ্টা নিষ্ক্রিয় থাকায় সেশন শেষ হয়েছে — আবার লগইন করুন");
+      void signOut();
+    },
+    Boolean(session),
+  );
+
   const accessQuery = useQuery({
     queryKey: ["admin-access", session?.user.id ?? null],
     queryFn: () => getAdminAccess(),
