@@ -1,5 +1,5 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
-import { ArrowUpRight, Sparkles } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 
 import { getPromotions } from "@/lib/catalog.functions";
 import type { PromotionListData } from "@/lib/types";
@@ -47,8 +47,7 @@ function OffersPage() {
         <Breadcrumbs items={[{ label: tr(lang, "home"), to: "/" }, { label: tr(lang, "offers") }]} />
 
         <header className="mx-auto mb-8 mt-10 max-w-2xl text-center sm:mb-12 sm:mt-14">
-          <div className="mb-3 inline-flex items-center gap-2 text-xs font-bold uppercase text-primary">
-            <Sparkles className="size-4" aria-hidden="true" />
+          <div className="mb-3 inline-flex items-center text-xs font-bold uppercase text-primary">
             <span>{lang === "bn" ? "এক্সক্লুসিভ কালেকশন" : "Exclusive selections"}</span>
           </div>
           <h1 className="text-4xl font-black uppercase leading-tight sm:text-5xl">
@@ -64,8 +63,7 @@ function OffersPage() {
 
         {promotions.length === 0 ? (
           <div className="border border-dashed border-border bg-card px-5 py-16 text-center shadow-[var(--shadow-card)]">
-            <Sparkles className="mx-auto size-8 text-primary" aria-hidden="true" />
-            <h2 className="mt-4 text-xl font-bold">
+            <h2 className="text-xl font-bold">
               {lang === "bn" ? "নতুন অফার আসছে" : "New offers are coming"}
             </h2>
             <p className="mt-2 text-sm text-muted-foreground">

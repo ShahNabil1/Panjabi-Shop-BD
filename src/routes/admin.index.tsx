@@ -5,8 +5,8 @@ import {
   Boxes,
   Clock,
   Layers,
+  Megaphone,
   Package,
-  Sparkles,
 } from "lucide-react";
 
 import { adminOverview } from "@/lib/admin.functions";
@@ -35,7 +35,7 @@ function AdminOverviewPage() {
     { label: "Pending orders", value: String(data?.pending ?? 0), icon: Clock },
     { label: "Products", value: String(data?.productCount ?? 0), icon: Boxes },
     { label: "Categories", value: String(data?.categoryCount ?? 0), icon: Layers },
-    { label: "Promotions", value: String(data?.promotionCount ?? 0), icon: Sparkles },
+    { label: "Promotions", value: String(data?.promotionCount ?? 0), icon: Megaphone },
   ];
 
   return (
