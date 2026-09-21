@@ -6,6 +6,7 @@ import { NumberField, Panel } from "@/components/admin/kit";
 import { SaveButton, isDirty } from "@/components/admin/save-button";
 import { Button } from "@/components/ui/button";
 import { useConfirm } from "@/components/ui/confirm-dialog";
+import { cn } from "@/lib/utils";
 import { adminSearchProducts } from "@/lib/admin.functions";
 import {
   normalizeDeliveryConfig,
@@ -60,18 +61,33 @@ function ModeTabs({
   options: Array<{ value: string; label: string }>;
 }) {
   return (
-    <div className="inline-flex flex-wrap gap-1 rounded-xl border border-border bg-background/50 p-1">
-      {options.map((opt) => (
+    <div className="grid w-full grid-cols-2 gap-1.5 rounded-xl border border-border bg-muted/40 p-1.5 shadow-sm sm:w-fit">
+      {options.map((opt, index) => (
         <button
           key={opt.value}
           type="button"
           onClick={() => onChange(opt.value)}
-          className={`rounded-lg px-3 py-1.5 text-xs font-bold transition-all duration-200 active:scale-95 ${
+          className={cn(
+            "flex items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-xs font-bold transition-all duration-200",
             value === opt.value
-              ? "bg-primary text-primary-foreground shadow-sm"
-              : "text-muted-foreground hover:text-foreground"
-          }`}
+              ? index === 0
+                ? "bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-md shadow-amber-500/30 ring-1 ring-amber-400/50"
+                : "bg-gradient-to-r from-emerald-500 to-green-600 text-white shadow-md shadow-emerald-500/30 ring-1 ring-emerald-400/50"
+              : index === 0
+                ? "text-amber-700 hover:bg-amber-500/10 dark:text-amber-400"
+                : "text-emerald-700 hover:bg-emerald-500/10 dark:text-emerald-400",
+          )}
         >
+          <span
+            className={cn(
+              "size-1.5 rounded-full",
+              value === opt.value
+                ? "bg-white"
+                : index === 0
+                  ? "bg-amber-500"
+                  : "bg-emerald-500",
+            )}
+          />
           {opt.label}
         </button>
       ))}
