@@ -29,8 +29,8 @@ import {
   AreaField,
   EmptyState,
   Field,
-  NumberField,
   Panel,
+
   TextField,
   ToggleField,
 } from "@/components/admin/kit";
