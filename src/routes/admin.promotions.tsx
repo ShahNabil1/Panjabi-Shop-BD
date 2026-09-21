@@ -183,7 +183,9 @@ function PromotionsPage() {
               folder="promotions"
               value={draft.banner_url}
               onChange={(v) => setDraft({ ...draft, banner_url: v })}
+              hint="বেস্ট সাইজ: ১৬০০×৬০০ px (৮:৩), JPG/WebP, ৩০০ KB-এর কম — সব ডিভাইসে রেস্পন্সিভ থাকবে। গুরুত্বপূর্ণ লেখা মাঝের ৬০% অংশে রাখুন।"
             />
+
             <TextField
               label="Starts (YYYY-MM-DD)"
               value={(draft.starts_at ?? "").slice(0, 10)}
