@@ -1,5 +1,5 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
-import { BadgeCheck, RefreshCcw, Shirt, Sparkles } from "lucide-react";
+import { BadgeCheck, RefreshCcw, Shirt } from "lucide-react";
 
 import { RichText } from "@/components/site/rich-text";
 import { useSiteData } from "@/components/site/site-header";
@@ -31,7 +31,7 @@ export function AboutPage() {
       <section className="bg-secondary text-secondary-foreground">
         <div className="mx-auto grid w-full max-w-6xl gap-8 px-4 py-12 sm:py-16 lg:grid-cols-[minmax(0,1.2fr)_minmax(18rem,.8fr)] lg:items-center lg:py-20">
           <div className="min-w-0">
-            <div className="flex items-center gap-2 text-sm font-semibold text-primary"><Sparkles className="size-4" /> আমাদের ঐতিহ্য, আপনার রুচি</div>
+            <div className="text-sm font-semibold text-primary">আমাদের ঐতিহ্য, আপনার রুচি</div>
             <h1 className="mt-4 max-w-3xl text-4xl font-bold leading-tight sm:text-5xl">{page.title}</h1>
             <p className="mt-4 max-w-2xl text-base leading-8 text-secondary-foreground/75 sm:text-lg">মানসম্মত কাপড়, নিখুঁত সেলাই ও আধুনিক ডিজাইনে প্রতিটি উপলক্ষের জন্য আপনার নির্ভরযোগ্য পাঞ্জাবির ঠিকানা।</p>
             <Button asChild className="mt-7"><Link to="/categories">কালেকশন দেখুন</Link></Button>
