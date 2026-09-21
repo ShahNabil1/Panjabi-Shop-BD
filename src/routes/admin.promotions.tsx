@@ -290,6 +290,74 @@ function PromotionsPage() {
             </div>
           </div>
 
+          {draft.products.length ? (
+            <div className="rounded-xl border border-border/70 bg-background/40 p-3">
+              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                Discount per product
+              </p>
+              <p className="mt-1 text-[11px] leading-relaxed text-muted-foreground">
+                ছাড় সরাসরি প্রোডাক্টের বিক্রয়মূল্যে বসবে, আগের দাম কাটা দামে দেখাবে। প্রমোশন
+                বন্ধ/ডিলিট করলে বা প্রোডাক্ট সরালে আগের দাম নিজে থেকেই ফিরে আসবে। ক্রয়মূল্য ও
+                স্টকে কোনো পরিবর্তন হয় না, তাই প্রফিট হিসাব ঠিক থাকে। তারিখ দিলে সেই সময়ের
+                বাইরে ছাড় বসবে না।
+              </p>
+              <div className="mt-3 space-y-2">
+                {draft.products.map((row) => {
+                  const p = productById.get(row.product_id);
+                  const price = Number(p?.price ?? 0);
+                  const next = previewPrice(price, row.discount_type, row.discount_value);
+                  return (
+                    <div
+                      key={row.product_id}
+                      className="grid gap-2 rounded-lg border border-border/60 bg-card/60 p-2 sm:grid-cols-[minmax(0,1fr)_130px_120px]"
+                    >
+                      <div className="min-w-0">
+                        <p className="truncate text-xs font-medium">{p?.name_bn ?? "—"}</p>
+                        <p className="text-[11px] text-muted-foreground">
+                          ৳{price}
+                          {next != null ? (
+                            <span className="ml-1 font-semibold text-primary">→ ৳{next}</span>
+                          ) : null}
+                        </p>
+                      </div>
+                      <Select
+                        value={row.discount_type}
+                        onValueChange={(v) =>
+                          updateProduct(row.product_id, {
+                            discount_type: v as typeof row.discount_type,
+                          })
+                        }
+                      >
+                        <SelectTrigger className="h-8 text-xs">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="none">ছাড় নেই</SelectItem>
+                          <SelectItem value="percent">% ছাড়</SelectItem>
+                          <SelectItem value="flat">৳ ছাড়</SelectItem>
+                          <SelectItem value="fixed_price">নির্দিষ্ট দাম</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <Input
+                        type="number"
+                        min={0}
+                        disabled={row.discount_type === "none"}
+                        value={row.discount_value}
+                        onChange={(e) =>
+                          updateProduct(row.product_id, {
+                            discount_value: Number(e.target.value) || 0,
+                          })
+                        }
+                        className="h-8 text-xs"
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          ) : null}
+
+
           <div className="sticky bottom-0 z-10 -mx-4 flex gap-2 border-t border-border/70 bg-card/95 px-4 py-3 backdrop-blur sm:-mx-5 sm:px-5">
             <Button loading={save.isPending} onClick={() => save.mutate(draft)}>
               Save
