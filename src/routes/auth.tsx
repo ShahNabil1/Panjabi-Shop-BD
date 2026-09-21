@@ -1,5 +1,5 @@
 import { Link, createFileRoute, useNavigate, useRouterState } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import logoMark from "@/assets/panjabishopbd-logo.png";
+import { Turnstile, type TurnstileHandle } from "@/components/turnstile";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -43,6 +44,8 @@ function AuthPage() {
   const [fullName, setFullName] = useState("");
   const [busy, setBusy] = useState(false);
   const [googleBusy, setGoogleBusy] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const captchaRef = useRef<TurnstileHandle | null>(null);
 
   async function signInWithGoogle() {
     setGoogleBusy(true);
@@ -74,7 +77,11 @@ function AuthPage() {
     setBusy(true);
     try {
       if (mode === "signin") {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        const { error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+          options: { captchaToken: captchaToken ?? undefined },
+        });
         if (error) throw error;
         toast.success("সফলভাবে লগইন হয়েছে");
       } else {
@@ -84,6 +91,7 @@ function AuthPage() {
           options: {
             emailRedirectTo: `${window.location.origin}/admin`,
             data: { full_name: fullName },
+            captchaToken: captchaToken ?? undefined,
           },
         });
         if (error) throw error;
@@ -92,6 +100,7 @@ function AuthPage() {
       await navigate({ to: "/admin" });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "কিছু একটা সমস্যা হয়েছে");
+      captchaRef.current?.reset();
     } finally {
       setBusy(false);
     }
