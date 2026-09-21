@@ -10,5 +10,5 @@ export const Route = createFileRoute("/return-policy")({
     const page = readLegalPage("legal_returns", loaderData);
     return { meta: [{ title: page.metaTitle }, { name: "description", content: page.metaDescription }, { property: "og:title", content: page.metaTitle }, { property: "og:description", content: page.metaDescription }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }], links: [{ rel: "canonical", href: absoluteUrl("/return-policy") }] };
   },
-  component: () => <LegalPage page={readLegalPage("legal_returns", Route.useLoaderData())} />,
+  component: () => <LegalPage page={readLegalPage("legal_returns", Route.useLoaderData())} pageKey="legal_returns" />,
 });

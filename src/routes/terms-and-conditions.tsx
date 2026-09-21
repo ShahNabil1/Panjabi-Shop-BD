@@ -10,5 +10,5 @@ export const Route = createFileRoute("/terms-and-conditions")({
     const page = readLegalPage("legal_terms", loaderData);
     return { meta: [{ title: page.metaTitle }, { name: "description", content: page.metaDescription }, { property: "og:title", content: page.metaTitle }, { property: "og:description", content: page.metaDescription }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }], links: [{ rel: "canonical", href: absoluteUrl("/terms-and-conditions") }] };
   },
-  component: () => <LegalPage page={readLegalPage("legal_terms", Route.useLoaderData())} />,
+  component: () => <LegalPage page={readLegalPage("legal_terms", Route.useLoaderData())} pageKey="legal_terms" />,
 });
