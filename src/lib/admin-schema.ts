@@ -66,6 +66,8 @@ export type OrderBucket = (typeof orderBuckets)[number];
 
 
 export const promotionTypes = ["offer", "featured", "flash", "new_arrival"] as const;
+export const promotionDiscountTypes = ["none", "percent", "flat", "fixed_price"] as const;
+
 
 const uuid = z.string().uuid();
 const optText = z
