@@ -3,12 +3,13 @@ import { useConfirm } from "@/components/ui/confirm-dialog";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { HelpCircle, Pencil, Search, Trash2, X } from "lucide-react";
+import { GripVertical, HelpCircle, Pencil, Search, Trash2, X } from "lucide-react";
 
 import {
   adminDeleteFaq,
   adminListFaqs,
   adminListSettings,
+  adminReorderFaqs,
   adminSaveFaq,
   adminSaveSetting,
 } from "@/lib/admin.functions";
@@ -17,12 +18,11 @@ import {
   AdminHeading,
   AreaField,
   EmptyState,
-  NumberField,
   Panel,
   TextField,
   ToggleField,
 } from "@/components/admin/kit";
-import { ImageUploadButton } from "@/components/admin/image-upload";
+import { ImageField } from "@/components/admin/image-upload";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/admin/faqs")({
@@ -87,34 +87,14 @@ function FaqSeoPanel() {
         maxLength={160}
         hint="সর্বোচ্চ ১৬০ ক্যারেক্টার"
       />
-      <div className="space-y-2">
-        <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-          OG image
-        </p>
-        <div className="flex items-center gap-3">
-          {seo.og_image ? (
-            <img
-              src={seo.og_image}
-              alt="FAQ share preview"
-              className="h-16 w-28 rounded-md border border-border object-cover"
-            />
-          ) : (
-            <div className="flex h-16 w-28 items-center justify-center rounded-md border border-dashed border-border text-[11px] text-muted-foreground">
-              No image
-            </div>
-          )}
-          <ImageUploadButton
-            folder="site"
-            label="Upload"
-            onUploaded={(urls) => urls[0] && setSeo({ ...seo, og_image: urls[0] })}
-          />
-          {seo.og_image ? (
-            <Button variant="ghost" size="sm" onClick={() => setSeo({ ...seo, og_image: "" })}>
-              <X className="size-4" />
-            </Button>
-          ) : null}
-        </div>
-      </div>
+      <ImageField
+        label="OG image"
+        folder="site"
+        value={seo.og_image || null}
+        onChange={(url) => setSeo({ ...seo, og_image: url ?? "" })}
+        cropPreset="og"
+        hint="বেস্ট সাইজ: ১২০০×৬৩০ px (১.৯১:১), JPG/WebP, ৩০০ KB-এর কম। ছবি আপলোডের পর Crop চাপলে এই অনুপাতে নিখুঁতভাবে অ্যাডজাস্ট করা যাবে।"
+      />
       <Button
         loading={save.isPending}
         onClick={() => save.mutate()}
@@ -153,7 +133,13 @@ function FaqsAdmin() {
   const confirmDialog = useConfirm();
   const [draft, setDraft] = useState<FaqInput>(emptyFaq());
   const [openId, setOpenId] = useState<string | null>(null);
+  const [dragId, setDragId] = useState<string | null>(null);
+  const [order, setOrder] = useState<string[]>([]);
   const { data } = useQuery({ queryKey: ["admin", "faqs"], queryFn: () => adminListFaqs() });
+
+  useEffect(() => {
+    setOrder((data ?? []).map((faq) => faq.id));
+  }, [data]);
 
   const save = useMutation({
     mutationFn: (input: FaqInput) => adminSaveFaq({ data: input }),
@@ -172,6 +158,36 @@ function FaqsAdmin() {
     },
     onError: (e: Error) => toast.error(e.message),
   });
+  const reorder = useMutation({
+    mutationFn: (ids: string[]) => adminReorderFaqs({ data: { ids } }),
+    onSuccess: async () => {
+      await qc.invalidateQueries({ queryKey: ["admin", "faqs"] });
+    },
+    onError: (e: Error) => {
+      toast.error(e.message);
+      setOrder((data ?? []).map((faq) => faq.id));
+    },
+  });
+
+  const orderedFaqs = (data ?? []).slice().sort((a, b) => {
+    const aIndex = order.indexOf(a.id);
+    const bIndex = order.indexOf(b.id);
+    return (aIndex < 0 ? Number.MAX_SAFE_INTEGER : aIndex) -
+      (bIndex < 0 ? Number.MAX_SAFE_INTEGER : bIndex);
+  });
+
+  const dropOn = (targetId: string) => {
+    if (!dragId || dragId === targetId) return;
+    const next = order.slice();
+    const from = next.indexOf(dragId);
+    const to = next.indexOf(targetId);
+    if (from < 0 || to < 0) return;
+    next.splice(from, 1);
+    next.splice(to, 0, dragId);
+    setOrder(next);
+    setDragId(null);
+    reorder.mutate(next);
+  };
 
   return (
     <div className="space-y-6 pb-16">
@@ -197,12 +213,7 @@ function FaqsAdmin() {
             value={draft.answer_bn}
             onChange={(v) => setDraft({ ...draft, answer_bn: v, answer_en: v })}
           />
-          <div className="grid gap-3 sm:grid-cols-2">
-            <NumberField
-              label="Sort order"
-              value={draft.sort_order}
-              onChange={(v) => setDraft({ ...draft, sort_order: v })}
-            />
+          <div>
             <ToggleField
               label="Active"
               checked={draft.is_active}
@@ -227,19 +238,27 @@ function FaqsAdmin() {
         </Panel>
 
         <Panel className="p-0">
-          <h2 className="border-b border-border p-4 text-sm font-bold">All questions</h2>
+          <div className="flex items-center justify-between gap-3 border-b border-border p-4">
+            <h2 className="text-sm font-bold">All questions</h2>
+            <span className="text-xs text-muted-foreground">ড্র্যাগ করে সাজান</span>
+          </div>
           {(data ?? []).length === 0 ? (
             <div className="p-4">
               <EmptyState title="No FAQs yet" hint="Add your first question on the left." />
             </div>
           ) : (
             <ul className="divide-y divide-border">
-              {(data ?? []).map((f, i) => {
+              {orderedFaqs.map((f, i) => {
                 const isOpen = openId === f.id;
                 return (
                   <li
                     key={f.id}
-                    className="admin-rise transition-colors duration-300"
+                     draggable
+                     onDragStart={() => setDragId(f.id)}
+                     onDragOver={(event) => event.preventDefault()}
+                     onDrop={() => dropOn(f.id)}
+                     onDragEnd={() => setDragId(null)}
+                     className={`admin-rise transition-colors duration-300 ${dragId === f.id ? "opacity-50" : ""}`}
                     style={{ animationDelay: `${i * 30}ms` }}
                   >
                     <button
@@ -247,6 +266,7 @@ function FaqsAdmin() {
                       onClick={() => setOpenId(isOpen ? null : f.id)}
                       className="group flex w-full items-center gap-2 px-4 py-3 text-left text-sm transition-colors duration-200 hover:bg-primary/5"
                     >
+                      <GripVertical className="size-4 shrink-0 cursor-grab text-muted-foreground active:cursor-grabbing" />
                       <p className="min-w-0 flex-1 truncate font-medium">
                         {f.question_bn || f.question_en}
                       </p>

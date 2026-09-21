@@ -1,1 +1,2 @@
-- [x] Redesign /contact without adding a form; preserve existing phone, email, address, and payment details.
+- [x] FAQ list: replace Sort Order with drag sorting
+- [x] FAQ OG image: size guidance and crop tool
