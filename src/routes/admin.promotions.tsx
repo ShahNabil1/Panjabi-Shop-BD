@@ -107,13 +107,51 @@ function PromotionsPage() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const reorder = useMutation({
+    mutationFn: (ids: string[]) => adminReorderPromotions({ data: { ids } }),
+    onSuccess: async () => {
+      await qc.invalidateQueries({ queryKey: ["admin", "promotions"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
   function toggleProduct(id: string) {
     setDraft((d) => ({
       ...d,
-      product_ids: d.product_ids.includes(id)
-        ? d.product_ids.filter((x) => x !== id)
-        : [...d.product_ids, id],
+      products: d.products.some((x) => x.product_id === id)
+        ? d.products.filter((x) => x.product_id !== id)
+        : [...d.products, { product_id: id, discount_type: "none" as const, discount_value: 0 }],
     }));
+  }
+
+  function updateProduct(id: string, patch: Partial<PromotionInput["products"][number]>) {
+    setDraft((d) => ({
+      ...d,
+      products: d.products.map((x) => (x.product_id === id ? { ...x, ...patch } : x)),
+    }));
+  }
+
+  const productById = useMemo(
+    () => new Map((products.data ?? []).map((p) => [p.id as string, p])),
+    [products.data],
+  );
+
+  const orderedPromotions = useMemo(() => {
+    const list = (promotions.data ?? []).slice();
+    if (!order.length) return list;
+    return list.sort((a, b) => order.indexOf(a.id) - order.indexOf(b.id));
+  }, [promotions.data, order]);
+
+  function dropOn(targetId: string) {
+    if (!dragId || dragId === targetId) return;
+    const ids = orderedPromotions.map((p) => p.id);
+    const from = ids.indexOf(dragId);
+    const to = ids.indexOf(targetId);
+    if (from < 0 || to < 0) return;
+    ids.splice(to, 0, ids.splice(from, 1)[0] as string);
+    setOrder(ids);
+    setDragId(null);
+    reorder.mutate(ids);
   }
 
   const filteredProducts = useMemo(() => {
@@ -125,6 +163,7 @@ function PromotionsPage() {
       `${p.name_bn} ${p.name_en}`.toLowerCase().includes(q),
     );
   }, [products.data, productQuery]);
+
 
   return (
     <div className="space-y-6 pb-16">
