@@ -29,6 +29,9 @@ function ProfitAndLoss() {
   const [days, setDays] = useState<number>(30);
   const [tab, setTab] = useState<Tab>("orders");
 
+  const { data: access } = useQuery({ queryKey: ["admin-access"], queryFn: () => getAdminAccess() });
+  const canExport = hasFlag(access, "flag:data.export");
+
   const { data, isLoading } = useQuery({
     queryKey: ["admin", "profit", days],
     queryFn: () => profitReport({ data: { days } }),
