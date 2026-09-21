@@ -256,6 +256,22 @@ function AdminLayout() {
     setMobileOpen(false);
   }, [pathname]);
 
+  // While the mobile drawer is open, freeze the page behind it so scrolling
+  // inside the menu never moves the content underneath.
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const { body } = document;
+    const prevOverflow = body.style.overflow;
+    const prevTouch = body.style.touchAction;
+    body.style.overflow = "hidden";
+    body.style.touchAction = "none";
+    return () => {
+      body.style.overflow = prevOverflow;
+      body.style.touchAction = prevTouch;
+    };
+  }, [mobileOpen]);
+
+
   useEffect(() => {
     if (!loading && !session) void navigate({ to: "/auth" });
   }, [loading, session, navigate]);
