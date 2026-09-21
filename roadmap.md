@@ -1,2 +1,2 @@
-- [ ] FAQ list: replace Sort Order with drag sorting
-- [ ] FAQ OG image: size guidance and crop tool
+- [x] FAQ list: replace Sort Order with drag sorting
+- [x] FAQ OG image: size guidance and crop tool

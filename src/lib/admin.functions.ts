@@ -883,11 +883,35 @@ export const adminSaveFaq = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const db = await requireAdmin(context.supabase, context.userId);
     const { id, ...rest } = data;
+    let payload = rest;
+    if (!id) {
+      const { data: last } = await db
+        .from("faqs")
+        .select("sort_order")
+        .order("sort_order", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      payload = { ...rest, sort_order: Number(last?.sort_order ?? -1) + 1 };
+    }
     const res = id
-      ? await db.from("faqs").update(rest).eq("id", id).select("id").single()
-      : await db.from("faqs").insert(rest).select("id").single();
+      ? await db.from("faqs").update(payload).eq("id", id).select("id").single()
+      : await db.from("faqs").insert(payload).select("id").single();
     if (res.error) throw new Error(res.error.message);
     return res.data;
+  });
+
+export const adminReorderFaqs = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z.object({ ids: z.array(z.string().uuid()).max(200) }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const db = await requireAdmin(context.supabase, context.userId);
+    for (const [index, id] of data.ids.entries()) {
+      const { error } = await db.from("faqs").update({ sort_order: index }).eq("id", id);
+      if (error) throw new Error(error.message);
+    }
+    return { ok: true };
   });
 
 export const adminDeleteFaq = createServerFn({ method: "POST" })
