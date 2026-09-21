@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import type { ReactNode } from "react";
 import { Search, Trash2 } from "lucide-react";
 
 import { NumberField, Panel } from "@/components/admin/kit";
@@ -15,6 +16,51 @@ import {
   type ProductDeliveryMode,
   type ProductDeliveryRule,
 } from "@/lib/delivery-rates";
+
+function Collapse({ open, children }: { open: boolean; children: ReactNode }) {
+  const innerRef = useRef<HTMLDivElement | null>(null);
+  const [height, setHeight] = useState(0);
+
+  useLayoutEffect(() => {
+    const el = innerRef.current;
+    if (!el) return;
+    const measure = () => setHeight(el.offsetHeight);
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  const ease = "cubic-bezier(0.22, 0.61, 0.24, 1)";
+
+  return (
+    <div
+      aria-hidden={!open}
+      style={{
+        height: open ? height : 0,
+        opacity: open ? 1 : 0,
+        filter: open ? "blur(0px)" : "blur(3px)",
+        overflow: "hidden",
+        transition: `height 760ms ${ease}, opacity 620ms ${ease}, filter 620ms ${ease}`,
+        willChange: "height, opacity",
+      }}
+      className="motion-reduce:!transition-none"
+    >
+      <div
+        ref={innerRef}
+        style={{
+          transform: open ? "translateY(0px) scale(1)" : "translateY(-6px) scale(0.985)",
+          transformOrigin: "top center",
+          transition: `transform 760ms ${ease}`,
+          willChange: "transform",
+        }}
+        className={cn("motion-reduce:!transition-none", !open && "pointer-events-none")}
+      >
+        {children}
+      </div>
+    </div>
+  );
+}
 
 function Toggle({
   checked,
@@ -187,28 +233,31 @@ export function DeliverySettingsPanel({
           />
         </div>
 
-        <div className="grid gap-3 sm:grid-cols-3">
-          {config.mode === "uniform" ? (
-            <NumberField
-              label="Universal rate (৳)"
-              hint="Same charge anywhere in Bangladesh"
-              value={config.uniform}
-              onChange={(v) => patch({ uniform: v })}
-            />
-          ) : (
-            <>
+        <div className="grid items-start gap-3 sm:grid-cols-3">
+          <div className="min-w-0 sm:col-span-2">
+            <Collapse open={config.mode === "zone"}>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <NumberField
+                  label="Inside Dhaka (৳)"
+                  value={config.inside_dhaka}
+                  onChange={(v) => patch({ inside_dhaka: v })}
+                />
+                <NumberField
+                  label="Outside Dhaka (৳)"
+                  value={config.outside_dhaka}
+                  onChange={(v) => patch({ outside_dhaka: v })}
+                />
+              </div>
+            </Collapse>
+            <Collapse open={config.mode === "uniform"}>
               <NumberField
-                label="Inside Dhaka (৳)"
-                value={config.inside_dhaka}
-                onChange={(v) => patch({ inside_dhaka: v })}
+                label="Universal rate (৳)"
+                hint="Same charge anywhere in Bangladesh"
+                value={config.uniform}
+                onChange={(v) => patch({ uniform: v })}
               />
-              <NumberField
-                label="Outside Dhaka (৳)"
-                value={config.outside_dhaka}
-                onChange={(v) => patch({ outside_dhaka: v })}
-              />
-            </>
-          )}
+            </Collapse>
+          </div>
           <NumberField
             label="Free delivery above (৳)"
             hint="0 = off"
