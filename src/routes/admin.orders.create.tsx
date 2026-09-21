@@ -16,6 +16,8 @@ import {
   orderSources,
 } from "@/lib/admin-schema";
 import { adminActiveDeliveryPartners } from "@/lib/delivery.functions";
+import { getAdminAccess } from "@/lib/staff.functions";
+import { hasFlag } from "@/lib/rbac-shared";
 import { providerLabels } from "@/lib/delivery-shared";
 import { BD_DIVISIONS } from "@/lib/bd-geo";
 import { AdminHeading, Panel } from "@/components/admin/kit";
@@ -170,6 +172,11 @@ function CreateOrderPage() {
   const [comboDrafts, setComboDrafts] = useState<Record<string, Record<string, string>>>({});
 
   const [discount, setDiscount] = useState(0);
+  const { data: staffAccess } = useQuery({
+    queryKey: ["admin-access"],
+    queryFn: () => getAdminAccess(),
+  });
+  const canDiscount = hasFlag(staffAccess, "flag:order.discount");
   const [deliveryCharge, setDeliveryCharge] = useState(0);
   const [advanceAmount, setAdvanceAmount] = useState(0);
   const [advanceMethod, setAdvanceMethod] =
