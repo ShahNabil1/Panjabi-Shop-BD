@@ -90,6 +90,13 @@ function formatWhen(iso: string) {
   }
 }
 
+function randomPassword() {
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789@#$%";
+  const buf = new Uint32Array(14);
+  crypto.getRandomValues(buf);
+  return Array.from(buf, (n) => chars[n % chars.length]).join("");
+}
+
 const emptyDraft = {
   fullName: "",
   email: "",
@@ -192,6 +199,7 @@ function StaffPage() {
   const [creating, setCreating] = useState(false);
   const [draft, setDraft] = useState(emptyDraft);
   const [editing, setEditing] = useState<string | null>(null);
+  const [resetFor, setResetFor] = useState<string | null>(null);
   const [editDraft, setEditDraft] = useState<{
     fullName: string;
     phone: string;
