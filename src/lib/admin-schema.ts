@@ -66,6 +66,8 @@ export type OrderBucket = (typeof orderBuckets)[number];
 
 
 export const promotionTypes = ["offer", "featured", "flash", "new_arrival"] as const;
+export const promotionDiscountTypes = ["none", "percent", "flat", "fixed_price"] as const;
+
 
 const uuid = z.string().uuid();
 const optText = z
@@ -314,8 +316,23 @@ export const promotionSchema = z.object({
   sort_order: z.number().int().min(0).default(0),
   show_on_home: z.boolean().default(true),
   is_active: z.boolean().default(true),
-  product_ids: z.array(uuid).default([]),
+  /**
+   * Products in the promotion, each with its own optional discount. The
+   * discount is written onto the product price when the promotion is saved
+   * (and rolled back when it is removed/deactivated), so cart, checkout,
+   * orders, inventory and profit reporting all keep using one price source.
+   */
+  products: z
+    .array(
+      z.object({
+        product_id: uuid,
+        discount_type: z.enum(promotionDiscountTypes).default("none"),
+        discount_value: z.number().min(0).max(1000000).default(0),
+      }),
+    )
+    .default([]),
 });
+
 
 export const landingPageSchema = z.object({
   id: uuid.optional(),

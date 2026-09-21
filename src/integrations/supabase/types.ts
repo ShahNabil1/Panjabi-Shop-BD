@@ -1646,19 +1646,31 @@ export type Database = {
       }
       promotion_products: {
         Row: {
+          compare_before: number | null
+          discount_type: string
+          discount_value: number
           id: string
+          price_before: number | null
           product_id: string
           promotion_id: string
           sort_order: number
         }
         Insert: {
+          compare_before?: number | null
+          discount_type?: string
+          discount_value?: number
           id?: string
+          price_before?: number | null
           product_id: string
           promotion_id: string
           sort_order?: number
         }
         Update: {
+          compare_before?: number | null
+          discount_type?: string
+          discount_value?: number
           id?: string
+          price_before?: number | null
           product_id?: string
           promotion_id?: string
           sort_order?: number

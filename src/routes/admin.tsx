@@ -256,6 +256,22 @@ function AdminLayout() {
     setMobileOpen(false);
   }, [pathname]);
 
+  // While the mobile drawer is open, freeze the page behind it so scrolling
+  // inside the menu never moves the content underneath.
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const { body } = document;
+    const prevOverflow = body.style.overflow;
+    const prevTouch = body.style.touchAction;
+    body.style.overflow = "hidden";
+    body.style.touchAction = "none";
+    return () => {
+      body.style.overflow = prevOverflow;
+      body.style.touchAction = prevTouch;
+    };
+  }, [mobileOpen]);
+
+
   useEffect(() => {
     if (!loading && !session) void navigate({ to: "/auth" });
   }, [loading, session, navigate]);
@@ -400,7 +416,7 @@ function AdminLayout() {
         </Link>
       </div>
 
-      <nav className="relative flex-1 space-y-3 overflow-y-auto px-4 pb-8 pt-5">
+      <nav className="relative flex-1 space-y-3 overflow-y-auto overscroll-contain px-4 pb-8 pt-5">
         {sections.map((section) => {
           const open = collapsed || openSections.includes(section.title);
           const hasActive = section.items.some(isActive);
