@@ -280,6 +280,13 @@ function AdminOrderDetail() {
       setPending("");
       setReason("");
       await qc.invalidateQueries({ queryKey: ["admin"] });
+      // Leave the order workspace right away and return to the board (and the
+      // exact status tab) the user came from.
+      if (ownsRef.current) {
+        void adminReleaseOrder({ data: { id } }).catch(() => {});
+        ownsRef.current = false;
+      }
+      void navigate({ to: backTo, search: backSearch });
     },
     onError: (e: Error) => toast.error(e.message),
   });
