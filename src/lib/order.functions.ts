@@ -69,6 +69,10 @@ export const placeOrder = createServerFn({ method: "POST" })
     const { getRequestSecurityContext } = await import("./request-security.server");
     const security = await getRequestSecurityContext();
 
+    const { verifyTurnstile } = await import("./turnstile.server");
+    const captcha = await verifyTurnstile(data.captchaToken, security?.ip ?? null);
+    if (!captcha.ok) throw new Error("CAPTCHA_FAILED");
+
 
 
     const productIds = [...new Set(data.items.map((i) => i.productId))];
