@@ -70,7 +70,7 @@ function emptyPromotion(): PromotionInput {
     sort_order: 0,
     show_on_home: true,
     is_active: true,
-    product_ids: [],
+    products: [],
   };
 }
 
