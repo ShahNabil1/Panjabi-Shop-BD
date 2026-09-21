@@ -65,6 +65,17 @@ export const getAdminAccess = createServerFn({ method: "GET" })
       .eq("id", context.userId)
       .maybeSingle();
 
+    // An admin can end someone's sessions; any token issued before that moment
+    // is treated as signed out by the admin shell.
+    const { data: revocation } = await context.supabase
+      .from("admin_session_revocations")
+      .select("revoked_at")
+      .eq("user_id", context.userId)
+      .maybeSingle();
+    const issuedAt = Number((context.claims as { iat?: number } | undefined)?.iat ?? 0) * 1000;
+    const revokedAt = (revocation as { revoked_at?: string } | null)?.revoked_at;
+    const revoked = Boolean(revokedAt && issuedAt && new Date(revokedAt).getTime() > issuedAt);
+
     const row = staff as {
       full_name?: string;
       email?: string;
@@ -78,7 +89,8 @@ export const getAdminAccess = createServerFn({ method: "GET" })
       isAdmin,
       isStaff: Boolean(row),
       fullAccess: isAdmin || Boolean(row?.full_access),
-      isActive: isAdmin || Boolean(row?.is_active),
+      isActive: !revoked && (isAdmin || Boolean(row?.is_active)),
+      revoked,
       permissions: clean(row?.permissions ?? []),
       name:
         row?.full_name ??
