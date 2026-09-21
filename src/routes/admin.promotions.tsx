@@ -229,7 +229,7 @@ function PromotionsPage() {
           <div>
             <div className="flex flex-wrap items-center justify-between gap-2">
               <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                Select Products ({draft.product_ids.length})
+                Select Products ({draft.products.length})
               </p>
               <div className="relative w-full max-w-[220px]">
                 <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
