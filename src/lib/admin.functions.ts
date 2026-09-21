@@ -675,17 +675,58 @@ export const adminListPromotions = createServerFn({ method: "GET" })
     return unwrap(
       await db
         .from("promotions")
-        .select("*, promotion_products(product_id, sort_order)")
+        .select(
+          "*, promotion_products(product_id, sort_order, discount_type, discount_value, price_before, compare_before)",
+        )
         .order("sort_order"),
     );
   });
+
+type PromoDb = Awaited<ReturnType<typeof requireAdmin>>;
+
+/**
+ * Promotion discounts are written onto the product price itself, and the
+ * pre-discount price is kept on the promotion link so it can be rolled back.
+ * That keeps ONE price source for storefront, cart, checkout, orders and
+ * profit reports (cost_price is never touched, so margins stay correct).
+ */
+async function restorePromotionPrices(db: PromoDb, promotionId: string) {
+  const { data } = await db
+    .from("promotion_products")
+    .select("product_id, price_before, compare_before")
+    .eq("promotion_id", promotionId);
+  for (const row of data ?? []) {
+    if (row.price_before == null) continue;
+    await db
+      .from("products")
+      .update({ price: row.price_before, compare_at_price: row.compare_before })
+      .eq("id", row.product_id);
+  }
+}
+
+function discountedPrice(
+  price: number,
+  type: "none" | "percent" | "flat" | "fixed_price",
+  value: number,
+) {
+  if (type === "none" || !(value > 0)) return null;
+  const next =
+    type === "percent" ? price * (1 - value / 100) : type === "flat" ? price - value : value;
+  const rounded = Math.round(next);
+  if (!Number.isFinite(rounded) || rounded < 0 || rounded >= price) return null;
+  return rounded;
+}
 
 export const adminSavePromotion = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => promotionSchema.parse(mirrorLang(input)))
   .handler(async ({ data, context }) => {
     const db = await requireAdmin(context.supabase, context.userId);
-    const { id, product_ids, ...rest } = data;
+    const { id, products, ...rest } = data;
+
+    // Roll back any prices this promotion had previously discounted.
+    if (id) await restorePromotionPrices(db, id);
+
     const res = id
       ? await db.from("promotions").update(rest).eq("id", id).select("id").single()
       : await db.from("promotions").insert(rest).select("id").single();
@@ -693,17 +734,92 @@ export const adminSavePromotion = createServerFn({ method: "POST" })
     const promotionId = res.data.id as string;
 
     await db.from("promotion_products").delete().eq("promotion_id", promotionId);
-    if (product_ids.length) {
-      const ins = await db.from("promotion_products").insert(
-        product_ids.map((productId, i) => ({
-          promotion_id: promotionId,
-          product_id: productId,
-          sort_order: i,
-        })),
+    if (!products.length) return { id: promotionId, discounted: 0 };
+
+    const today = new Date().toISOString().slice(0, 10);
+    const started = !rest.starts_at || rest.starts_at.slice(0, 10) <= today;
+    const notEnded = !rest.ends_at || rest.ends_at.slice(0, 10) >= today;
+    const live = rest.is_active && started && notEnded;
+
+    const { data: rows } = await db
+      .from("products")
+      .select("id, price, compare_at_price")
+      .in(
+        "id",
+        products.map((p) => p.product_id),
       );
-      if (ins.error) throw new Error(ins.error.message);
+    const byId = new Map((rows ?? []).map((r) => [r.id as string, r]));
+
+    let discounted = 0;
+    const links = products.map((p, i) => {
+      const row = byId.get(p.product_id);
+      const price = Number(row?.price ?? 0);
+      const next = live && row ? discountedPrice(price, p.discount_type, p.discount_value) : null;
+      if (next == null) {
+        return {
+          promotion_id: promotionId,
+          product_id: p.product_id,
+          sort_order: i,
+          discount_type: p.discount_type,
+          discount_value: p.discount_value,
+          price_before: null,
+          compare_before: null,
+        };
+      }
+      discounted += 1;
+      return {
+        promotion_id: promotionId,
+        product_id: p.product_id,
+        sort_order: i,
+        discount_type: p.discount_type,
+        discount_value: p.discount_value,
+        price_before: price,
+        compare_before: row?.compare_at_price ?? null,
+      };
+    });
+
+    const ins = await db.from("promotion_products").insert(links);
+    if (ins.error) throw new Error(ins.error.message);
+
+    for (const link of links) {
+      if (link.price_before == null) continue;
+      const original = Number(link.price_before);
+      const row = byId.get(link.product_id);
+      const p = products.find((x) => x.product_id === link.product_id)!;
+      const next = discountedPrice(original, p.discount_type, p.discount_value);
+      if (next == null) continue;
+      const { error } = await db
+        .from("products")
+        .update({
+          price: next,
+          // Keep the pre-offer price visible as the struck-through price.
+          compare_at_price: Number(row?.compare_at_price ?? 0) > original
+            ? row?.compare_at_price
+            : original,
+        })
+        .eq("id", link.product_id);
+      if (error) throw new Error(error.message);
     }
-    return { id: promotionId };
+
+    return { id: promotionId, discounted };
+  });
+
+/** Drag-and-drop ordering for the promotion list. */
+export const adminReorderPromotions = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z.object({ ids: z.array(z.string().uuid()).max(200) }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const db = await requireAdmin(context.supabase, context.userId);
+    for (let i = 0; i < data.ids.length; i += 1) {
+      const { error } = await db
+        .from("promotions")
+        .update({ sort_order: i })
+        .eq("id", data.ids[i] as string);
+      if (error) throw new Error(error.message);
+    }
+    return { ok: true };
   });
 
 export const adminDeletePromotion = createServerFn({ method: "POST" })
@@ -711,11 +827,14 @@ export const adminDeletePromotion = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => idSchema.parse(input))
   .handler(async ({ data, context }) => {
     const db = await requireAdmin(context.supabase, context.userId);
+    // Put original prices back before the links disappear.
+    await restorePromotionPrices(db, data.id);
     await db.from("promotion_products").delete().eq("promotion_id", data.id);
     const { error } = await db.from("promotions").delete().eq("id", data.id);
     if (error) throw new Error(error.message);
     return { ok: true };
   });
+
 
 export const adminListLandingPages = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
