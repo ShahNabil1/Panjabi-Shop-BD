@@ -1,2 +1,3 @@
-- [x] FAQ list: replace Sort Order with drag sorting
-- [x] FAQ OG image: size guidance and crop tool
+- [ ] Add professional homepage SEO settings panel
+- [ ] Connect saved homepage SEO to live / metadata
+- [ ] Add 1200x630 OG image guidance and crop tool
