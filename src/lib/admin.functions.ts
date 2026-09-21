@@ -793,9 +793,11 @@ export const adminSavePromotion = createServerFn({ method: "POST" })
         .update({
           price: next,
           // Keep the pre-offer price visible as the struck-through price.
-          compare_at_price: Number(row?.compare_at_price ?? 0) > original
-            ? row?.compare_at_price
-            : original,
+          compare_at_price:
+            Number(row?.compare_at_price ?? 0) > original
+              ? Number(row?.compare_at_price ?? original)
+              : original,
+
         })
         .eq("id", link.product_id);
       if (error) throw new Error(error.message);
