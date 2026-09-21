@@ -79,6 +79,9 @@ function PromotionsPage() {
   const confirmDialog = useConfirm();
   const [draft, setDraft] = useState<PromotionInput>(emptyPromotion());
   const [productQuery, setProductQuery] = useState("");
+  const [dragId, setDragId] = useState<string | null>(null);
+  const [order, setOrder] = useState<string[]>([]);
+
 
   const promotions = useQuery({
     queryKey: ["admin", "promotions"],
