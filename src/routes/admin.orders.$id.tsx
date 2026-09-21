@@ -15,6 +15,7 @@ import {
   adminReleaseOrder,
 } from "@/lib/presence.functions";
 import { useOrderPresence } from "@/lib/use-order-presence";
+import { useIdleTimeout } from "@/lib/use-idle";
 import { useOrderRealtime } from "@/lib/use-order-realtime";
 import { useAuth } from "@/lib/auth-context";
 import { adminOrderWorkspace } from "@/lib/order-admin.functions";
@@ -184,6 +185,22 @@ function AdminOrderDetail() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
+
+  // Idle guard: 5 minutes without any activity releases the order and sends
+  // the staff member back to the board, so nobody blocks an order by walking
+  // away from the desk.
+  useIdleTimeout(
+    5 * 60_000,
+    () => {
+      if (ownsRef.current) {
+        void adminReleaseOrder({ data: { id } }).catch(() => {});
+        ownsRef.current = false;
+      }
+      toast.info("৫ মিনিট নিষ্ক্রিয় থাকায় অর্ডার থেকে বের করে দেওয়া হয়েছে");
+      void navigate({ to: backTo, search: backSearch });
+    },
+    Boolean(id) && !evictedBy,
+  );
 
   // Someone else claimed the order while we were inside it.
   useEffect(() => {
