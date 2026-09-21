@@ -422,10 +422,10 @@ export function OrdersBoard({
 
               <li
                 key={o.id}
-                className="flex flex-wrap items-center justify-between gap-3 px-4 py-3.5 transition-colors duration-200 hover:bg-muted/40"
+                className="group flex flex-wrap items-center justify-between gap-3 px-4 py-3.5 transition-colors duration-200 hover:bg-muted/40"
               >
                 <span
-                  className="flex size-8 shrink-0 items-center justify-center rounded-full border border-border bg-muted text-xs font-bold tabular-nums text-foreground"
+                  className="flex size-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary to-amber-500 text-xs font-bold tabular-nums text-primary-foreground shadow-md shadow-primary/20 ring-2 ring-white/80 transition-all duration-200 group-hover:scale-110 group-hover:shadow-lg group-hover:shadow-primary/30 dark:ring-white/20"
                   aria-label={`Serial number ${(current - 1) * pageSize + rowIndex + 1}`}
                   title="Serial number"
                 >
