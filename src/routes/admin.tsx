@@ -196,12 +196,20 @@ function AdminLayout() {
     queryKey: ["admin-access", session?.user.id ?? null],
     queryFn: () => getAdminAccess(),
     enabled: Boolean(session),
-    staleTime: 5 * 60 * 1000,
+    refetchInterval: 60_000,
+    staleTime: 30 * 1000,
     gcTime: 30 * 60 * 1000,
     retry: 1,
   });
   const access = accessQuery.data ?? null;
   const manageStaff = canManageStaff(access);
+
+  // An admin ended this session from Staff & Access.
+  useEffect(() => {
+    if (!access?.revoked) return;
+    toast.info("একজন অ্যাডমিন আপনার সেশন বন্ধ করেছেন — আবার লগইন করুন");
+    void signOut();
+  }, [access?.revoked, signOut]);
 
   const sections = useMemo(
     () =>
