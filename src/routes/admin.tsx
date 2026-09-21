@@ -416,7 +416,7 @@ function AdminLayout() {
         </Link>
       </div>
 
-      <nav className="relative flex-1 space-y-3 overflow-y-auto px-4 pb-8 pt-5">
+      <nav className="relative flex-1 space-y-3 overflow-y-auto overscroll-contain px-4 pb-8 pt-5">
         {sections.map((section) => {
           const open = collapsed || openSections.includes(section.title);
           const hasActive = section.items.some(isActive);
