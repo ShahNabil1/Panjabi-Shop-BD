@@ -42,6 +42,24 @@ function AuthPage() {
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [busy, setBusy] = useState(false);
+  const [googleBusy, setGoogleBusy] = useState(false);
+
+  async function signInWithGoogle() {
+    setGoogleBusy(true);
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: `${window.location.origin}/auth`,
+          queryParams: { prompt: "select_account" },
+        },
+      });
+      if (error) throw error;
+    } catch (err) {
+      setGoogleBusy(false);
+      toast.error(err instanceof Error ? err.message : "Google লগইন শুরু করা গেল না");
+    }
+  }
 
   useEffect(() => {
     if (!signupAllowed) setMode("signin");
