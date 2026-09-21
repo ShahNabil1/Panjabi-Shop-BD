@@ -80,7 +80,7 @@ function AuthPage() {
         const { error } = await supabase.auth.signInWithPassword({
           email,
           password,
-          options: { captchaToken: captchaToken ?? undefined },
+          ...(captchaToken ? { options: { captchaToken } } : {}),
         });
         if (error) throw error;
         toast.success("সফলভাবে লগইন হয়েছে");
@@ -91,7 +91,7 @@ function AuthPage() {
           options: {
             emailRedirectTo: `${window.location.origin}/admin`,
             data: { full_name: fullName },
-            captchaToken: captchaToken ?? undefined,
+            ...(captchaToken ? { captchaToken } : {}),
           },
         });
         if (error) throw error;
