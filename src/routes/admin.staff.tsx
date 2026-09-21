@@ -283,6 +283,7 @@ function StaffPage() {
 
   const startEdit = (row: StaffRow) => {
     setEditing(row.user_id);
+    setResetFor(null);
     setEditDraft({
       fullName: row.full_name,
       phone: row.phone ?? "",
