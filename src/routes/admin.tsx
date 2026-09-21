@@ -51,7 +51,9 @@ import {
   ShieldCheck,
 } from "lucide-react";
 
+import { toast } from "sonner";
 import { useAuth } from "@/lib/auth-context";
+import { useIdleTimeout } from "@/lib/use-idle";
 import { getAdminAccess, logAdminActivity } from "@/lib/staff.functions";
 import { canAccessPath, canManageStaff } from "@/lib/rbac-shared";
 import { BrandLoader } from "@/components/admin/brand-loader";
