@@ -204,7 +204,10 @@ function AuthPage() {
                 required
               />
             </div>
-            <Button type="submit" className="w-full" disabled={busy}>
+            <div className="flex justify-center">
+              <Turnstile onToken={setCaptchaToken} handleRef={captchaRef} />
+            </div>
+            <Button type="submit" className="w-full" disabled={busy || !captchaToken}>
               {busy ? "অপেক্ষা করুন…" : mode === "signin" ? "লগইন" : "সাইন আপ"}
             </Button>
           </form>
