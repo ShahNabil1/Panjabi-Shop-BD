@@ -303,16 +303,30 @@ function PromotionsPage() {
         </Panel>
 
         <Panel className="p-0">
-          <h2 className="border-b border-border p-4 text-sm font-bold">Promotion List</h2>
-          {(promotions.data ?? []).length === 0 ? (
+          <h2 className="border-b border-border p-4 text-sm font-bold">
+            Promotion List
+            <span className="ml-2 text-xs font-normal text-muted-foreground">
+              ড্র্যাগ করে সাজান
+            </span>
+          </h2>
+          {orderedPromotions.length === 0 ? (
             <EmptyState title="No promotions yet" hint="Create one on the left." />
           ) : (
             <ul className="divide-y divide-border">
-              {(promotions.data ?? []).map((p) => (
+              {orderedPromotions.map((p) => (
                 <li
                   key={p.id}
-                  className="flex items-center gap-2 px-4 py-3 text-sm transition-colors duration-200 hover:bg-muted/40"
+                  draggable
+                  onDragStart={() => setDragId(p.id)}
+                  onDragOver={(e) => e.preventDefault()}
+                  onDrop={() => dropOn(p.id)}
+                  onDragEnd={() => setDragId(null)}
+                  className={cn(
+                    "flex items-center gap-2 px-4 py-3 text-sm transition-colors duration-200 hover:bg-muted/40",
+                    dragId === p.id && "opacity-50",
+                  )}
                 >
+                  <GripVertical className="h-4 w-4 shrink-0 cursor-grab text-muted-foreground" />
                   <div className="min-w-0 flex-1">
                     <p className="truncate font-semibold">{p.title_bn}</p>
                     <p className="truncate text-xs text-muted-foreground">
@@ -325,10 +339,15 @@ function PromotionsPage() {
                     onClick={() =>
                       setDraft({
                         ...(p as unknown as PromotionInput),
-                        product_ids: (p.promotion_products ?? [])
+                        products: (p.promotion_products ?? [])
                           .slice()
                           .sort((a, b) => a.sort_order - b.sort_order)
-                          .map((pp) => pp.product_id),
+                          .map((pp) => ({
+                            product_id: pp.product_id,
+                            discount_type: (pp.discount_type ??
+                              "none") as PromotionInput["products"][number]["discount_type"],
+                            discount_value: Number(pp.discount_value ?? 0),
+                          })),
                       })
                     }
                   >
@@ -340,7 +359,8 @@ function PromotionsPage() {
                     onClick={() => {
                       void confirmDialog({
                         title: "Delete this promotion?",
-                        description: "The promotion and its offer page will no longer be visible.",
+                        description:
+                          "প্রমোশনটি মুছে যাবে এবং ছাড় দেওয়া প্রোডাক্টগুলোর আগের দাম ফিরে আসবে।",
                       }).then((ok) => ok && remove.mutate(p.id));
                     }}
                   >
@@ -351,6 +371,7 @@ function PromotionsPage() {
             </ul>
           )}
         </Panel>
+
       </div>
     </div>
   );
