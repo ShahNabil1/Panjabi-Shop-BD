@@ -1,0 +1,1 @@
+- [ ] Redesign /contact without adding a form; preserve existing phone, email, address, and payment details.
