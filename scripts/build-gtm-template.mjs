@@ -213,7 +213,30 @@ tag.push(
   ]),
 );
 
+/*
+ * Variables are referenced UNQUOTED inside <script>. GTM compiles every
+ * {{Variable}} in Custom HTML into a live JS reference (macro call), so arrays
+ * and objects arrive as real arrays/objects — never "[object Object]". Every
+ * value is still type-guarded, so a missing/odd value can never throw.
+ */
+const R = (name) => `{{${name}}}`;
+
+/** Shared, defensive reader for the current event's payload. */
+const READ = `
+  var _arr = function (v) { return Array.isArray(v) ? v : []; };
+  var _str = function (v) { return (typeof v === 'string' || typeof v === 'number') && String(v).length ? String(v) : undefined; };
+  var _num = function (v) { var n = Number(v); return isFinite(n) ? n : 0; };
+  var _c = _arr(${R("DL - contents")});
+  var _ids = _arr(${R("DL - content_ids")});
+  var _eid = _str(${R("DL - event_id")});
+  var _xid = _str(${R("DL - external_id")});
+  var _ph = (_str(${R("DL - customer_phone")}) || '').replace(/\\D/g, '');
+  if (_ph.indexOf('01') === 0 && _ph.length === 11) _ph = '88' + _ph;
+  if (_ph.length < 11) _ph = '';`;
+
 /* --- Meta Pixel --------------------------------------------------- */
+// Base: init with Advanced Matching (external_id) + PageView on EVERY page.
+// _fbp/_fbc cookies are read by the Pixel itself; fbclid is parsed from the URL.
 tag.push(
   html(
     "Meta Pixel - Base",
@@ -223,30 +246,46 @@ n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
 n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
 t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
 document,'script','https://connect.facebook.net/en_US/fbevents.js');
-fbq('init', ${JSON.stringify(V("CFG - Meta Pixel ID"))});
+(function () {
+  var _xid = ${R("DL - external_id")};
+  var _am = {};
+  if (typeof _xid === 'string' && _xid) _am.external_id = _xid;
+  fbq('init', ${JSON.stringify(V("CFG - Meta Pixel ID"))}, _am);
+  fbq('track', 'PageView');
+})();
 </script>`,
     [allPages.triggerId],
     100,
   ),
 );
 
-/** Unquoted variable reference — arrays/numbers must NOT be wrapped in quotes,
- *  otherwise GTM stringifies them ("[object Object]"). */
-const R = (name) => `{{${name}}}`;
-
 for (const [ev, fbEvent] of Object.entries(META_MAP)) {
+  // PageView is sent by the Base tag on every page (incl. landing pages).
+  if (ev === "view_page") continue;
   tag.push(
     html(
       `Meta Pixel - ${fbEvent}`,
       `<script>
-  window.fbq && fbq('track', ${JSON.stringify(fbEvent)}, {
-    content_type: ${JSON.stringify(V("DL - content_type"))} || 'product',
-    content_ids: ${R("DL - content_ids")},
-    contents: ${R("DL - contents")},
-    num_items: ${R("DL - num_items")},
-    value: ${R("DL - value")},
-    currency: ${JSON.stringify(V("DL - currency"))} || 'BDT'
-  }, { eventID: ${JSON.stringify(V("DL - event_id"))} });
+(function () {
+  if (!window.fbq) return;${READ}
+  if (_ph || _xid) {
+    var _am = {};
+    if (_xid) _am.external_id = _xid;
+    if (_ph) _am.ph = _ph;
+    fbq('init', ${JSON.stringify(V("CFG - Meta Pixel ID"))}, _am);
+  }
+  var _p = {
+    content_type: _str(${R("DL - content_type")}) || 'product',
+    content_ids: _ids,
+    contents: _c.map(function (i) { return { id: String(i.id || i.content_id || ''), quantity: _num(i.quantity) || 1, item_price: _num(i.item_price || i.price) }; }),
+    num_items: _num(${R("DL - num_items")}),
+    value: _num(${R("DL - value")}),
+    currency: _str(${R("DL - currency")}) || 'BDT'
+  };
+  var _oid = _str(${R("DL - order_number")}) || _str(${R("DL - transaction_id")});
+  if (_oid) _p.order_id = _oid;
+  fbq('track', ${JSON.stringify(fbEvent)}, _p, _eid ? { eventID: _eid } : {});
+})();
 </script>`,
       [T[ev]],
     ),
@@ -268,7 +307,10 @@ ttq._i=ttq._i||{};ttq._i[e]=[];ttq._i[e]._u=r;ttq._t=ttq._t||{};ttq._t[e]=+new D
 ttq._o=ttq._o||{};ttq._o[e]=n||{};var o=d.createElement("script");o.type="text/javascript";
 o.async=!0;o.src=r+"?sdkid="+e+"&lib="+t;var a=d.getElementsByTagName("script")[0];
 a.parentNode.insertBefore(o,a)};
-ttq.load(${JSON.stringify(V("CFG - TikTok Pixel ID"))});ttq.page();
+ttq.load(${JSON.stringify(V("CFG - TikTok Pixel ID"))});
+var _xid = ${R("DL - external_id")};
+if (typeof _xid === 'string' && _xid) ttq.identify({ external_id: _xid });
+ttq.page();
 }(window, document, 'ttq');
 </script>`,
     [allPages.triggerId],
@@ -277,21 +319,29 @@ ttq.load(${JSON.stringify(V("CFG - TikTok Pixel ID"))});ttq.page();
 );
 
 for (const [ev, ttEvent] of Object.entries(TT_MAP)) {
-  if (ev === "view_page") continue; // ttq.page() already fires on load
+  if (ev === "view_page") continue; // ttq.page() already fires on every load
   tag.push(
     html(
       `TikTok Pixel - ${ttEvent}`,
       `<script>
-  var _c = ${R("DL - contents")} || [];
-  var _ids = ${R("DL - content_ids")} || [];
-  window.ttq && ttq.track(${JSON.stringify(ttEvent)}, {
-    contents: _c,
-    content_id: (_c[0] && (_c[0].content_id || _c[0].id)) || _ids[0],
-    content_name: _c[0] && _c[0].content_name,
+(function () {
+  if (!window.ttq) return;${READ}
+  if (_ph || _xid) {
+    var _id = {};
+    if (_xid) _id.external_id = _xid;
+    if (_ph) _id.phone_number = '+' + _ph;
+    ttq.identify(_id);
+  }
+  var _p = {
+    contents: _c.map(function (i) { return { content_id: String(i.content_id || i.id || ''), content_name: i.content_name, quantity: _num(i.quantity) || 1, price: _num(i.price || i.item_price) }; }),
     content_type: 'product',
-    value: ${R("DL - value")},
-    currency: ${JSON.stringify(V("DL - currency"))} || 'BDT'
-  }, { event_id: ${JSON.stringify(V("DL - event_id"))} });
+    value: _num(${R("DL - value")}),
+    currency: _str(${R("DL - currency")}) || 'BDT'
+  };
+  var _first = _c[0] ? (_c[0].content_id || _c[0].id) : _ids[0];
+  if (_first) _p.content_id = String(_first);
+  ttq.track(${JSON.stringify(ttEvent)}, _p, _eid ? { event_id: _eid } : {});
+})();
 </script>`,
       [T[ev]],
     ),
