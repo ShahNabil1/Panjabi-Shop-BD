@@ -31,9 +31,9 @@ Allow: /
 
 User-agent: *
 Allow: /
+# /admin and /auth stay crawlable so Google can read their noindex header.
 # /auth is intentionally crawlable (it carries noindex) so Safe Browsing and
 # Search Console can verify it is our own branded staff login page.
-Disallow: /admin
 Disallow: /cart
 Disallow: /checkout
 Disallow: /order/
