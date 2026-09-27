@@ -20,8 +20,16 @@ function esc(value: string) {
 export const Route = createFileRoute("/catalog.xml")({
   server: {
     handlers: {
-      GET: async () => {
-        const items = await fetchCatalogFeed();
+      GET: async ({ request }) => {
+        // Optional per-category feeds: /catalog.xml?category=<slug>[&subcategory=<slug>]
+        const q = new URL(request.url).searchParams;
+        const cat = q.get("category")?.trim().toLowerCase() || null;
+        const sub = q.get("subcategory")?.trim().toLowerCase() || null;
+        const items = (await fetchCatalogFeed()).filter(
+          (p) =>
+            (!cat || p.categorySlug?.toLowerCase() === cat) &&
+            (!sub || p.subcategorySlug?.toLowerCase() === sub),
+        );
 
         const entries = items.map((p) =>
           [
@@ -104,7 +112,7 @@ export const Route = createFileRoute("/catalog.xml")({
         return new Response(xml, {
           headers: {
             "Content-Type": "application/xml; charset=utf-8",
-            "Cache-Control": "public, max-age=3600",
+            "Cache-Control": "public, max-age=900, s-maxage=900",
           },
         });
       },

@@ -44,12 +44,23 @@ function isH3SwallowedErrorBody(body: string): boolean {
   }
 }
 
+// Private areas: strict noindex at the HTTP level (covers every nested page,
+// redirects and non-HTML responses too).
+const PRIVATE_PATH = /^\/(admin|auth|cart|checkout|order|invoice|inv|search)(\/|$)/;
+
+function withRobotsHeader(request: Request, response: Response): Response {
+  if (!PRIVATE_PATH.test(new URL(request.url).pathname)) return response;
+  const headers = new Headers(response.headers);
+  headers.set("X-Robots-Tag", "noindex, nofollow, noarchive");
+  return new Response(response.body, { status: response.status, statusText: response.statusText, headers });
+}
+
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
     try {
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);
-      return await normalizeCatastrophicSsrResponse(response);
+      return withRobotsHeader(request, await normalizeCatastrophicSsrResponse(response));
     } catch (error) {
       console.error(error);
       return new Response(renderErrorPage(), {
