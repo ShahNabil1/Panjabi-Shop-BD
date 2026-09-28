@@ -4,7 +4,8 @@ import { ShoppingBag, Zap } from "lucide-react";
 
 import { SmartImage } from "@/components/site/smart-image";
 import { useCart } from "@/lib/cart-context";
-import { getComboSelections } from "@/lib/catalog.functions";
+import { getComboSelections, getProductPage } from "@/lib/catalog.functions";
+import { VariantPicker, type PickerResult, type PickerVariant } from "@/components/site/variant-picker";
 
 
 import { useLang } from "@/lib/language-context";
@@ -79,7 +80,14 @@ export function ProductCard({ product }: { product: ProductCardData }) {
 
   // Cards don't carry combo contents, so fetch the full package list before
   // adding — otherwise combos added from listings reach checkout item-less.
-  const addItem = async () => {
+  const [picker, setPicker] = useState<{ mode: "buy" | "cart"; variants: PickerVariant[] } | null>(null);
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [busy, setBusy] = useState(false);
+
+  const addItem = async (choice?: PickerResult) => {
+    const v = choice?.variant;
+    const qty = choice?.quantity ?? 1;
+    const unit = product.price + Number(v?.price_delta ?? 0);
     let comboSelections: Awaited<ReturnType<typeof getComboSelections>> = [];
     try {
       comboSelections = await getComboSelections({ data: { productId: product.id } });
@@ -92,13 +100,13 @@ export function ProductCard({ product }: { product: ProductCardData }) {
       nameBn: product.nameBn,
       nameEn: product.nameEn,
       image: product.image,
-      price: product.price,
-      quantity: 1,
-      stock: product.stock,
-      sku: product.sku,
-      variantId: null,
-      variantLabelBn: null,
-      variantLabelEn: null,
+      price: unit,
+      quantity: qty,
+      stock: v ? v.stock : product.stock,
+      sku: v?.sku ?? product.sku,
+      variantId: v?.id ?? null,
+      variantLabelBn: v ? `${v.group_name_bn}: ${v.value_bn}` : null,
+      variantLabelEn: v ? `${v.group_name_en}: ${v.value_en}` : null,
       comboSelections,
     });
     if (!added) return false;
@@ -106,36 +114,72 @@ export function ProductCard({ product }: { product: ProductCardData }) {
       "add_to_cart",
       ecommerce([
         {
-          id: catalogId(product.sku, product.slug, product.id),
+          id: catalogId(v?.sku ?? product.sku, product.slug, product.id),
           name: product.nameEn || product.nameBn,
+          variant: v ? `${v.group_name_en}: ${v.value_en}` : undefined,
           item_group_id: product.slug,
-          quantity: 1,
-          price: product.price,
+          quantity: qty,
+          price: unit,
         },
       ]),
     );
     return true;
   };
 
-  const onAddToCart = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (soldOut) return;
-    void addItem().then((added) => {
-      if (added) openCart("cart");
-    });
+  const finish = (mode: "buy" | "cart", added: boolean) => {
+    if (!added) return;
+    if (mode === "buy") void navigate({ to: "/checkout" });
+    else openCart("cart");
   };
 
-  const onBuyNow = (e: React.MouseEvent) => {
+  // Products with variants must be picked first — open the option sheet.
+  const start = async (e: React.MouseEvent, mode: "buy" | "cart") => {
     e.preventDefault();
     e.stopPropagation();
-    if (soldOut) return;
-    void addItem().then((added) => {
-      if (added) void navigate({ to: "/checkout" });
-    });
+    if (soldOut || busy) return;
+    setBusy(true);
+    try {
+      let variants: PickerVariant[] = [];
+      try {
+        const page = await getProductPage({ data: { slug: product.slug } });
+        variants = ((page as { variants?: PickerVariant[] } | null)?.variants ?? []) as PickerVariant[];
+      } catch {
+        variants = [];
+      }
+      if (variants.length > 0) {
+        setPicker({ mode, variants });
+        setPickerOpen(true);
+        return;
+      }
+      finish(mode, await addItem());
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const onAddToCart = (e: React.MouseEvent) => void start(e, "cart");
+  const onBuyNow = (e: React.MouseEvent) => void start(e, "buy");
+
+  const onPicked = async (choice: PickerResult) => {
+    const mode = picker?.mode ?? "cart";
+    setPickerOpen(false);
+    finish(mode, await addItem(choice));
   };
 
   return (
+    <>
+    {picker ? (
+      <VariantPicker
+        open={pickerOpen}
+        onOpenChange={setPickerOpen}
+        mode={picker.mode}
+        name={name}
+        image={product.image}
+        basePrice={product.price}
+        variants={picker.variants}
+        onConfirm={(c) => void onPicked(c)}
+      />
+    ) : null}
     <Link
       to="/p/$product"
       params={{ product: product.slug }}
