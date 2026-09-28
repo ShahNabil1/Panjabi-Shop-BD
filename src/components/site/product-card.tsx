@@ -270,6 +270,7 @@ export function ProductCard({ product }: { product: ProductCardData }) {
         </div>
       </div>
     </Link>
+    </>
   );
 }
 
