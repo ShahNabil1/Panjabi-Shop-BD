@@ -19,9 +19,20 @@ export const getGtmContainerId = createServerFn({ method: "GET" }).handler(async
     const { readTrackingConfig } = await import("./tracking.server");
     const cfg = await readTrackingConfig();
     const id = cfg.gtmId.toUpperCase();
-    return { gtmId: /^GTM-[A-Z0-9]{6,9}$/.test(id) ? id : "" };
+    // Pixel / measurement ids are public by design (they ship in every pixel
+    // request). They are handed to GTM so the container reads the admin values.
+    const clean = (v: string) => v.replace(/[^A-Za-z0-9_-]/g, "");
+    return {
+      gtmId: /^GTM-[A-Z0-9]{6,9}$/.test(id) ? id : "",
+      config: {
+        meta_pixel_id: clean(cfg.metaPixelId),
+        tiktok_pixel_id: clean(cfg.tiktokPixelId),
+        ga4_measurement_id: clean(cfg.ga4MeasurementId),
+        clarity_project_id: clean(cfg.clarityId),
+      },
+    };
   } catch {
-    return { gtmId: "" };
+    return { gtmId: "", config: null };
   }
 });
 
