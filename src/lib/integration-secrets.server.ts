@@ -32,6 +32,7 @@ export const INTEGRATION_KEYS = [
   "TIKTOK_TEST_EVENT_CODE",
   "GA4_MEASUREMENT_ID",
   "GA4_API_SECRET",
+  "CLARITY_PROJECT_ID",
 ] as const;
 
 
