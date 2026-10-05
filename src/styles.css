@@ -925,6 +925,11 @@ html:has(body.lv-scroll-locked) {
 /* Keep the full form visible at ordinary laptop and tablet heights, without
    clipping content when text is enlarged or a smaller viewport needs scrolling. */
 .auth-form-panel { padding-block: 20px; }
+.auth-logo-link img { width: 96px; }
+.auth-form-content .auth-logo-link img { width: 64px; }
+.auth-brand-panel { padding-block: 24px; }
+.auth-headline { font-size: 64px; }
+.auth-brand-copy { padding-block: 24px; }
 .auth-form-content > header { margin-bottom: 16px; }
 .auth-form-content > header .auth-logo-link { margin-bottom: 16px; }
 .auth-form-content > header p { margin-top: 6px; }
@@ -946,7 +951,8 @@ html:has(body.lv-scroll-locked) {
   .auth-form-content > header .auth-logo-link { margin-bottom: 10px; }
   .auth-form-content > .auth-enter.my-6 { margin-block: 10px; }
   .auth-form-content form { gap: 8px; }
-  .auth-field > [aria-live] { height: 32px; }
+  .auth-field > [aria-live] { height: 28px; }
+  .auth-field.space-y-2 > * + * { margin-top: 4px; }
   .auth-form-content footer { margin-top: 10px; }
   .auth-form-content footer > p:first-child { display: none; }
   .auth-form-content > .mt-4 { margin-top: 8px; }
@@ -958,6 +964,8 @@ html:has(body.lv-scroll-locked) {
   .auth-form-panel { border-left: 1px solid var(--border); padding-inline: 24px; }
   .auth-form-content > header .auth-logo-link { display: none; }
   .auth-form-content > header h2 { font-size: 26px; }
+  .auth-form-content > header p { margin-top: 4px; }
+  .auth-form-content > .auth-enter.my-6 { margin-block: 8px; }
   .auth-form-content footer > p:last-child { display: none; }
 }
 @media (prefers-reduced-motion: reduce) {
