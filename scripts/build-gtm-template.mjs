@@ -43,11 +43,24 @@ const dlv = (name, dataLayerName, version = 2) =>
     ],
   });
 
+/** IDs come from Admin → API & Integrations (pushed as `site_config` before GTM loads). */
+const cfg = (name, key) =>
+  base("v", name, {
+    variableId: nid(),
+    notes: "Auto-filled from the website admin panel (dataLayer site_config).",
+    parameter: [
+      { type: "INTEGER", key: "dataLayerVersion", value: "2" },
+      { type: "BOOLEAN", key: "setDefaultValue", value: "true" },
+      { type: "TEMPLATE", key: "defaultValue", value: "" },
+      { type: "TEMPLATE", key: "name", value: `site_config.${key}` },
+    ],
+  });
+
 const variable = [
-  constant("CFG - GA4 Measurement ID", "G-XXXXXXXXXX", "Replace per project."),
-  constant("CFG - Meta Pixel ID", "000000000000000", "Replace per project."),
-  constant("CFG - TikTok Pixel ID", "XXXXXXXXXXXXXXXXXXXX", "Replace per project."),
-  constant("CFG - Clarity Project ID", "xxxxxxxxxx", "Replace per project."),
+  cfg("CFG - GA4 Measurement ID", "ga4_measurement_id"),
+  cfg("CFG - Meta Pixel ID", "meta_pixel_id"),
+  cfg("CFG - TikTok Pixel ID", "tiktok_pixel_id"),
+  cfg("CFG - Clarity Project ID", "clarity_project_id"),
 
   dlv("DL - event_id", "event_id"),
   dlv("DL - surface", "surface"),
