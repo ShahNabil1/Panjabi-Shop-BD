@@ -180,7 +180,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   shellComponent: RootShell,
   component: RootComponent,
   notFoundComponent: RootNotFound,
-  errorComponent: ErrorComponent,
+  errorComponent: ErrorComponent as unknown as import("@tanstack/react-router").ErrorRouteComponent,
 });
 
 function RootShell({ children }: { children: ReactNode }) {
@@ -306,7 +306,7 @@ function ErrorBody({ error, reset }: { error: Error; reset: () => void }) {
   );
 }
 
-function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
+function ErrorComponent({ error, reset }: { error: Error; reset: () => void; info?: unknown }) {
   console.error(error);
   useEffect(() => {
     reportLovableError(error, { boundary: "tanstack_root_error_component" });
