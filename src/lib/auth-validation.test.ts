@@ -4,7 +4,8 @@ import { authEmailSchema, authPasswordSchema, validateAuthFields } from "./auth-
 describe("auth form validation", () => {
   it("reports invalid and missing credentials", () => {
     expect(validateAuthFields({ email: "invalid", password: "", fullName: "" }, false)).toEqual({
-      email: "Enter a valid email address.", password: "Password must contain at least 6 characters.",
+      email: "Enter a valid email address.",
+      password: "Password must contain at least 6 characters.",
     });
   });
   it("validates names only for the existing signup mode", () => {
