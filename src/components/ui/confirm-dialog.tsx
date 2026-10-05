@@ -54,6 +54,8 @@ export function ConfirmProvider({ children }: { children: ReactNode }) {
 
   const tone = options?.tone ?? "danger";
   const isDanger = tone === "danger";
+  const iconKind = options?.icon ?? (isDanger ? "trash" : "warning");
+  const Icon = iconKind === "logout" ? LogOut : iconKind === "warning" ? AlertTriangle : Trash2;
 
   const value = useMemo(() => confirm, [confirm]);
 
