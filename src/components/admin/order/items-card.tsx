@@ -295,7 +295,7 @@ export function ItemsCard({
         it.comboSelections.map((s) => s.variantId).join("+") === comboKey,
     );
     if (existing >= 0) {
-      patch(existing, { quantity: items[existing].quantity + 1 });
+      patch(existing, { quantity: (items[existing]?.quantity ?? 0) + 1 });
     } else {
       setItems([
         ...items,
