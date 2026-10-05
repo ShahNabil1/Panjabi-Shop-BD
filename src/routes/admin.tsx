@@ -1,6 +1,6 @@
 import { Link, Outlet, createFileRoute, useNavigate, useRouter, useRouterState } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Activity,
   BadgePercent,
@@ -57,6 +57,7 @@ import { useIdleTimeout } from "@/lib/use-idle";
 import { getAdminAccess, logAdminActivity } from "@/lib/staff.functions";
 import { canAccessPath, canManageStaff } from "@/lib/rbac-shared";
 import { BrandLoader } from "@/components/admin/brand-loader";
+import { useConfirm } from "@/components/ui/confirm-dialog";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import logoMark from "@/assets/panjabishopbd-logo.png";
@@ -376,7 +377,7 @@ function AdminLayout() {
             : "This account is not allowed in the admin panel."}
         </p>
         <div className="mt-6 flex justify-center gap-2">
-          <Button variant="outline" onClick={() => void signOut()}>
+          <Button variant="outline" onClick={() => void requestSignOut()}>
             Sign out
           </Button>
           <Button asChild>
@@ -561,7 +562,7 @@ function AdminLayout() {
           </span>
         </Link>
         <button
-          onClick={() => void signOut()}
+          onClick={() => void requestSignOut()}
           title="Sign out"
           className={cn(
             "flex w-full items-center gap-3.5 rounded-xl px-3 py-3 text-[0.95rem] font-semibold text-red-300 transition-colors hover:bg-red-500/10 hover:text-red-200",
@@ -685,7 +686,7 @@ function AdminLayout() {
                 </div>
               ) : (
                 <div className="mt-6 flex justify-center gap-2">
-                  <Button variant="outline" onClick={() => void signOut()}>
+                  <Button variant="outline" onClick={() => void requestSignOut()}>
                     Sign out
                   </Button>
                   <Button asChild>
