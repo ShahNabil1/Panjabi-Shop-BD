@@ -254,7 +254,7 @@ export function SiteHeader() {
         onClick={() => setOpen(false)}
         activeOptions={{ exact: true }}
         activeProps={{ className: "text-primary" }}
-      className="group relative flex min-h-11 items-center py-2 text-sm font-medium transition-colors hover:text-accent-foreground"
+        className="group relative flex min-h-11 items-center py-2 text-sm font-medium transition-colors hover:text-accent-foreground"
       >
         {tr(lang, "home")}
         <span className="absolute -bottom-0.5 left-0 h-0.5 w-0 bg-primary transition-all duration-300 group-hover:w-full" />
@@ -263,7 +263,7 @@ export function SiteHeader() {
         to="/offers"
         onClick={() => setOpen(false)}
         activeProps={{ className: "text-primary" }}
-        className="group relative py-1 text-sm font-medium transition-colors hover:text-primary"
+        className="group relative flex min-h-11 items-center py-2 text-sm font-medium transition-colors hover:text-accent-foreground"
       >
         {tr(lang, "offers")}
         <span className="absolute -bottom-0.5 left-0 h-0.5 w-0 bg-primary transition-all duration-300 group-hover:w-full" />
@@ -272,7 +272,7 @@ export function SiteHeader() {
         to="/faq"
         onClick={() => setOpen(false)}
         activeProps={{ className: "text-primary" }}
-        className="group relative py-1 text-sm font-medium transition-colors hover:text-primary"
+        className="group relative flex min-h-11 items-center py-2 text-sm font-medium transition-colors hover:text-accent-foreground"
       >
         {tr(lang, "faq")}
         <span className="absolute -bottom-0.5 left-0 h-0.5 w-0 bg-primary transition-all duration-300 group-hover:w-full" />
@@ -281,7 +281,7 @@ export function SiteHeader() {
         to="/about"
         onClick={() => setOpen(false)}
         activeProps={{ className: "text-primary" }}
-        className="group relative py-1 text-sm font-medium transition-colors hover:text-primary"
+        className="group relative flex min-h-11 items-center py-2 text-sm font-medium transition-colors hover:text-accent-foreground"
       >
         {tr(lang, "about")}
         <span className="absolute -bottom-0.5 left-0 h-0.5 w-0 bg-primary transition-all duration-300 group-hover:w-full" />
@@ -290,7 +290,7 @@ export function SiteHeader() {
         to="/contact"
         onClick={() => setOpen(false)}
         activeProps={{ className: "text-primary" }}
-        className="group relative py-1 text-sm font-medium transition-colors hover:text-primary"
+        className="group relative flex min-h-11 items-center py-2 text-sm font-medium transition-colors hover:text-accent-foreground"
       >
         {tr(lang, "contact")}
         <span className="absolute -bottom-0.5 left-0 h-0.5 w-0 bg-primary transition-all duration-300 group-hover:w-full" />

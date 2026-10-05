@@ -145,14 +145,14 @@ function HomePage() {
             <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
               <Link
                 to="/categories"
-                className="group inline-flex items-center gap-1.5 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm transition-all duration-200 hover:scale-105 hover:shadow-md active:scale-95"
+                className="group inline-flex min-h-11 items-center gap-1.5 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-secondary shadow-sm transition-all duration-200 hover:scale-105 hover:shadow-md active:scale-95"
               >
                 {lang === "bn" ? "সব ক্যাটাগরি দেখুন" : "Browse All Categories"}
                 <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5" />
               </Link>
               <Link
                 to="/offers"
-                className="group inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-5 py-2.5 text-sm font-semibold transition-all duration-200 hover:scale-105 hover:border-primary hover:text-primary hover:shadow-md active:scale-95"
+                className="group inline-flex min-h-11 items-center gap-1.5 rounded-full border border-border bg-card px-5 py-2.5 text-sm font-semibold transition-all duration-200 hover:scale-105 hover:border-primary hover:text-accent-foreground hover:shadow-md active:scale-95"
               >
                 <Percent className="h-4 w-4" />
                 {lang === "bn" ? "অফার দেখুন" : "View Offers"}
@@ -189,11 +189,11 @@ function HomePage() {
       {data.faqs.length > 0 ? (
         <Section>
           <div className="mb-8 text-center">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-[11px] font-bold uppercase tracking-widest text-primary">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-[11px] font-bold uppercase tracking-widest text-accent-foreground">
               <span className="h-1.5 w-1.5 rounded-full bg-primary" />
               Help Center
             </span>
-            <h2 className="mx-auto mt-3 max-w-full text-xl font-bold tracking-tight text-primary min-[380px]:text-2xl sm:text-3xl">
+            <h2 className="mx-auto mt-3 max-w-full text-xl font-bold tracking-tight text-accent-foreground min-[380px]:text-2xl sm:text-3xl">
               Frequently asked questions
             </h2>
             <p className="mx-auto mt-2 max-w-xl text-balance px-2 text-sm font-semibold leading-6 text-muted-foreground lg:max-w-none lg:whitespace-nowrap">

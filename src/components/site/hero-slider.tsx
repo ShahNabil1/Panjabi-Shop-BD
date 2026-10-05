@@ -132,7 +132,7 @@ export function HeroSlider({ slides }: { slides: HeroSlide[] }) {
                 type="button"
                 aria-label="আগের ব্যানার"
                 onClick={() => go(index - 1)}
-                className="absolute left-2 top-1/2 hidden -translate-y-1/2 rounded-full bg-card/85 p-2 text-foreground shadow-sm backdrop-blur transition-colors hover:bg-card sm:block"
+                className="absolute left-2 top-1/2 hidden size-11 -translate-y-1/2 place-items-center rounded-full bg-card/85 text-foreground shadow-sm backdrop-blur transition-colors hover:bg-card sm:grid"
               >
                 <ChevronLeft className="size-5" />
               </button>
@@ -140,7 +140,7 @@ export function HeroSlider({ slides }: { slides: HeroSlide[] }) {
                 type="button"
                 aria-label="পরের ব্যানার"
                 onClick={() => go(index + 1)}
-                className="absolute right-2 top-1/2 hidden -translate-y-1/2 rounded-full bg-card/85 p-2 text-foreground shadow-sm backdrop-blur transition-colors hover:bg-card sm:block"
+                className="absolute right-2 top-1/2 hidden size-11 -translate-y-1/2 place-items-center rounded-full bg-card/85 text-foreground shadow-sm backdrop-blur transition-colors hover:bg-card sm:grid"
               >
                 <ChevronRight className="size-5" />
               </button>
