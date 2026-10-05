@@ -191,7 +191,7 @@ function AuthPage() {
             <img
               src={logoMark}
               alt="Panjabi Shop BD"
-              className="h-auto w-56 max-w-full object-contain sm:w-64"
+              className="h-auto w-36 max-w-full object-contain sm:w-40"
             />
           </Link>
           <div className="auth-brand-copy auth-enter relative z-10 my-auto max-w-xl py-12 lg:py-16">
@@ -235,7 +235,7 @@ function AuthPage() {
                 <img
                   src={logoMark}
                   alt="Panjabi Shop BD"
-                  className="h-auto w-48 max-w-full object-contain"
+                  className="h-auto w-32 max-w-full object-contain"
                 />
               </Link>
               <h2 className="font-en text-3xl font-semibold leading-tight">
