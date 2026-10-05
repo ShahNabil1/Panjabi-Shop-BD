@@ -125,6 +125,11 @@ trigger.push(allPages);
 /* Tags                                                                */
 /* ------------------------------------------------------------------ */
 
+/** Base tags only run when the admin panel supplied that platform's id. */
+const guard = (cfgName, code) =>
+  code.replace("<script>", `<script>\nif (${R0(cfgName)}) {`).replace(/<\/script>\s*$/, "}\n</script>");
+const R0 = (name) => `{{${name}}}`;
+
 const html = (name, code, triggers, priority) =>
   base("html", name, {
     tagId: nid(),
@@ -253,7 +258,7 @@ const READ = `
 tag.push(
   html(
     "Meta Pixel - Base",
-    `<script>
+    guard("CFG - Meta Pixel ID", `<script>
 !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
 n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
 n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
@@ -266,7 +271,7 @@ document,'script','https://connect.facebook.net/en_US/fbevents.js');
   fbq('init', ${JSON.stringify(V("CFG - Meta Pixel ID"))}, _am);
   fbq('track', 'PageView');
 })();
-</script>`,
+</script>`),
     [allPages.triggerId],
     100,
   ),
@@ -309,7 +314,7 @@ for (const [ev, fbEvent] of Object.entries(META_MAP)) {
 tag.push(
   html(
     "TikTok Pixel - Base",
-    `<script>
+    guard("CFG - TikTok Pixel ID", `<script>
 !function (w, d, t) { w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];
 ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie"];
 ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};
@@ -325,7 +330,7 @@ var _xid = ${R("DL - external_id")};
 if (typeof _xid === 'string' && _xid) ttq.identify({ external_id: _xid });
 ttq.page();
 }(window, document, 'ttq');
-</script>`,
+</script>`),
     [allPages.triggerId],
     100,
   ),
@@ -365,13 +370,13 @@ for (const [ev, ttEvent] of Object.entries(TT_MAP)) {
 tag.push(
   html(
     "Microsoft Clarity",
-    `<script>
+    guard("CFG - Clarity Project ID", `<script>
 (function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
 t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
 y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script",${JSON.stringify(
       V("CFG - Clarity Project ID"),
     )});
-</script>`,
+</script>`),
     [allPages.triggerId],
     100,
   ),
