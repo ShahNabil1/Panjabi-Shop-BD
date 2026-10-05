@@ -20,7 +20,6 @@ export type TrackingConfig = {
   ga4MeasurementId: string;
   ga4ApiSecret: string;
   metaApiVersion: string;
-  clarityId: string;
 };
 
 export async function readTrackingConfig(): Promise<TrackingConfig> {
@@ -37,7 +36,6 @@ export async function readTrackingConfig(): Promise<TrackingConfig> {
     ga4MeasurementId: s("GA4_MEASUREMENT_ID"),
     ga4ApiSecret: s("GA4_API_SECRET"),
     metaApiVersion: s("META_API_VERSION") || "v21.0",
-    clarityId: s("CLARITY_PROJECT_ID"),
   };
 }
 

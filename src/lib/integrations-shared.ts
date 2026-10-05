@@ -194,14 +194,6 @@ export const integrationMeta: Record<
         secret: true,
         hint: "Admin → Data Streams → Measurement Protocol API secrets.",
       },
-      {
-        key: "CLARITY_PROJECT_ID",
-        label: "Microsoft Clarity Project ID",
-        secret: false,
-        optional: true,
-        placeholder: "xxxxxxxxxx",
-        hint: "clarity.microsoft.com → Settings → Overview → Project ID.",
-      },
     ],
   },
 };

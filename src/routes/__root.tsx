@@ -45,7 +45,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         categories: [] as Awaited<ReturnType<typeof getLayoutData>>["categories"],
         settings: {} as Awaited<ReturnType<typeof getLayoutData>>["settings"],
       })),
-      getGtmContainerId().catch(() => ({ gtmId: "", config: null })),
+      getGtmContainerId().catch(() => ({ gtmId: "" })),
     ]);
     const general = layout.settings["general"] ?? {};
     const contactSetting = layout.settings["contact"] ?? {};
@@ -55,7 +55,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       lang,
       categories: layout.categories,
       gtmId: gtm.gtmId,
-      trackingConfig: gtm.config,
       brand: str(general["brand_name"], "Panjabi Shop BD"),
       tagline: str(general["tagline"], "প্রিমিয়াম পাঞ্জাবির বিশ্বস্ত অনলাইন শপ · সারা দেশে ক্যাশ অন ডেলিভারি"),
       contact: {
@@ -116,7 +115,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         ...(loaderData?.gtmId
           ? [
               {
-                children: `window.dataLayer=window.dataLayer||[];window.dataLayer.push({site_config:${JSON.stringify(loaderData.trackingConfig ?? {}).replace(/</g, "\\u003c")}});(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','${loaderData.gtmId}');`,
+                children: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','${loaderData.gtmId}');`,
               },
             ]
           : []),
