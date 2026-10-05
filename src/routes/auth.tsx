@@ -268,7 +268,7 @@ function AuthPage() {
                       errors.fullName && "border-destructive focus-visible:ring-destructive",
                     )}
                   />
-                  <FieldFeedback id="fullName-feedback" field="fullName" error={errors.fullName} />
+                  <FieldFeedback id="fullName-feedback" error={errors.fullName} />
                 </div>
               ) : null}
               <div className="auth-field space-y-2">
@@ -307,7 +307,7 @@ function AuthPage() {
                     )}
                   />
                 </div>
-                <FieldFeedback id="email-feedback" field="email" error={errors.email} caps={capsField === "email"} />
+                <FieldFeedback id="email-feedback" error={errors.email} caps={capsField === "email"} />
               </div>
               <div className="auth-field space-y-2">
                 <Label htmlFor="password" className="font-en text-xs font-semibold uppercase text-muted-foreground">
