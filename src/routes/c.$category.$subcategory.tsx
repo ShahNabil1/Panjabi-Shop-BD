@@ -117,8 +117,8 @@ function SubcategoryPage() {
               key={s.id}
               to="/c/$category/$subcategory"
               params={{ category: category.slug, subcategory: s.slug }}
-              activeProps={{ className: "border-primary text-primary" }}
-              className="rounded-sm border border-border bg-card px-3.5 py-2 text-sm transition-colors hover:border-primary hover:text-primary"
+              activeProps={{ className: "border-primary text-primary-dark" }}
+              className="rounded-sm border border-border bg-card px-3.5 py-2 text-sm transition-colors hover:border-primary hover:text-primary-dark"
             >
               {pick(lang, s.name_bn, s.name_en)}
             </Link>

@@ -293,7 +293,7 @@ function ProductPage() {
 
           <div className="min-w-0">
             {badge ? (
-              <span className="inline-block rounded-sm bg-primary/10 px-2.5 py-1 text-xs font-semibold uppercase text-primary">
+              <span className="inline-block rounded-sm bg-primary/10 px-2.5 py-1 text-xs font-semibold uppercase text-primary-dark">
                 {badge}
               </span>
             ) : null}
@@ -342,7 +342,7 @@ function ProductPage() {
             ) : null}
 
             <div className="mt-5 flex flex-wrap items-baseline gap-3">
-              <span className="text-3xl font-bold text-primary">
+              <span className="text-3xl font-bold text-primary-dark">
                 {formatPrice(lang, product.price)}
               </span>
               {off > 0 ? (
