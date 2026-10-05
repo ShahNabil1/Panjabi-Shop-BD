@@ -40,6 +40,7 @@ export function CartDrawer() {
     <div
       className={cn("fixed inset-0 z-[70]", open ? "" : "pointer-events-none")}
       aria-hidden={!open}
+      {...(!open ? { inert: true } : {})}
     >
       <button
         type="button"
@@ -66,7 +67,7 @@ export function CartDrawer() {
             type="button"
             onClick={closeCart}
             aria-label={tr(lang, "close")}
-            className="grid h-10 w-10 shrink-0 cursor-pointer place-items-center rounded-full border border-border bg-card text-foreground transition-all duration-200 hover:scale-105 hover:border-primary hover:text-primary hover:shadow-sm active:scale-95"
+            className="grid size-11 shrink-0 cursor-pointer place-items-center rounded-full border border-border bg-card text-foreground transition-all duration-200 hover:scale-105 hover:border-primary hover:text-accent-foreground hover:shadow-sm active:scale-95"
           >
             <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M19 12H5" />
@@ -198,7 +199,7 @@ export function CartDrawer() {
                         type="button"
                         onClick={() => remove(item.key)}
                         aria-label={tr(lang, "remove")}
-                        className="grid h-8 w-8 shrink-0 cursor-pointer place-items-center rounded-full border border-border bg-card text-muted-foreground transition-all duration-200 hover:scale-110 hover:border-destructive hover:text-destructive hover:shadow-sm active:scale-95"
+                        className="grid size-11 shrink-0 cursor-pointer place-items-center rounded-full border border-border bg-card text-muted-foreground transition-all duration-200 hover:scale-110 hover:border-destructive hover:text-destructive hover:shadow-sm active:scale-95"
                       >
                         <Trash2 className="h-4 w-4" />
                       </button>

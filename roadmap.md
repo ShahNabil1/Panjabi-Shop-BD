@@ -3,3 +3,4 @@
 - [x] Add 1200x630 OG image guidance and crop tool
 - [x] Fix homepage agent accessibility semantics
 - [x] Add compliant llms.txt and AI catalog responses
+- [x] Resolve reported mobile PageSpeed performance and accessibility issues

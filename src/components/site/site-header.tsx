@@ -121,7 +121,7 @@ function SearchBox({ onDone }: { onDone?: () => void }) {
         />
         <button
           type="submit"
-          className="shrink-0 rounded-sm bg-primary px-3 py-1 text-xs font-semibold text-primary-foreground transition-all duration-200 hover:scale-105 hover:shadow-md active:scale-95"
+          className="min-h-11 shrink-0 rounded-sm bg-primary px-3 py-1 text-xs font-semibold text-secondary transition-all duration-200 hover:scale-105 hover:shadow-md active:scale-95"
         >
           {tr(lang, "search")}
         </button>
@@ -153,6 +153,9 @@ function SearchBox({ onDone }: { onDone?: () => void }) {
                         src={p.image}
                         alt={pick(lang, p.imageAltBn, p.imageAltEn) || pick(lang, p.nameBn, p.nameEn)}
                         baseWidth={96}
+                        intrinsicWidth={96}
+                        intrinsicHeight={96}
+                        sizes="44px"
                         className="h-11 w-11 shrink-0 rounded-md border border-border object-cover"
                       />
                     ) : (
@@ -209,7 +212,7 @@ function CartButton({ className }: { className?: string }) {
       onClick={() => openCart("cart")}
       aria-label={tr(lang, "cart")}
       className={cn(
-        "relative grid h-10 w-10 place-items-center rounded-sm border border-border transition-colors hover:border-primary hover:text-primary",
+        "relative grid size-11 place-items-center rounded-sm border border-border transition-colors hover:border-primary hover:text-accent-foreground",
         className,
       )}
     >
@@ -251,7 +254,7 @@ export function SiteHeader() {
         onClick={() => setOpen(false)}
         activeOptions={{ exact: true }}
         activeProps={{ className: "text-primary" }}
-        className="group relative py-1 text-sm font-medium transition-colors hover:text-primary"
+        className="group relative flex min-h-11 items-center py-2 text-sm font-medium transition-colors hover:text-accent-foreground"
       >
         {tr(lang, "home")}
         <span className="absolute -bottom-0.5 left-0 h-0.5 w-0 bg-primary transition-all duration-300 group-hover:w-full" />
@@ -260,7 +263,7 @@ export function SiteHeader() {
         to="/offers"
         onClick={() => setOpen(false)}
         activeProps={{ className: "text-primary" }}
-        className="group relative py-1 text-sm font-medium transition-colors hover:text-primary"
+        className="group relative flex min-h-11 items-center py-2 text-sm font-medium transition-colors hover:text-accent-foreground"
       >
         {tr(lang, "offers")}
         <span className="absolute -bottom-0.5 left-0 h-0.5 w-0 bg-primary transition-all duration-300 group-hover:w-full" />
@@ -269,7 +272,7 @@ export function SiteHeader() {
         to="/faq"
         onClick={() => setOpen(false)}
         activeProps={{ className: "text-primary" }}
-        className="group relative py-1 text-sm font-medium transition-colors hover:text-primary"
+        className="group relative flex min-h-11 items-center py-2 text-sm font-medium transition-colors hover:text-accent-foreground"
       >
         {tr(lang, "faq")}
         <span className="absolute -bottom-0.5 left-0 h-0.5 w-0 bg-primary transition-all duration-300 group-hover:w-full" />
@@ -278,7 +281,7 @@ export function SiteHeader() {
         to="/about"
         onClick={() => setOpen(false)}
         activeProps={{ className: "text-primary" }}
-        className="group relative py-1 text-sm font-medium transition-colors hover:text-primary"
+        className="group relative flex min-h-11 items-center py-2 text-sm font-medium transition-colors hover:text-accent-foreground"
       >
         {tr(lang, "about")}
         <span className="absolute -bottom-0.5 left-0 h-0.5 w-0 bg-primary transition-all duration-300 group-hover:w-full" />
@@ -287,7 +290,7 @@ export function SiteHeader() {
         to="/contact"
         onClick={() => setOpen(false)}
         activeProps={{ className: "text-primary" }}
-        className="group relative py-1 text-sm font-medium transition-colors hover:text-primary"
+        className="group relative flex min-h-11 items-center py-2 text-sm font-medium transition-colors hover:text-accent-foreground"
       >
         {tr(lang, "contact")}
         <span className="absolute -bottom-0.5 left-0 h-0.5 w-0 bg-primary transition-all duration-300 group-hover:w-full" />

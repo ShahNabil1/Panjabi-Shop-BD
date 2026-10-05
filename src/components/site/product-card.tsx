@@ -1,11 +1,11 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { lazy, Suspense, useState } from "react";
 import { ShoppingBag, Zap } from "lucide-react";
 
 import { SmartImage } from "@/components/site/smart-image";
 import { useCart } from "@/lib/cart-context";
 import { getComboSelections, getProductPage } from "@/lib/catalog.functions";
-import { VariantPicker, type PickerResult, type PickerVariant } from "@/components/site/variant-picker";
+import type { PickerResult, PickerVariant } from "@/components/site/variant-picker";
 
 
 import { useLang } from "@/lib/language-context";
@@ -15,6 +15,10 @@ import { ecommerce, pushEvent } from "@/lib/tracking";
 import { catalogId } from "@/lib/tracking-items";
 import { cn } from "@/lib/utils";
 
+const VariantPicker = lazy(() =>
+  import("@/components/site/variant-picker").then((module) => ({ default: module.VariantPicker })),
+);
+
 export function ProductThumb({
   src,
   alt,
@@ -23,6 +27,7 @@ export function ProductThumb({
   onClick,
   fit = "contain",
   priority,
+  sizes,
 }: {
   src: string | null;
   alt: string;
@@ -32,6 +37,7 @@ export function ProductThumb({
   /** contain = never crop the artwork (default), cover = fill the box. */
   fit?: "contain" | "cover";
   priority?: boolean;
+  sizes?: string;
 }) {
   const [failed, setFailed] = useState(false);
 
@@ -41,7 +47,10 @@ export function ProductThumb({
         src={src}
         alt={alt}
         baseWidth={480}
+        intrinsicWidth={480}
+        intrinsicHeight={600}
         fit={fit}
+        sizes={sizes ?? "(max-width: 639px) calc(50vw - 22px), (max-width: 1023px) calc(50vw - 30px), 272px"}
         {...(priority ? { priority: true } : {})}
         onError={() => setFailed(true)}
         onClick={onClick}
@@ -169,16 +178,18 @@ export function ProductCard({ product }: { product: ProductCardData }) {
   return (
     <>
     {picker ? (
-      <VariantPicker
-        open={pickerOpen}
-        onOpenChange={setPickerOpen}
-        mode={picker.mode}
-        name={name}
-        image={product.image}
-        basePrice={product.price}
-        variants={picker.variants}
-        onConfirm={(c) => void onPicked(c)}
-      />
+      <Suspense fallback={null}>
+        <VariantPicker
+          open={pickerOpen}
+          onOpenChange={setPickerOpen}
+          mode={picker.mode}
+          name={name}
+          image={product.image}
+          basePrice={product.price}
+          variants={picker.variants}
+          onConfirm={(c) => void onPicked(c)}
+        />
+      </Suspense>
     ) : null}
     <article
       className={cn(
@@ -203,7 +214,7 @@ export function ProductCard({ product }: { product: ProductCardData }) {
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-primary/25 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
         <div className="absolute left-0 top-3 flex flex-col gap-1">
           {badge ? (
-            <span className="rounded-r-full bg-primary px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-primary-foreground shadow-sm">
+            <span className="rounded-r-full bg-primary px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-secondary shadow-sm">
               {badge}
             </span>
           ) : null}
@@ -239,7 +250,7 @@ export function ProductCard({ product }: { product: ProductCardData }) {
           </p>
         ) : null}
         <div className="mt-auto flex flex-wrap items-baseline justify-center gap-2 pt-1.5 sm:justify-start">
-          <span className="text-base font-bold text-primary">
+          <span className="text-base font-bold text-accent-foreground">
             {formatPrice(lang, product.price)}
           </span>
           {off > 0 ? (
@@ -255,8 +266,8 @@ export function ProductCard({ product }: { product: ProductCardData }) {
             onClick={onAddToCart}
             disabled={soldOut}
             className={cn(
-              "inline-flex w-full items-center justify-center gap-1.5 rounded-xl border border-primary/60 bg-primary/5 px-3 py-2 text-[13px] font-semibold text-primary",
-              "transition-all duration-200 ease-out hover:bg-primary hover:text-primary-foreground hover:shadow-[0_8px_20px_-10px_rgba(255,51,102,0.8)] active:scale-[0.97]",
+              "inline-flex min-h-11 w-full items-center justify-center gap-1.5 rounded-xl border border-primary bg-primary/5 px-3 py-2 text-[13px] font-semibold text-accent-foreground",
+              "transition-all duration-200 ease-out hover:bg-primary hover:text-secondary hover:shadow-[var(--shadow-card)] active:scale-[0.97]",
               "disabled:pointer-events-none disabled:opacity-50",
             )}
           >
@@ -268,7 +279,7 @@ export function ProductCard({ product }: { product: ProductCardData }) {
             onClick={onBuyNow}
             disabled={soldOut}
             className={cn(
-              "inline-flex w-full items-center justify-center gap-1.5 rounded-xl bg-primary px-3 py-2 text-[13px] font-bold text-primary-foreground shadow-sm",
+              "inline-flex min-h-11 w-full items-center justify-center gap-1.5 rounded-xl bg-primary px-3 py-2 text-[13px] font-bold text-secondary shadow-sm",
               "transition-all duration-200 ease-out hover:bg-footer hover:text-white hover:shadow-[0_10px_24px_-10px_oklch(0.222_0.04_193/0.45)] active:scale-[0.97]",
               "disabled:pointer-events-none disabled:opacity-50",
             )}

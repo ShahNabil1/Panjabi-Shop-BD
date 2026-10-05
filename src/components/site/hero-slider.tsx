@@ -95,6 +95,9 @@ export function HeroSlider({ slides }: { slides: HeroSlide[] }) {
                   src={slide.url}
                   alt={slide.alt ?? "Panjabi Shop BD ব্যানার"}
                   baseWidth={1200}
+                  intrinsicWidth={1600}
+                  intrinsicHeight={600}
+                  sizes="(max-width: 639px) 100vw, 1152px"
                   priority={i === 0}
                   className="h-auto w-full object-contain sm:aspect-[21/9] sm:object-cover"
                 />
@@ -104,6 +107,7 @@ export function HeroSlider({ slides }: { slides: HeroSlide[] }) {
                   key={`${slide.url}-${i}`}
                   className="w-full shrink-0"
                   aria-hidden={i !== index}
+                  {...(i !== index ? { inert: true } : {})}
                 >
                   {slide.link ? (
                     <a
@@ -128,7 +132,7 @@ export function HeroSlider({ slides }: { slides: HeroSlide[] }) {
                 type="button"
                 aria-label="আগের ব্যানার"
                 onClick={() => go(index - 1)}
-                className="absolute left-2 top-1/2 hidden -translate-y-1/2 rounded-full bg-card/85 p-2 text-foreground shadow-sm backdrop-blur transition-colors hover:bg-card sm:block"
+                className="absolute left-2 top-1/2 hidden size-11 -translate-y-1/2 place-items-center rounded-full bg-card/85 text-foreground shadow-sm backdrop-blur transition-colors hover:bg-card sm:grid"
               >
                 <ChevronLeft className="size-5" />
               </button>
@@ -136,7 +140,7 @@ export function HeroSlider({ slides }: { slides: HeroSlide[] }) {
                 type="button"
                 aria-label="পরের ব্যানার"
                 onClick={() => go(index + 1)}
-                className="absolute right-2 top-1/2 hidden -translate-y-1/2 rounded-full bg-card/85 p-2 text-foreground shadow-sm backdrop-blur transition-colors hover:bg-card sm:block"
+                className="absolute right-2 top-1/2 hidden size-11 -translate-y-1/2 place-items-center rounded-full bg-card/85 text-foreground shadow-sm backdrop-blur transition-colors hover:bg-card sm:grid"
               >
                 <ChevronRight className="size-5" />
               </button>
@@ -148,12 +152,17 @@ export function HeroSlider({ slides }: { slides: HeroSlide[] }) {
                     aria-label={`ব্যানার ${i + 1}`}
                     aria-current={i === index}
                     onClick={() => go(i)}
-                    className={
-                      i === index
-                        ? "h-2 w-6 rounded-full bg-primary transition-all"
-                        : "h-2 w-2 rounded-full bg-card/80 transition-all hover:bg-card"
-                    }
-                  />
+                    className="grid size-11 place-items-center rounded-full"
+                  >
+                    <span
+                      aria-hidden
+                      className={
+                        i === index
+                          ? "h-2 w-6 rounded-full bg-primary transition-all"
+                          : "size-2 rounded-full bg-card/80 transition-all"
+                      }
+                    />
+                  </button>
                 ))}
               </div>
             </>

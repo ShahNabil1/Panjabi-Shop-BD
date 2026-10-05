@@ -33,9 +33,10 @@ export function CategoryCard({
       <div className="relative aspect-[3/4] overflow-hidden bg-secondary sm:aspect-[4/5]">
         <ProductThumb
           src={category.image_url}
-          alt={name}
+          alt=""
           label={name}
           fit="cover"
+          sizes="(max-width: 639px) calc(50vw - 22px), (max-width: 1023px) calc(50vw - 30px), 272px"
           className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.07]"
 
         />
