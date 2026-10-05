@@ -186,11 +186,13 @@ function AdminLayout() {
 
   const requestSignOut = useCallback(async () => {
     const ok = await confirm({
-      title: "Sign out?",
-      description: "আপনি কি সত্যিই অ্যাডমিন প্যানেল থেকে সাইন আউট করতে চান?",
+      title: "Sign out of the admin panel?",
+      description:
+        "You'll need to sign in again to manage orders, products, and store settings.",
       confirmLabel: "Sign out",
-      cancelLabel: "Cancel",
+      cancelLabel: "Stay signed in",
       tone: "danger",
+      icon: "logout",
     });
     if (ok) void signOut();
   }, [confirm, signOut]);
