@@ -10,3 +10,4 @@
 <!-- LOVABLE:END -->
 
 - Serve machine-readable discovery resources through dedicated TanStack server routes so they return correct status codes, content types, and bodies instead of the HTML catch-all.
+- Keep landing-editor helpers client-safe and use the existing landing schema; admin previews must not mount checkout or emit storefront tracking events.

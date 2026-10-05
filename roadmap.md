@@ -4,3 +4,6 @@
 - [x] Fix homepage agent accessibility semantics
 - [x] Add compliant llms.txt and AI catalog responses
 - [x] Resolve reported mobile PageSpeed performance and accessibility issues
+- [x] Upgrade landing editor, page library, previews and publishing validation
+- [x] Preserve landing checkout/tracking code; pass six editor safeguard tests and validate compilation
+- [ ] Verify authenticated builder interactions and live tracking delivery — blocked by external authentication unavailable in this session

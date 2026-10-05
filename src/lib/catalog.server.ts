@@ -599,9 +599,17 @@ export async function fetchLandingPage(slug: string) {
     .sort((a, b) => a.sort_order - b.sort_order);
 
   const content = (landing.content ?? {}) as Record<string, unknown>;
-  const blocks = Array.isArray(content["blocks"])
-    ? (content["blocks"] as Array<Record<string, string>>)
-    : [];
+  const blocks = Array.isArray(content["bullets"])
+    ? content["bullets"].flatMap((item) => {
+        if (!item || typeof item !== "object") return [];
+        const bullet = item as Record<string, unknown>;
+        const bn = typeof bullet["bn"] === "string" ? bullet["bn"] : "";
+        const en = typeof bullet["en"] === "string" ? bullet["en"] : "";
+        return bn || en ? [{ text_bn: bn || en, text_en: en || bn }] : [];
+      })
+    : Array.isArray(content["blocks"])
+      ? (content["blocks"] as Array<Record<string, string>>)
+      : [];
   const rawSeo = (content["seo"] ?? {}) as Record<string, unknown>;
   const str = (v: unknown) => (typeof v === "string" && v.trim() ? v.trim() : null);
   const seo = {
