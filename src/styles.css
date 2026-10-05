@@ -796,3 +796,22 @@ html:has(body.lv-scroll-locked) {
   overflow: hidden !important;
   overscroll-behavior: none;
 }
+
+/* Country artwork stays true to the flag; only its fabric-like motion changes. */
+.country-flag-frame {
+  perspective: 240px;
+}
+
+.country-flag {
+  transform-origin: left center;
+  animation: country-flag-wave 4s ease-in-out infinite;
+}
+
+@keyframes country-flag-wave {
+  0%, 100% { transform: rotateY(-5deg) rotateZ(-1deg); }
+  50% { transform: rotateY(9deg) rotateZ(1deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .country-flag { animation: none; transform: none; }
+}

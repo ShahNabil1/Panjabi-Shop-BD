@@ -20,6 +20,7 @@ import {
   type CourierStatus,
 } from "@/lib/delivery-shared";
 import { Panel } from "@/components/admin/kit";
+import { CountryIdentity } from "@/components/admin/country-identity";
 import { CourierBadge, CourierMark, CourierWatermark } from "@/components/admin/courier-logo";
 import { OrderSourcePanel } from "@/components/admin/order/source-panel";
 import type { AttributionPayload } from "@/lib/attribution";
@@ -949,10 +950,11 @@ export function SecurityCard({
           <div className="flex items-center gap-1.5 text-[11px] font-semibold uppercase text-muted-foreground">
             <MapPin className="size-3.5" /> IP-based location
           </div>
-          <p className="mt-1 break-words text-sm font-semibold">
-            {[ipLocation["city"], ipLocation["region"], ipLocation["country"]]
+          <CountryIdentity country={ipLocation["country"]} />
+          <p className="mt-2 break-words text-sm font-semibold">
+            {[ipLocation["city"], ipLocation["region"]]
               .filter((value): value is string => typeof value === "string" && value.length > 0)
-              .join(", ") || "Location unavailable"}
+              .join(", ")}
           </p>
           <p className="mt-1 break-words text-xs text-muted-foreground">
             {[ipLocation["postalCode"], ipLocation["timezone"]]
