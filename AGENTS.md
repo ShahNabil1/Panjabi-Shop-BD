@@ -8,3 +8,5 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Serve machine-readable discovery resources through dedicated TanStack server routes so they return correct status codes, content types, and bodies instead of the HTML catch-all.

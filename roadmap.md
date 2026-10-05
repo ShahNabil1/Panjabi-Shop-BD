@@ -1,3 +1,5 @@
 - [x] Add professional homepage SEO settings panel
 - [x] Connect saved homepage SEO to live / metadata
 - [x] Add 1200x630 OG image guidance and crop tool
+- [x] Fix homepage agent accessibility semantics
+- [x] Add compliant llms.txt and AI catalog responses

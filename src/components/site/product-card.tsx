@@ -180,16 +180,19 @@ export function ProductCard({ product }: { product: ProductCardData }) {
         onConfirm={(c) => void onPicked(c)}
       />
     ) : null}
-    <Link
-      to="/p/$product"
-      params={{ product: product.slug }}
+    <article
       className={cn(
         "group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card",
         "transition-all duration-300 ease-out will-change-transform",
         "hover:-translate-y-1.5 hover:border-primary/40 hover:shadow-[0_18px_40px_-18px_rgba(255,51,102,0.45)]",
       )}
     >
-      <div className="relative aspect-4/5 overflow-hidden bg-secondary">
+      <Link
+        to="/p/$product"
+        params={{ product: product.slug }}
+        aria-label={`${name} — ${lang === "bn" ? "বিস্তারিত দেখুন" : "View details"}`}
+        className="relative block aspect-4/5 overflow-hidden bg-secondary focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-primary"
+      >
         <ProductThumb
           src={product.image}
           alt={pick(lang, product.imageAltBn, product.imageAltEn) || name}
@@ -217,12 +220,18 @@ export function ProductCard({ product }: { product: ProductCardData }) {
             </span>
           </div>
         ) : null}
-      </div>
+      </Link>
 
       <div className="flex min-w-0 flex-1 flex-col gap-1.5 p-3.5 text-center sm:text-left">
-        <h3 className="line-clamp-2 text-[15px] font-semibold leading-snug text-card-foreground transition-colors duration-200 group-hover:text-primary">
-          {name}
-        </h3>
+        <Link
+          to="/p/$product"
+          params={{ product: product.slug }}
+          className="rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+        >
+          <h3 className="line-clamp-2 text-[15px] font-semibold leading-snug text-card-foreground transition-colors duration-200 group-hover:text-primary">
+            {name}
+          </h3>
+        </Link>
         {product.reviewCount > 0 ? (
           <p className="text-xs text-muted-foreground">
             ★ {lang === "bn" ? toBnDigits(product.rating.toFixed(1)) : product.rating.toFixed(1)} ·{" "}
@@ -269,7 +278,7 @@ export function ProductCard({ product }: { product: ProductCardData }) {
           </button>
         </div>
       </div>
-    </Link>
+    </article>
     </>
   );
 }

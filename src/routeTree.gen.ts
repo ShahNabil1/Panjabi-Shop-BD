@@ -21,11 +21,13 @@ import { Route as CategoriesRouteImport } from './routes/categories'
 import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as FaqRouteImport } from './routes/faq'
+import { Route as LlmsDottxtRouteImport } from './routes/llms[.]txt'
 import { Route as PrivacyPolicyRouteImport } from './routes/privacy-policy'
 import { Route as ReturnPolicyRouteImport } from './routes/return-policy'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as TermsAndConditionsRouteImport } from './routes/terms-and-conditions'
+import { Route as DotwellKnownAiCatalogDotjsonRouteImport } from './routes/[.]well-known.ai-catalog[.]json'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminCouponsRouteImport } from './routes/admin.coupons'
 import { Route as AdminFaqsRouteImport } from './routes/admin.faqs'
@@ -149,6 +151,11 @@ const FaqRoute = FaqRouteImport.update({
   path: '/faq',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LlmsDottxtRoute = LlmsDottxtRouteImport.update({
+  id: '/llms.txt',
+  path: '/llms.txt',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PrivacyPolicyRoute = PrivacyPolicyRouteImport.update({
   id: '/privacy-policy',
   path: '/privacy-policy',
@@ -174,6 +181,12 @@ const TermsAndConditionsRoute = TermsAndConditionsRouteImport.update({
   path: '/terms-and-conditions',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DotwellKnownAiCatalogDotjsonRoute =
+  DotwellKnownAiCatalogDotjsonRouteImport.update({
+    id: '/.well-known/ai-catalog.json',
+    path: '/.well-known/ai-catalog.json',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -509,11 +522,13 @@ export interface FileRoutesByFullPath {
   '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
   '/faq': typeof FaqRoute
+  '/llms.txt': typeof LlmsDottxtRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
   '/return-policy': typeof ReturnPolicyRoute
   '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms-and-conditions': typeof TermsAndConditionsRoute
+  '/.well-known/ai-catalog.json': typeof DotwellKnownAiCatalogDotjsonRoute
   '/admin/coupons': typeof AdminCouponsRoute
   '/admin/faqs': typeof AdminFaqsRoute
   '/admin/landing': typeof AdminLandingRoute
@@ -589,11 +604,13 @@ export interface FileRoutesByTo {
   '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
   '/faq': typeof FaqRoute
+  '/llms.txt': typeof LlmsDottxtRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
   '/return-policy': typeof ReturnPolicyRoute
   '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms-and-conditions': typeof TermsAndConditionsRoute
+  '/.well-known/ai-catalog.json': typeof DotwellKnownAiCatalogDotjsonRoute
   '/admin/coupons': typeof AdminCouponsRoute
   '/admin/faqs': typeof AdminFaqsRoute
   '/admin/landing': typeof AdminLandingRoute
@@ -671,11 +688,13 @@ export interface FileRoutesById {
   '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
   '/faq': typeof FaqRoute
+  '/llms.txt': typeof LlmsDottxtRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
   '/return-policy': typeof ReturnPolicyRoute
   '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms-and-conditions': typeof TermsAndConditionsRoute
+  '/.well-known/ai-catalog.json': typeof DotwellKnownAiCatalogDotjsonRoute
   '/admin/coupons': typeof AdminCouponsRoute
   '/admin/faqs': typeof AdminFaqsRoute
   '/admin/landing': typeof AdminLandingRoute
@@ -754,11 +773,13 @@ export interface FileRouteTypes {
     | '/checkout'
     | '/contact'
     | '/faq'
+    | '/llms.txt'
     | '/privacy-policy'
     | '/return-policy'
     | '/search'
     | '/sitemap.xml'
     | '/terms-and-conditions'
+    | '/.well-known/ai-catalog.json'
     | '/admin/coupons'
     | '/admin/faqs'
     | '/admin/landing'
@@ -834,11 +855,13 @@ export interface FileRouteTypes {
     | '/checkout'
     | '/contact'
     | '/faq'
+    | '/llms.txt'
     | '/privacy-policy'
     | '/return-policy'
     | '/search'
     | '/sitemap.xml'
     | '/terms-and-conditions'
+    | '/.well-known/ai-catalog.json'
     | '/admin/coupons'
     | '/admin/faqs'
     | '/admin/landing'
@@ -915,11 +938,13 @@ export interface FileRouteTypes {
     | '/checkout'
     | '/contact'
     | '/faq'
+    | '/llms.txt'
     | '/privacy-policy'
     | '/return-policy'
     | '/search'
     | '/sitemap.xml'
     | '/terms-and-conditions'
+    | '/.well-known/ai-catalog.json'
     | '/admin/coupons'
     | '/admin/faqs'
     | '/admin/landing'
@@ -997,11 +1022,13 @@ export interface RootRouteChildren {
   CheckoutRoute: typeof CheckoutRoute
   ContactRoute: typeof ContactRoute
   FaqRoute: typeof FaqRoute
+  LlmsDottxtRoute: typeof LlmsDottxtRoute
   PrivacyPolicyRoute: typeof PrivacyPolicyRoute
   ReturnPolicyRoute: typeof ReturnPolicyRoute
   SearchRoute: typeof SearchRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsAndConditionsRoute: typeof TermsAndConditionsRoute
+  DotwellKnownAiCatalogDotjsonRoute: typeof DotwellKnownAiCatalogDotjsonRoute
   InvOrderNumberRoute: typeof InvOrderNumberRoute
   InvoiceOrderNumberRoute: typeof InvoiceOrderNumberRoute
   LpSlugRoute: typeof LpSlugRoute
@@ -1103,6 +1130,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FaqRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/llms.txt': {
+      id: '/llms.txt'
+      path: '/llms.txt'
+      fullPath: '/llms.txt'
+      preLoaderRoute: typeof LlmsDottxtRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/privacy-policy': {
       id: '/privacy-policy'
       path: '/privacy-policy'
@@ -1136,6 +1170,13 @@ declare module '@tanstack/react-router' {
       path: '/terms-and-conditions'
       fullPath: '/terms-and-conditions'
       preLoaderRoute: typeof TermsAndConditionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/.well-known/ai-catalog.json': {
+      id: '/.well-known/ai-catalog.json'
+      path: '/.well-known/ai-catalog.json'
+      fullPath: '/.well-known/ai-catalog.json'
+      preLoaderRoute: typeof DotwellKnownAiCatalogDotjsonRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/': {
@@ -1694,11 +1735,13 @@ const rootRouteChildren: RootRouteChildren = {
   CheckoutRoute: CheckoutRoute,
   ContactRoute: ContactRoute,
   FaqRoute: FaqRoute,
+  LlmsDottxtRoute: LlmsDottxtRoute,
   PrivacyPolicyRoute: PrivacyPolicyRoute,
   ReturnPolicyRoute: ReturnPolicyRoute,
   SearchRoute: SearchRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsAndConditionsRoute: TermsAndConditionsRoute,
+  DotwellKnownAiCatalogDotjsonRoute: DotwellKnownAiCatalogDotjsonRoute,
   InvOrderNumberRoute: InvOrderNumberRoute,
   InvoiceOrderNumberRoute: InvoiceOrderNumberRoute,
   LpSlugRoute: LpSlugRoute,
