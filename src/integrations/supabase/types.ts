@@ -2680,6 +2680,7 @@ export type Database = {
         Args: { _fingerprint?: string; _ip?: string; _phone?: string }
         Returns: boolean
       }
+      sync_product_stock: { Args: { _pid: string }; Returns: undefined }
       validate_coupon: {
         Args: {
           _code: string
