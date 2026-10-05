@@ -20,7 +20,7 @@ export function BlockedSupportProvider({ children }: { children: ReactNode }) {
           <div className="h-1 bg-primary" />
           <div className="p-6">
             <DialogHeader className="items-center text-center">
-              <span className="grid size-12 place-items-center rounded-full bg-primary/10 text-primary">
+              <span className="grid size-12 place-items-center rounded-full bg-primary/10 text-primary-dark">
                 <ShieldAlert className="size-6" />
               </span>
               <DialogTitle className="pt-2">অর্ডারটি এখন নেওয়া যাচ্ছে না</DialogTitle>

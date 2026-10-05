@@ -74,7 +74,7 @@ export function VariantPicker({
         </div>
         <div className="min-w-0 flex-1">
           <p className="line-clamp-2 font-semibold leading-snug">{name}</p>
-          <p className="mt-1 text-lg font-bold text-primary">{formatPrice(lang, unit)}</p>
+          <p className="mt-1 text-lg font-bold text-primary-dark">{formatPrice(lang, unit)}</p>
           <p className="text-xs text-muted-foreground">
             {selected
               ? `${pick(lang, selected.group_name_bn, selected.group_name_en)}: ${pick(lang, selected.value_bn, selected.value_en)}`
@@ -101,7 +101,7 @@ export function VariantPicker({
                     "relative inline-flex min-w-14 items-center justify-center gap-1 rounded-xl border px-4 py-2.5 text-sm font-semibold transition-all duration-200 active:scale-95",
                     active
                       ? "border-primary bg-primary text-primary-foreground shadow-md ring-2 ring-primary/30"
-                      : "border-border bg-card hover:border-primary/60 hover:text-primary",
+                      : "border-border bg-card hover:border-primary/60 hover:text-primary-dark",
                     out && "cursor-not-allowed opacity-40 line-through",
                   )}
                 >

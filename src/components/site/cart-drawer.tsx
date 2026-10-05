@@ -76,7 +76,7 @@ export function CartDrawer() {
           </button>
           <h2 className="min-w-0 flex-1 text-lg font-bold sm:text-xl">
             {tr(lang, "cart")}
-            <span className="ml-1.5 text-base font-semibold text-primary">
+            <span className="ml-1.5 text-base font-semibold text-primary-dark">
               ({formatNumber("en", items.reduce((sum, item) => sum + item.quantity, 0))} items)
             </span>
           </h2>
@@ -88,7 +88,7 @@ export function CartDrawer() {
               <div className="grid h-24 w-24 place-items-center rounded-full bg-primary/10 ring-8 ring-primary/5">
                 <svg
                   viewBox="0 0 24 24"
-                  className="h-11 w-11 text-primary"
+                  className="h-11 w-11 text-primary-dark"
                   fill="none"
                   stroke="currentColor"
                   strokeWidth="1.5"
@@ -126,7 +126,7 @@ export function CartDrawer() {
                 <button
                   type="button"
                   onClick={closeCart}
-                  className="text-sm font-semibold text-muted-foreground transition-colors hover:text-primary"
+                  className="text-sm font-semibold text-muted-foreground transition-colors hover:text-primary-dark"
                 >
                   {tr(lang, "continueShopping")}
                 </button>
@@ -159,7 +159,7 @@ export function CartDrawer() {
                         to="/p/$product"
                         params={{ product: item.slug }}
                         onClick={closeCart}
-                        className="line-clamp-2 min-w-0 text-sm font-semibold hover:text-primary"
+                        className="line-clamp-2 min-w-0 text-sm font-semibold hover:text-primary-dark"
                       >
                         {pick(lang, item.nameBn, item.nameEn)}
                       </Link>
@@ -207,7 +207,7 @@ export function CartDrawer() {
             <footer className="border-t border-border bg-card px-4 py-4">
               <div className="flex items-center justify-between">
                 <span className="text-base font-bold text-foreground">Subtotal</span>
-                <span className="text-xl font-bold tabular-nums text-primary">
+                <span className="text-xl font-bold tabular-nums text-primary-dark">
                   {formatPrice(lang, subtotal)}
                 </span>
               </div>
@@ -222,7 +222,7 @@ export function CartDrawer() {
               <button
                 type="button"
                 onClick={closeCart}
-                className="mt-2 w-full rounded-sm border border-border bg-background px-5 py-2.5 text-center text-sm font-semibold text-foreground transition-all duration-200 hover:border-primary hover:text-primary hover:shadow-sm active:scale-[0.98]"
+                className="mt-2 w-full rounded-sm border border-border bg-background px-5 py-2.5 text-center text-sm font-semibold text-foreground transition-all duration-200 hover:border-primary hover:text-primary-dark hover:shadow-sm active:scale-[0.98]"
               >
                 {tr(lang, "continueShopping")}
               </button>

@@ -83,7 +83,7 @@ function ContactPage() {
 
           <div className="mt-10 grid min-w-0 gap-10 lg:grid-cols-[minmax(0,1.15fr)_minmax(18rem,0.85fr)] lg:items-end lg:gap-16">
             <div className="min-w-0">
-              <p className="text-sm font-semibold text-primary">
+              <p className="text-sm font-semibold text-primary-dark">
                 {lang === "bn" ? "আমরা আছি আপনার পাশে" : "We are here for you"}
               </p>
               <h1 className="mt-3 max-w-2xl text-4xl font-bold leading-tight sm:text-5xl lg:text-6xl">
@@ -105,7 +105,7 @@ function ContactPage() {
             </div>
 
             <div className="border-l-2 border-primary pl-5 sm:pl-7">
-              <Clock3 className="size-6 text-primary" aria-hidden />
+              <Clock3 className="size-6 text-primary-dark" aria-hidden />
               <p className="mt-4 text-sm text-secondary-foreground/60">
                 {lang === "bn" ? "সাপোর্ট সময়" : "Support hours"}
               </p>
@@ -118,7 +118,7 @@ function ContactPage() {
       <Section className="py-12 sm:py-16 lg:py-20">
         <div className="mb-7 grid min-w-0 gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
           <div className="min-w-0">
-            <p className="text-sm font-semibold text-primary">
+            <p className="text-sm font-semibold text-primary-dark">
               {lang === "bn" ? "যোগাযোগের বিস্তারিত" : "Contact details"}
             </p>
             <h2 className="mt-2 text-2xl font-bold sm:text-3xl">
@@ -146,7 +146,7 @@ function ContactPage() {
                 </span>
                 {detail.href ? (
                   <ArrowUpRight
-                    className="mt-1 size-5 shrink-0 text-muted-foreground transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-primary"
+                    className="mt-1 size-5 shrink-0 text-muted-foreground transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-primary-dark"
                     aria-hidden
                   />
                 ) : null}

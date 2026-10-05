@@ -417,7 +417,7 @@ export function CheckoutForm({
           <svg
             viewBox="0 0 24 24"
             aria-hidden
-            className="h-8 w-8 text-primary"
+            className="h-8 w-8 text-primary-dark"
             fill="currentColor"
           >
             <path d="M7 18a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm10 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4ZM2.2 2h2.1a1 1 0 0 1 .97.76L5.8 5H21a1 1 0 0 1 .97 1.24l-1.8 7.2A2 2 0 0 1 18.23 15H8.1a2 2 0 0 1-1.95-1.55L4.02 4H2.2a1 1 0 0 1 0-2Z" />
@@ -571,7 +571,7 @@ export function CheckoutForm({
                       className={cn(
                         "rounded-md border px-3.5 py-2 text-sm font-semibold transition-colors",
                         v.id === variantId
-                          ? "border-primary bg-primary/10 text-primary"
+                          ? "border-primary bg-primary/10 text-primary-dark"
                           : "border-border bg-card hover:border-primary",
                       )}
                     >
@@ -586,7 +586,7 @@ export function CheckoutForm({
 
         {/* Billing details — unchanged fields */}
         <section className="grid gap-4">
-          <h3 className="text-lg font-extrabold text-primary">
+          <h3 className="text-lg font-extrabold text-primary-dark">
             {pick(lang, "বিলিং তথ্য", "Billing details")}
           </h3>
 
@@ -699,8 +699,8 @@ export function CheckoutForm({
         <section>
           <h3 className="font-en text-lg font-extrabold sm:text-xl">Shipping</h3>
           <div className="mt-3 flex items-center justify-between gap-3 rounded-xl border-2 border-primary bg-primary/5 px-4 py-3 text-sm shadow-sm">
-            <span className="font-en font-bold text-primary">Delivery Charge</span>
-            <span className="font-en text-base font-extrabold tabular-nums text-primary">
+            <span className="font-en font-bold text-primary-dark">Delivery Charge</span>
+            <span className="font-en text-base font-extrabold tabular-nums text-primary-dark">
               {delivery === 0 ? "Free" : formatPrice(lang, delivery)}
             </span>
           </div>
@@ -708,7 +708,7 @@ export function CheckoutForm({
 
         {/* Your order */}
         <section>
-          <h3 className="font-en text-lg font-extrabold text-primary sm:text-xl">Your Order</h3>
+          <h3 className="font-en text-lg font-extrabold text-primary-dark sm:text-xl">Your Order</h3>
 
           <div className="mt-3 grid gap-2 border-b border-dashed border-border pb-3 text-xs font-extrabold uppercase tracking-wide text-foreground sm:text-sm">
             <div className="font-en flex justify-between">
@@ -749,7 +749,7 @@ export function CheckoutForm({
                 type="button"
                 onClick={() => setCouponOpen(true)}
                 className={cn(
-                  "group inline-flex items-center gap-2 rounded-full border border-dashed border-primary/40 bg-primary/5 px-3.5 py-1.5 text-[15px] font-black tracking-tight text-primary shadow-sm transition-all duration-300 ease-out hover:scale-[1.02] hover:border-primary/60 hover:bg-primary/10 hover:shadow-md active:scale-[0.98]",
+                  "group inline-flex items-center gap-2 rounded-full border border-dashed border-primary/40 bg-primary/5 px-3.5 py-1.5 text-[15px] font-black tracking-tight text-primary-dark shadow-sm transition-all duration-300 ease-out hover:scale-[1.02] hover:border-primary/60 hover:bg-primary/10 hover:shadow-md active:scale-[0.98]",
                   lang === "bn" && "font-display-bn",
                   couponOpen
                     ? "pointer-events-none absolute left-0 top-0 h-0 py-0 opacity-0"
@@ -760,7 +760,7 @@ export function CheckoutForm({
               >
                 <svg
                   viewBox="0 0 24 24"
-                  className="h-4 w-4 shrink-0 text-primary transition-transform duration-300 group-hover:rotate-12"
+                  className="h-4 w-4 shrink-0 text-primary-dark transition-transform duration-300 group-hover:rotate-12"
                   fill="none"
                   stroke="currentColor"
                   strokeWidth="2"
@@ -853,8 +853,8 @@ export function CheckoutForm({
               <dd className="font-en text-base font-extrabold tabular-nums">{formatPrice(lang, subtotal)}</dd>
             </div>
             <div className="flex items-center justify-between rounded-xl border-2 border-primary bg-primary/5 px-3 py-2 shadow-sm">
-              <dt className="font-en font-bold text-primary">Delivery Charge</dt>
-              <dd className="font-en text-base font-extrabold tabular-nums text-primary">
+              <dt className="font-en font-bold text-primary-dark">Delivery Charge</dt>
+              <dd className="font-en text-base font-extrabold tabular-nums text-primary-dark">
                 {delivery === 0 ? "Free" : formatPrice(lang, delivery)}
               </dd>
             </div>
@@ -869,7 +869,7 @@ export function CheckoutForm({
             ) : null}
             <div className="flex items-center justify-between border-t border-border pt-2.5">
               <dt className="font-en text-base font-extrabold sm:text-lg">Total</dt>
-              <dd className="font-en text-lg font-extrabold tabular-nums text-primary sm:text-xl">{formatPrice(lang, total)}</dd>
+              <dd className="font-en text-lg font-extrabold tabular-nums text-primary-dark sm:text-xl">{formatPrice(lang, total)}</dd>
             </div>
 
           </dl>

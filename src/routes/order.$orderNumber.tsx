@@ -49,7 +49,7 @@ function OrderReceipt() {
           <p className="mt-2 text-sm text-muted-foreground">{tr(lang, "orderPlacedBody")}</p>
           <p className="mt-4 text-sm">
             <span className="text-muted-foreground">{tr(lang, "orderNumber")}: </span>
-            <span className="font-en font-bold tracking-wide text-primary">{orderNumber}</span>
+            <span className="font-en font-bold tracking-wide text-primary-dark">{orderNumber}</span>
           </p>
         </div>
 
@@ -99,7 +99,7 @@ function OrderReceipt() {
               </div>
               <div className="flex justify-between border-t border-border pt-2 text-base">
                 <dt className="font-bold">{tr(lang, "total")}</dt>
-                <dd className="font-bold tabular-nums text-primary">
+                <dd className="font-bold tabular-nums text-primary-dark">
                   {formatPrice(lang, data.total)}
                 </dd>
               </div>
@@ -127,7 +127,7 @@ function OrderReceipt() {
           ) : null}
           <Link
             to="/"
-            className="inline-block rounded-sm border border-border px-5 py-2.5 text-sm font-semibold transition-colors hover:border-primary hover:text-primary"
+            className="inline-block rounded-sm border border-border px-5 py-2.5 text-sm font-semibold transition-colors hover:border-primary hover:text-primary-dark"
           >
             {tr(lang, "continueShopping")}
           </Link>

@@ -166,7 +166,7 @@ function SearchBox({ onDone }: { onDone?: () => void }) {
                         {pick(lang, p.nameBn, p.nameEn)}
                       </span>
                       <span className="mt-0.5 flex items-baseline gap-2 text-xs">
-                        <span className="font-semibold text-primary">
+                        <span className="font-semibold text-primary-dark">
                           {formatPrice(lang, p.price)}
                         </span>
                         {p.compareAtPrice && p.compareAtPrice > p.price ? (
@@ -189,7 +189,7 @@ function SearchBox({ onDone }: { onDone?: () => void }) {
                     onDone?.();
                     navigate({ to: "/search", search: { q: term } });
                   }}
-                  className="block w-full px-4 py-2.5 text-center text-xs font-semibold text-primary transition-colors hover:bg-muted/60"
+                  className="block w-full px-4 py-2.5 text-center text-xs font-semibold text-primary-dark transition-colors hover:bg-muted/60"
                 >
                   {lang === "bn" ? `“${q.trim()}” এর সব ফলাফল দেখুন` : `See all results for “${q.trim()}”`}
                 </button>
@@ -253,7 +253,7 @@ export function SiteHeader() {
         to="/"
         onClick={() => setOpen(false)}
         activeOptions={{ exact: true }}
-        activeProps={{ className: "text-primary" }}
+        activeProps={{ className: "text-primary-dark" }}
         className="group relative flex min-h-11 items-center py-2 text-sm font-medium transition-colors hover:text-accent-foreground"
       >
         {tr(lang, "home")}
@@ -262,7 +262,7 @@ export function SiteHeader() {
       <Link
         to="/offers"
         onClick={() => setOpen(false)}
-        activeProps={{ className: "text-primary" }}
+        activeProps={{ className: "text-primary-dark" }}
         className="group relative flex min-h-11 items-center py-2 text-sm font-medium transition-colors hover:text-accent-foreground"
       >
         {tr(lang, "offers")}
@@ -271,7 +271,7 @@ export function SiteHeader() {
       <Link
         to="/faq"
         onClick={() => setOpen(false)}
-        activeProps={{ className: "text-primary" }}
+        activeProps={{ className: "text-primary-dark" }}
         className="group relative flex min-h-11 items-center py-2 text-sm font-medium transition-colors hover:text-accent-foreground"
       >
         {tr(lang, "faq")}
@@ -280,7 +280,7 @@ export function SiteHeader() {
       <Link
         to="/about"
         onClick={() => setOpen(false)}
-        activeProps={{ className: "text-primary" }}
+        activeProps={{ className: "text-primary-dark" }}
         className="group relative flex min-h-11 items-center py-2 text-sm font-medium transition-colors hover:text-accent-foreground"
       >
         {tr(lang, "about")}
@@ -289,7 +289,7 @@ export function SiteHeader() {
       <Link
         to="/contact"
         onClick={() => setOpen(false)}
-        activeProps={{ className: "text-primary" }}
+        activeProps={{ className: "text-primary-dark" }}
         className="group relative flex min-h-11 items-center py-2 text-sm font-medium transition-colors hover:text-accent-foreground"
       >
         {tr(lang, "contact")}
@@ -420,7 +420,7 @@ export function SiteHeader() {
                 <Link
                   to="/categories"
                   onClick={() => setOpen(false)}
-                  className="block py-1 text-sm font-semibold text-primary"
+                  className="block py-1 text-sm font-semibold text-primary-dark"
                 >
                   {tr(lang, "allCategories")}
                 </Link>

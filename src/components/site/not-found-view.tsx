@@ -46,7 +46,7 @@ export function NotFoundView({ title, body }: { title?: string; body?: string })
                 key={c.id}
                 to="/c/$category"
                 params={{ category: c.slug }}
-                className="rounded-sm border border-border bg-card px-3.5 py-2 text-sm transition-colors hover:border-primary hover:text-primary"
+                className="rounded-sm border border-border bg-card px-3.5 py-2 text-sm transition-colors hover:border-primary hover:text-primary-dark"
               >
                 {pick(lang, c.name_bn, c.name_en)}
               </Link>
