@@ -44,6 +44,43 @@ export const Route = createFileRoute("/auth")({
   component: AuthPage,
 });
 
+function FieldFeedback({ field, message, capsLock = false }: {
+  field: "email" | "password" | "fullName";
+  message: string | undefined;
+  capsLock?: boolean;
+}) {
+  const [lastMessage, setLastMessage] = useState(message ?? "");
+  useEffect(() => {
+    if (message) setLastMessage(message);
+  }, [message]);
+
+  return (
+    <div className="relative h-10" aria-live="polite" aria-atomic="true">
+      <p
+        id={`${field}-error`}
+        aria-hidden={!message}
+        className={cn(
+          "absolute inset-x-0 top-0 flex items-start gap-1.5 pt-2 text-xs leading-4 text-destructive motion-safe:transition-[opacity,transform] motion-safe:duration-300 motion-safe:ease-out",
+          message ? "translate-y-0 opacity-100" : "pointer-events-none -translate-y-1 opacity-0",
+        )}
+      >
+        <AlertCircle aria-hidden="true" className="mt-0.5 size-3.5 shrink-0" />
+        <span>{message ?? lastMessage}</span>
+      </p>
+      {field === "password" ? (
+        <p
+          id="password-caps"
+          aria-hidden={!capsLock || Boolean(message)}
+          className={cn(
+            "absolute inset-x-0 top-0 pt-2 font-en text-xs leading-4 text-muted-foreground motion-safe:transition-[opacity,transform] motion-safe:duration-300 motion-safe:ease-out",
+            capsLock && !message ? "translate-y-0 opacity-100" : "pointer-events-none -translate-y-1 opacity-0",
+          )}
+        >Caps Lock is on — check your typing.</p>
+      ) : null}
+    </div>
+  );
+}
+
 function AuthPage() {
   const navigate = useNavigate();
   const { session, loading } = useAuth();
@@ -143,26 +180,7 @@ function AuthPage() {
   }
 
   function fieldFeedback(field: "email" | "password" | "fullName") {
-    const message = errors[field];
-    return (
-      <div
-        id={`${field}-error`}
-        aria-live="polite"
-        className={cn(
-          "grid motion-safe:transition-[grid-template-rows,opacity] motion-safe:duration-200",
-          message ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0",
-        )}
-      >
-        <div className="overflow-hidden">
-          {message ? (
-            <p className="flex items-start gap-1.5 pt-2 text-xs text-destructive">
-              <AlertCircle aria-hidden="true" className="mt-0.5 size-3.5 shrink-0" />
-              {message}
-            </p>
-          ) : null}
-        </div>
-      </div>
-    );
+    return <FieldFeedback field={field} message={errors[field]} capsLock={field === "password" && capsLock} />;
   }
 
   function updateField(field: "email" | "password" | "fullName", value: string) {
@@ -279,7 +297,7 @@ function AuthPage() {
             <span className="font-en text-xs text-muted-foreground">or continue with email</span>
             <span className="h-px flex-1 bg-border" />
           </div>
-          <form onSubmit={submit} noValidate className="space-y-4">
+          <form onSubmit={submit} noValidate>
             {mode === "signup" ? (
               <div>
                 <Label htmlFor="fullName" className="font-en">
@@ -365,24 +383,17 @@ function AuthPage() {
                 </Button>
               </div>
               {fieldFeedback("password")}
-              <p
-                id="password-caps"
-                aria-live="polite"
-                className="font-en text-xs text-muted-foreground"
-              >
-                {capsLock ? "Caps Lock is on — check your typing." : ""}
-              </p>
             </div>
             {formError ? (
               <div
                 role="alert"
-                className="flex items-start gap-2 rounded-md border border-destructive/30 bg-destructive/5 p-3 text-sm text-destructive"
+                className="mb-4 flex items-start gap-2 rounded-md border border-destructive/30 bg-destructive/5 p-3 text-sm text-destructive"
               >
                 <AlertCircle className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
                 <span>{formError}</span>
               </div>
             ) : null}
-            <div className="flex min-h-[65px] justify-center">
+            <div className="mb-4 flex min-h-[65px] justify-center">
               <Turnstile onToken={setCaptchaToken} handleRef={captchaRef} />
             </div>
             <Button
