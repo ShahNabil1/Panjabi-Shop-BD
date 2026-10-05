@@ -136,7 +136,7 @@ function SearchBox({ onDone }: { onDone?: () => void }) {
               {lang === "bn" ? "কোনো পণ্য পাওয়া যায়নি" : "No products found"}
             </p>
           ) : (
-            <ul role="listbox" aria-label={tr(lang, "search")}>
+            <ul aria-label={tr(lang, "search")}>
               {results.map((p) => (
                 <li key={p.id}>
                   <Link
