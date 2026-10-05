@@ -459,18 +459,18 @@ export function FulfillmentCard({
 
         <div
           className={cn(
-            "relative overflow-hidden rounded-xl border p-3",
+            "relative isolate overflow-hidden rounded-xl border p-3",
             isPathao
               ? "border-[#E32227]/30 bg-gradient-to-br from-[#E32227]/[0.06] via-white to-white"
               : "border-border/70 bg-background/60",
           )}
         >
-          <CourierWatermark partner={partner} />
+          <CourierWatermark partner={partner} className="-z-10" />
           <p className="relative text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
             Physical shipment
           </p>
 
-          <div className="mt-2 flex flex-wrap items-center gap-2">
+          <div className="relative mt-2 flex flex-wrap items-center gap-2">
             {(() => {
               // A terminal order state (cancelled / returned / lost) overrides the
               // internal fulfillment flag, which stays "pending" when nothing shipped.
@@ -495,10 +495,12 @@ export function FulfillmentCard({
             {courierStatus || courierStatusRaw ? (
               <span
                 className={cn(
-                  "inline-flex rounded-full px-2.5 py-0.5 text-xs font-bold ring-1",
+                  "relative inline-flex max-w-full rounded-full px-3 py-1 text-xs font-bold ring-1",
                   isPathao
                     ? "bg-black text-white ring-black"
-                    : courierStatusTone(normalised),
+                    : normalised === "unknown"
+                      ? "bg-background text-foreground ring-border"
+                      : courierStatusTone(normalised),
                 )}
               >
                 {/* Show the courier's own wording; our internal bucket is coarse
