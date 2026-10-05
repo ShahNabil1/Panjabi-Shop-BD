@@ -35,6 +35,7 @@ export type StockLine = {
   sku: string | null;
   quantity: number;
   label: string;
+  variantLabel?: string | null;
 };
 
 /**
@@ -45,7 +46,7 @@ export type StockLine = {
 export async function orderStockLines(db: Db, orderId: string): Promise<StockLine[]> {
   const { data: rows } = await db
     .from("order_items")
-    .select("product_id, product_name, sku, quantity, combo_selections, products(id,kind,sku)")
+    .select("product_id, product_name, variant_label, sku, quantity, combo_selections, products(id,kind,sku)")
     .eq("order_id", orderId);
 
   const items = (rows ?? []) as unknown as Array<Record<string, any>>;
@@ -84,6 +85,7 @@ export async function orderStockLines(db: Db, orderId: string): Promise<StockLin
       sku: (it["sku"] as string | null) ?? null,
       quantity: qty,
       label: String(it["product_name"] ?? "Item"),
+      variantLabel: (it["variant_label"] as string | null) ?? null,
     });
   }
 
@@ -123,6 +125,24 @@ export async function orderStockLines(db: Db, orderId: string): Promise<StockLin
     for (const line of out) {
       if (line.variantId || !line.sku) continue;
       line.variantId = bySku.get(`${line.productId}|${line.sku}`) ?? null;
+    }
+  }
+
+  // Fallback: variants without their own SKU are matched by the stored "Group: Value" label.
+  const byLabel = out.filter((l) => !l.variantId && l.variantLabel);
+  if (byLabel.length > 0) {
+    const { data: vrows } = await db
+      .from("product_variants")
+      .select("id, product_id, group_name_bn, group_name_en, value_bn, value_en")
+      .in("product_id", Array.from(new Set(byLabel.map((l) => l.productId))));
+    const norm = (x: string) => x.replace(/\s+/g, " ").trim().toLowerCase();
+    const map = new Map<string, string>();
+    for (const v of (vrows ?? []) as Array<Record<string, string>>) {
+      map.set(`${v["product_id"]}|${norm(`${v["group_name_bn"]}: ${v["value_bn"]}`)}`, v["id"]!);
+      map.set(`${v["product_id"]}|${norm(`${v["group_name_en"]}: ${v["value_en"]}`)}`, v["id"]!);
+    }
+    for (const line of byLabel) {
+      line.variantId = map.get(`${line.productId}|${norm(line.variantLabel!)}`) ?? null;
     }
   }
 
