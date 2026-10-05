@@ -179,7 +179,7 @@ export function DeliveryNoteCard({
 export function ItemsCard({
   orderId,
   initialItems,
-  deliveryCharge,
+  deliveryCharge: initialDeliveryCharge,
   discount: initialDiscount,
   couponCode = null,
   advanceAmount: initialAdvance,
@@ -203,6 +203,7 @@ export function ItemsCard({
   const [query, setQuery] = useState("");
   const [comboDrafts, setComboDrafts] = useState<Record<string, Record<string, string>>>({});
   const [discount, setDiscount] = useState(initialDiscount);
+  const [deliveryCharge, setDeliveryCharge] = useState(initialDeliveryCharge);
   const [advance, setAdvance] = useState(initialAdvance ?? 0);
   const [advanceMethod, setAdvanceMethod] = useState<string>(
     initialAdvanceMethod ?? advanceMethods[0],
@@ -222,7 +223,8 @@ export function ItemsCard({
     });
 
   const [savedSnapshot, setSavedSnapshot] = useState(() =>
-    snapshot(initialItems, initialDiscount, initialAdvance ?? 0, initialAdvanceMethod ?? advanceMethods[0]),
+    snapshot(initialItems, initialDiscount, initialAdvance ?? 0, initialAdvanceMethod ?? advanceMethods[0]) +
+      `|dc:${Number(initialDeliveryCharge) || 0}`,
   );
 
   const { data: results } = useQuery({
@@ -236,7 +238,8 @@ export function ItemsCard({
   const paidAdvance = Math.min(advance, total);
   const due = Math.max(0, total - paidAdvance);
 
-  const currentSnapshot = snapshot(items, discount, paidAdvance, advanceMethod);
+  const currentSnapshot =
+    snapshot(items, discount, paidAdvance, advanceMethod) + `|dc:${Number(deliveryCharge) || 0}`;
   const isDirty = currentSnapshot !== savedSnapshot;
 
   const save = useMutation({
@@ -559,7 +562,34 @@ export function ItemsCard({
         ))}
       </ul>
 
-      <div className="grid gap-3 rounded-xl border border-border/70 bg-background/60 p-3 sm:grid-cols-2">
+      <div className="grid gap-3 rounded-xl border border-border/70 bg-background/60 p-3 sm:grid-cols-3">
+        <div className="space-y-1.5">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+            Delivery Charge (৳)
+          </p>
+          <Input
+            type="number"
+            min={0}
+            readOnly={locked}
+            disabled={locked}
+            className="h-9 rounded-lg"
+            value={deliveryCharge}
+            onChange={(e) => setDeliveryCharge(Math.max(0, Number(e.target.value) || 0))}
+          />
+          <p className="text-[11px] text-muted-foreground">
+            Site charge: {money(initialDeliveryCharge)}
+            {deliveryCharge !== initialDeliveryCharge ? (
+              <button
+                type="button"
+                disabled={locked}
+                className="ml-1.5 font-semibold text-primary hover:underline"
+                onClick={() => setDeliveryCharge(initialDeliveryCharge)}
+              >
+                Reset
+              </button>
+            ) : null}
+          </p>
+        </div>
         <div className="space-y-1.5">
           <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
             Discount (৳)
