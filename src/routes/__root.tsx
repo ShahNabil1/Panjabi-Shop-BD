@@ -109,7 +109,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         ...(loaderData?.gtmId
           ? [
               {
-                children: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','${loaderData.gtmId}');`,
+                // dataLayer is created immediately so every event pushed before
+                // GTM arrives is queued and replayed (no tracking loss). The
+                // container itself loads on first interaction or shortly after
+                // page load, keeping pixels off the critical rendering path.
+                children: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var done=false,ev=['pointerdown','keydown','touchstart','scroll'];function load(){if(done)return;done=true;ev.forEach(function(e){w.removeEventListener(e,load,{passive:true})});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);}ev.forEach(function(e){w.addEventListener(e,load,{passive:true,once:true})});function later(){setTimeout(function(){(w.requestIdleCallback||function(c){c()})(load,{timeout:2000})},3500)}if(d.readyState==='complete')later();else w.addEventListener('load',later);})(window,document,'script','dataLayer','${loaderData.gtmId}');`,
               },
             ]
           : []),
