@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 
 import {
+  IMAGE_WIDTHS,
   bucketWidth,
   canTransform,
   cdnImage,
@@ -15,6 +16,9 @@ type SmartImageProps = {
   /** Width assumed before the element is measured (SSR / first paint). */
   baseWidth?: number;
   height?: number;
+  /** Intrinsic dimensions reserve the correct layout space without forcing a crop. */
+  intrinsicWidth?: number;
+  intrinsicHeight?: number;
   fit?: "cover" | "contain" | "scale-down";
   gravity?: "auto" | "center";
   quality?: number;
@@ -42,6 +46,8 @@ export function SmartImage({
   alt,
   baseWidth = 640,
   height,
+  intrinsicWidth,
+  intrinsicHeight,
   fit = "cover",
   gravity = "auto",
   quality,
@@ -96,18 +102,34 @@ export function SmartImage({
     ...(quality ? { quality } : {}),
       });
 
+  const responsiveSrcSet =
+    !rawFallback && canTransform(src)
+      ? IMAGE_WIDTHS.filter((candidate) => candidate <= Math.max(1600, width))
+          .map(
+            (candidate) =>
+              `${cdnImage(src, {
+                width: candidate,
+                ...(height ? { height } : {}),
+                fit,
+                gravity,
+                ...(quality ? { quality } : {}),
+              })} ${candidate}w`,
+          )
+          .join(", ")
+      : undefined;
+
   /** Single fixed-width variant is served, so the hint mirrors the rendered box. */
   const autoSizes = sizes ?? `${Math.round(cssWidth ?? baseWidth)}px`;
 
   return (
     <>
-      {priority ? (
-        <link rel="preload" as="image" href={finalSrc} fetchPriority="high" />
-      ) : null}
       <img
         ref={ref}
         src={finalSrc}
+        srcSet={responsiveSrcSet}
         alt={alt}
+        width={intrinsicWidth ?? baseWidth}
+        height={intrinsicHeight ?? height ?? baseWidth}
         sizes={autoSizes}
         loading={priority ? "eager" : "lazy"}
         decoding={priority ? "sync" : "async"}

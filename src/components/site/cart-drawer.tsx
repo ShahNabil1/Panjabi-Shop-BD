@@ -40,6 +40,7 @@ export function CartDrawer() {
     <div
       className={cn("fixed inset-0 z-[70]", open ? "" : "pointer-events-none")}
       aria-hidden={!open}
+      {...(!open ? { inert: true } : {})}
     >
       <button
         type="button"
@@ -198,7 +199,7 @@ export function CartDrawer() {
                         type="button"
                         onClick={() => remove(item.key)}
                         aria-label={tr(lang, "remove")}
-                        className="grid h-8 w-8 shrink-0 cursor-pointer place-items-center rounded-full border border-border bg-card text-muted-foreground transition-all duration-200 hover:scale-110 hover:border-destructive hover:text-destructive hover:shadow-sm active:scale-95"
+                        className="grid size-11 shrink-0 cursor-pointer place-items-center rounded-full border border-border bg-card text-muted-foreground transition-all duration-200 hover:scale-110 hover:border-destructive hover:text-destructive hover:shadow-sm active:scale-95"
                       >
                         <Trash2 className="h-4 w-4" />
                       </button>

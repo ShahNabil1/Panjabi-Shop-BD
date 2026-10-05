@@ -36,6 +36,7 @@ export function CategoryCard({
           alt={name}
           label={name}
           fit="cover"
+          sizes="(max-width: 639px) calc(50vw - 22px), (max-width: 1023px) calc(50vw - 30px), 272px"
           className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.07]"
 
         />

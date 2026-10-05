@@ -117,7 +117,7 @@ function HomePage() {
         action={
           <Link
             to="/categories"
-            className="group inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm transition-all duration-200 hover:scale-105 hover:shadow-md active:scale-95"
+            className="group inline-flex min-h-11 items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-secondary shadow-sm transition-all duration-200 hover:scale-105 hover:shadow-md active:scale-95"
           >
             View ALL Category
             <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5" />
@@ -171,7 +171,7 @@ function HomePage() {
             <Link
               to="/offers/$promotion"
               params={{ promotion: promo.slug }}
-              className="group inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm transition-all duration-200 hover:scale-105 hover:shadow-md active:scale-95"
+              className="group inline-flex min-h-11 items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-secondary shadow-sm transition-all duration-200 hover:scale-105 hover:shadow-md active:scale-95"
             >
               {tr(lang, "viewAll")}
               <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5" />
