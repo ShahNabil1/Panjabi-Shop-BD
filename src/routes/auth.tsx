@@ -442,7 +442,6 @@ function FieldFeedback({
     if (error) setLastError(error);
   }, [error]);
   const shown = error ?? (caps ? "Caps Lock is on — check your typing." : null);
-  const isError = Boolean(error);
 
   return (
     <div id={id} aria-live="polite" aria-atomic="true" className="relative h-10">
@@ -450,14 +449,13 @@ function FieldFeedback({
         aria-hidden={!shown}
         className={cn(
           "auth-feedback absolute inset-x-0 top-0 flex items-start gap-1.5 pt-1 font-en text-xs leading-5",
-          isError ? "text-destructive" : "text-primary",
+          error ? "text-destructive" : "text-primary",
           shown ? "translate-y-0 opacity-100" : "pointer-events-none -translate-y-1 opacity-0",
         )}
       >
         <AlertTriangle className="mt-0.5 size-3.5 shrink-0" aria-hidden="true" />
         <span>{shown ? shown : lastError}</span>
       </p>
-      <span className="sr-only">{field}</span>
     </div>
   );
 }
