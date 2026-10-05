@@ -7,4 +7,4 @@
 - [x] Upgrade landing editor, page library, previews and publishing validation
 - [x] Preserve landing checkout/tracking code; pass six editor safeguard tests and validate compilation
 - [ ] Verify authenticated builder interactions and live tracking delivery — blocked by external authentication unavailable in this session
-- [ ] Match the referenced auth presentation to Panjabi Shop BD and validate inputs without changing sign-in flows
+- [x] Match the referenced auth presentation to Panjabi Shop BD and validate inputs without changing sign-in flows; four tests and public browser checks pass
