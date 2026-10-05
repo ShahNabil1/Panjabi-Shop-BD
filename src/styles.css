@@ -938,8 +938,8 @@ html:has(body.lv-scroll-locked) {
 .auth-form-content form { gap: 12px; display: flex; flex-direction: column; }
 .auth-form-content form > * { margin-block: 0; }
 .auth-page .auth-input, .auth-submit { height: 44px; }
-.auth-form-content footer { margin-top: 16px; }
-.auth-form-content footer > * + * { margin-top: 8px; }
+.auth-form-content footer { margin-top: 16px; display: flex; flex-direction: column; gap: 8px; }
+.auth-form-content footer > * { margin-block: 0; }
 @media (max-width: 1023px) {
   .auth-layout { grid-template-rows: auto 1fr; }
   .auth-brand-panel { padding-block: 12px; }
@@ -949,6 +949,7 @@ html:has(body.lv-scroll-locked) {
   .auth-form-panel { padding-block: 12px; }
   .auth-form-content > header { margin-bottom: 12px; }
   .auth-form-content > header .auth-logo-link { margin-bottom: 10px; }
+  .auth-form-content > header .auth-logo-link img { width: 48px; }
   .auth-form-content > .auth-enter.my-6 { margin-block: 10px; }
   .auth-form-content form { gap: 8px; }
   .auth-field > [aria-live] { height: 28px; }
@@ -967,6 +968,9 @@ html:has(body.lv-scroll-locked) {
   .auth-form-content > header p { margin-top: 4px; }
   .auth-form-content > .auth-enter.my-6 { margin-block: 8px; }
   .auth-form-content footer > p:last-child { display: none; }
+  .auth-form-panel { padding-block: 8px; }
+  .auth-headline { font-size: 48px; }
+  .auth-brand-copy p { margin-top: 16px; font-size: 14px; line-height: 24px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .auth-page *, .auth-page *::before, .auth-page *::after {
