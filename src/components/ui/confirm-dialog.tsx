@@ -63,59 +63,49 @@ export function ConfirmProvider({ children }: { children: ReactNode }) {
     <ConfirmContext.Provider value={value}>
       {children}
       <AlertDialog open={open} onOpenChange={(next) => (next ? setOpen(true) : settle(false))}>
-        <AlertDialogContent className="max-w-md overflow-hidden rounded-2xl border-border/70 p-0 shadow-2xl">
-          <div
-            className={cn(
-              "h-1 w-full",
-              isDanger ? "bg-destructive" : "bg-primary",
-            )}
-          />
-          <div className="p-6">
-            <AlertDialogHeader className="flex-row items-start gap-4 space-y-0 text-left">
+        <AlertDialogContent className="max-w-sm overflow-hidden rounded-2xl border-border/60 p-0 shadow-2xl">
+          <div className="p-6 pb-5">
+            <AlertDialogHeader className="flex-col items-center gap-0 space-y-0 text-center">
               <span
                 className={cn(
-                  "grid size-11 shrink-0 place-items-center rounded-full",
-                  isDanger ? "bg-destructive/10 text-destructive" : "bg-primary/10 text-primary",
-                )}
-              >
-                {isDanger ? (
-                  <Trash2 className="size-5" />
-                ) : (
-                  <AlertTriangle className="size-5" />
-                )}
-              </span>
-              <div className="min-w-0 space-y-1.5">
-                <AlertDialogTitle className="text-base font-bold leading-snug">
-                  {options?.title}
-                </AlertDialogTitle>
-                {options?.description ? (
-                  <AlertDialogDescription className="text-sm leading-relaxed text-muted-foreground">
-                    {options.description}
-                  </AlertDialogDescription>
-                ) : null}
-              </div>
-            </AlertDialogHeader>
-
-            <AlertDialogFooter className="mt-6 gap-2">
-              <AlertDialogCancel
-                onClick={() => settle(false)}
-                className="rounded-lg transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]"
-              >
-                {options?.cancelLabel ?? "Cancel"}
-              </AlertDialogCancel>
-              <AlertDialogAction
-                onClick={() => settle(true)}
-                className={cn(
-                  "rounded-lg transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]",
+                  "grid size-12 place-items-center rounded-full ring-8",
                   isDanger
-                    ? "bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                    : "bg-primary text-primary-foreground hover:bg-primary/90",
+                    ? "bg-destructive/10 text-destructive ring-destructive/5"
+                    : "bg-primary/10 text-primary ring-primary/5",
                 )}
               >
-                {options?.confirmLabel ?? (isDanger ? "Delete" : "Confirm")}
-              </AlertDialogAction>
-            </AlertDialogFooter>
+                <Icon className="size-5" strokeWidth={2.25} />
+              </span>
+              <AlertDialogTitle className="mt-4 text-lg font-semibold tracking-tight">
+                {options?.title}
+              </AlertDialogTitle>
+              {options?.description ? (
+                <AlertDialogDescription className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+                  {options.description}
+                </AlertDialogDescription>
+              ) : null}
+            </AlertDialogHeader>
           </div>
+
+          <AlertDialogFooter className="grid grid-cols-2 gap-0 border-t border-border/60 sm:grid-cols-2">
+            <AlertDialogCancel
+              onClick={() => settle(false)}
+              className="m-0 h-12 rounded-none border-0 border-r border-border/60 bg-transparent text-sm font-medium text-foreground shadow-none hover:bg-muted/60 hover:text-foreground"
+            >
+              {options?.cancelLabel ?? "Cancel"}
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => settle(true)}
+              className={cn(
+                "m-0 h-12 rounded-none text-sm font-semibold shadow-none",
+                isDanger
+                  ? "bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  : "bg-primary text-primary-foreground hover:bg-primary/90",
+              )}
+            >
+              {options?.confirmLabel ?? (isDanger ? "Delete" : "Confirm")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
     </ConfirmContext.Provider>
