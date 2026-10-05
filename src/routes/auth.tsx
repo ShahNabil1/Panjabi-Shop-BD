@@ -430,12 +430,10 @@ function AuthPage() {
  */
 function FieldFeedback({
   id,
-  field,
   error,
   caps = false,
 }: {
   id: string;
-  field: "email" | "password" | "fullName";
   error: string | undefined;
   caps?: boolean;
 }) {
