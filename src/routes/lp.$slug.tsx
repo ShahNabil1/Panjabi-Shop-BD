@@ -281,7 +281,7 @@ function LandingPage() {
 
         <div>
           <div className="flex flex-wrap items-baseline gap-3">
-            <span className="text-3xl font-bold text-primary">{formatPrice(lang, unitPrice)}</span>
+            <span className="text-3xl font-bold text-primary-dark">{formatPrice(lang, unitPrice)}</span>
             {off > 0 ? (
               <>
                 <span className="text-lg text-muted-foreground line-through">
@@ -305,7 +305,7 @@ function LandingPage() {
             <ul className="mt-5 grid gap-2">
               {landing.blocks.map((block, i) => (
                 <li key={i} className="flex gap-2 text-[15px] leading-7">
-                  <span aria-hidden className="text-primary">
+                  <span aria-hidden className="text-primary-dark">
                     ✓
                   </span>
                   <span>{pick(lang, block["text_bn"], block["text_en"])}</span>

@@ -93,7 +93,7 @@ function InvoicePage() {
   return (
     <div className="print-sheet mx-auto max-w-[820px] px-3 py-5 sm:px-4 sm:py-8 print:px-0 print:py-0">
       <div className="mb-4 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 sm:mb-5 print:hidden">
-        <Link to="/" className="truncate text-sm font-semibold text-primary">
+        <Link to="/" className="truncate text-sm font-semibold text-primary-dark">
           ← {site.brand}
         </Link>
         <button
@@ -125,7 +125,7 @@ function InvoicePage() {
           </div>
           <div className="shrink-0 font-en text-right">
             <p className="text-base font-bold uppercase tracking-wide">Invoice</p>
-            <p className="mt-1 text-lg font-bold text-primary">{data.orderNumber}</p>
+            <p className="mt-1 text-lg font-bold text-primary-dark">{data.orderNumber}</p>
             <p className="text-xs font-medium text-foreground/70">
               {new Date(data.createdAt).toLocaleString("en-GB", {
                 day: "2-digit",
@@ -170,7 +170,7 @@ function InvoicePage() {
                   href={trackingUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="mt-1 inline-block rounded-sm border-2 border-primary px-3 py-1.5 text-xs font-bold text-primary transition-colors duration-200 ease-out hover:bg-primary hover:text-primary-foreground"
+                  className="mt-1 inline-block rounded-sm border-2 border-primary px-3 py-1.5 text-xs font-bold text-primary-dark transition-colors duration-200 ease-out hover:bg-primary hover:text-primary-foreground"
                 >
                   Track parcel →
                 </a>
@@ -181,7 +181,7 @@ function InvoicePage() {
 
         {data.note ? (
           <div className="mt-5 rounded-sm border-l-4 border-primary bg-primary/10 p-3">
-            <p className="text-sm font-bold text-primary">Customer Note</p>
+            <p className="text-sm font-bold text-primary-dark">Customer Note</p>
             <p className="mt-0.5 text-sm font-semibold text-foreground">{data.note}</p>
           </div>
         ) : null}
@@ -306,7 +306,7 @@ function InvoicePage() {
                 <dt className="text-foreground/70">
                   Discount
                   {data.couponCode ? (
-                    <span className="ml-1.5 rounded border border-primary/40 bg-primary/10 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-primary">
+                    <span className="ml-1.5 rounded border border-primary/40 bg-primary/10 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-primary-dark">
                       {data.couponCode}
                     </span>
                   ) : null}
@@ -316,7 +316,7 @@ function InvoicePage() {
             ) : null}
             <div className="flex justify-between border-t-2 border-border pt-2 text-xl font-extrabold">
               <dt>Total</dt>
-              <dd className="tabular-nums text-primary">{formatPrice("en", data.total)}</dd>
+              <dd className="tabular-nums text-primary-dark">{formatPrice("en", data.total)}</dd>
             </div>
           </dl>
         </div>

@@ -116,7 +116,7 @@ function AuthPage() {
             <img src={logoMark} alt="Panjabi Shop BD" className="h-9 w-9 rounded-sm object-contain" />
             <span className="text-sm font-bold tracking-tight">Panjabi Shop BD</span>
           </Link>
-          <Link to="/" className="text-sm text-muted-foreground hover:text-primary">
+          <Link to="/" className="text-sm text-muted-foreground hover:text-primary-dark">
             ← হোমপেইজে ফিরুন
           </Link>
         </div>
@@ -223,7 +223,7 @@ function AuthPage() {
           ) : (
             <p className="mt-4 text-center text-xs text-muted-foreground">
               অ্যাকাউন্ট শুধুমাত্র Panjabi Shop BD অ্যাডমিন তৈরি করে দেন। সমস্যা হলে{" "}
-              <Link to="/contact" className="underline underline-offset-4 hover:text-primary">
+              <Link to="/contact" className="underline underline-offset-4 hover:text-primary-dark">
                 যোগাযোগ করুন
               </Link>
               ।
@@ -233,11 +233,11 @@ function AuthPage() {
 
         <p className="mt-6 text-center text-xs text-muted-foreground">
           © Panjabi Shop BD · <span className="font-en">panjabishopbd.com</span> ·{" "}
-          <Link to="/about" className="underline underline-offset-4 hover:text-primary">
+          <Link to="/about" className="underline underline-offset-4 hover:text-primary-dark">
             আমাদের সম্পর্কে
           </Link>{" "}
           ·{" "}
-          <Link to="/contact" className="underline underline-offset-4 hover:text-primary">
+          <Link to="/contact" className="underline underline-offset-4 hover:text-primary-dark">
             যোগাযোগ
           </Link>
         </p>

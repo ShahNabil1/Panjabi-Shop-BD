@@ -127,7 +127,7 @@ export function AddToCartBar({
         <button
           type="button"
           onClick={() => void addItem()}
-          className="font-en min-w-36 flex-1 rounded-sm border border-primary px-5 py-3 text-sm font-semibold text-primary transition-colors hover:bg-primary/5"
+          className="font-en min-w-36 flex-1 rounded-sm border border-primary px-5 py-3 text-sm font-semibold text-primary-dark transition-colors hover:bg-primary/5"
         >
           {tr(lang, "addToCart")}
         </button>

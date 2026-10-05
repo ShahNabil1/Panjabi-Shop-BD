@@ -38,17 +38,17 @@ export function LegalPage({ page, pageKey }: { page: LegalPageContent; pageKey: 
     <main className="overflow-hidden bg-background">
       <section className="bg-secondary text-secondary-foreground">
         <div className="mx-auto w-full max-w-6xl px-4 py-11 sm:py-15 lg:py-18">
-          <Link to="/" className="inline-flex items-center gap-2 text-sm text-secondary-foreground/70 transition-colors hover:text-primary">
-            Home <span aria-hidden="true">/</span> <span className="text-primary">{page.title}</span>
+          <Link to="/" className="inline-flex items-center gap-2 text-sm text-secondary-foreground/70 transition-colors hover:text-primary-dark">
+            Home <span aria-hidden="true">/</span> <span className="text-primary-dark">{page.title}</span>
           </Link>
           <div className="mt-7 grid gap-7 lg:grid-cols-[minmax(0,1fr)_18rem] lg:items-end">
             <div className="min-w-0">
-              <div className="flex items-center gap-2 text-sm font-semibold text-primary"><Icon className="size-5" /> {detail.eyebrow}</div>
+              <div className="flex items-center gap-2 text-sm font-semibold text-primary-dark"><Icon className="size-5" /> {detail.eyebrow}</div>
               <h1 className="mt-4 max-w-3xl text-4xl font-bold leading-tight sm:text-5xl">{page.title}</h1>
               <p className="mt-4 max-w-2xl text-base leading-8 text-secondary-foreground/75 sm:text-lg">{detail.description}</p>
             </div>
             <div className="border-l-4 border-primary bg-secondary-foreground/5 p-5 sm:p-6">
-              <p className="text-sm font-semibold text-primary">Panjabi Shop BD</p>
+              <p className="text-sm font-semibold text-primary-dark">Panjabi Shop BD</p>
               <p className="mt-2 text-lg font-bold leading-7">স্বচ্ছতা, বিশ্বাস ও গ্রাহকের নিশ্চয়তা আমাদের অগ্রাধিকার।</p>
             </div>
           </div>
@@ -57,7 +57,7 @@ export function LegalPage({ page, pageKey }: { page: LegalPageContent; pageKey: 
 
       <section className="mx-auto grid w-full max-w-6xl gap-8 px-4 py-10 sm:py-14 lg:grid-cols-[15rem_minmax(0,1fr)] lg:gap-12">
         <aside className="lg:sticky lg:top-28 lg:self-start">
-          <p className="flex items-center gap-2 text-sm font-bold text-primary"><FileText className="size-4" /> নীতিমালা</p>
+          <p className="flex items-center gap-2 text-sm font-bold text-primary-dark"><FileText className="size-4" /> নীতিমালা</p>
           <nav className="mt-4 grid border-y border-border" aria-label="Legal pages">
             {policyLinks.map((item) => (
               <Link
@@ -82,7 +82,7 @@ export function LegalPage({ page, pageKey }: { page: LegalPageContent; pageKey: 
       <section className="bg-accent">
         <div className="mx-auto flex w-full max-w-6xl flex-col gap-5 px-4 py-9 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="flex items-center gap-2 text-sm font-semibold text-primary"><Headphones className="size-4" /> সাহায্য প্রয়োজন?</p>
+            <p className="flex items-center gap-2 text-sm font-semibold text-primary-dark"><Headphones className="size-4" /> সাহায্য প্রয়োজন?</p>
             <h2 className="mt-1 text-2xl font-bold text-secondary">নীতিমালা সম্পর্কে কোনো প্রশ্ন আছে?</h2>
           </div>
           <Button asChild variant="secondary"><Link to="/contact">আমাদের সাথে যোগাযোগ করুন</Link></Button>

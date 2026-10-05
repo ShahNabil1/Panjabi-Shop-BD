@@ -337,7 +337,7 @@ export function ImageLightbox({
 
         {images.length > 1 ? (
           <div className="mt-3 flex items-center gap-1.5 rounded-full bg-card/95 px-3.5 py-1.5 text-sm font-semibold shadow-lg backdrop-blur">
-            <span className="font-en text-primary">{index + 1}</span>
+            <span className="font-en text-primary-dark">{index + 1}</span>
             <span className="text-muted-foreground">/</span>
             <span className="font-en text-muted-foreground">{images.length}</span>
           </div>

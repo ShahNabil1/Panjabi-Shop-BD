@@ -50,7 +50,7 @@ function CheckoutPage() {
             </h1>
           </div>
           <div className="mb-5 text-center">
-            <h2 className="inline-flex items-center gap-2 text-base font-bold text-primary">
+            <h2 className="inline-flex items-center gap-2 text-base font-bold text-primary-dark">
               <span className="inline-block h-2 w-2 rounded-full bg-primary shadow-[0_0_8px_var(--color-primary)]" />
               Delivery Information
             </h2>

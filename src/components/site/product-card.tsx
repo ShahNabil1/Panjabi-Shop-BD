@@ -239,7 +239,7 @@ export function ProductCard({ product }: { product: ProductCardData }) {
           params={{ product: product.slug }}
           className="rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
         >
-          <h3 className="line-clamp-2 text-[15px] font-semibold leading-snug text-card-foreground transition-colors duration-200 group-hover:text-primary">
+          <h3 className="line-clamp-2 text-[15px] font-semibold leading-snug text-card-foreground transition-colors duration-200 group-hover:text-primary-dark">
             {name}
           </h3>
         </Link>
