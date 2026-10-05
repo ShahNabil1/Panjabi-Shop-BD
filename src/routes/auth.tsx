@@ -412,7 +412,6 @@ function AuthPage() {
                 </div>
                 <FieldFeedback
                   id="password-feedback"
-                  field="password"
                   error={errors.password}
                   caps={capsField === "password"}
                 />
