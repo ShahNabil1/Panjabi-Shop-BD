@@ -47,7 +47,7 @@ function OffersPage() {
         <Breadcrumbs items={[{ label: tr(lang, "home"), to: "/" }, { label: tr(lang, "offers") }]} />
 
         <header className="mx-auto mb-8 mt-10 max-w-2xl text-center sm:mb-12 sm:mt-14">
-          <div className="mb-3 inline-flex items-center text-xs font-bold uppercase text-primary">
+          <div className="mb-3 inline-flex items-center text-xs font-bold uppercase text-primary-dark">
             <span>{lang === "bn" ? "এক্সক্লুসিভ কালেকশন" : "Exclusive selections"}</span>
           </div>
           <h1 className="text-4xl font-black uppercase leading-tight sm:text-5xl">
@@ -98,7 +98,7 @@ function OffersPage() {
                   </div>
 
                   <div className="absolute inset-x-0 bottom-0 z-10 p-7 text-secondary-foreground sm:p-9">
-                    <p className="mb-2 text-sm font-semibold text-primary">
+                    <p className="mb-2 text-sm font-semibold text-primary-dark">
                       {lang === "bn" ? `ক্যাম্পেইন ${String(index + 1).padStart(2, "0")}` : `Campaign ${String(index + 1).padStart(2, "0")}`}
                     </p>
                     <h2 className="max-w-xl text-3xl font-black leading-tight sm:text-4xl">{title}</h2>

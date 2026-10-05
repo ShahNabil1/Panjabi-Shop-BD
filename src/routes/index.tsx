@@ -79,11 +79,11 @@ function HomePage() {
             <h2 className="text-2xl font-bold tracking-tight sm:text-4xl">
               {lang === "bn" ? (
                 <>
-                  আপনার স্টাইলের <span className="text-primary">প্রিমিয়াম পাঞ্জাবি</span>
+                  আপনার স্টাইলের <span className="text-primary-dark">প্রিমিয়াম পাঞ্জাবি</span>
                 </>
               ) : (
                 <>
-                  Find your <span className="text-primary">premium Panjabi</span>
+                  Find your <span className="text-primary-dark">premium Panjabi</span>
                 </>
               )}
             </h2>
@@ -100,7 +100,7 @@ function HomePage() {
               ) : null}
               <Link
                 to="/offers"
-                className="group inline-flex items-center gap-2 rounded-full border border-border bg-card px-7 py-3 text-sm font-semibold transition-all duration-200 hover:scale-105 hover:border-primary hover:bg-primary/5 hover:text-primary hover:shadow-md active:scale-95"
+                className="group inline-flex items-center gap-2 rounded-full border border-border bg-card px-7 py-3 text-sm font-semibold transition-all duration-200 hover:scale-105 hover:border-primary hover:bg-primary/5 hover:text-primary-dark hover:shadow-md active:scale-95"
               >
                 {tr(lang, "offers")}
                 <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5" />
