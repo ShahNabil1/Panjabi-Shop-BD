@@ -1,6 +1,6 @@
 {
   "exportFormatVersion": 2,
-  "exportTime": "2026-09-27T19:46:30.254Z",
+  "exportTime": "2026-10-05T04:53:15.988Z",
   "containerVersion": {
     "accountId": "0",
     "containerId": "0",
@@ -698,7 +698,7 @@
           {
             "type": "TEMPLATE",
             "key": "html",
-            "value": "<script>\n!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?\nn.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;\nn.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;\nt.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,\ndocument,'script','https://connect.facebook.net/en_US/fbevents.js');\n(function () {\n  var _xid = {{DL - external_id}};\n  var _am = {};\n  if (typeof _xid === 'string' && _xid) _am.external_id = _xid;\n  fbq('init', \"{{CFG - Meta Pixel ID}}\", _am);\n  fbq('track', 'PageView');\n})();\n</script>"
+            "value": "<script>\nif ({{CFG - Meta Pixel ID}}) {\n!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?\nn.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;\nn.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;\nt.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,\ndocument,'script','https://connect.facebook.net/en_US/fbevents.js');\n(function () {\n  var _xid = {{DL - external_id}};\n  var _am = {};\n  if (typeof _xid === 'string' && _xid) _am.external_id = _xid;\n  fbq('init', \"{{CFG - Meta Pixel ID}}\", _am);\n  fbq('track', 'PageView');\n})();\n}\n</script>"
           },
           {
             "type": "BOOLEAN",
@@ -879,7 +879,7 @@
           {
             "type": "TEMPLATE",
             "key": "html",
-            "value": "<script>\n!function (w, d, t) { w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];\nttq.methods=[\"page\",\"track\",\"identify\",\"instances\",\"debug\",\"on\",\"off\",\"once\",\"ready\",\"alias\",\"group\",\"enableCookie\",\"disableCookie\"];\nttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};\nfor(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);\nttq.instance=function(t){for(var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n]);return e};\nttq.load=function(e,n){var r=\"https://analytics.tiktok.com/i18n/pixel/events.js\";\nttq._i=ttq._i||{};ttq._i[e]=[];ttq._i[e]._u=r;ttq._t=ttq._t||{};ttq._t[e]=+new Date;\nttq._o=ttq._o||{};ttq._o[e]=n||{};var o=d.createElement(\"script\");o.type=\"text/javascript\";\no.async=!0;o.src=r+\"?sdkid=\"+e+\"&lib=\"+t;var a=d.getElementsByTagName(\"script\")[0];\na.parentNode.insertBefore(o,a)};\nttq.load(\"{{CFG - TikTok Pixel ID}}\");\nvar _xid = {{DL - external_id}};\nif (typeof _xid === 'string' && _xid) ttq.identify({ external_id: _xid });\nttq.page();\n}(window, document, 'ttq');\n</script>"
+            "value": "<script>\nif ({{CFG - TikTok Pixel ID}}) {\n!function (w, d, t) { w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];\nttq.methods=[\"page\",\"track\",\"identify\",\"instances\",\"debug\",\"on\",\"off\",\"once\",\"ready\",\"alias\",\"group\",\"enableCookie\",\"disableCookie\"];\nttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};\nfor(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);\nttq.instance=function(t){for(var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n]);return e};\nttq.load=function(e,n){var r=\"https://analytics.tiktok.com/i18n/pixel/events.js\";\nttq._i=ttq._i||{};ttq._i[e]=[];ttq._i[e]._u=r;ttq._t=ttq._t||{};ttq._t[e]=+new Date;\nttq._o=ttq._o||{};ttq._o[e]=n||{};var o=d.createElement(\"script\");o.type=\"text/javascript\";\no.async=!0;o.src=r+\"?sdkid=\"+e+\"&lib=\"+t;var a=d.getElementsByTagName(\"script\")[0];\na.parentNode.insertBefore(o,a)};\nttq.load(\"{{CFG - TikTok Pixel ID}}\");\nvar _xid = {{DL - external_id}};\nif (typeof _xid === 'string' && _xid) ttq.identify({ external_id: _xid });\nttq.page();\n}(window, document, 'ttq');\n}\n</script>"
           },
           {
             "type": "BOOLEAN",
@@ -1038,7 +1038,7 @@
           {
             "type": "TEMPLATE",
             "key": "html",
-            "value": "<script>\n(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};\nt=l.createElement(r);t.async=1;t.src=\"https://www.clarity.ms/tag/\"+i;\ny=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,\"clarity\",\"script\",\"{{CFG - Clarity Project ID}}\");\n</script>"
+            "value": "<script>\nif ({{CFG - Clarity Project ID}}) {\n(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};\nt=l.createElement(r);t.async=1;t.src=\"https://www.clarity.ms/tag/\"+i;\ny=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,\"clarity\",\"script\",\"{{CFG - Clarity Project ID}}\");\n}\n</script>"
           },
           {
             "type": "BOOLEAN",
@@ -1305,14 +1305,29 @@
         "accountId": "0",
         "containerId": "0",
         "name": "CFG - GA4 Measurement ID",
-        "type": "c",
+        "type": "v",
         "variableId": "1",
-        "notes": "Replace per project.",
+        "notes": "Auto-filled from the website admin panel (dataLayer site_config).",
         "parameter": [
           {
+            "type": "INTEGER",
+            "key": "dataLayerVersion",
+            "value": "2"
+          },
+          {
+            "type": "BOOLEAN",
+            "key": "setDefaultValue",
+            "value": "true"
+          },
+          {
             "type": "TEMPLATE",
-            "key": "value",
-            "value": "G-XXXXXXXXXX"
+            "key": "defaultValue",
+            "value": ""
+          },
+          {
+            "type": "TEMPLATE",
+            "key": "name",
+            "value": "site_config.ga4_measurement_id"
           }
         ]
       },
@@ -1320,14 +1335,29 @@
         "accountId": "0",
         "containerId": "0",
         "name": "CFG - Meta Pixel ID",
-        "type": "c",
+        "type": "v",
         "variableId": "2",
-        "notes": "Replace per project.",
+        "notes": "Auto-filled from the website admin panel (dataLayer site_config).",
         "parameter": [
           {
+            "type": "INTEGER",
+            "key": "dataLayerVersion",
+            "value": "2"
+          },
+          {
+            "type": "BOOLEAN",
+            "key": "setDefaultValue",
+            "value": "true"
+          },
+          {
             "type": "TEMPLATE",
-            "key": "value",
-            "value": "000000000000000"
+            "key": "defaultValue",
+            "value": ""
+          },
+          {
+            "type": "TEMPLATE",
+            "key": "name",
+            "value": "site_config.meta_pixel_id"
           }
         ]
       },
@@ -1335,14 +1365,29 @@
         "accountId": "0",
         "containerId": "0",
         "name": "CFG - TikTok Pixel ID",
-        "type": "c",
+        "type": "v",
         "variableId": "3",
-        "notes": "Replace per project.",
+        "notes": "Auto-filled from the website admin panel (dataLayer site_config).",
         "parameter": [
           {
+            "type": "INTEGER",
+            "key": "dataLayerVersion",
+            "value": "2"
+          },
+          {
+            "type": "BOOLEAN",
+            "key": "setDefaultValue",
+            "value": "true"
+          },
+          {
             "type": "TEMPLATE",
-            "key": "value",
-            "value": "XXXXXXXXXXXXXXXXXXXX"
+            "key": "defaultValue",
+            "value": ""
+          },
+          {
+            "type": "TEMPLATE",
+            "key": "name",
+            "value": "site_config.tiktok_pixel_id"
           }
         ]
       },
@@ -1350,14 +1395,29 @@
         "accountId": "0",
         "containerId": "0",
         "name": "CFG - Clarity Project ID",
-        "type": "c",
+        "type": "v",
         "variableId": "4",
-        "notes": "Replace per project.",
+        "notes": "Auto-filled from the website admin panel (dataLayer site_config).",
         "parameter": [
           {
+            "type": "INTEGER",
+            "key": "dataLayerVersion",
+            "value": "2"
+          },
+          {
+            "type": "BOOLEAN",
+            "key": "setDefaultValue",
+            "value": "true"
+          },
+          {
             "type": "TEMPLATE",
-            "key": "value",
-            "value": "xxxxxxxxxx"
+            "key": "defaultValue",
+            "value": ""
+          },
+          {
+            "type": "TEMPLATE",
+            "key": "name",
+            "value": "site_config.clarity_project_id"
           }
         ]
       },
