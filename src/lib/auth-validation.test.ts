@@ -4,7 +4,13 @@ import { authFields, validateAuthField, validateAuthForm } from "./auth-validati
 describe("auth input validation", () => {
   it("checks email format and accepts trimmed email", () => {
     expect(authFields.email.parse(" team@example.com ")).toBe("team@example.com");
-    for (const value of ["", "not-an-email", "নাম@example.com", "a b@example.com", `${"a".repeat(255)}@example.com`]) {
+    for (const value of [
+      "",
+      "not-an-email",
+      "নাম@example.com",
+      "a b@example.com",
+      `${"a".repeat(255)}@example.com`,
+    ]) {
       expect(validateAuthField("email", value)).toBeDefined();
     }
   });

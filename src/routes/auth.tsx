@@ -1,7 +1,16 @@
 import { Link, createFileRoute, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { AlertTriangle, ArrowLeft, ArrowRight, Eye, EyeOff, KeyRound, LockKeyhole, Mail } from "lucide-react";
+import {
+  AlertTriangle,
+  ArrowLeft,
+  ArrowRight,
+  Eye,
+  EyeOff,
+  KeyRound,
+  LockKeyhole,
+  Mail,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { validateAuthField, validateAuthForm, type AuthField } from "@/lib/auth-validation";
 
@@ -73,7 +82,8 @@ function AuthPage() {
     if (field === "password") setPassword(value);
     if (field === "fullName") setFullName(value);
     setFormError(null);
-    if (touched[field]) setErrors((current) => ({ ...current, [field]: validateAuthField(field, value) }));
+    if (touched[field])
+      setErrors((current) => ({ ...current, [field]: validateAuthField(field, value) }));
   }
 
   const syncCaps = (field: AuthField) => (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -120,7 +130,9 @@ function AuthPage() {
     setErrors(nextErrors);
     setTouched({ email: true, password: true, fullName: mode === "signup" });
     setFormError(null);
-    const firstInvalid = (["fullName", "email", "password"] as AuthField[]).find((field) => nextErrors[field]);
+    const firstInvalid = (["fullName", "email", "password"] as AuthField[]).find(
+      (field) => nextErrors[field],
+    );
     if (firstInvalid) {
       document.getElementById(firstInvalid)?.focus();
       return;
@@ -171,8 +183,16 @@ function AuthPage() {
     <main lang="en" className="auth-page min-h-svh bg-background text-foreground">
       <div className="auth-layout mx-auto grid min-h-svh max-w-[1600px] lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
         <section className="auth-brand-panel relative flex min-w-0 flex-col justify-between overflow-hidden border-b border-border px-6 py-6 sm:px-10 lg:min-h-svh lg:border-b-0 lg:px-12 lg:py-10 xl:px-16">
-          <Link to="/" className="auth-logo-link auth-enter relative z-10 block w-fit" aria-label="Panjabi Shop BD home">
-            <img src={logoMark} alt="Panjabi Shop BD" className="h-auto w-56 max-w-full object-contain sm:w-64" />
+          <Link
+            to="/"
+            className="auth-logo-link auth-enter relative z-10 block w-fit"
+            aria-label="Panjabi Shop BD home"
+          >
+            <img
+              src={logoMark}
+              alt="Panjabi Shop BD"
+              className="h-auto w-56 max-w-full object-contain sm:w-64"
+            />
           </Link>
           <div className="auth-brand-copy auth-enter relative z-10 my-auto max-w-xl py-12 lg:py-16">
             <div className="mb-7 inline-flex items-center gap-2.5 border-l-2 border-primary pl-3 font-en text-xs font-semibold uppercase text-primary">
@@ -184,13 +204,20 @@ function AuthPage() {
               <span className="text-primary">Heritage</span> Fashion.
             </h1>
             <p className="mt-7 max-w-sm font-en text-base leading-7 text-muted-foreground sm:text-lg">
-              The exclusive management portal for the Panjabi Shop BD team. Every panjabi carries a story of craft.
+              The exclusive management portal for the Panjabi Shop BD team. Every panjabi carries a
+              story of craft.
             </p>
           </div>
           <div className="auth-enter relative z-10 flex flex-wrap items-center justify-between gap-4 border-t border-border pt-6 font-en text-xs text-muted-foreground">
-            <Link to="/" className="group inline-flex min-h-11 items-center gap-2 transition-colors hover:text-primary">
-              <ArrowLeft className="size-4 transition-transform group-hover:-translate-x-1" aria-hidden="true" /> Return
-              to storefront
+            <Link
+              to="/"
+              className="group inline-flex min-h-11 items-center gap-2 transition-colors hover:text-primary"
+            >
+              <ArrowLeft
+                className="size-4 transition-transform group-hover:-translate-x-1"
+                aria-hidden="true"
+              />{" "}
+              Return to storefront
             </Link>
             <span className="hidden items-center gap-2 xl:flex">
               <LockKeyhole className="size-3.5" aria-hidden="true" /> Authorized team access
@@ -200,8 +227,16 @@ function AuthPage() {
         <section className="auth-form-panel flex min-w-0 items-center justify-center px-6 py-10 sm:px-10 lg:border-l lg:border-border lg:px-9 xl:px-12">
           <div className="auth-form-content w-full max-w-md">
             <header className="auth-enter mb-8">
-              <Link to="/" className="auth-logo-link mb-6 hidden w-fit lg:block" aria-label="Panjabi Shop BD home">
-                <img src={logoMark} alt="Panjabi Shop BD" className="h-auto w-48 max-w-full object-contain" />
+              <Link
+                to="/"
+                className="auth-logo-link mb-6 hidden w-fit lg:block"
+                aria-label="Panjabi Shop BD home"
+              >
+                <img
+                  src={logoMark}
+                  alt="Panjabi Shop BD"
+                  className="h-auto w-48 max-w-full object-contain"
+                />
               </Link>
               <h2 className="font-en text-3xl font-semibold leading-tight">
                 {mode === "signin" ? "Welcome back" : "Join the team"}
@@ -242,13 +277,18 @@ function AuthPage() {
             </Button>
             <div className="auth-enter my-6 flex items-center gap-4">
               <span className="h-px flex-1 bg-border" />
-              <span className="font-en text-[11px] font-medium uppercase text-muted-foreground">Or secure login</span>
+              <span className="font-en text-[11px] font-medium uppercase text-muted-foreground">
+                Or secure login
+              </span>
               <span className="h-px flex-1 bg-border" />
             </div>
             <form onSubmit={submit} noValidate className="auth-enter space-y-5" aria-busy={busy}>
               {mode === "signup" ? (
                 <div className="auth-field space-y-2">
-                  <Label htmlFor="fullName" className="font-en text-xs font-semibold uppercase text-muted-foreground">
+                  <Label
+                    htmlFor="fullName"
+                    className="font-en text-xs font-semibold uppercase text-muted-foreground"
+                  >
                     Full name
                   </Label>
                   <Input
@@ -272,7 +312,10 @@ function AuthPage() {
                 </div>
               ) : null}
               <div className="auth-field space-y-2">
-                <Label htmlFor="email" className="font-en text-xs font-semibold uppercase text-muted-foreground">
+                <Label
+                  htmlFor="email"
+                  className="font-en text-xs font-semibold uppercase text-muted-foreground"
+                >
                   Work email
                 </Label>
                 <div className="relative">
@@ -307,10 +350,17 @@ function AuthPage() {
                     )}
                   />
                 </div>
-                <FieldFeedback id="email-feedback" error={errors.email} caps={capsField === "email"} />
+                <FieldFeedback
+                  id="email-feedback"
+                  error={errors.email}
+                  caps={capsField === "email"}
+                />
               </div>
               <div className="auth-field space-y-2">
-                <Label htmlFor="password" className="font-en text-xs font-semibold uppercase text-muted-foreground">
+                <Label
+                  htmlFor="password"
+                  className="font-en text-xs font-semibold uppercase text-muted-foreground"
+                >
                   Password
                 </Label>
                 <div className="relative">
@@ -353,7 +403,11 @@ function AuthPage() {
                     aria-controls="password"
                     className="absolute right-1.5 top-1/2 size-11 -translate-y-1/2 text-muted-foreground hover:text-primary"
                   >
-                    {showPassword ? <EyeOff className="auth-eye" aria-hidden="true" /> : <Eye className="auth-eye" aria-hidden="true" />}
+                    {showPassword ? (
+                      <EyeOff className="auth-eye" aria-hidden="true" />
+                    ) : (
+                      <Eye className="auth-eye" aria-hidden="true" />
+                    )}
                   </Button>
                 </div>
                 <FieldFeedback
@@ -382,7 +436,12 @@ function AuthPage() {
                 disabled={busy || googleBusy || !captchaToken}
               >
                 {busy ? "Please wait…" : mode === "signin" ? "Access system" : "Create account"}
-                {!busy ? <ArrowRight className="transition-transform group-hover:translate-x-1" aria-hidden="true" /> : null}
+                {!busy ? (
+                  <ArrowRight
+                    className="transition-transform group-hover:translate-x-1"
+                    aria-hidden="true"
+                  />
+                ) : null}
               </Button>
             </form>
             {signupAllowed ? (
@@ -399,19 +458,31 @@ function AuthPage() {
             <footer className="auth-enter mt-8 space-y-5 text-center font-en text-xs leading-6 text-muted-foreground">
               <p>
                 For authorized team members only. Accounts are managed by your administrator.{" "}
-                <Link to="/contact" className="text-foreground underline underline-offset-4 transition-colors hover:text-primary">
+                <Link
+                  to="/contact"
+                  className="text-foreground underline underline-offset-4 transition-colors hover:text-primary"
+                >
                   Contact support
                 </Link>
               </p>
               <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-[11px]">
                 <span>© Panjabi Shop BD</span>
-                <Link to="/privacy-policy" className="inline-flex min-h-9 items-center transition-colors hover:text-primary">
+                <Link
+                  to="/privacy-policy"
+                  className="inline-flex min-h-9 items-center transition-colors hover:text-primary"
+                >
                   Privacy
                 </Link>
-                <Link to="/terms-and-conditions" className="inline-flex min-h-9 items-center transition-colors hover:text-primary">
+                <Link
+                  to="/terms-and-conditions"
+                  className="inline-flex min-h-9 items-center transition-colors hover:text-primary"
+                >
                   Terms
                 </Link>
-                <Link to="/contact" className="inline-flex min-h-9 items-center transition-colors hover:text-primary">
+                <Link
+                  to="/contact"
+                  className="inline-flex min-h-9 items-center transition-colors hover:text-primary"
+                >
                   Support
                 </Link>
               </div>
