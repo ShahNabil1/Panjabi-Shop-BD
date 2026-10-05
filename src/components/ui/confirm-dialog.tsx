@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useMemo, useRef, useState, type ReactNode } from "react";
-import { AlertTriangle, Trash2 } from "lucide-react";
+import { AlertTriangle, LogOut, Trash2 } from "lucide-react";
 
 import {
   AlertDialog,
@@ -20,6 +20,8 @@ export type ConfirmOptions = {
   cancelLabel?: string;
   /** `danger` = destructive red action, `brand` = primary brand action. */
   tone?: "danger" | "brand";
+  /** Icon shown in the header badge. Defaults to trash (danger) / warning (brand). */
+  icon?: "trash" | "warning" | "logout";
 };
 
 type ConfirmFn = (options: ConfirmOptions) => Promise<boolean>;
