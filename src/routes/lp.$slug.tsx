@@ -63,7 +63,8 @@ export const Route = createFileRoute("/lp/$slug")({
       `${product.nameBn} — ${formatPrice("bn", product.price)}. ক্যাশ অন ডেলিভারিতে অর্ডার করুন।`;
     const ogTitle = seo.ogTitle || title;
     const ogDescription = seo.ogDescription || description;
-    const image = landing.ogImageUrl ?? images[0]?.url ?? null;
+    const candidateImage = landing.ogImageUrl ?? images[0]?.url ?? null;
+    const image = candidateImage && /^https:\/\//i.test(candidateImage) ? candidateImage : null;
     const url = seo.canonicalUrl || `${SITE_URL}/lp/${params.slug}`;
 
     return {
@@ -74,6 +75,7 @@ export const Route = createFileRoute("/lp/$slug")({
         { property: "og:title", content: ogTitle },
         { property: "og:description", content: ogDescription },
         { property: "og:type", content: "product" },
+        { name: "twitter:card", content: "summary_large_image" },
         { property: "og:url", content: url },
         ...(image ? [{ property: "og:image", content: image }] : []),
         ...(image ? [{ name: "twitter:image", content: image }] : []),
