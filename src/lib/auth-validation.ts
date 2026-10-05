@@ -19,11 +19,11 @@ export function validateAuthFields(
   const errors: Partial<Record<"email" | "password" | "fullName", string>> = {};
   const email = authEmailSchema.safeParse(values.email);
   const password = authPasswordSchema.safeParse(values.password);
-  if (!email.success) errors.email = email.error.issues[0]?.message;
-  if (!password.success) errors.password = password.error.issues[0]?.message;
+  if (!email.success) errors.email = email.error.issues[0]?.message ?? "Enter a valid email address.";
+  if (!password.success) errors.password = password.error.issues[0]?.message ?? "Enter your password.";
   if (signup) {
     const name = authNameSchema.safeParse(values.fullName);
-    if (!name.success) errors.fullName = name.error.issues[0]?.message;
+    if (!name.success) errors.fullName = name.error.issues[0]?.message ?? "Enter your full name.";
   }
   return errors;
 }
