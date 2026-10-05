@@ -4,3 +4,5 @@
 - [x] Fix homepage agent accessibility semantics
 - [x] Add compliant llms.txt and AI catalog responses
 - [x] Resolve reported mobile PageSpeed performance and accessibility issues
+- [ ] Upgrade landing editor, page library, previews and publishing validation
+- [ ] Preserve landing checkout/tracking and verify the updated builder
