@@ -301,15 +301,32 @@ export function DeliverySettingsPanel({
                   (search.data ?? []).map((p) => {
                     const label = p.name_bn || p.name_en;
                     const added = existing.has(p.id);
+                    const image = [...(p.product_images ?? [])].sort(
+                      (a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0),
+                    )[0]?.url;
                     return (
                       <button
                         key={p.id}
                         type="button"
                         disabled={added}
                         onClick={() => addRule(p.id, label)}
-                        className="flex w-full items-center justify-between gap-2 rounded-lg px-2.5 py-2 text-left text-sm transition-colors hover:bg-muted disabled:opacity-50"
+                        className="flex w-full items-center justify-between gap-2.5 rounded-lg px-2.5 py-2 text-left text-sm transition-colors hover:bg-muted disabled:opacity-50"
                       >
-                        <span className="min-w-0 truncate font-semibold">{label}</span>
+                        <span className="flex min-w-0 items-center gap-2.5">
+                          {image ? (
+                            <img
+                              src={image}
+                              alt=""
+                              loading="lazy"
+                              className="size-10 shrink-0 rounded-md border border-border/60 object-cover"
+                            />
+                          ) : (
+                            <span className="grid size-10 shrink-0 place-items-center rounded-md border border-border/60 bg-muted text-[10px] font-bold uppercase text-muted-foreground">
+                              {p.kind === "combo" ? "Cmb" : "Img"}
+                            </span>
+                          )}
+                          <span className="min-w-0 truncate font-semibold">{label}</span>
+                        </span>
                         <span className="shrink-0 text-[11px] font-bold uppercase text-muted-foreground">
                           {added ? "Added" : p.kind === "combo" ? "Combo" : "Product"}
                         </span>
