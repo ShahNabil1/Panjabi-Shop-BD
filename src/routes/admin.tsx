@@ -181,6 +181,18 @@ function AdminLayout() {
   const navigate = useNavigate();
   const router = useRouter();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const confirm = useConfirm();
+
+  const requestSignOut = useCallback(async () => {
+    const ok = await confirm({
+      title: "Sign out?",
+      description: "আপনি কি সত্যিই অ্যাডমিন প্যানেল থেকে সাইন আউট করতে চান?",
+      confirmLabel: "Sign out",
+      cancelLabel: "Cancel",
+      tone: "danger",
+    });
+    if (ok) void signOut();
+  }, [confirm, signOut]);
 
   // Idle guard: one hour without activity ends the admin session.
   useIdleTimeout(
