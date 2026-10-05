@@ -390,8 +390,8 @@ export function SiteHeader() {
               key={c.id}
               to="/c/$category"
               params={{ category: c.slug }}
-              activeProps={{ className: "text-primary-dark" }}
-              className="group relative whitespace-nowrap text-sm font-medium text-secondary-foreground transition-all duration-200 hover:scale-105 hover:text-primary-dark active:scale-95"
+              activeProps={{ className: "text-primary" }}
+              className="group relative whitespace-nowrap text-sm font-medium text-secondary-foreground transition-all duration-200 hover:scale-105 hover:text-primary active:scale-95"
             >
               {pick(lang, c.name_bn, c.name_en)}
               <span className="absolute -bottom-0.5 left-0 h-0.5 w-0 bg-primary transition-all duration-300 group-hover:w-full" />
@@ -399,8 +399,8 @@ export function SiteHeader() {
           ))}
           <Link
             to="/categories"
-            activeProps={{ className: "text-primary-dark" }}
-            className="group relative ml-auto whitespace-nowrap text-sm font-semibold text-primary-dark transition-all duration-200 hover:scale-105 active:scale-95"
+            activeProps={{ className: "text-primary" }}
+            className="group relative ml-auto whitespace-nowrap text-sm font-semibold text-primary transition-all duration-200 hover:scale-105 active:scale-95"
           >
             {tr(lang, "allCategories")}
             <span className="absolute -bottom-0.5 left-0 h-0.5 w-0 bg-primary transition-all duration-300 group-hover:w-full" />
