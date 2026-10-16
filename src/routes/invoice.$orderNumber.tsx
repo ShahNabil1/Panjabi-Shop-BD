@@ -11,6 +11,7 @@ function searchSchema(input: Record<string, unknown>) {
 
 /** Legacy invoice URL — permanently forwards to the short /inv link. */
 export const Route = createFileRoute("/invoice/$orderNumber")({
+  head: ({ params }) => ({ meta: [{ title: `Invoice ${params.orderNumber} — Panjabi Shop BD` }, { name: "description", content: `Order invoice ${params.orderNumber} from Panjabi Shop BD.` }, { property: "og:title", content: `Invoice ${params.orderNumber} — Panjabi Shop BD` }, { property: "og:description", content: `Order invoice ${params.orderNumber} from Panjabi Shop BD.` }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { name: "robots", content: "noindex, nofollow" }] }),
   validateSearch: searchSchema,
   beforeLoad: ({ params, search }) => {
     throw redirect({
