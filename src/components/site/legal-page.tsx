@@ -75,7 +75,7 @@ export function LegalPage({ page, pageKey }: { page: LegalPageContent; pageKey: 
         </aside>
 
         <article className="min-w-0 border-t-4 border-primary bg-card px-5 py-7 shadow-card sm:px-8 sm:py-9 lg:px-10">
-          <RichText html={page.content} className="text-base leading-8 [&_h2]:text-secondary [&_h3]:text-secondary" />
+          <RichText html={page.content.replace(/<(\/?)h1\b/gi, "<$1h2")} className="text-base leading-8 [&_h2]:text-secondary [&_h3]:text-secondary" />
         </article>
       </section>
 
