@@ -42,8 +42,10 @@ export function findDistrict(divisionName: string, name: string) {
 }
 
 export function findUpazila(divisionName: string, districtName: string, name: string) {
+  const target = name.trim();
   return (
-    findDistrict(divisionName, districtName)?.upazilas.find((u) => u.bn === name || u.en === name) ??
-    null
+    findDistrict(divisionName, districtName)?.upazilas.find(
+      (u) => u.bn.trim() === target || u.en.trim() === target,
+    ) ?? null
   );
 }
