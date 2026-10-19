@@ -245,6 +245,11 @@ export const adminUpdateOrderStatus = createServerFn({ method: "POST" })
       }
     }
 
+    if (before !== data.status) {
+      const { sendAutoStatusSms } = await import("./sms-auto.server");
+      await sendAutoStatusSms(db, data.id, data.status);
+    }
+
     // Inventory bridge: deduct stock on commitment, give it back on release.
     if (before !== data.status) {
       try {
@@ -1228,6 +1233,11 @@ export const adminCreateOrder = createServerFn({ method: "POST" })
       actor: creator,
       meta: { mode: data.mode },
     });
+
+    if (data.mode === "manual" && (data.preOrder || data.scheduledFor)) {
+      const { sendAutoStatusSms } = await import("./sms-auto.server");
+      await sendAutoStatusSms(db, order.id as string, data.preOrder ? "pre_order" : "scheduled_order");
+    }
 
     return { id: order.id as string, orderNumber: order.order_number as string };
   });
