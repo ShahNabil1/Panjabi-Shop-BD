@@ -70,10 +70,49 @@ export function VariableTextarea({
     if (el) caret.current = { start: el.selectionStart, end: el.selectionEnd };
   };
 
+  const [anchor, setAnchor] = useState<{ left: number; top: number; line: number; above: boolean }>({
+    left: 0,
+    top: 0,
+    line: 20,
+    above: false,
+  });
+
+  /** Caret pixel position inside the textarea via a mirror element. */
+  const measureCaret = (el: HTMLTextAreaElement, pos: number) => {
+    const cs = getComputedStyle(el);
+    const mirror = document.createElement("div");
+    const props = [
+      "boxSizing", "width", "paddingTop", "paddingRight", "paddingBottom", "paddingLeft",
+      "borderTopWidth", "borderRightWidth", "borderBottomWidth", "borderLeftWidth",
+      "fontFamily", "fontSize", "fontWeight", "fontStyle", "letterSpacing", "lineHeight",
+      "textTransform", "wordSpacing", "tabSize",
+    ] as const;
+    for (const p of props) mirror.style[p] = cs[p];
+    mirror.style.position = "absolute";
+    mirror.style.visibility = "hidden";
+    mirror.style.whiteSpace = "pre-wrap";
+    mirror.style.overflowWrap = "break-word";
+    mirror.style.top = "0";
+    mirror.style.left = "-9999px";
+    mirror.textContent = el.value.slice(0, pos);
+    const span = document.createElement("span");
+    span.textContent = el.value.slice(pos) || ".";
+    mirror.appendChild(span);
+    document.body.appendChild(mirror);
+    const line = parseFloat(cs.lineHeight) || parseFloat(cs.fontSize) * 1.4;
+    const top = span.offsetTop - el.scrollTop;
+    const left = span.offsetLeft - el.scrollLeft;
+    document.body.removeChild(mirror);
+    const rect = el.getBoundingClientRect();
+    const spaceBelow = window.innerHeight - (rect.top + top + line);
+    setAnchor({ left, top, line, above: spaceBelow < 200 && rect.top + top > 200 });
+  };
+
   const detectSlash = (text: string, pos: number) => {
     const before = text.slice(0, pos);
     const m = before.match(/(^|\s)\/(\w*)$/);
     const q = m?.[2] ?? "";
+    if (m && ref.current) measureCaret(ref.current, pos);
     setSlash(m ? { at: pos - q.length - 1, query: q } : null);
   };
 
@@ -176,7 +215,13 @@ export function VariableTextarea({
           <div
             ref={listRef}
             role="listbox"
-            className="absolute inset-x-2 top-full z-50 mt-1 max-h-60 overflow-y-auto overscroll-contain rounded-xl border border-border bg-popover p-1 text-popover-foreground shadow-lg"
+            style={{
+              left: `clamp(0.25rem, ${anchor.left}px, calc(100% - min(16rem, 100% - 0.5rem) - 0.25rem))`,
+              ...(anchor.above
+                ? { bottom: `calc(100% - ${anchor.top}px + 4px)` }
+                : { top: anchor.top + anchor.line + 4 }),
+            }}
+            className="absolute z-50 w-max min-w-[9rem] max-w-[min(16rem,calc(100%-0.5rem))] max-h-48 overflow-y-auto overscroll-contain rounded-lg border border-border bg-popover p-1 text-popover-foreground shadow-lg animate-in fade-in-0 zoom-in-95"
           >
             {matches.map((v, i) => (
               <button
@@ -189,12 +234,12 @@ export function VariableTextarea({
                 onMouseEnter={() => setActive(i)}
                 onClick={() => pickSlash(v)}
                 className={cn(
-                  "flex w-full touch-manipulation items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-left text-sm",
+                  "flex w-full min-w-0 touch-manipulation flex-col items-start rounded-md px-2 py-1.5 text-left",
                   i === active ? "bg-accent text-accent-foreground" : "hover:bg-muted",
                 )}
               >
-                <span className="font-mono text-xs font-semibold">{`{{${v}}}`}</span>
-                <span className="truncate text-xs text-muted-foreground">
+                <span className="max-w-full truncate font-mono text-xs font-semibold">{`{{${v}}}`}</span>
+                <span className="max-w-full truncate text-[10px] text-muted-foreground">
                   {values ? values[v] || "—" : (LABELS[v] ?? "")}
                 </span>
               </button>
