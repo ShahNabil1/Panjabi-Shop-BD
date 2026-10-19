@@ -65,6 +65,12 @@ async function loadFromDb(): Promise<Record<string, string>> {
   }
 }
 
+/** Env fallback, ignoring scaffold placeholders so they never look configured. */
+function envValue(key: string): string {
+  const v = (process.env[key] ?? "").trim();
+  return /PLACEHOLDER/i.test(v) ? "" : v;
+}
+
 /** All managed values, database first with environment-variable fallback. */
 export async function getIntegrationValues(): Promise<Record<string, string>> {
   const now = Date.now();
@@ -74,7 +80,7 @@ export async function getIntegrationValues(): Promise<Record<string, string>> {
   const out: Record<string, string> = {};
   for (const key of INTEGRATION_KEYS) {
     const fromDb = cache.values[key];
-    const fromEnv = process.env[key];
+    const fromEnv = envValue(key);
     const value = (fromDb ?? fromEnv ?? "").trim();
     if (value) out[key] = value;
   }
@@ -93,7 +99,7 @@ export async function getIntegrationSources(): Promise<
   for (const key of INTEGRATION_KEYS) {
     out[key] = cache.values[key]
       ? "database"
-      : (process.env[key] ?? "").trim()
+      : envValue(key)
         ? "environment"
         : "missing";
   }

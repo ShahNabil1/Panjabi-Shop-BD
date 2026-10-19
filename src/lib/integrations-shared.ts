@@ -70,7 +70,7 @@ export const integrationMeta: Record<
         label: "System User Access Token",
         secret: true,
         placeholder: "EAAG…",
-        hint: "Long-lived system user token with ads_read, ads_management, business_management, catalog_management.",
+        hint: "Long-lived system user token with all 6 permissions: ads_management, ads_read, business_management, catalog_management, pages_manage_ads, pages_read_engagement.",
       },
       {
         key: "META_AD_ACCOUNT_ID",
