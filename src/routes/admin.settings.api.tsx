@@ -145,6 +145,7 @@ function GroupCard({
 
   const locked = Boolean(state?.configured) && !unlocked;
   const isDirty = JSON.stringify(values) !== savedSnapshot;
+  const hasAnyValue = Object.values(values).some((v) => v.trim().length > 0);
 
 
   const save = useMutation({
@@ -285,13 +286,13 @@ function GroupCard({
           </>
         ) : (
           <>
-            <Button type="button" disabled={busy || !isDirty} onClick={() => save.mutate()}>
-              {save.isPending ? (
-                <Loader2 className="mr-1.5 size-4 animate-spin" />
-              ) : !isDirty ? (
-                <CheckCircle2 className="mr-1.5 size-4" />
-              ) : null}
-              {!isDirty && !save.isPending ? "Saved" : "Save"}
+            <Button
+              type="button"
+              disabled={busy || !isDirty || !hasAnyValue}
+              onClick={() => save.mutate()}
+            >
+              {save.isPending ? <Loader2 className="mr-1.5 size-4 animate-spin" /> : null}
+              Save
             </Button>
             {state?.configured ? (
               <Button
@@ -308,20 +309,22 @@ function GroupCard({
             ) : null}
           </>
         )}
-        <Button
-          type="button"
-          variant="secondary"
-          disabled={test.isPending}
-          onClick={() => test.mutate()}
-        >
-          {test.isPending ? (
-            <Loader2 className="mr-1.5 size-4 animate-spin" />
-          ) : (
-            <PlugZap className="mr-1.5 size-4" />
-          )}
-          Test connection
-        </Button>
-        {locked ? null : (
+        {state?.configured && locked ? (
+          <Button
+            type="button"
+            variant="secondary"
+            disabled={test.isPending}
+            onClick={() => test.mutate()}
+          >
+            {test.isPending ? (
+              <Loader2 className="mr-1.5 size-4 animate-spin" />
+            ) : (
+              <PlugZap className="mr-1.5 size-4" />
+            )}
+            Test connection
+          </Button>
+        ) : null}
+        {state?.configured && !locked ? (
           <Button
             type="button"
             variant="ghost"
@@ -341,36 +344,40 @@ function GroupCard({
             <Trash2 className="mr-1.5 size-4" />
             Remove
           </Button>
-        )}
+        ) : null}
       </div>
 
-
-      {result ? (
+      {result && state?.configured ? (
         <div
           className={cn(
-            "space-y-2 rounded-xl border px-3 py-3 text-xs",
+            "min-w-0 space-y-2 overflow-hidden rounded-xl border px-3 py-3 text-xs",
             result.ok
               ? "border-emerald-200 bg-emerald-50/70"
               : "border-rose-200 bg-rose-50/70 text-rose-900",
           )}
         >
-          <div className="flex items-center gap-2 font-bold">
+          <div className="flex min-w-0 flex-wrap items-start gap-2 font-bold">
             {result.ok ? (
-              <CheckCircle2 className="size-4 text-emerald-600" />
+              <CheckCircle2 className="size-4 shrink-0 text-emerald-600" />
             ) : (
-              <XCircle className="size-4 text-rose-600" />
+              <XCircle className="size-4 shrink-0 text-rose-600" />
             )}
-            {result.message}
-            <span className="ml-auto font-medium text-muted-foreground">
+            <span className="min-w-0 flex-1 break-words">{result.message}</span>
+            <span className="shrink-0 font-medium text-muted-foreground">
               {new Date(result.checkedAt).toLocaleTimeString()}
             </span>
           </div>
           {result.details.length ? (
-            <dl className="grid gap-x-4 gap-y-1.5 sm:grid-cols-2">
+            <dl className="grid min-w-0 gap-x-6 gap-y-2 md:grid-cols-2">
               {result.details.map((row) => (
-                <div key={row.label} className="flex items-center justify-between gap-3">
-                  <dt className="text-muted-foreground">{row.label}</dt>
-                  <dd className="ig-text truncate font-semibold">{row.value}</dd>
+                <div
+                  key={row.label}
+                  className="flex min-w-0 flex-col gap-0.5 border-b border-border/40 pb-1.5 last:border-0 min-[420px]:flex-row min-[420px]:items-start min-[420px]:justify-between min-[420px]:gap-3"
+                >
+                  <dt className="shrink-0 text-muted-foreground">{row.label}</dt>
+                  <dd className="ig-text min-w-0 font-semibold [overflow-wrap:anywhere] min-[420px]:text-right">
+                    {row.value}
+                  </dd>
                 </div>
               ))}
             </dl>
