@@ -124,7 +124,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
             "@context": "https://schema.org",
             "@graph": [
               {
-                "@type": "Organization",
+                "@type": ["Organization", "OnlineStore"],
                 "@id": `${SITE_URL}/#organization`,
                 name: brand,
                 url: SITE_URL,
@@ -142,13 +142,25 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
                     }
                   : {}),
                 ...(loaderData?.contact.address
-                  ? {
-                      address: {
-                        "@type": "PostalAddress",
-                        streetAddress: loaderData.contact.address,
-                        addressCountry: "BD",
-                      },
-                    }
+                  ? (() => {
+                      const raw = loaderData.contact.address.trim();
+                      const postal = raw.match(/\b(\d{4})\b(?!.*\b\d{4}\b)/)?.[1] ?? "1219";
+                      const street =
+                        raw
+                          .replace(/,?\s*Dhaka\s*-?\s*\d{4}\s*$/i, "")
+                          .replace(/,?\s*\d{4}\s*$/, "")
+                          .trim() || raw;
+                      return {
+                        address: {
+                          "@type": "PostalAddress",
+                          streetAddress: street,
+                          addressLocality: "Dhaka",
+                          addressRegion: "Dhaka Division",
+                          postalCode: postal,
+                          addressCountry: "BD",
+                        },
+                      };
+                    })()
                   : {}),
               },
               {
