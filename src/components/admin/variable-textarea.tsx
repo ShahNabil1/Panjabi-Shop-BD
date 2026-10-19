@@ -73,7 +73,8 @@ export function VariableTextarea({
   const detectSlash = (text: string, pos: number) => {
     const before = text.slice(0, pos);
     const m = before.match(/(^|\s)\/(\w*)$/);
-    setSlash(m ? { at: pos - m[2].length - 1, query: m[2] } : null);
+    const q = m?.[2] ?? "";
+    setSlash(m ? { at: pos - q.length - 1, query: q } : null);
   };
 
   const replaceRange = (start: number, end: number, insert: string) => {
@@ -113,7 +114,8 @@ export function VariableTextarea({
       setActive((i) => (i - 1 + matches.length) % matches.length);
     } else if (e.key === "Enter" || e.key === "Tab") {
       e.preventDefault();
-      pickSlash(matches[active]);
+      const pick = matches[active];
+      if (pick) pickSlash(pick);
     } else if (e.key === "Escape") {
       e.preventDefault();
       setSlash(null);
