@@ -268,12 +268,9 @@ for (const [ev, fbEvent] of Object.entries(META_MAP)) {
       `<script>
 (function () {
   if (!window.fbq) return;${READ}
-  if (_ph || _xid) {
-    var _am = {};
-    if (_xid) _am.external_id = _xid;
-    if (_ph) _am.ph = _ph;
-    fbq('init', ${JSON.stringify(V("CFG - Meta Pixel ID"))}, _am);
-  }
+  // Never re-initialize the Pixel here: a second init call without full user
+  // data makes it drop the click id (fbc) attached from the URL/cookies.
+  // Advanced matching happens once in the Base tag; hashed phone goes via CAPI.
   var _p = {
     content_type: _str(${R("DL - content_type")}) || 'product',
     content_ids: _ids,

@@ -88,10 +88,26 @@ function readCookie(name: string): string | undefined {
   return match?.[1] ? clean(decodeURIComponent(match[1])) : undefined;
 }
 
+/**
+ * Root-domain scope for first-party cookies. Meta's fbevents.js writes
+ * `_fbp`/`_fbc` on `.panjabishopbd.com`; if we write the same names host-only,
+ * two competing cookies exist and the Pixel may read the wrong one. Aligning
+ * the domain keeps a single cookie. On preview/localhost hosts we stay
+ * host-only (a domain attribute would be rejected anyway).
+ */
+function cookieDomain(): string | undefined {
+  if (typeof location === "undefined") return undefined;
+  const host = location.hostname;
+  return host === "panjabishopbd.com" || host.endsWith(".panjabishopbd.com")
+    ? ".panjabishopbd.com"
+    : undefined;
+}
+
 function writeCookie(name: string, value: string) {
   if (typeof document === "undefined") return;
   const maxAge = 60 * 60 * 24 * 90; // Meta's own _fbc/_fbp window.
-  document.cookie = `${name}=${encodeURIComponent(value)}; path=/; max-age=${maxAge}; SameSite=Lax`;
+  const domain = cookieDomain();
+  document.cookie = `${name}=${encodeURIComponent(value)}; path=/; max-age=${maxAge}; SameSite=Lax${domain ? `; domain=${domain}` : ""}`;
 }
 
 function randomFbp(): string {
