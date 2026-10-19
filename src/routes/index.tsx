@@ -28,7 +28,7 @@ export const Route = createFileRoute("/")({
     const description =
       typeof descriptionValue === "string" && descriptionValue.trim()
         ? descriptionValue.trim()
-        : "আধুনিক ডিজাইন, আরামদায়ক কাপড় ও নিখুঁত ফিটের প্রিমিয়াম পাঞ্জাবি কিনুন। সারা বাংলাদেশে ক্যাশ অন ডেলিভারি।";
+        : "Panjabi Shop BD থেকে আধুনিক ডিজাইন, আরামদায়ক কাপড় ও নিখুঁত ফিটের প্রিমিয়াম পাঞ্জাবি কিনুন। সারা বাংলাদেশে ক্যাশ অন ডেলিভারি।";
     const image =
       typeof imageValue === "string" && imageValue.trim().startsWith("https://")
         ? imageValue.trim()

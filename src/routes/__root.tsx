@@ -75,12 +75,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           content:
             "width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content",
         },
-        { title: `${brand} — প্রিমিয়াম পাঞ্জাবির অনলাইন শপ` },
-        {
-          name: "description",
-          content:
-            "Panjabi Shop BD থেকে মানসম্মত ও আধুনিক ডিজাইনের পাঞ্জাবি কিনুন। সারা বাংলাদেশে ক্যাশ অন ডেলিভারি সুবিধা।",
-        },
+        // Page titles and descriptions belong to leaf routes, not shared defaults.
         {
           name: "google-site-verification",
           content: "cXRYWCzWKgQUOaUz8mLsw-P1yraw7rQ-hXbzFZHI3-g",
