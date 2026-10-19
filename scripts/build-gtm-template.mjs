@@ -268,9 +268,9 @@ for (const [ev, fbEvent] of Object.entries(META_MAP)) {
       `<script>
 (function () {
   if (!window.fbq) return;${READ}
-  // Never re-init here: a second fbq('init') without full user data makes the
-  // Pixel drop the click id (fbc) it attached from the URL/cookies. Advanced
-  // matching happens once in the Base tag; hashed phone goes via CAPI.
+  // Never re-initialize the Pixel here: a second init call without full user
+  // data makes it drop the click id (fbc) attached from the URL/cookies.
+  // Advanced matching happens once in the Base tag; hashed phone goes via CAPI.
   var _p = {
     content_type: _str(${R("DL - content_type")}) || 'product',
     content_ids: _ids,
