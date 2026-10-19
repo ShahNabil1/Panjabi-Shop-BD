@@ -8,6 +8,7 @@ import { VariableTextarea } from "@/components/admin/variable-textarea";
 
 import {
   SMS_TEMPLATE_VARIABLES,
+  AUTO_SMS_KEYS,
   adminDeleteSmsTemplate,
   adminListSmsTemplates,
   adminSetSmsTemplateEnabled,
@@ -26,7 +27,7 @@ export const Route = createFileRoute("/admin/settings/sms-templates")({
 });
 
 /** Templates that fire automatically and can therefore be switched off. */
-const AUTO_KEYS = new Set(["order_confirm"]);
+const AUTO_KEYS = AUTO_SMS_KEYS;
 
 function SmsTemplatesAdmin() {
   const qc = useQueryClient();
@@ -269,10 +270,11 @@ function SmsTemplatesAdmin() {
                   {selected?.key && AUTO_KEYS.has(selected.key) ? (
                     <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-muted/40 p-3">
                       <div>
-                        <p className="text-sm font-bold">Auto-send on order confirm</p>
+                        <p className="text-sm font-bold">Auto-send</p>
                         <p className="text-xs text-muted-foreground">
-                          When off, the “Send SMS &amp; Confirm” button is hidden and no automatic
-                          SMS goes out.
+                          {selected.key === "order_confirm"
+                            ? "When off, the “Send SMS & Confirm” button is hidden and no automatic SMS goes out."
+                            : "When on, this SMS goes out automatically when the order reaches this status. When off, nothing is sent."}
                         </p>
                       </div>
                       <Switch
