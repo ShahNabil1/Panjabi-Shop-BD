@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Copy, MessageSquare, RotateCw, Send } from "lucide-react";
+import { MessageSquare, RotateCw, Send } from "lucide-react";
+import { VariableTextarea } from "@/components/admin/variable-textarea";
+import { renderSmsTemplate } from "@/lib/sms-template";
 
 import { adminListSmsTemplates } from "@/lib/sms-templates.functions";
 import { adminRetrySms, adminSendSms } from "@/lib/order-admin.functions";
@@ -44,7 +46,16 @@ const dt = (value: string) =>
   });
 
 /** Gradient launcher card + composer modal for manual customer SMS. */
-export function SmsCard({ orderId, phone }: { orderId: string; phone: string }) {
+export function SmsCard({
+  orderId,
+  phone,
+  vars = {},
+}: {
+  orderId: string;
+  phone: string;
+  /** Real per-order values; variables render as these in the composer. */
+  vars?: Record<string, string>;
+}) {
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
   const [template, setTemplate] = useState("");
@@ -118,7 +129,7 @@ export function SmsCard({ orderId, phone }: { orderId: string; phone: string }) 
                 onChange={(e) => {
                   setTemplate(e.target.value);
                   const found = smsTemplates.find((t) => t.id === e.target.value);
-                  if (found) setMessage(found.body);
+                  if (found) setMessage(renderSmsTemplate(found.body, vars));
                 }}
               >
                 <option value="">— Select or write your own —</option>
@@ -131,35 +142,15 @@ export function SmsCard({ orderId, phone }: { orderId: string; phone: string }) 
             </div>
 
             <div className="space-y-1.5">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
-                Variables (click to insert)
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {smsVariables.map((v) => (
-                  <button
-                    key={v}
-                    type="button"
-                    className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-background px-2 py-1 font-mono text-xs transition-colors hover:border-primary/40 hover:bg-accent"
-                    onClick={() => setMessage((m) => `${m}{{${v}}}`)}
-                  >
-                    <Copy className="size-3" />
-                    {`{{${v}}}`}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="space-y-1.5">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
-                Message
-              </p>
-              <Textarea
+              <VariableTextarea
+                value={message}
+                onChange={setMessage}
+                variables={smsVariables}
+                values={vars}
                 rows={5}
                 maxLength={1000}
-                className="rounded-xl"
-                placeholder="আপনার SMS টাইপ করুন — variables ব্যবহার করুন personalized করতে"
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
+                placeholder="আপনার SMS টাইপ করুন — ভেরিয়েবলের জন্য / টাইপ করুন"
+                label="Variables — tap to insert real value, or type /"
               />
               <div className="flex justify-between text-xs text-muted-foreground">
                 <span>

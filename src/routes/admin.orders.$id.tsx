@@ -702,7 +702,7 @@ function AdminOrderDetail() {
         locked={dispatchLocked}
       />
 
-      <SmsCard orderId={order.id} phone={order.customer_phone} />
+      <SmsCard orderId={order.id} phone={order.customer_phone} vars={orderSmsVars(order)} />
 
       <ItemsCard
         orderId={order.id}

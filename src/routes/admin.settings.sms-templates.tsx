@@ -3,7 +3,8 @@ import { useConfirm } from "@/components/ui/confirm-dialog";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Copy, Loader2, Lock, MessageSquareText, Pencil, Plus, Save, Trash2, X } from "lucide-react";
+import { Loader2, Lock, MessageSquareText, Pencil, Plus, Save, Trash2, X } from "lucide-react";
+import { VariableTextarea } from "@/components/admin/variable-textarea";
 
 import {
   SMS_TEMPLATE_VARIABLES,
@@ -152,10 +153,6 @@ function SmsTemplatesAdmin() {
     }
   }
 
-  function copyVar(v: string) {
-    const token = `{{${v}}}`;
-    void navigator.clipboard.writeText(token).then(() => toast.success(`Copied ${token}`));
-  }
 
   const showEditor = Boolean(selected) || isNew;
 
@@ -312,35 +309,17 @@ function SmsTemplatesAdmin() {
                   </select>
 
                   <div className="mt-4">
-                    <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                      Available variables (click to copy)
-                    </label>
-                    <div className="mt-1.5 flex flex-wrap gap-1.5">
-                      {variables.map((v) => (
-                        <button
-                          key={v}
-                          type="button"
-                          onClick={() => copyVar(v)}
-                          className="inline-flex items-center gap-1 rounded-full border border-border bg-muted/60 px-2.5 py-1 font-mono text-[11px] font-semibold transition-colors hover:border-primary/40 hover:text-primary active:scale-95"
-                        >
-                          <Copy className="size-3" />
-                          {`{{${v}}}`}
-                        </button>
-                      ))}
-                    </div>
+                    <VariableTextarea
+                      value={body}
+                      onChange={setBody}
+                      variables={variables}
+                      disabled={!isEditing}
+                      rows={8}
+                      maxLength={1000}
+                      placeholder="প্রিয় {{name}}, ... (ভেরিয়েবলের জন্য / টাইপ করুন)"
+                      className="font-mono"
+                    />
                   </div>
-
-                  <label className="mt-4 block text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                    Message body
-                  </label>
-                  <textarea
-                    value={body}
-                    onChange={(e) => setBody(e.target.value)}
-                    disabled={!isEditing}
-                    rows={8}
-                    placeholder="প্রিয় {{name}}, ..."
-                    className="mt-1 w-full rounded-xl border border-border/80 bg-background/70 p-3 font-mono text-sm disabled:opacity-70"
-                  />
                   <p className="mt-1 text-[11px] text-muted-foreground">
                     Bangla text is sent as unicode (70 chars per SMS part). Length: {body.length}
                     /1000
