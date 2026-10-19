@@ -5,7 +5,7 @@ import { MessageSquare, RotateCw, Send } from "lucide-react";
 import { VariableTextarea } from "@/components/admin/variable-textarea";
 import { renderSmsTemplate } from "@/lib/sms-template";
 
-import { adminListSmsTemplates } from "@/lib/sms-templates.functions";
+import { AUTO_SMS_KEYS, adminListSmsTemplates } from "@/lib/sms-templates.functions";
 import { adminRetrySms, adminSendSms } from "@/lib/order-admin.functions";
 import { Panel } from "@/components/admin/kit";
 import { Button } from "@/components/ui/button";
@@ -67,8 +67,9 @@ export function SmsCard({
     queryKey: ["admin", "sms-templates"],
     queryFn: () => adminListSmsTemplates(),
   });
-  const smsTemplates = tplQuery.data?.templates ?? [];
-  const smsVariables = smsTemplates.find((t) => t.key === "order_confirm")?.variables ?? [
+  const allTemplates = tplQuery.data?.templates ?? [];
+  const smsTemplates = allTemplates.filter((t) => !t.key || !AUTO_SMS_KEYS.has(t.key));
+  const smsVariables = allTemplates.find((t) => t.key === "order_confirm")?.variables ?? [
     "name",
     "order_no",
     "amount",

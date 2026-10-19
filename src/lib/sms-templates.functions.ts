@@ -11,7 +11,18 @@ export const SMS_TEMPLATE_VARIABLES = [
   "amount",
   "phone",
   "receipt_url",
+  "address",
+  "items",
 ] as const;
+
+/** Templates sent automatically on order events — never offered for manual sending. */
+export const AUTO_SMS_KEYS = new Set([
+  "order_confirm",
+  "shipped",
+  "order_cancelled",
+  "pre_order",
+  "scheduled_order",
+]);
 
 export type SmsTemplateRow = {
   id: string;

@@ -232,6 +232,27 @@ export async function processCourierWebhook(
   // so the fan-out uses the service-role client (RLS blocks anon here).
   // Never allowed to fail the acknowledgement — couriers retry aggressively.
   if (result?.processed) {
+    const to = /→ order (shipped|cancelled)\b/.exec(result.message ?? "")?.[1];
+    if (to) {
+      try {
+        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+        let orderId: string | null = null;
+        if (parsed.consignmentId) {
+          const { data: c } = await supabaseAdmin.from("order_consignments").select("order_id").eq("consignment_id", parsed.consignmentId).limit(1).maybeSingle();
+          orderId = (c as { order_id?: string } | null)?.order_id ?? null;
+        }
+        if (!orderId && parsed.merchantOrderId) {
+          const { data: o } = await supabaseAdmin.from("orders").select("id").eq("order_number", parsed.merchantOrderId).limit(1).maybeSingle();
+          orderId = (o as { id?: string } | null)?.id ?? null;
+        }
+        if (orderId) {
+          const { sendAutoStatusSms } = await import("./sms-auto.server");
+          await sendAutoStatusSms(supabaseAdmin as never, orderId, to);
+        }
+      } catch {
+        // SMS must never break webhook acknowledgement.
+      }
+    }
     try {
       await dispatchCourierConversions(provider, parsed.consignmentId, parsed.merchantOrderId);
     } catch {
