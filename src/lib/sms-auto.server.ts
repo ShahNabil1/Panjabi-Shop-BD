@@ -8,17 +8,6 @@ const STATUS_KEYS: Record<string, string> = {
   scheduled_order: "scheduled_order",
 };
 
-function dhakaDate(value: unknown): string {
-  if (!value) return "";
-  const d = new Date(String(value));
-  if (Number.isNaN(d.getTime())) return "";
-  return d.toLocaleDateString("en-GB", {
-    timeZone: "Asia/Dhaka",
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  });
-}
 
 /**
  * Sends the automatic SMS tied to an order status (if its template is on).
