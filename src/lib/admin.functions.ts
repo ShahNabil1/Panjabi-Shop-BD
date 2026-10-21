@@ -199,9 +199,10 @@ export const adminUpdateOrderStatus = createServerFn({ method: "POST" })
 
     // Auto confirmation SMS once an order moves into the confirmed pipeline.
     if (!data.skipSms && (data.status === "pending" || data.status === "confirmed")) {
+      const { ORDER_SMS_SELECT } = await import("./sms-template");
       const { data: order } = await db
         .from("orders")
-        .select("order_number, customer_name, customer_phone, total, auto_sms_status")
+        .select(`${ORDER_SMS_SELECT}, auto_sms_status`)
         .eq("id", data.id)
         .maybeSingle();
       const o = order as unknown as Record<string, unknown> | null;
@@ -216,16 +217,9 @@ export const adminUpdateOrderStatus = createServerFn({ method: "POST" })
 
       if (o && autoEnabled && o["auto_sms_status"] !== "sent") {
         const { deliverSms, renderSmsTemplate } = await import("./sms.server");
-        const { receiptUrl } = await import("./sms-template");
+        const { orderSmsVars } = await import("./sms-template");
         const tpl = tplData?.body ?? "";
-        const orderNo = String(o["order_number"] ?? "");
-        const message = renderSmsTemplate(tpl, {
-          name: String(o["customer_name"] ?? ""),
-          order_no: orderNo,
-          amount: String(Number(o["total"] ?? 0)),
-          phone: String(o["customer_phone"] ?? ""),
-          receipt_url: receiptUrl(orderNo, String(o["customer_phone"] ?? "")),
-        });
+        const message = renderSmsTemplate(tpl, orderSmsVars(o as never));
         const result = await deliverSms(db, {
           orderId: data.id,
           phone: String(o["customer_phone"] ?? ""),

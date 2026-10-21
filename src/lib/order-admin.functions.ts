@@ -438,7 +438,7 @@ export const adminSendSms = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const db = await requireAdmin(context.supabase, context.userId);
     const { deliverSms, renderSmsTemplate } = await import("./sms.server");
-    const { receiptUrl } = await import("./sms-template");
+    const { orderSmsVars, ORDER_SMS_SELECT } = await import("./sms-template");
     const { data: profile } = await db
       .from("profiles")
       .select("full_name")
@@ -448,18 +448,14 @@ export const adminSendSms = createServerFn({ method: "POST" })
     // Resolve {{variables}} against the real order so the log and the SMS match.
     const { data: order } = await db
       .from("orders")
-      .select("order_number, customer_name, customer_phone, total")
+      .select(ORDER_SMS_SELECT)
       .eq("id", data.orderId)
       .maybeSingle();
     const o = (order ?? {}) as unknown as Record<string, unknown>;
-    const orderNo = String(o["order_number"] ?? "");
-    const message = renderSmsTemplate(data.message, {
-      name: String(o["customer_name"] ?? ""),
-      order_no: orderNo,
-      amount: String(Number(o["total"] ?? 0)),
-      phone: String(o["customer_phone"] ?? data.phone),
-      receipt_url: receiptUrl(orderNo, String(o["customer_phone"] ?? data.phone)),
-    });
+    const message = renderSmsTemplate(
+      data.message,
+      orderSmsVars({ ...o, customer_phone: String(o["customer_phone"] ?? data.phone) } as never),
+    );
 
     const who = (profile?.full_name as string | null) ?? "Staff";
     const result = await deliverSms(db, {

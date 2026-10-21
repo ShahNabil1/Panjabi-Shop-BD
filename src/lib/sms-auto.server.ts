@@ -45,30 +45,16 @@ export async function sendAutoStatusSms(db: Db, orderId: string, status: string)
       .limit(1);
     if (prior && prior.length) return;
 
+    const { renderSmsTemplate, orderSmsVars, ORDER_SMS_SELECT } = await import("./sms-template");
     const { data: order } = await db
       .from("orders")
-      .select(
-        "order_number, customer_name, customer_phone, total, address_line, upazila, district, scheduled_for, order_items(product_name, variant_label, quantity)",
-      )
+      .select(ORDER_SMS_SELECT)
       .eq("id", orderId)
       .maybeSingle();
     const o = order as unknown as Record<string, unknown> | null;
     if (!o || !o["customer_phone"]) return;
 
-    const { renderSmsTemplate, orderSmsVars } = await import("./sms-template");
-    const items = ((o["order_items"] as Array<Record<string, unknown>>) ?? [])
-      .map(
-        (i) =>
-          `${String(i["product_name"] ?? "")}${i["variant_label"] ? ` (${String(i["variant_label"])})` : ""} x${Number(i["quantity"] ?? 1)}`,
-      )
-      .join(", ");
-    const vars = {
-      ...orderSmsVars(o as never),
-      items,
-      address: [o["address_line"], o["upazila"], o["district"]].filter(Boolean).join(", "),
-      scheduled_date: dhakaDate(o["scheduled_for"]),
-    };
-    const message = renderSmsTemplate(t.body, vars);
+    const message = renderSmsTemplate(t.body, orderSmsVars(o as never));
     const { deliverSms } = await import("./sms.server");
     const result = await deliverSms(db, {
       orderId,
