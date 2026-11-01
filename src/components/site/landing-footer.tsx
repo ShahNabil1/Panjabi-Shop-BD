@@ -1,5 +1,5 @@
 import { useLang } from "@/lib/language-context";
-import logoMark from "@/assets/panjabishopbd-logo.webp";
+import logoMark from "@/assets/panjabishopbd-logo-open.webp";
 import { cn } from "@/lib/utils";
 import { SOCIAL_LINKS } from "./social-links";
 

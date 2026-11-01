@@ -4,7 +4,7 @@ import { Phone, Mail, MapPin } from "lucide-react";
 import { useLang } from "@/lib/language-context";
 import { tr } from "@/lib/i18n";
 import { useSiteData } from "./site-header";
-import logoMark from "@/assets/panjabishopbd-logo.webp";
+import logoMark from "@/assets/panjabishopbd-logo-open.webp";
 import { SOCIAL_LINKS } from "./social-links";
 import { cn } from "@/lib/utils";
 
