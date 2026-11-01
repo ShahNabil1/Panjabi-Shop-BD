@@ -19,7 +19,7 @@ import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import logoMark from "@/assets/panjabishopbd-logo-open.webp";
+import logoMark from "@/assets/panjabishopbd-logo.webp";
 import { Turnstile, type TurnstileHandle } from "@/components/turnstile";
 
 export const Route = createFileRoute("/auth")({
