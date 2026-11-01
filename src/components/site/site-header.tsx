@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 import { searchProducts } from "@/lib/catalog.functions";
 import type { ProductCard } from "@/lib/supabase-public";
 import { SmartImage } from "@/components/site/smart-image";
-import logoMark from "@/assets/panjabishopbd-logo.png";
+import logoMark from "@/assets/panjabishopbd-logo.webp";
 
 
 export type SiteData = {
@@ -340,8 +340,8 @@ export function SiteHeader() {
             <img
               src={logoMark}
               alt={brand}
-              width={1040}
-              height={375}
+              width={320}
+              height={320}
               className="h-12 w-auto max-w-full object-contain min-[380px]:h-14 sm:h-16 lg:h-[4.5rem]"
             />
           </a>
@@ -354,8 +354,8 @@ export function SiteHeader() {
             <img
               src={logoMark}
               alt={brand}
-              width={1040}
-              height={375}
+              width={320}
+              height={320}
               className="h-12 w-auto max-w-full object-contain min-[380px]:h-14 sm:h-16 lg:h-[4.5rem]"
             />
           </Link>

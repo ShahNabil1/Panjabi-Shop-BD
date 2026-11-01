@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useEffect, useRef } from "react";
 import { useServerFn } from "@tanstack/react-start";
 
-import logoMark from "@/assets/panjabishopbd-logo.png";
+import logoMark from "@/assets/panjabishopbd-logo.webp";
 import { getOrderSummaryShort } from "@/lib/order.functions";
 import { courierLabel, courierTrackingUrl, orderStatusLabel } from "@/lib/order-receipt";
 import { formatPrice } from "@/lib/i18n";
