@@ -1,3 +1,4 @@
+import logoMark from "@/assets/panjabishopbd-logo.webp";
 import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
 
@@ -45,7 +46,7 @@ export function BrandLoader({
         <div className="absolute -inset-4 animate-ping rounded-full bg-primary/10" />
         <div className="absolute -inset-2 animate-pulse rounded-full bg-primary/5" />
         <img
-          src="/favicon.png"
+          src={logoMark}
           alt="Panjabi Shop BD"
           className={cn(
             "relative z-10 rounded-full bg-white object-contain p-1.5 shadow-lg ring-1 ring-border",
@@ -90,7 +91,7 @@ export function BrandSkeleton({ className, rows = 4 }: { className?: string; row
       <div className="flex items-center gap-3 pb-2">
         <div className="relative">
           <img
-            src="/favicon.png"
+            src={logoMark}
             alt="Panjabi Shop BD"
             className="size-10 rounded-full bg-white object-contain p-1 ring-1 ring-border"
           />

@@ -433,7 +433,7 @@ function AdminLayout() {
           className={cn("shrink-0 transition-all duration-300", collapsed ? "block" : "hidden")}
         >
           <img
-            src="/favicon.png"
+            src={logoMark}
             alt="Panjabi Shop BD"
             className="size-12 rounded-xl bg-white object-contain p-1.5 ring-1 ring-white/15"
           />
@@ -602,7 +602,7 @@ function AdminLayout() {
       {/* Mobile top bar */}
       <header className="sticky top-0 z-20 flex items-center justify-between border-b border-border bg-card/80 px-4 py-3 backdrop-blur lg:hidden">
         <div className="flex items-center gap-2">
-          <img src="/favicon.png" alt="" className="size-8 rounded-lg object-contain" />
+          <img src={logoMark} alt="" className="size-8 rounded-lg object-contain" />
           <span className="text-base font-bold tracking-tight">Panjabi Shop BD</span>
         </div>
         <button
