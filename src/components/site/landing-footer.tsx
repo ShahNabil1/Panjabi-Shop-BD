@@ -14,8 +14,8 @@ export function LandingFooter({ brand }: { brand: string }) {
           src={logoMark}
           alt={brand}
           loading="lazy"
-          width={320}
-          height={320}
+          width={725}
+          height={598}
           className="h-16 w-auto object-contain sm:h-20"
         />
 

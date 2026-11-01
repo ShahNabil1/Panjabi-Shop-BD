@@ -236,8 +236,8 @@ function LandingPage() {
         <img
           src={logoMark}
           alt={pick(lang, product.nameBn, product.nameEn)}
-          width={320}
-          height={320}
+          width={725}
+          height={598}
           className="relative mx-auto h-14 w-auto object-contain sm:h-16"
         />
 

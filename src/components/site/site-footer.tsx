@@ -27,8 +27,8 @@ export function SiteFooter({ minimalOnMobile }: { minimalOnMobile?: boolean }) {
                 src={logoMark}
                 alt={brand}
                 loading="lazy"
-                width={320}
-                height={320}
+                width={725}
+                height={598}
                 className="h-16 w-auto shrink-0 cursor-pointer object-contain sm:h-20"
               />
             </button>
