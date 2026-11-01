@@ -89,6 +89,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       links: [
         { rel: "stylesheet", href: appCss },
         // Google's crawler prefers a root .ico; keep the PNG variants for browsers.
+        { rel: "icon", href: "/favicon.ico", sizes: "any" },
+        { rel: "icon", href: "/favicon-32.png", type: "image/png", sizes: "32x32" },
         { rel: "icon", href: "/favicon.png", type: "image/png", sizes: "64x64" },
 
         { rel: "icon", href: "/icon-192.png", type: "image/png", sizes: "192x192" },
@@ -123,6 +125,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
                 "@id": `${SITE_URL}/#organization`,
                 name: brand,
                 url: SITE_URL,
+                logo: {
+                  "@type": "ImageObject",
+                  url: `${SITE_URL}/logo.png`,
+                  width: 512,
+                  height: 512,
+                },
+                image: `${SITE_URL}/logo.png`,
                 ...(loaderData?.contact.phone
                   ? {
                       contactPoint: [

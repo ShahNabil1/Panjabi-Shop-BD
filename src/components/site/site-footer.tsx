@@ -4,7 +4,7 @@ import { Phone, Mail, MapPin } from "lucide-react";
 import { useLang } from "@/lib/language-context";
 import { tr } from "@/lib/i18n";
 import { useSiteData } from "./site-header";
-import logoMark from "@/assets/panjabishopbd-logo.png";
+import logoMark from "@/assets/panjabishopbd-logo.webp";
 import { SOCIAL_LINKS } from "./social-links";
 import { cn } from "@/lib/utils";
 
@@ -27,8 +27,8 @@ export function SiteFooter({ minimalOnMobile }: { minimalOnMobile?: boolean }) {
                 src={logoMark}
                 alt={brand}
                 loading="lazy"
-                width={1040}
-                height={375}
+                width={320}
+                height={320}
                 className="h-16 w-auto shrink-0 cursor-pointer object-contain sm:h-20"
               />
             </button>

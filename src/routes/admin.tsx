@@ -60,7 +60,7 @@ import { BrandLoader } from "@/components/admin/brand-loader";
 import { useConfirm } from "@/components/ui/confirm-dialog";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import logoMark from "@/assets/panjabishopbd-logo.png";
+import logoMark from "@/assets/panjabishopbd-logo.webp";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({

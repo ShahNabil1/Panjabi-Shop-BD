@@ -1,5 +1,5 @@
 import { useLang } from "@/lib/language-context";
-import logoMark from "@/assets/panjabishopbd-logo.png";
+import logoMark from "@/assets/panjabishopbd-logo.webp";
 import { cn } from "@/lib/utils";
 import { SOCIAL_LINKS } from "./social-links";
 
@@ -14,8 +14,8 @@ export function LandingFooter({ brand }: { brand: string }) {
           src={logoMark}
           alt={brand}
           loading="lazy"
-          width={1040}
-          height={375}
+          width={320}
+          height={320}
           className="h-16 w-auto object-contain sm:h-20"
         />
 
