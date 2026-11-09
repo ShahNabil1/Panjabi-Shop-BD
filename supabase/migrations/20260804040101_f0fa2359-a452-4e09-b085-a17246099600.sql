@@ -64,15 +64,4 @@ ON CONFLICT (key) DO UPDATE SET
     COALESCE(public.site_settings.value->'days', '90'::jsonb)
   );
 
--- Schedule daily cleanup at 3:30 AM Asia/Dhaka
-SELECT cron.schedule(
-  'cleanup-old-order-logs-daily',
-  '30 3 * * *',
-  $$
-  SELECT net.http_post(
-    url := 'https://upoharkabbo.com/api/public/hooks/cleanup-old-logs',
-    headers := '{"Content-Type": "application/json", "apikey": "' || current_setting('app.settings.anon_key', true) || '"}'::jsonb,
-    body := '{}'::jsonb
-  ) AS request_id;
-  $$
-);
+-- Scheduled HTTP hooks are installed by the credential-backed scheduler migration.

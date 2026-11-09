@@ -10,7 +10,6 @@ import {
 import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
-import { reportLovableError } from "../lib/lovable-error-reporting";
 import { getLayoutData } from "../lib/catalog.functions";
 import { getLang } from "../lib/lang.functions";
 import { getGtmContainerId } from "../lib/tracking.functions";
@@ -322,9 +321,6 @@ function ErrorBody({ error, reset }: { error: Error; reset: () => void }) {
 
 function ErrorComponent({ error, reset }: { error: Error; reset: () => void; info?: unknown }) {
   console.error(error);
-  useEffect(() => {
-    reportLovableError(error, { boundary: "tanstack_root_error_component" });
-  }, [error]);
 
   return (
     <div className="flex min-h-screen flex-col">

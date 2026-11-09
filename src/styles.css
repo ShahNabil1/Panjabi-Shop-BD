@@ -15,7 +15,7 @@
 
 @font-face {
   font-family: "SolaimanLipi";
-  src: url("/__l5e/assets-v1/1292f2ad-b070-4db0-a364-d3a2d237c4b8/solaiman-lipi-regular.woff2")
+  src: url("./assets/fonts/solaiman-lipi-regular.woff2")
     format("woff2");
   font-weight: 400;
   font-style: normal;
@@ -25,7 +25,7 @@
 
 @font-face {
   font-family: "SolaimanLipi";
-  src: url("/__l5e/assets-v1/fbd6c6cf-c659-4b43-b1ee-b234339cbea4/solaiman-lipi-semibold.woff2")
+  src: url("./assets/fonts/solaiman-lipi-semibold.woff2")
     format("woff2");
   font-weight: 500 600;
   font-style: normal;
@@ -35,7 +35,7 @@
 
 @font-face {
   font-family: "SolaimanLipi";
-  src: url("/__l5e/assets-v1/c76193e2-134a-4773-b5ce-81ebe6f39e7c/solaiman-lipi-bold.woff2")
+  src: url("./assets/fonts/solaiman-lipi-bold.woff2")
     format("woff2");
   font-weight: 700 900;
   font-style: normal;
@@ -46,7 +46,7 @@
 /* Display face used ONLY for landing-page headings/titles. */
 @font-face {
   font-family: "NotoSerifBanglaDisplay";
-  src: url("/__l5e/assets-v1/0bdeb3f3-5f96-4981-a5f9-369492efaaba/NotoSerifBengali-Bold.ttf")
+  src: url("./assets/fonts/noto-serif-bengali-bold.ttf")
     format("truetype");
   font-weight: 400 900;
   font-style: normal;

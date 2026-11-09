@@ -1,7 +1,6 @@
 {
   // Cloudflare Workers deploy config for this TanStack Start (Nitro) app.
   // Only used by `wrangler deploy` / Cloudflare Workers Builds.
-  // Lovable preview + Lovable hosting ignore this file completely.
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "panjabishopbd",
   "main": "./dist/server/index.mjs",

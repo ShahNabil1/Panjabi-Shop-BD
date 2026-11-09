@@ -1,11 +1,11 @@
 import { Truck } from "lucide-react";
 
-import pathaoAsset from "@/assets/pathao.png.asset.json";
-import carrybeeAsset from "@/assets/carrybee-mark.png.asset.json";
-import carrybeeLightAsset from "@/assets/carrybee-mark-onlight.png.asset.json";
-import carrybeeIconAsset from "@/assets/carrybee-icon.jpg.asset.json";
-import steadfastAsset from "@/assets/steadfast-logo.svg.asset.json";
-import steadfastIconAsset from "@/assets/steadfast-icon.webp.asset.json";
+import pathaoAsset from "@/assets/pathao.png";
+import carrybeeAsset from "@/assets/carrybee-mark.png";
+import carrybeeLightAsset from "@/assets/carrybee-mark-onlight.png";
+import carrybeeIconAsset from "@/assets/carrybee-icon.jpg";
+import steadfastAsset from "@/assets/steadfast-logo.svg";
+import steadfastIconAsset from "@/assets/steadfast-icon.webp";
 import { cn } from "@/lib/utils";
 
 type CourierKey = "pathao" | "carrybee" | "steadfast";
@@ -27,18 +27,18 @@ const COURIERS: Record<
 > = {
   pathao: {
     label: "Pathao",
-    src: pathaoAsset.url,
+    src: pathaoAsset,
     chip: "bg-white text-[#E32227] ring-[#E32227]/30",
     ring: "ring-[#E32227]/25 bg-white",
     watermarkClass: "opacity-[0.11] mix-blend-multiply",
   },
   carrybee: {
     label: "CarryBee",
-    src: carrybeeAsset.url,
+    src: carrybeeAsset,
     chip: "bg-[#111111] text-white ring-[#FFCB05]/50",
     ring: "ring-[#FFCB05]/50 bg-[#FFCB05]",
-    iconSrc: carrybeeIconAsset.url,
-    watermarkSrc: carrybeeLightAsset.url,
+    iconSrc: carrybeeIconAsset,
+    watermarkSrc: carrybeeLightAsset,
     markClass: "size-full object-cover p-0",
     watermarkClass: "w-[92%] max-w-[560px] -rotate-[18deg] opacity-[0.22] mix-blend-normal",
     hideLabel: true,
@@ -47,10 +47,10 @@ const COURIERS: Record<
   },
   steadfast: {
     label: "Steadfast",
-    src: steadfastAsset.url,
+    src: steadfastAsset,
     chip: "bg-white text-[#349574] ring-[#349574]/30",
     ring: "ring-[#349574]/25 bg-white",
-    iconSrc: steadfastIconAsset.url,
+    iconSrc: steadfastIconAsset,
     markClass: "size-full object-cover p-0",
     hideLabel: true,
     badgeClass: "px-3 py-1.5",
